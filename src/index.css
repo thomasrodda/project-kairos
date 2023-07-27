@@ -3,81 +3,155 @@
 @tailwind utilities;
 
 /*Default Font of Inter*/
-body {
-  font-family: 'Inter';
-  text-align: left;
-  @apply text-white;
-}
+  body {
+    font-family: 'Inter';
+    text-align: left;
+    @apply text-white;
+  }
 
 /*Default Icon Size of 24px*/
-.IconSize {
-  @apply w-6 h-6;
-}
+  .IconSize {
+    @apply w-6 h-6;
+  }
+
+/*Create Item*/
+  .CreateButton {
+    @apply p-2 space-x-3 rounded flex items-center bg-off-black text-light-grey cursor-pointer;
+  }
+  .CreateButton:hover {
+    @apply text-white;
+  }
+  .CreateButtonText {
+    @apply text-info ml-2 mr-2;
+  }
+
+  .gradient-border:hover {
+    --borderWidth: 2px;
+    position: relative;
+    border-radius: 4px;
+  }
+  .gradient-border:after {
+    content: '';
+    position: absolute;
+    top: calc(-1 * var(--borderWidth));
+    left: calc(-1 * var(--borderWidth));
+    height: calc(100% + var(--borderWidth) * 2);
+    width: calc(100% + var(--borderWidth) * 2);
+    background: linear-gradient(60deg, #FEBB63, #B373FC, #F992E0, #FEBB63, #B373FC, #F992E0);
+    border-radius: 4px;
+    z-index: -1;
+    animation: animatedgradient 3s ease alternate infinite;
+    background-size: 300% 300%;
+  }
+  @keyframes animatedgradient {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
 
 /*SideBar*/
 
   /*SideBar Menu Items*/
-  .MenuItem {
-    @apply py-1 px-2 space-x-3 rounded flex items-center;
-  }
-  .MenuItem:hover {
-    @apply bg-darker-grey;
-  }
-  .MenuItemText {
-    @apply text-light-grey text-info ml-2 mr-2;
-  }
+    .MenuItem {
+      @apply py-1 px-2 space-x-3 rounded flex items-center;
+    }
+    .MenuItem:hover {
+      @apply bg-darker-grey;
+    }
+    .MenuItemText {
+      @apply text-light-grey text-info mx-2 mt-[1px];
+    }
 
   /*Sidebar Divider*/
-  .HrStyle {
-    @apply bg-grey h-[0.5px] my-3 mx-auto border-0 rounded;
+    .HrStyle {
+      @apply bg-grey h-[0.5px] my-3 mx-auto border-0 rounded;
+    }
+
+  /*Page List Scroll Bar*/
+    .pageList::-webkit-scrollbar {
+      @apply w-2;
+    }
+    .pageList::-webkit-scrollbar-track {
+      background: none;
+    }
+    .pageList::-webkit-scrollbar-thumb {
+      @apply bg-grey rounded-md w-2;
+    }
+    .pageList::-webkit-scrollbar-thumb:hover {
+      @apply bg-lighter-grey;
+    }
+
+  /* Styles for Firefox */
+    .pageList {
+      scrollbar-width: thin;
+      scrollbar-color: #868686;
+    }
+  
+  /* Page List */
+  .pageList {
+    @apply px-2;
   }
+  /* Page List Items */
+    .pageListItem {
+      @apply py-1 px-2 text-info rounded hover:bg-darker-grey cursor-pointer;
+      @apply rounded flex items-center;
+    }
+    .pageItemText {
+      @apply text-light-grey text-info mx-2 mt-[2px];
+    }
 
 /*Editor*/
 
   /*Scroll Bar*/
-  .editor::-webkit-scrollbar {
-    @apply w-2;
-  }
-  .editor::-webkit-scrollbar-track {
-    background: none;
-  }
-  .editor::-webkit-scrollbar-thumb {
-    @apply bg-grey rounded-md w-2;
-  }
-  .editor::-webkit-scrollbar-thumb:hover {
-    @apply bg-lighter-grey;
-  }
+    .editor::-webkit-scrollbar {
+      @apply w-2;
+    }
+    .editor::-webkit-scrollbar-track {
+      background: none;
+    }
+    .editor::-webkit-scrollbar-thumb {
+      @apply bg-grey rounded-md w-2;
+    }
+    .editor::-webkit-scrollbar-thumb:hover {
+      @apply bg-lighter-grey;
+    }
 
   /* Styles for Firefox */
-  .editor {
-    scrollbar-width: thin;
-    scrollbar-color: #868686;
-  }
+    .editor {
+      scrollbar-width: thin;
+      scrollbar-color: #868686;
+    }
 
 
   /*Lexical*/
-  .contentEditable {
-    height: 100%;
-    width: 800px;
-    border: none;
-    @apply text-white text-body;
-  }
-  .contentEditable:focus {
-    outline: none;
-  }
-  .placeholder {
-    position: absolute;
-    top: 0;
-    @apply text-grey pointer-events-none text-body;
-  }
-  .lexicalContainer {
-    position: relative;
-  }
+    .contentEditable {
+      height: 100%;
+      width: 800px;
+      border: none;
+      @apply text-white text-body;
+    }
+    .contentEditable:focus {
+      outline: none;
+    }
+    .placeholder {
+      position: absolute;
+      top: 0;
+      @apply text-grey pointer-events-none text-body;
+    }
+    .lexicalContainer {
+      position: relative;
+    }
 
     /*Theming*/
-    .editor-textBold {
-      font-weight: bold;
-    }
-    .editor-textItalic {
-      font-style: italic;
-    }
+      .editor-textBold {
+        font-weight: bold;
+      }
+      .editor-textItalic {
+        font-style: italic;
+      }
