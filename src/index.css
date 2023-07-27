@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*Default Font of Inter*/
+body {
+  font-family: 'Inter';
+  text-align: left;
+  @apply text-white;
+}
+
+/*Default Icon Size of 24px*/
+.IconSize {
+  @apply w-6 h-6;
+}
+
+/*SideBar*/
+
+  /*SideBar Menu Items*/
+  .MenuItem {
+    @apply py-1 px-2 space-x-3 rounded flex items-center;
+  }
+  .MenuItem:hover {
+    @apply bg-darker-grey;
+  }
+  .MenuItemText {
+    @apply text-light-grey text-info ml-2 mr-2;
+  }
+
+  /*Sidebar Divider*/
+  .HrStyle {
+    @apply bg-grey h-[0.5px] my-3 mx-auto border-0 rounded;
+  }
+
+/*Editor*/
+
+  /*Scroll Bar*/
+  .editor::-webkit-scrollbar {
+    @apply w-2;
+  }
+  .editor::-webkit-scrollbar-track {
+    background: none;
+  }
+  .editor::-webkit-scrollbar-thumb {
+    @apply bg-grey rounded-md w-2;
+  }
+  .editor::-webkit-scrollbar-thumb:hover {
+    @apply bg-lighter-grey;
+  }
+
+  /* Styles for Firefox */
+  .editor {
+    scrollbar-width: thin;
+    scrollbar-color: #868686;
+  }
+
+
+  /*Lexical*/
+  .contentEditable {
+    height: 100%;
+    width: 800px;
+    border: none;
+    @apply text-white text-body;
+  }
+  .contentEditable:focus {
+    outline: none;
+  }
+  .placeholder {
+    position: absolute;
+    top: 0;
+    @apply text-grey pointer-events-none text-body;
+  }
+  .lexicalContainer {
+    position: relative;
+  }
+
+    /*Theming*/
+    .editor-textBold {
+      font-weight: bold;
+    }
+    .editor-textItalic {
+      font-style: italic;
+    }
