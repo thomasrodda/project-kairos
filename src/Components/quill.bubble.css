@@ -4,28 +4,37 @@
  * Copyright (c) 2014, Jason Chen
  * Copyright (c) 2013, salesforce.com
  */
-.ql-aiAssistant {
-  display: inline-block;
-  margin: 6px 16px 10px 8px;
-  height: auto;
-  padding: 0px !important;
-}
-.ql-aiAssistant img {
-  display: inline-block;
-  vertical-align: middle;
-  height: 100%;
-  margin-right: 4px;
-}
-.ql-aiAssistant span {
-  display: inline-block;
-  vertical-align: middle;
-  @apply text-info
-}
-.ql-aiAssistant svg {
-  width: 18px;
-  height: 18px;
-  vertical-align: middle;
-}
+
+/* Tooltip Ai Button */
+  .ql-aiAssistant {
+    display: inline-block;
+    margin: 6px 16px 10px 8px;
+    height: auto;
+    padding: 0px !important;
+  }
+  .ql-aiAssistant img {
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+    margin-right: 4px;
+  }
+  .ql-aiAssistant span {
+    display: inline-block;
+    vertical-align: middle;
+    @apply text-info
+  }
+  .ql-aiAssistant svg {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+  }
+
+/* Slash Key Dropdown */
+  .slash-dropdown {
+    display: none;
+    /* other styling here */
+  }
+
 .ql-container {
   box-sizing: border-box;
   font-family: Inter, Arial, sans-serif;
