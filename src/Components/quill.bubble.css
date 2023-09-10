@@ -4,9 +4,27 @@
  * Copyright (c) 2014, Jason Chen
  * Copyright (c) 2013, salesforce.com
  */
+.ql-aiAssistant {
+  display: inline-block;
+  margin: 6px 16px 10px 8px;
+  height: auto;
+  padding: 0px !important;
+}
+.ql-aiAssistant img {
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
+  margin-right: 4px;
+}
+.ql-aiAssistant span {
+  display: inline-block;
+  vertical-align: middle;
+  @apply text-info
+}
 .ql-aiAssistant svg {
   width: 18px;
   height: 18px;
+  vertical-align: middle;
 }
 .ql-container {
   box-sizing: border-box;
@@ -433,7 +451,7 @@
   float: left;
   height: 24px;
   padding: 3px 5px;
-  width: 28px;
+  width: auto;
 }
 .ql-bubble.ql-toolbar button svg,
 .ql-bubble .ql-toolbar button svg {
@@ -557,6 +575,7 @@
 }
 .ql-tooltip {
   z-index: 1000;
+  width: auto !important;
 }
 .ql-bubble .ql-tooltip {
   position: absolute;
@@ -686,6 +705,10 @@
     padding-right: 2px;
     position: relative;
     width: 100%;
+  }
+  .ql-bubble .ql-align .ql-picker-label svg {
+
+    width: 18px;
   }
   .ql-bubble .ql-align .ql-picker-options {
     border-radius: 0px 0px 8px 8px;

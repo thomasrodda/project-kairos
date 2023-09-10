@@ -16,13 +16,10 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
   const modules = {
     toolbar: [
       ['bold', 'italic', 'underline'], // Toggled buttons
-      ['blockquote', 'code-block'],
-  
-      [{ 'header': ['1', '2', '3', '4', false] }], // Dropdown for headers and body text
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+      [{ 'header': ['1', '2', '3', '4', false] }], // Dropdown for headers and body text  
+      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'align': [] }],
       //[{ 'script': 'sub'}, { 'script': 'super' }], // Superscript/subscript
-      [{ 'align': [] }], // Text alignment
-  
+      ['blockquote', 'code-block'],
       ['clean'] // Remove formatting button
     ],
   };
@@ -38,8 +35,10 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         // Add custom button
         const aiButton = document.createElement('button');
         aiButton.className = 'ql-aiAssistant';
-        aiButton.innerHTML = `<img src="${ai_icon}" alt="AI Assistant" />`;
-        toolbar.container.appendChild(aiButton);
+        aiButton.innerHTML = `<img src="${ai_icon}" alt="AI Assistant" /><span>Ask AI</span>`;
+        
+        // Insert custom button at the beginning of the toolbar
+        toolbar.container.insertBefore(aiButton, toolbar.container.firstChild);
 
         // Add event listener to custom button
         aiButton.addEventListener('click', () => {
