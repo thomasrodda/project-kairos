@@ -1,0 +1,598 @@
+Packages - lexical (core) page:
+
+This package contains the core library, including the Editor, EditorState, Selection, and core nodes. It also contains logic for the fundamental logic of the library, such as updates and DOM reconciliation.
+
+
+Packages - @lexical/clipboard page:
+
+This package contains the functionality for the clipboard feature of Lexical.
+
+
+Packages - @lexical/code page:
+
+This package contains the functionality for the code blocks and code highlighting for Lexical.
+
+
+Packages - @lexical/dragon page:
+
+This package contains compatibility with Dragon NaturallySpeaking accessibility tools.
+
+More documentation coming soon.
+
+
+Packages - @lexical/file page:
+
+This package contains the functionality for the file import/export feature of Lexical.
+
+
+Packages - @lexical/hashtag page:
+
+This package contains the functionality for Lexical hashtags.
+
+More documentation coming soon.
+
+
+Packages - @lexical/headless page:
+
+This package allows you to interact with Lexical in a headless environment (one that does not rely on DOM, e.g. for Node.js environment), and use its main features like editor.update(), editor.registerNodeTransform(), editor.registerUpdateListener() to create, update or traverse state.
+
+Install @lexical/headless:
+
+npm install --save @lexical/headless
+
+const { createHeadlessEditor } = require('@lexical/headless');
+
+const editor = createHeadlessEditor({
+  nodes: [],
+  onError: () => {},
+});
+
+editor.update(() => {
+  $getRoot().append(
+    $createParagraphNode().append(
+      $createTextNode('Hello world')
+    )
+  )
+});
+
+Any plugins that do not rely on DOM could also be used. Here's an example of how you can convert lexical editor state to markdown on server:
+
+const { createHeadlessEditor } = require('@lexical/headless');
+const { $convertToMarkdownString, TRANSFORMERS } = require('@lexical/markdown');
+
+app.get('article/:id/markdown', await (req, res) => {
+  const editor = createHeadlessEditor({
+    nodes: [],
+    onError: () => {},
+  });
+
+  const articleEditorStateJSON = await loadArticleBody(req.query.id);
+  editor.setEditorState(editor.parseEditorState(articleEditorStateJSON));  
+
+  editor.update(() => {
+    const markdown = $convertToMarkdownString(TRANSFORMERS);
+    res.send(markdown);
+  });
+});
+
+
+Packages - @lexical/history page:
+
+This package contains history helpers for Lexical.
+
+Methods
+registerHistory
+Registers necessary listeners to manage undo/redo history stack and related editor commands. It returns unregister callback that cleans up all listeners and should be called on editor unmount.
+
+function registerHistory(
+  editor: LexicalEditor,
+  externalHistoryState: HistoryState,
+  delay: number,
+): () => void
+
+Commands
+History package handles UNDO_COMMAND, REDO_COMMAND and CLEAR_HISTORY_COMMAND commands. It also triggers CAN_UNDO_COMMAND and CAN_REDO_COMMAND commands when history state is changed. These commands could be used to work with history state:
+
+import {UNDO_COMMAND, REDO_COMMAND} from 'lexical';
+
+<Toolbar>
+  <Button onClick={() => editor.dispatchCommand(UNDO_COMMAND)}>Undo</Button>
+  <Button onClick={() => editor.dispatchCommand(REDO_COMMAND)}>Redo</Button>
+</Toolbar>;
+
+
+Packages - @lexical/link page:
+
+This package contains the functionality for Lexical links.
+
+More documentation coming soon.
+
+
+Packages - @lexical/list page:
+
+This package exposes the primitives for implementing lists in Lexical. If you're trying to implement conventional lists with React, take a look at the ListPlugin exposed by @lexical/react, which wraps these primitives into a neat component that you can drop into any LexicalComposer.
+
+The API of @lexical/list primarily consists of Lexical Nodes that encapsulate list behaviors and a set of functions that can be called to trigger typical list manipulation functionality:
+
+Functions
+insertList
+As the name suggests, this inserts a list of the provided type according to an algorithm that tries to determine the best way to do that based on the current Selection. For instance, if some text is selected, insertList may try to move it into the first item in the list. See the API documentation for more detail.
+
+removeList
+Attempts to remove lists inside the current selection based on a set of opinionated heuristics that implement conventional editor behaviors. For instance, it converts empty ListItemNodes into empty ParagraphNodes.
+
+Nodes
+ListNode
+ListItemNode
+Commands
+For convenience, we provide a set of commands that can be used to connect a plugin to trigger typical list manipulation functionality:
+
+INSERT_UNORDERED_LIST_COMMAND
+INSERT_ORDERED_LIST_COMMAND
+INSERT_CHECK_LIST_COMMAND
+REMOVE_LIST_COMMAND
+It's important to note that these commands don't have any functionality on their own. They are just for convenience and require you to register a handler for them in order to actually change the editor state when they are dispatched, as below:
+
+// MyListPlugin.ts
+
+editor.registerCommand(INSERT_UNORDERED_LIST_COMMAND, () => {
+    insertList(editor, 'bullet');
+    return true;
+}, COMMAND_PRIORITY_LOW);
+
+// MyInsertListToolbarButton.ts
+
+function onButtonClick(e: MouseEvent) {
+    editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined);
+}
+
+
+Theming
+Lists can be styled using the following properties in the EditorTheme passed to the editor in the initial config (the values are classses that will be applied in the denoted contexts):
+
+{
+  list?: {
+    // Applies to all lists of type "bullet"
+    ul?: EditorThemeClassName;
+    // Used to apply specific styling to nested levels of bullet lists
+    // e.g., [ 'bullet-list-level-one', 'bullet-list-level-two' ]
+    ulDepth?: Array<EditorThemeClassName>;
+    // Applies to all lists of type "number"
+    ol?: EditorThemeClassName;
+    // Used to apply specific styling to nested levels of number lists
+    // e.g., [ 'number-list-level-one', 'number-list-level-two' ]
+    olDepth?: Array<EditorThemeClassName>;
+    // Applies to all list items
+    listitem?: EditorThemeClassName;
+    // Applies to all list items with checked property set to "true"
+    listitemChecked?: EditorThemeClassName;
+    // Applies to all list items with checked property set to "false"
+    listitemUnchecked?: EditorThemeClassName;
+    // Applies only to list and list items that are not at the top level.
+    nested?: {
+      list?: EditorThemeClassName;
+      listitem?: EditorThemeClassName;
+    };
+  };
+}
+
+
+Packages - @lexical/markdown page:
+
+This package contains markdown helpers for Lexical: import, export and shortcuts.
+
+Import and export
+import {
+  $convertFromMarkdownString,
+  $convertToMarkdownString,
+  TRANSFORMERS,
+} from '@lexical/markdown';
+
+editor.update(() => {
+  const markdown = $convertToMarkdownString(TRANSFORMERS);
+  ...
+});
+
+editor.update(() => {
+  $convertFromMarkdownString(markdown, TRANSFORMERS);
+});
+
+It can also be used for initializing editor's state from markdown string. Here's an example with react <RichTextPlugin>
+
+<LexicalComposer initialConfig={{
+  editorState: () => $convertFromMarkdownString(markdown, TRANSFORMERS)
+}}>
+  <RichTextPlugin />
+</LexicalComposer>
+
+Shortcuts
+Can use <MarkdownShortcutPlugin> if using React
+
+import { TRANSFORMERS } from '@lexical/markdown';
+import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
+
+<LexicalComposer>
+  <MarkdownShortcutPlugin transformers={TRANSFORMERS} />
+</LexicalComposer>
+
+Or registerMarkdownShortcuts to register it manually:
+
+import {
+  registerMarkdownShortcuts,
+  TRANSFORMERS,
+} from '@lexical/markdown';
+
+const editor = createEditor(...);
+registerMarkdownShortcuts(editor, TRANSFORMERS);
+
+Transformers
+Markdown functionality relies on transformers configuration. It's an array of objects that define how certain text or nodes are processed during import, export or while typing. @lexical/markdown package provides set of built-in transformers:
+
+// Element transformers
+UNORDERED_LIST
+CODE
+HEADING
+ORDERED_LIST
+QUOTE
+
+// Text format transformers
+BOLD_ITALIC_STAR
+BOLD_ITALIC_UNDERSCORE
+BOLD_STAR
+BOLD_UNDERSCORE
+INLINE_CODE
+ITALIC_STAR
+ITALIC_UNDERSCORE
+STRIKETHROUGH
+
+// Text match transformers
+LINK
+
+And bundles of commonly used transformers:
+
+TRANSFORMERS - all built-in transformers
+ELEMENT_TRANSFORMERS - all built-in element transformers
+TEXT_FORMAT_TRANSFORMERS - all built-in text format transformers
+TEXT_MATCH_TRANSFORMERS - all built-in text match transformers
+Transformers are explicitly passed to markdown API allowing application-specific subset of markdown or custom transformers.
+
+There're three types of transformers:
+
+Element transformer handles top level elements (lists, headings, quotes, tables or code blocks)
+Text format transformer applies text range formats defined in TextFormatType (bold, italic, underline, strikethrough, code, subscript and superscript)
+Text match transformer relies on matching leaf text node content
+See MarkdownTransformers.js for transformer implementation examples
+
+
+Packages - @lexical/offset page:
+
+This package contains selection offset helpers for Lexical.
+
+
+Packages - @lexical/plain-text page:
+
+This package provides a starting point for Lexical users by registering listeners for a set of basic commands that cover simple text-editing behavior such as entering text, deleting characters, copy + paste, or changing the selection with arrow keys.
+
+You can use this package as a starting point, and then add additional command listeners to customize the functionality of your editor. If you want to add rich-text features, such as headings, blockquotes, or formatted text, you may want to consider using @lexical/rich-text instead.
+
+
+Packages - @lexical/rich-text page:
+
+This package provides a starting point for Lexical users by registering listeners for a set of basic commands that cover simple text-editing behavior such as entering text, deleting characters, copy + paste, or changing the selection with arrow keys. It also provides default behavior for rich text features, such as headings, formatted, text and blockquotes.
+
+You can use this package as a starting point, and then add additional command listeners to customize the functionality of your editor. If you don't want or need rich text functionality, you may want to consider using @lexical/plain-text instead.
+
+
+Packages - @lexical/selection page:
+
+This package contains selection helpers for Lexical.
+
+Methods
+getStyleObjectFromCSS
+Given a CSS string, returns an object from the style cache.
+
+export function getStyleObjectFromCSS(css: string): {
+  [key: string]: string;
+} | null;
+
+$patchStyleText
+Applies the provided styles to the TextNodes in the provided Selection. Key names in the patch argument should be the valid CSS properties (i.e., kebab-case).
+
+export function $patchStyleText(
+  selection: RangeSelection | GridSelection,
+  patch: {
+    [key: string]: string;
+  },
+): void;
+
+$getSelectionStyleValueForProperty
+Given a selection and a valid CSS property name, returns the current value of that property for TextNodes in the Selection, if set. If not set, it returns the defaultValue. If all TextNodes do not have the same value, it returns an empty string.
+
+export function $getSelectionStyleValueForProperty(
+  selection: RangeSelection,
+  styleProperty: string,
+  defaultValue: string,
+): string;
+
+$moveCaretSelection
+Moves the selection according to the arguments.
+
+export function $moveCaretSelection(
+  selection: RangeSelection,
+  isHoldingShift: boolean,
+  isBackward: boolean,
+  granularity: 'character' | 'word' | 'lineboundary',
+): void;
+
+$isParentElementRTL
+Returns true if the parent of the Selection anchor node is in Right-To-Left mode, false if not.
+
+export function $isParentElementRTL(selection: RangeSelection): boolean;
+
+$moveCharacter
+Wraps $moveCaretSelection, using character granularity and accounting for RTL mode.
+
+export function $moveCharacter(
+  selection: RangeSelection,
+  isHoldingShift: boolean,
+  isBackward: boolean,
+): void;
+
+$selectAll
+Expands the current Selection to cover all of the content in the editor.
+
+export function $selectAll(selection: RangeSelection): void;
+
+$setBlocksType
+Converts all nodes in the selection that are of one block type to another specified by parameter
+
+export function $setBlocksType(
+  selection: RangeSelection,
+  createElement: () => ElementNode,
+): void;
+
+$isAtNodeEnd
+Returns true if the provided point offset is in the last possible position.
+
+export function $isAtNodeEnd(point: Point): boolean;
+
+$shouldOverrideDefaultCharacterSelection
+Returns true if default character selection should be overridden, false if not. Used with DecoratorNodes
+
+export function $shouldOverrideDefaultCharacterSelection(
+  selection: RangeSelection,
+  isBackward: boolean,
+): boolean;
+
+
+Packages - @lexical/table page:
+
+This package contains the functionality for the Tables feature of Lexical.
+
+More documentation coming soon.
+
+
+Packages - @lexical/text page:
+
+This package contains utilities and helpers for handling Lexical text.
+
+
+Packages - @lexical/utils page:
+
+This package contains misc utilities for Lexical.
+
+
+React page:
+
+To make it easier for React users to implement rich-text editors, Lexical exposes a set of abstractions that aim to cover a wide range of use cases out-of-the-box.
+
+Supported Versions
+React 17+
+
+
+React - Lexical Plugins page:
+
+React-based plugins are using Lexical editor instance from <LexicalComposer> context:
+
+import {LexicalComposer} from '@lexical/react/LexicalComposer';
+import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';
+import {ContentEditable} from '@lexical/react/LexicalContentEditable';
+import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
+import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
+
+const initialConfig = {
+  namespace: 'MyEditor',
+  theme,
+  onError,
+};
+
+<LexicalComposer initialConfig={initialConfig}>
+  <PlainTextPlugin
+    contentEditable={<ContentEditable />}
+    placeholder={<div>Enter some text...</div>}
+  />
+  <HistoryPlugin />
+  <OnChangePlugin onChange={onChange} />
+  ...
+</LexicalComposer>
+
+Note: Many plugins might require you to register the one or many Lexical nodes in order for the plugin to work. You can do this by passing a reference to the node to the nodes array in your initial editor configuration.
+
+const initialConfig = {
+  namespace: 'MyEditor',
+  theme,
+  nodes: [ListNode, ListItemNode], // Pass the references to the nodes here
+  onError,
+};
+
+LexicalPlainTextPlugin
+React wrapper for @lexical/plain-text that adds major features for plain text editing, including typing, deletion and copy/pasting
+
+<PlainTextPlugin
+  contentEditable={<ContentEditable />}
+  placeholder={<div>Enter some text...</div>}
+  ErrorBoundary={LexicalErrorBoundary}
+/>
+
+LexicalRichTextPlugin
+React wrapper for @lexical/rich-text that adds major features for rich text editing, including typing, deletion, copy/pasting, indent/outdent and bold/italic/underline/strikethrough text formatting
+
+<RichTextPlugin
+  contentEditable={<ContentEditable />}
+  placeholder={<div>Enter some text...</div>}
+  ErrorBoundary={LexicalErrorBoundary}
+/>
+
+LexicalOnChangePlugin
+Plugin that calls onChange whenever Lexical state is updated. Using ignoreHistoryMergeTagChange (true by default) and ignoreSelectionChange (false by default) can give more granular control over changes that are causing onChange call
+
+<OnChangePlugin onChange={onChange} />
+
+LexicalHistoryPlugin
+React wrapper for @lexical/history that adds support for history stack management and undo / redo commands
+
+<HistoryPlugin />
+
+LexicalLinkPlugin
+React wrapper for @lexical/link that adds support for links, including toggleLink command support that toggles link for selected text
+
+<LinkPlugin />
+
+LexicalListPlugin
+React wrapper for @lexical/list that adds support for lists (ordered and unordered)
+
+<ListPlugin />
+
+LexicalCheckListPlugin
+React wrapper for @lexical/list that adds support for check lists. Note that it requires some css to render check/uncheck marks. See PlaygroundEditorTheme.css for details.
+
+<CheckListPlugin />
+
+LexicalTablePlugin
+React wrapper for @lexical/table that adds support for tables
+
+<TablePlugin />
+
+LexicalTabIndentationPlugin
+Plugin that allows tab indentation in combination with @lexical/rich-text.
+
+<TabIndentationPlugin />
+
+LexicalAutoLinkPlugin
+Plugin will convert text into links based on passed matchers list. In example below whenever user types url-like string it will automaticaly convert it into a link node
+
+const URL_MATCHER =
+  /((https?:\/\/(www\.)?)|(www\.))[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/;
+
+const MATCHERS = [
+  (text) => {
+    const match = URL_MATCHER.exec(text);
+    if (match === null) {
+      return null;
+    }
+    const fullMatch = match[0];
+    return {
+      index: match.index,
+      length: fullMatch.length,
+      text: fullMatch,
+      url: fullMatch.startsWith('http') ? fullMatch : `https://${fullMatch}`,
+      // attributes: { rel: 'noreferrer', target: '_blank' }, // Optional link attributes
+    };
+  },
+];
+
+...
+
+<AutoLinkPlugin matchers={MATCHERS} />
+
+
+LexicalClearEditorPlugin
+Adds clearEditor command support to clear editor's content
+
+LexicalMarkdownShortcutPlugin
+Adds markdown shortcut support: headings, lists, code blocks, quotes, links and inline styles (bold, italic, strikethrough)
+
+TableOfContentsPlugin
+This plugin allows you to navigate to certain sections of the page by clicking on headings that exist inside these sections. Once you load the plugin, it automatically collects and injects the headings of the page inside the table of contents, then it listens to any deletions or modifications to those headings and updates the table of contents. Additionally, it's able to track any newly added headings and inserts them in the table of contents once they are created. This plugin also supports lazy loading - so you can defer adding the plugin until when the user needs it.
+
+<TableOfContentsPlugin />
+
+You can alternatively leverage the use of LexicalTableOfContents API, which provides you with all the functioanlity that TableOfContentsPlugin provides, but without any styling. In order to use LexicalTableOfContents, you need to pass a callback function in its children. This callback function gives you access to the up-to-date data of the table of contents. You can access this data through a single parameter for the callback which comes in the form of an array of arrays [[headingKey, headingTextContent, headingTag], [], [], ...] headingKey: Unique key that identifies the heading.headingTextContent: A string of the exact text of the heading.headingTag: A string that reads either 'h1', 'h2', or 'h3'.
+
+<LexicalTableOfContents>
+  {(tableOfContentsArray) => {
+    return <MyCustomTableOfContetsPlugin tableOfContents={tableOfContentsArray} />;
+  }}
+</LexicalTableOfContents>
+
+LexicalEditorRefPlugin
+Allows you to get a ref to the underlying editor instance outside of LexicalComposer, which is convenient when you want to interact with the editor from a separate part of your application.
+
+  const editorRef = useRef(null);
+  <LexicalEditorRefPlugin editorRef={ref}>
+
+
+React - Create a React Plugin page:
+
+In addition to using the Lexical React plugins offered by the core library, you can make your own plugins to extend or alter Lexical's functionality to suit your own use cases.
+
+Lexical's React plugin interface is simple - just create a React component and add it as a child of your LexicalComposer component:
+
+ <LexicalComposer>
+    <MyLexicalPlugin>
+ </LexicalComposer>
+
+If the Plugin introduces new nodes, they have to be registered in initialConfig.nodes:
+
+const initialConfig = {
+  namespace: "MyEditor",
+  nodes: [MyLexicalNode],
+};
+
+ <LexicalComposer initialConfig={initialConfig}>
+    <MyLexicalPlugin>
+ </LexicalComposer>
+
+LexicalComposer provides access to the underlying LexicalEditor instance via React Context:
+
+//MyLexicalPlugin.js
+
+export function MyLexicalPlugin(props) {
+    const [editor] = useLexicalComposerContext();
+    ...
+}
+
+With access to the Editor, your plugin can extend Lexical via Commands, Transforms, or other APIs. For example, the TwitterPlugin embeds a tweet into the editor, fetching the data asynchronously from Twitter based on the provided Tweet ID:
+
+export const INSERT_TWEET_COMMAND: LexicalCommand<string> = createCommand();
+
+export default function TwitterPlugin(): JSX.Element | null {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    if (!editor.hasNodes([TweetNode])) {
+      throw new Error('TwitterPlugin: TweetNode not registered on editor (initialConfig.nodes)');
+    }
+
+    return editor.registerCommand<string>(
+      INSERT_TWEET_COMMAND,
+      (payload) => {
+        const tweetNode = $createTweetNode(payload);
+        $insertNodeToNearestRoot(tweetNode);
+
+        return true;
+      },
+      COMMAND_PRIORITY_EDITOR,
+    );
+  }, [editor]);
+
+  return null;
+}
+
+TwitterPlugin is just a React component that accesses the Lexical editor via React Context (useLexicalComposerContext). Using the LexicalEditor instance, this plugin does two things:
+
+Verifies that there is a TweetNode registered on the editor (if you forget to register the node, you can't do #2)
+registers a "command", passing a callback that will run when that command is dispatched. The command callback creates and inserts a TweetNode in the editor.
+You can see how it's used in the playground here. It's added it as a child of a LexicalComposer component, which does the job of providing the Context necessary for access to the editor instance. To actually trigger this command callback and insert a TweetNode, we have a button that "dispatches" the Tweet command we registered in the plugin.
+
+While the TwitterPlugin registers a command that inserts a custom node, this is only one example of what can be done with a plugin. To get a better idea of what's possible, take a look at the plugins defined in the playground.

@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 /*Default Font of Inter*/
   body {
@@ -9,26 +10,47 @@
     @apply text-white;
   }
 
+/* Placeholder Text*/
+  ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    opacity: 1; /* Firefox */
+    @apply text-grey
+  }
+
+  :-ms-input-placeholder { /* Internet Explorer 10-11 */
+    @apply text-grey
+  }
+
+  ::-ms-input-placeholder { /* Microsoft Edge */
+    @apply text-grey
+  }
+
 /*Default Icon Size of 24px*/
   .IconSize {
     @apply w-6 h-6;
   }
 
-/*Create Item*/
-  .CreateButton {
-    @apply p-2 space-x-3 rounded flex items-center bg-off-black text-light-grey cursor-pointer;
-  }
-  .CreateButton:hover {
-    @apply text-white;
-  }
-  .CreateButtonText {
-    @apply text-info ml-2 mr-2;
+/*Form Labels*/
+  .formLabels {
+    @apply text-body text-light-grey;
   }
 
-  .gradient-border:hover {
-    --borderWidth: 2px;
+/*Form Fields*/
+  .formFields {
+    @apply bg-off-black rounded-lg p-4;
+  }
+
+/*Special Button*/
+  .SpecialButton {
+    @apply p-3 bg-off-black text-white cursor-pointer;
+  }
+  .SpecialButtonText {
+    @apply text-body mx-2 text-center;
+  }
+
+  .gradient-border{
+    --borderWidth: 3px;
     position: relative;
-    border-radius: 4px;
+    border-radius: 6px;
   }
   .gradient-border:after {
     content: '';
@@ -38,7 +60,7 @@
     height: calc(100% + var(--borderWidth) * 2);
     width: calc(100% + var(--borderWidth) * 2);
     background: linear-gradient(60deg, #FEBB63, #B373FC, #F992E0, #FEBB63, #B373FC, #F992E0);
-    border-radius: 4px;
+    border-radius: 8px;
     z-index: -1;
     animation: animatedgradient 3s ease alternate infinite;
     background-size: 300% 300%;
@@ -55,7 +77,51 @@
     }
   }
 
+/*Special Button 2*/
+.SpecialButton2 {
+  @apply p-2 space-x-3 rounded flex items-center bg-off-black text-light-grey cursor-pointer;
+}
+.SpecialButton2:hover {
+  @apply text-white;
+}
+.SpecialButton2Text {
+  @apply text-info ml-2 mr-2;
+}
+
+.gradient-border2:hover {
+  --borderWidth: 2px;
+  position: relative;
+  border-radius: 4px;
+}
+.gradient-border2:after {
+  content: '';
+  position: absolute;
+  top: calc(-1 * var(--borderWidth));
+  left: calc(-1 * var(--borderWidth));
+  height: calc(100% + var(--borderWidth) * 2);
+  width: calc(100% + var(--borderWidth) * 2);
+  background: linear-gradient(60deg, #FEBB63, #B373FC, #F992E0, #FEBB63, #B373FC, #F992E0);
+  border-radius: 4px;
+  z-index: -1;
+  animation: animatedgradient 3s ease alternate infinite;
+  background-size: 300% 300%;
+}
+@keyframes animatedgradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 /*SideBar*/
+  #sideBar {
+    z-index: 10;
+  }
 
   /*SideBar Menu Items*/
     .MenuItem {
@@ -102,9 +168,41 @@
       @apply py-1 px-2 text-info rounded hover:bg-darker-grey cursor-pointer;
       @apply rounded flex items-center;
     }
+    .pageListItem.selected {
+      @apply bg-darker-grey;
+    }
     .pageItemText {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       @apply text-light-grey text-info mx-2 mt-[2px];
     }
+    .pageListItem.selected .pageItemText {
+      @apply text-white;
+    }
+
+/*Create Page Popup*/
+    .createPagePopup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 680px;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+      @apply bg-darkest-grey p-16 rounded-xl;
+    }
+
+/*Popup Backdrop*/
+  .backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 99;
+  }
 
 /*Editor*/
 
@@ -128,30 +226,4 @@
       scrollbar-color: #868686;
     }
 
-
-  /*Lexical*/
-    .contentEditable {
-      height: 100%;
-      width: 800px;
-      border: none;
-      @apply text-white text-body;
-    }
-    .contentEditable:focus {
-      outline: none;
-    }
-    .placeholder {
-      position: absolute;
-      top: 0;
-      @apply text-grey pointer-events-none text-body;
-    }
-    .lexicalContainer {
-      position: relative;
-    }
-
-    /*Theming*/
-      .editor-textBold {
-        font-weight: bold;
-      }
-      .editor-textItalic {
-        font-style: italic;
-      }
+/* Quill */

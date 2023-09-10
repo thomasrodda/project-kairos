@@ -29,6 +29,14 @@ module.exports = {
       fontFamily: {
         inter: 'Inter, sans-serif',
       },
+      borderRadius: {
+        'none': '0',
+        'sm': '2px',
+        'DEFAULT': '4px',
+        'md': '8px',
+        'lg': '16px',
+        'xl': '24px',
+      }
     },
   },
   plugins: [],

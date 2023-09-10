@@ -1,0 +1,570 @@
+Home Page:
+
+Introduction Lexical is an extensible JavaScript web text-editor framework with an emphasis on reliability, accessibility, and performance. Lexical aims to provide a best-in-class developer experience, so you can easily prototype and build features with confidence. Combined with a highly extensible architecture, Lexical allows developers to create unique text editing experiences that scale in size and functionality. Lexical works by attaching itself to a contentEditable element and from there you can work with Lexical's declarative APIs to make things happen without needing to worry about specific edge-cases around the DOM. In fact, you rarely need to interact with the DOM at all in most cases (unless you build your own custom nodes). The core package of Lexical is only 22kb in file size (min+gzip) and you only ever pay the cost for what you need. So Lexical can grow with your surface and the requirements. Furthermore, in frameworks that support lazy-loading, you can defer Lexical plugins until the user actually interacts with the editor itself – which can greatly help improve performance. What can be built with Lexical?​
+
+Lexical makes it possible to easily create complex text editing experiences that otherwise would be very complex with the built-in browser tooling. We built Lexical to enable developers to move-fast and create different types of text experiences that scale to specific requirements. Here are some (but not all) examples of what you can do with Lexical:
+
+Simple plain-text editors that have more requirements than a <textarea>, such as requiring features like mentions, custom emojis, links and hashtags. More complex rich-text editors that can be used to post content on blogs, social media, messaging applications. A full-blown WYSIWYG editor that can be used in a CMS or rich content editor. Real-time collaborative text editing experiences that combine many of the above points.
+
+You can think of Lexical as a text editor UI framework. Whilst Lexical is currently only usable on the web, the team is also experimenting with building native versions of Lexical for other platforms. At Meta, Lexical powers web text editing experiences for hundreds of millions of users everyday across Facebook, Workplace, Messenger, WhatsApp and Instagram. Lexical's Design​
+
+The core of Lexical is a dependency-free text editor framework that allows developers to build powerful, simple and complex, editor surfaces. Lexical has a few concepts that are worth exploring: Editor instances​
+
+Editor instances are the core thing that wires everything together. You can attach a contenteditable DOM element to editor instances, and also register listeners and commands. Most importantly, the editor allows for updates to its EditorState. You can create an editor instance using the createEditor() API, however you normally don't have to worry when using framework bindings such as @lexical/react as this is handled for you. Editor States​
+
+An Editor State is the underlying data model that represents what you want to show on the DOM. Editor States contain two parts:
+
+a Lexical node tree a Lexical selection object
+
+Editor States are immutable once created, and in order to update one, you must do so via editor.update(() => {...}). However, you can also "hook" into an existing update using node transforms or command handlers – which are invoked as part of an existing update workflow to prevent cascading/water-falling of updates. You can retrieve the current editor state using editor.getEditorState(). Editor States are also fully serializable to JSON and can easily be serialized back into the editor using editor.parseEditorState(). Editor Updates​
+
+When you want to change something in an Editor State, you must do it via an update, editor.update(() => {...}). The closure passed to the update call is important. It's a place where you have full "lexical" context of the active editor state, and it exposes access to the underlying Editor State's node tree. We promote using $ prefixed functions in this context, as it signifies a place where they can be used exclusively. Attempting to use them outside of an update will trigger a runtime error with an appropriate error. For those familiar with React Hooks, you can think of these as having a similar functionality (except $ functions can be used in any order). DOM Reconciler​
+
+Lexical has its own DOM reconciler that takes a set of Editor States (always the "current" and the "pending") and applies a "diff" on them. It then uses this diff to update only the parts of the DOM that need changing. You can think of this as a kind-of virtual DOM, except Lexical is able to skip doing much of the diffing work, as it knows what was mutated in a given update. The DOM reconciler adopts performance optimizations that benefit the typical heuristics of a content editable – and is able to ensure consistency for LTR and RTL languages automatically. Listeners, Node Transforms and Commands​
+
+Outside of invoking updates, the bulk of work done with Lexical is via listeners, node transforms and commands. These all stem from the editor and are prefixed with register. Another important feature is that all the register methods return a function to easily unsubscribe them. For example here is how you listen to an update to a Lexical editor:
+
+const unregisterListener = editor.registerUpdateListener(({editorState}) => { // An update has occurred! console.log(editorState);});// Ensure we remove the listener later!unregisterListener();
+
+Commands are the communication system used to wire everything together in Lexical. Custom commands can be created using createCommand() and dispatched to an editor using editor.dispatchCommand(command, payload). Lexical dispatches commands internally when key presses are triggered and when other important signals occur. Commands can also be handled using editor.registerCommand(handler, priority), and incoming commands are propagated through all handlers by priority until a handler stops the propagation (in a similar way to event propagation in the browser).
+
+
+Getting Started with React page:
+
+Code Sample​
+
+Install lexical and @lexical/react:
+
+npm install --save lexical @lexical/react
+
+Below is an example of a basic plain text editor using lexical and @lexical/react (try it yourself).
+
+import {$getRoot, $getSelection} from 'lexical';import {useEffect} from 'react';import {LexicalComposer} from '@lexical/react/LexicalComposer';import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';import {ContentEditable} from '@lexical/react/LexicalContentEditable';import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';const theme = { // Theme styling goes here ...}// When the editor changes, you can get notified via the// LexicalOnChangePlugin!function onChange(editorState) { editorState.read(() => { // Read the contents of the EditorState here. const root = $getRoot(); const selection = $getSelection(); console.log(root, selection); });}// Lexical React plugins are React components, which makes them// highly composable. Furthermore, you can lazy load plugins if// desired, so you don't pay the cost for plugins until you// actually use them.function MyCustomAutoFocusPlugin() { const [editor] = useLexicalComposerContext(); useEffect(() => { // Focus the editor when the effect fires! editor.focus(); }, [editor]); return null;}// Catch any errors that occur during Lexical updates and log them// or throw them as needed. If you don't throw them, Lexical will// try to recover gracefully without losing user data.function onError(error) { console.error(error);}function Editor() { const initialConfig = { namespace: 'MyEditor', theme, onError, }; return ( <LexicalComposer initialConfig={initialConfig}> <PlainTextPlugin contentEditable={<ContentEditable />} placeholder={<div>Enter some text...</div>} ErrorBoundary={LexicalErrorBoundary} /> <OnChangePlugin onChange={onChange} /> <HistoryPlugin /> <MyCustomAutoFocusPlugin /> </LexicalComposer> );}
+
+
+Theming page:
+
+Theming Lexical tries to make theming straight-forward, by providing a way of passing a customizable theming object that maps CSS class names to the editor on creation. Here's an example of a plain-text theme:
+
+const exampleTheme = { ltr: 'ltr', rtl: 'rtl', paragraph: 'editor-paragraph',};
+
+In your CSS, you can then add something like:
+
+.ltr { text-align: left;}.rtl { text-align: right;}.editor-placeholder { color: #999; overflow: hidden; position: absolute; top: 15px; left: 15px; user-select: none; pointer-events: none;}.editor-paragraph { margin: 0 0 15px 0; position: relative;}
+
+To apply it, you need to pass it to your editor instance. If you're using a framework like React, this is done by passing it as a property of the initialConfig to <LexicalComposer>, like shown:
+
+import {LexicalComposer} from '@lexical/react/LexicalComposer';import {PlainTextPlugin} from '@lexical/react/LexicalPlainTextPlugin';import {ContentEditable} from '@lexical/react/LexicalContentEditable';import {exampleTheme} from './exampleTheme';import LexicalErrorBoundary from '@lexical/react/LexicalErrorBoundary';const initialConfig = {namespace: 'MyEditor', theme: exampleTheme};export default function Editor() { return ( <LexicalComposer initialConfig={initialConfig}> <PlainTextPlugin contentEditable={<ContentEditable />} placeholder={<div className="editor-placeholder">Enter some text...</div>} ErrorBoundary={LexicalErrorBoundary} /> </LexicalComposer> );}
+
+If you are using vanilla JS, you can pass it to the createEditor() function, like shown:
+
+import {createEditor} from 'lexical';const editor = createEditor({ namespace: 'MyEditor', theme: exampleTheme,});
+
+Many of the Lexical's core nodes also accept theming properties. Here's a more comprehensive theming object:
+
+const exampleTheme = { ltr: 'ltr', rtl: 'rtl', paragraph: 'editor-paragraph', quote: 'editor-quote', heading: { h1: 'editor-heading-h1', h2: 'editor-heading-h2', h3: 'editor-heading-h3', h4: 'editor-heading-h4', h5: 'editor-heading-h5', h6: 'editor-heading-h6', }, list: { nested: { listitem: 'editor-nested-listitem', }, ol: 'editor-list-ol', ul: 'editor-list-ul', listitem: 'editor-listItem', listitemChecked: 'editor-listItemChecked', listitemUnchecked: 'editor-listItemUnchecked', }, hashtag: 'editor-hashtag', image: 'editor-image', link: 'editor-link', text: { bold: 'editor-textBold', code: 'editor-textCode', italic: 'editor-textItalic', strikethrough: 'editor-textStrikethrough', subscript: 'editor-textSubscript', superscript: 'editor-textSuperscript', underline: 'editor-textUnderline', underlineStrikethrough: 'editor-textUnderlineStrikethrough', }, code: 'editor-code', codeHighlight: { atrule: 'editor-tokenAttr', attr: 'editor-tokenAttr', boolean: 'editor-tokenProperty', builtin: 'editor-tokenSelector', cdata: 'editor-tokenComment', char: 'editor-tokenSelector', class: 'editor-tokenFunction', 'class-name': 'editor-tokenFunction', comment: 'editor-tokenComment', constant: 'editor-tokenProperty', deleted: 'editor-tokenProperty', doctype: 'editor-tokenComment', entity: 'editor-tokenOperator', function: 'editor-tokenFunction', important: 'editor-tokenVariable', inserted: 'editor-tokenSelector', keyword: 'editor-tokenAttr', namespace: 'editor-tokenVariable', number: 'editor-tokenProperty', operator: 'editor-tokenOperator', prolog: 'editor-tokenComment', property: 'editor-tokenProperty', punctuation: 'editor-tokenPunctuation', regex: 'editor-tokenVariable', selector: 'editor-tokenSelector', string: 'editor-tokenSelector', symbol: 'editor-tokenProperty', tag: 'editor-tokenProperty', url: 'editor-tokenOperator', variable: 'editor-tokenVariable', },};
+
+
+Supported Browsers page:
+
+Note: Lexical does not support Internet Explorer or legacy versions of Edge.
+
+Firefox 52+
+Chrome 49+
+Edge 79+ (when Edge switched to Chromium)
+Safari 11+
+iOS 11+ (Safari)
+iPad OS 13+ (Safari)
+Android Chrome 72+
+
+
+Concepts - Editor State page:
+
+Editor State Understanding the Editor State​
+
+With Lexical, the source of truth is not the DOM, but rather an underlying state model that Lexical maintains and associates with an editor instance. You can get the latest editor state from an editor by calling editor.getEditorState(). Editor states have two phases:
+
+During an update they can be thought of as "mutable". See "Updating state" below to mutate an editor state. After an update, the editor state is then locked and deemed immutable from there on. This editor state can therefore be thought of as a "snapshot".
+
+Editor states contain two core things:
+
+The editor node tree (starting from the root node). The editor selection (which can be null).
+
+Editor states are serializable to JSON, and the editor instance provides a useful method to deserialize stringified editor states. Here's an example of how you can initialize editor with some state and then persist it:
+
+// Get editor initial state (e.g. loaded from backend)const loadContent = async () => { // 'empty' editor const value = '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}'; return value;}const initialEditorState = await loadContent();const editor = createEditor(...);registerRichText(editor, initialEditorState);...// Handler to store content (e.g. when user submits a form)const onSubmit = () => { await saveContent(JSON.stringify(editor.getEditorState()));}
+
+For React it could be something following:
+
+const initialEditorState = await loadContent();const editorStateRef = useRef();<LexicalComposer initialConfig={{ editorState: initialEditorState}}> <LexicalRichTextPlugin /> <LexicalOnChangePlugin onChange={editorState => editorStateRef.current = editorState} /> <Button label="Save" onPress={() => { if (editorStateRef.current) { saveContent(JSON.stringify(editorStateRef.current)) } }} /></LexicalComposer>
+
+Note that Lexical uses initialConfig.editorState only once (when it's being initialized) and passing different value later won't be reflected in editor. See "Update state" below for proper ways of updating editor state. Updating state​
+
+The most common way to update the editor is to use editor.update(). Calling this function requires a function to be passed in that will provide access to mutate the underlying editor state. When starting a fresh update, the current editor state is cloned and used as the starting point. From a technical perspective, this means that Lexical leverages a technique called double-buffering during updates. There's an editor state to represent what is current on the screen, and another work-in-progress editor state that represents future changes. Creating an update is typically an async process that allows Lexical to batch multiple updates together in a single update – improving performance. When Lexical is ready to commit the update to the DOM, the underlying mutations and changes in the update will form a new immutable editor state. Calling editor.getEditorState() will then return the latest editor state based on the changes from the update. Here's an example of how you can update an editor instance:
+
+import {$getRoot, $getSelection} from 'lexical';import {$createParagraphNode} from 'lexical';// Inside the `editor.update` you can use special $ prefixed helper functions.// These functions cannot be used outside the closure, and will error if you try.// (If you're familiar with React, you can imagine these to be a bit like using a hook// outside of a React function component).editor.update(() => { // Get the RootNode from the EditorState const root = $getRoot(); // Get the selection from the EditorState const selection = $getSelection(); // Create a new ParagraphNode const paragraphNode = $createParagraphNode(); // Create a new TextNode const textNode = $createTextNode('Hello world'); // Append the text node to the paragraph paragraphNode.append(textNode); // Finally, append the paragraph to the root root.append(paragraphNode);});
+
+Another way to set state is setEditorState method, which replaces current state with the one passed as an argument. Here's an example of how you can set editor state from a stringified JSON:
+
+const editorState = editor.parseEditorState(editorStateJSONString);editor.setEditorState(editorState);
+
+State update listener​
+
+If you want to know when the editor updates so you can react to the changes, you can add an update listener to the editor, as shown below:
+
+editor.registerUpdateListener(({editorState}) => { // The latest EditorState can be found as `editorState`. // To read the contents of the EditorState, use the following API: editorState.read(() => { // Just like editor.update(), .read() expects a closure where you can use // the $ prefixed helper functions. });});
+
+Cloning state​
+
+Lexical state can be cloned, optionally with custom selection. One of the scenarios where you'd want to do it is setting editor's state but not forcing any selection:
+
+// Passing `null` as a selection value to prevent focusing the editoreditor.setEditorState(editorState.clone(null));
+
+
+Concepts - Nodes page:
+
+Nodes Base Nodes​
+
+Nodes are a core concept in Lexical. Not only do they form the visual editor view, as part of the EditorState, but they also represent the underlying data model for what is stored in the editor at any given time. Lexical has a single core based node, called LexicalNode that is extended internally to create Lexical's five base nodes:
+
+RootNode LineBreakNode ElementNode TextNode DecoratorNode
+
+Of these nodes, three of them are exposed from the lexical package, making them ideal to be extended:
+
+ElementNode TextNode DecoratorNode
+
+RootNode​
+
+There is only ever a single RootNode in an EditorState and it is always at the top and it represents the contenteditable itself. This means that the RootNode does not have a parent or siblings.
+
+To get the text content of the entire editor, you should use rootNode.getTextContent(). To avoid selection issues, Lexical forbids insertion of text nodes directly into a RootNode.
+
+LineBreakNode​
+
+You should never have '\n' in your text nodes, instead you should use the LineBreakNode which represents '\n', and more importantly, can work consistently between browsers and operating systems.
+
+ElementNode​
+
+Used as parent for other nodes, can be block level (ParagraphNode, HeadingNode) and inline (LinkNode). Has various methods which define its behaviour that can be overridden during extension (isInline, canBeEmpty, canInsertTextBefore and more)
+
+TextNode​
+
+Leaf type of node that contains text. It also includes few text-specific properties:
+
+format any combination of bold, italic, underline, strikethrough, code, subscript and superscript
+
+mode
+
+token - acts as immutable node, can't change its content and is deleted all at once
+
+segmented - its content deleted by segments (one word at a time), it is editable although node becomes non-segmented once its content is updated
+
+style can be used to apply inline css styles to text
+
+DecoratorNode​
+
+Wrapper node to insert arbitrary view (component) inside the editor. Decorator node rendering is framework-agnostic and can output components from React, vanilla js or other frameworks. Node Properties​
+
+Lexical nodes can have properties. It's important that these properties are JSON serializable too, so you should never be assigning a property to a node that is a function, Symbol, Map, Set, or any other object that has a different prototype than the built-ins. null, undefined, number, string, boolean, {} and [] are all types of property that can be assigned to node. By convention, we prefix properties with __ (double underscore) so that it makes it clear that these properties are private and their access should be avoided directly. We opted for __ instead of _ because of the fact that some build tooling mangles and minifies single _ prefixed properties to improve code size. However, this breaks down if you're exposing a node to be extended outside of your build. If you are adding a property that you expect to be modifiable or accessible, then you should always create a set of get*() and set*() methods on your node for this property. Inside these methods, you'll need to invoke some very important methods that ensure consistency with Lexical's internal immutable system. These methods are getWritable() and getLatest().
+
+import type {NodeKey} from 'lexical';class MyCustomNode extends SomeOtherNode { __foo: string; constructor(foo: string, key?: NodeKey) { super(key); this.__foo = foo; } setFoo(foo: string) { // getWritable() creates a clone of the node // if needed, to ensure we don't try and mutate // a stale version of this node. const self = this.getWritable(); self.__foo = foo; } getFoo(): string { // getLatest() ensures we are getting the most // up-to-date value from the EditorState. const self = this.getLatest(); return self.__foo; }}
+
+Lastly, all nodes should have both a static getType() method and a static clone() method. Lexical uses the type to be able to reconstruct a node back with its associated class prototype during deserialization (important for copy + paste!). Lexical uses cloning to ensure consistency between creation of new EditorState snapshots. Expanding on the example above with these methods:
+
+class MyCustomNode extends SomeOtherNode { __foo: string; static getType(): string { return 'custom-node'; } static clone(node: MyCustomNode): MyCustomNode { return new MyCustomNode(node.__foo, node.__key); } constructor(foo: string, key?: NodeKey) { super(key); this.__foo = foo; } setFoo(foo: string) { // getWritable() creates a clone of the node // if needed, to ensure we don't try and mutate // a stale version of this node. const self = this.getWritable(); self.__foo = foo; } getFoo(): string { // getLatest() ensures we are getting the most // up-to-date value from the EditorState. const self = this.getLatest(); return self.__foo; }}
+
+Creating custom nodes​
+
+As mentioned above, Lexical exposes three base nodes that can be extended. Did you know? Nodes such as ElementNode are already extended in the core by Lexical, such as ParagraphNode and RootNode! Extending ElementNode​
+
+Below is an example of how you might extend ElementNode:
+
+import {ElementNode} from 'lexical';export class CustomParagraph extends ElementNode { static getType(): string { return 'custom-paragraph'; } static clone(node: ParagraphNode): ParagraphNode { return new CustomParagraph(node.__key); } createDOM(): HTMLElement { // Define the DOM element here const dom = document.createElement('p'); return dom; } updateDOM(prevNode: CustomParagraph, dom: HTMLElement): boolean { // Returning false tells Lexical that this node does not need its // DOM element replacing with a new copy from createDOM. return false; }}
+
+It's also good etiquette to provide some $ prefixed utility functions for your custom ElementNode so that others can easily consume and validate nodes are that of your custom node. Here's how you might do this for the above example:
+
+export function $createCustomParagraphNode(): ParagraphNode { return new CustomParagraph();}export function $isCustomParagraphNode(node: LexicalNode | null | undefined): node is CustomParagraph { return node instanceof CustomParagraph;}
+
+Extending TextNode​
+
+export class ColoredNode extends TextNode { __color: string; constructor(text: string, color: string, key?: NodeKey): void { super(text, key); this.__color = color; } static getType(): string { return 'colored'; } static clone(node: ColoredNode): ColoredNode { return new ColoredNode(node.__text, node.__color, node.__key); } createDOM(config: EditorConfig): HTMLElement { const element = super.createDOM(config); element.style.color = this.__color; return element; } updateDOM( prevNode: ColoredNode, dom: HTMLElement, config: EditorConfig, ): boolean { const isUpdated = super.updateDOM(prevNode, dom, config); if (prevNode.__color !== this.__color) { dom.style.color = this.__color; } return isUpdated; }}export function $createColoredNode(text: string, color: string): ColoredNode { return new ColoredNode(text, color);}export function $isColoredNode(node: LexicalNode | null | undefined): node is ColoredNode { return node instanceof ColoredNode;}
+
+Extending DecoratorNode​
+
+export class VideoNode extends DecoratorNode<ReactNode> { __id: string; static getType(): string { return 'video'; } static clone(node: VideoNode): VideoNode { return new VideoNode(node.__id, node.__key); } constructor(id: string, key?: NodeKey) { super(key); this.__id = id; } createDOM(): HTMLElement { return document.createElement('div'); } updateDOM(): false { return false; } decorate(): ReactNode { return <VideoPlayer videoID={this.__id} />; }}export function $createVideoNode(id: string): VideoNode { return new VideoNode(id);}export function $isVideoNode(node: LexicalNode | null | undefined): node is VideoNode { return node instanceof VideoNode;}
+
+
+Concepts - Node Overrides page:
+
+Node Overrides Some of the most commonly used Lexical Nodes are owned and maintained by the core library. For example, ParagraphNode, HeadingNode, QuoteNode, List(Item)Node etc - these are all provided by Lexical packages, which provides an easier out-of-the-box experience for some editor features, but makes it difficult to override their behavior. For instance, if you wanted to change the behavior of ListNode, you would typically extend the class and override the methods. However, how would you tell Lexical to use your ListNode subclass in the ListPlugin instead of using the core ListNode? That's where Node Overrides can help. Node Overrides allow you to replace all instances of a given node in your editor with instances of a different node class. This can be done through the nodes array in the Editor config:
+
+const editorConfig = { ... nodes=[ // Don't forget to register your custom node separately! CustomParagraphNode, { replace: ParagraphNode, with: (node: ParagraphNode) => { return new CustomParagraphNode(); } } ]}
+
+Once this is done, Lexical will replace all ParagraphNode instances with CustomParagraphNode instances. One important use case for this feature is overriding the serialization behavior of core nodes.
+
+
+Concepts - Listeners page:
+
+Listeners Listeners are a mechanism that lets the Editor instance inform the user when a certain operation has occured. All listeners follow a reactive pattern where you can do an operation upon something happening in the future. All listeners also return a function that easily allows for the listener to be unregistered. Below are the different listeners that Lexical supports today:
+
+registerUpdateListener​
+
+Get notified when Lexical commits an update to the DOM.
+
+const removeUpdateListener = editor.registerUpdateListener(({editorState}) => { // The latest EditorState can be found as `editorState`. // To read the contents of the EditorState, use the following API: editorState.read(() => { // Just like editor.update(), .read() expects a closure where you can use // the $ prefixed helper functions. });});// Do not forget to unregister the listener when no longer needed!removeUpdateListener();
+
+The update listener callbacks receives a single argument containing the follow properties:
+
+editorState the latest updated Editor State
+
+prevEditorState the previous Editor State
+
+tags a Set of all tags that were passed to the update
+
+One thing to be aware of is "waterfall" updates. This is where you might schedule an update inside an update listener, as show below:
+
+editor.registerUpdateListener(({editorState}) => { // Read the editorState and maybe get some value. editorState.read(() => { // ... }); // Then schedule another update. editor.update(() => { // ... });});
+
+The problem with this pattern is that it means we end up doing two DOM updates, when we likely could have done it in a single DOM update. This can have an impact on performance, which is important in text editor. To avoid this, we recommend looking into Node Transforms, which allow you to listen to node changes and transform them as part of the same given update, meaning no waterfalls!
+
+registerTextContentListener​
+
+Get notified when Lexical commits an update to the DOM and the text content of the editor changes from the previous state of the editor. If the text content is the same between updates, no notifications to the listeners will happen.
+
+const removeTextContentListener = editor.registerTextContentListener( (textContent) => { // The latest text content of the editor! console.log(textContent); },);// Do not forget to unregister the listener when no longer needed!removeTextContentListener();
+
+registerMutationListener​
+
+Get notified when a specific type of Lexical node has been mutated. There are three states of mutation:
+
+created destroyed updated
+
+Mutation listeners are great for tracking the lifecycle of specific types of node. They can be used to handle external UI state and UI features relating to specific types of node.
+
+const removeMutationListener = editor.registerMutationListener( MyCustomNode, (mutatedNodes) => { // mutatedNodes is a Map where each key is the NodeKey, and the value is the state of mutation. for (let [nodeKey, mutation] of mutatedNodes) { console.log(nodeKey, mutation) } },);// Do not forget to unregister the listener when no longer needed!removeMutationListener();
+
+registerEditableListener​
+
+Get notified when the editor's mode has changed. The editor's mode can be changed via editor.setEditable(boolean).
+
+const removeEditableListener = editor.registerEditableListener( (editable) => { // The editor's mode is passed in! console.log(editable); },);// Do not forget to unregister the listener when no longer needed!removeEditableListener();
+
+registerDecoratorListener​
+
+Get notified when the editor's decorator object changes. The decorator object contains all DecoratorNode keys -> their decorated value. This is primarily used with external UI frameworks.
+
+const removeDecoratorListener = editor.registerDecoratorListener( (decorators) => { // The editor's decorators object is passed in! console.log(decorators); },);// Do not forget to unregister the listener when no longer needed!removeDecoratorListener();
+
+registerRootListener​
+
+Get notified when the editor's root DOM element (the content editable Lexical attaches to) changes. This is primarily used to attach event listeners to the root element. The root listener function is executed directly upon registration and then on any subsequent update.
+
+const removeRootListener = editor.registerRootListener( (rootElement, prevRootElement) => { //add listeners to the new root element //remove listeners from the old root element },);// Do not forget to unregister the listener when no longer needed!removeRootListener();
+
+
+Concepts - Node Transformers page:
+
+Node Transforms Transforms are the most efficient mechanism to respond to changes to the EditorState. For example: User types a character and you want to color the word blue if the word is now equal to "congrats". We programmatically add an @Mention to the editor, the @Mention is immediately next to another @Mention (@Mention@Mention). Since we believe this makes mentions hard to read, we want to destroy/replace both mentions and render them as plain TextNode's instead.
+
+const removeTransform = editor.registerNodeTransform(TextNode, (textNode) => { if (textNode.getTextContent() === 'blue') { textNode.setTextContent('green'); }});
+
+Syntax​
+
+editor.registerNodeTransform<T: LexicalNode>(Class<T>, T): () => void
+
+Lifecycle​
+
+Transforms are executed sequentially before changes are propagated to the DOM and multiple transforms still lead to a single DOM reconciliation (the most expensive operation in Lexical's lifecycle).
+
+Beware! In most cases, it is possible to achieve the same or very similar result through an update listener followed by an update. This is highly discouraged as it triggers an additional render (the most expensive lifecycle operation). Additionally, each cycle creates a brand new EditorState object which can interfere with plugins like HistoryPlugin (undo-redo) if not handled correctly.
+
+editor.registerUpdateListener(() => { editor.update(() => { // Don't do this });});
+
+Preconditions​
+
+Preconditions are fundamental for transforms to prevent them from running multiple times and ultimately causing an infinite loop. Transforms are designed to run when nodes have been modified (aka marking nodes dirty). For the most part, transforms only need to run once after the update but the sequential nature of transforms makes it possible to have order bias. Hence, transforms are run over and over until this particular type of Node is no longer marked as dirty by any of the transforms. Hence, we have to make sure that the transforms do not mark the node dirty unnecessarily.
+
+// When a TextNode changes (marked as dirty) make it boldeditor.registerNodeTransform(TextNode, textNode => { // Important: Check current format state if (!textNode.hasFormat('bold')) { textNode.toggleFormat('bold'); }}
+
+But oftentimes, the order is not important. The below would always end up in the result of the two transforms:
+
+// Plugin 1editor.registerNodeTransform(TextNode, textNode => { // This transform runs twice but does nothing the first time because it doesn't meet the preconditions if (textNode.getTextContent() === 'modified') { textNode.setTextContent('re-modified'); }})// Plugin 2editor.registerNodeTransform(TextNode, textNode => { // This transform runs only once if (textNode.getTextContent() === 'original') { textNode.setTextContent('modified'); }})// Appeditor.addListener('update', ({editorState}) => { const text = editorState.read($textContent); // text === 're-modified'});
+
+Transforms on parent nodes​
+
+Transforms are very specific to a type of node. This applies to both the declaration (registerNodeTransform(ImageNode)) and the times it triggers during an update cycle.
+
+// Won't triggereditor.registerNodeTransform(ParagraphNode, ..)// Will trigger as TextNode was marked dirtyeditor.registerNodeTransform(TextNode, ..)editor.update(() => { const textNode = $getNodeByKey('3'); textNode.setTextContent('foo');});
+
+While the marked dirty rule is always true, there are some cases when it's not immediately obvious and/or we force nearby nodes to become dirty for the sake of easier transform logic: You add a node to an ElementNode, the ElementNode and the newly added children are marked dirty, also its new immediate siblings You remove a node, its parent is marked dirty, also the node's immediate siblings prior to being removed You move a node via replace, rules 2 and 1 are applied.
+
+editor.registerNodeTransform(ParagraphNode, paragraph => { // Triggers});editor.update(() => { const paragraph = $getRoot().getFirstChild(); paragraph.append($createTextNode('foo');});
+
+registerLexicalTextEntity​
+
+It is common to have certain nodes that are created/destroyed based on their text content and siblings. For example, #lexical is a valid hashtag whereas #!lexical is not. This is a perfectly valid case for transforms but we have gone ahead and already built a utility transform wrapper for you for this specific case:
+
+registerLexicalTextEntity<N: TextNode>( editor: LexicalEditor, getMatch: (text: string) => null | EntityMatch, targetNode: Class<N>, createNode: (textNode: TextNode) => N,): Array<() => void>;
+
+
+Concepts - Commands page:
+
+Commands Commands are a very powerful feature of Lexical that lets you register listeners for events like KEY_ENTER_COMMAND or KEY_TAB_COMMAND and contextually react to them wherever & however you'd like. This pattern is useful for building Toolbars or complex Plugins and Nodes such as the TablePlugin which require special handling for selection, keyboard events, and more. When registering a command you supply a priority and can return true to mark it as "handled", which stops other listeners from receiving the event. If a command isn't handled explicitly by you, it's likely handled by default in the RichTextPlugin or the PlainTextPlugin.
+
+createCommand(...)​
+
+You can view all of the existing commands in LexicalCommands.ts, but if you need a custom command for your own use case check out the typed createCommand(...) function.
+
+const HELLO_WORLD_COMMAND: LexicalCommand<string> = createCommand();editor.dispatchCommand(HELLO_WORLD_COMMAND, 'Hello World!');editor.registerCommand( HELLO_WORLD_COMMAND, (payload: string) => { console.log(payload); // Hello World! return false; }, LowPriority,);
+
+editor.dispatchCommand(...)​
+
+Commands can be dispatched from anywhere you have access to the editor such as a Toolbar Button, an event listener, or a Plugin, but most of the core commands are dispatched from LexicalEvents.ts.
+
+editor.dispatchCommand(command, payload);
+
+The payloads are typed via the createCommand(...) API, but they're usually a DOM event for commands dispatched from an event listener. Here are some real examples from LexicalEvents.ts.
+
+editor.dispatchCommand(KEY_ARROW_LEFT_COMMAND, event);// ...editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic');
+
+And another example from the ToolbarPlugin in our Playground.
+
+const formatBulletList = () => { editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND);};
+
+Which is later handled in useList to insert the list into the editor.
+
+editor.registerCommand( INSERT_UNORDERED_LIST_COMMAND, () => { insertList(editor, 'ul'); return true; }, COMMAND_PRIORITY_LOW,);
+
+editor.registerCommand(...)​
+
+You can register a command from anywhere you have access to the editor object, but it's important that you remember to clean up the listener with its remove listener callback when it's no longer needed.
+
+const removeListener = editor.registerCommand( COMMAND, (payload) => boolean, // Return true to stop propagation. priority,);// ...removeListener(); // Cleans up the listener.
+
+A common pattern for easy clean-up is returning a registerCommand call within a React useEffect.
+
+useEffect(() => { return editor.registerCommand( TOGGLE_LINK_COMMAND, (payload) => { const url: string | null = payload; setLink(url); return true; }, COMMAND_PRIORITY_EDITOR, );}, [editor]);
+
+And as seen above and below, registerCommand's callback can return true to signal to the other listeners that the command has been handled and propagation will be stopped. Here's a simplified example of handling a KEY_TAB_COMMAND from the RichTextPlugin, which is used to dispatch a OUTDENT_CONTENT_COMMAND or INDENT_CONTENT_COMMAND.
+
+editor.registerCommand( KEY_TAB_COMMAND, (payload) => { const event: KeyboardEvent = payload; event.preventDefault(); return editor.dispatchCommand( event.shiftKey ? OUTDENT_CONTENT_COMMAND : INDENT_CONTENT_COMMAND, ); }, COMMAND_PRIORITY_EDITOR,);
+
+Note that the same KEY_TAB_COMMAND command is registered by LexicalTableSelectionHelpers.js, which handles moving focus to the next or previous cell within a Table, but the priority is the highest it can be (4) because this behavior is very important.
+
+
+Concepts - Selection page:
+
+Selection Types of selection​
+
+Lexical's selection is part of the EditorState. This means that for every update, or change to the editor, the selection always remains consistent with that of the EditorState's node tree. In Lexical, there are four types of selection possible:
+
+RangeSelection NodeSelection GridSelection null
+
+RangeSelection​
+
+This is the most common type of selection, and is a normalization of the browser's DOM Selection and Range APIs. RangeSelection consists of three main properties:
+
+anchor representing a RangeSelection point
+
+focus representing a RangeSelection point
+
+format numeric bitwise flag, representing any active text formats
+
+Both the anchor and focus points refer to an object that represents a specific part of the editor. The main properties of a RangeSelection point are:
+
+key representing the NodeKey of the selected Lexical node
+
+offset representing the position from within its selected Lexical node. For the text type this is the character, and for the element type this is the child index from within the ElementNode
+
+type representing either element or text.
+
+NodeSelection​
+
+NodeSelection represents a selection of multiple arbitrary nodes. For example, three images selected at the same time.
+
+getNodes() returns an array containing the selected LexicalNodes
+
+GridSelection​
+
+GridSelection represents a grid-like selection like tables. It stores the key of the parent node where the selection takes place and the start and end points. GridSelection consists of three main properties:
+
+gridKey representing the parent node key where the selection takes place
+
+anchor representing a GridSelection point
+
+focus reprensenting a GridSelection point
+
+For example, a table where you select row = 1 col = 1 to row 2 col = 2 could be stored as follows:
+
+gridKey = 2 table key
+
+anchor = 4 table cell (key may vary)
+
+focus = 10 table cell (key may vary)
+
+Note that anchor and focus points work the same way as RangeSelection.
+
+null​
+
+This is for when the editor doesn't have any active selection. This is common for when the editor has been blurred or when selection has moved to another editor on the page. This can also happen when trying to select non-editable components within the editor space. Working with selection​
+
+Selection can be found using the $getSelection() helper, exported from the lexical package. This function can be used within an update, a read, or a command listener.
+
+import {$getSelection, SELECTION_CHANGE_COMMAND} from 'lexical';editor.update(() => { const selection = $getSelection();});editorState.read(() => { const selection = $getSelection();});// SELECTION_CHANGE_COMMAND fires when selection changes within a Lexical editor.editor.registerCommand(SELECTION_CHANGE_COMMAND, () => { const selection = $getSelection();});
+
+In some cases you might want to create a new type of selection and set the editor selection to be that. This can only be done in update or command listeners.
+
+import {$setSelection, $createRangeSelection, $createNodeSelection} from 'lexical';editor.update(() => { // Set a range selection const rangeSelection = $createRangeSelection(); $setSelection(rangeSelection); // You can also indirectly create a range selection, by calling some of the selection // methods on Lexical nodes. const someNode = $getNodeByKey(someKey); // On element nodes, this will create a RangeSelection with type "element", // referencing an offset relating to the child within the element. // On text nodes, this will create a RangeSelection with type "text", // referencing the text character offset. someNode.select(); someNode.selectPrevious(); someNode.selectNext(); // On element nodes, you can use these. someNode.selectStart(); someNode.selectEnd(); // Set a node selection const nodeSelection = $createNodeSelection(); // Add a node key to the selection. nodeSelection.add(someKey); $setSelection(nodeSelection); // You can also clear selection by setting it to `null`. $setSelection(null);});
+
+
+Concepts - Read Mode / Edit Mode page:
+
+Read Mode / Edit Mode Lexical supports two modes:
+
+Read mode Edit mode
+
+The default behavior for Lexical is edit mode, or more accurately not read only mode. Under-the-hood, the main implementation detail is that the contentEditable is being set to "false" or "true" depending on the mode. Specific plugins can listen to the mode change too – allowing them to customize parts of the UI depending on the mode. Setting the mode​
+
+In order to set the mode, this can be done on creation of the editor:
+
+const editor = createEditor({ editable: true, ...})
+
+If you're using @lexical/react this can be done on the initialConfig passed to <LexicalComposer>:
+
+<LexicalComposer initialConfig={{editable: true}}> ...</LexicalComposer>
+
+After an editor is created, the mode can be changed imperatively:
+
+editor.setEditable(true);
+
+Reading the mode​
+
+In order to find the current mode of the editor you can use:
+
+const isEditable = editor.isEditable(); // Returns true or false
+
+You can also get notified when the editor's read only mode has changed:
+
+const removeEditableListener = editor.registerEditableListener( (isEditable) => { // The editor's mode is passed in! console.log(isEditable); },);// Do not forget to unregister the listener when no longer needed!removeEditableListener();
+
+
+Concepts - Serialization & Deserialization page:
+
+Serialization & Deserialization Internally, Lexical maintains the state of a given editor in memory, updating it in response to user inputs. Sometimes, it's useful to convert this state into a serialized format in order to transfer it between editors or store it for retrieval at some later time. In order to make this process easier, Lexical provides some APIs that allow Nodes to specify how they should be represented in common serialized formats. HTML​
+
+Currently, HTML serialization is primarily used to transfer data between Lexical and non-Lexical editors (such as Google Docs or Quip) via the copy & paste functionality in @lexical/clipboard, but we also offer generic utilities for converting Lexical -> HTML and HTML -> Lexical in our @lexical/html package. Lexical -> HTML​
+
+When generating HTML from an editor you can pass in a selection object to narrow it down to a certain section or pass in null to convert the whole editor.
+
+import {$generateHtmlFromNodes} from '@lexical/html';const htmlString = $generateHtmlFromNodes(editor, selection | null);
+
+LexicalNode.exportDOM()​
+
+You can control how a LexicalNode is represented as HTML by adding an exportDOM() method.
+
+exportDOM(editor: LexicalEditor): DOMExportOutput
+
+When transforming an editor state into HTML, we simply traverse the current editor state (or the selected subset thereof) and call the exportDOM method for each Node in order to convert it to an HTMLElement. Sometimes, it's necessary or useful to do some post-processing after a node has been converted to HTML. For this, we expose the "after" API on DOMExportOutput, which allows exportDOM to specify a function that should be run after the conversion to an HTMLElement has happened.
+
+export type DOMExportOutput = { after?: (generatedElement: ?HTMLElement) => ?HTMLElement, element?: HTMLElement | null,};
+
+If the element property is null in the return value of exportDOM, that Node will not be represented in the serialized output. HTML -> Lexical​
+
+import {$generateNodesFromDOM} from '@lexical/html';editor.update(() => { // In the browser you can use the native DOMParser API to parse the HTML string. const parser = new DOMParser(); const dom = parser.parseFromString(htmlString, textHtmlMimeType); // Once you have the DOM instance it's easy to generate LexicalNodes. const nodes = $generateNodesFromDOM(editor, dom); // Select the root $getRoot().select(); // Insert them at a selection. $insertNodes(nodes);});
+
+If you are running in headless mode, you can do it this way using JSDOM:
+
+import {createHeadlessEditor} from '@lexical/headless';import {$generateNodesFromDOM} from '@lexical/html';// Once you've generated LexicalNodes from your HTML you can now initialize an editor instance with the parsed nodes.const editorNodes = [] // Any custom nodes you register on the editorconst editor = createHeadlessEditor({ ...config, nodes: editorNodes });editor.update(() => { // In a headless environment you can use a package such as JSDom to parse the HTML string. const dom = new JSDOM(htmlString); // Once you have the DOM instance it's easy to generate LexicalNodes. const nodes = $generateNodesFromDOM(editor, dom.window.document); // Select the root $getRoot().select(); // Insert them at a selection. const selection = $getSelection(); selection.insertNodes(nodes);});
+
+LexicalNode.importDOM()​
+
+You can control how an HTMLElement is represented in Lexical by adding an importDOM() method to your LexicalNode.
+
+static importDOM(): DOMConversionMap | null;
+
+The return value of importDOM is a map of the lower case (DOM) Node.nodeName property to an object that specifies a conversion function and a priority for that conversion. This allows LexicalNodes to specify which type of DOM nodes they can convert and what the relative priority of their conversion should be. This is useful in cases where a DOM Node with specific attributes should be interpreted as one type of LexicalNode, and otherwise it should be represented as another type of LexicalNode.
+
+export type DOMConversionMap = { [NodeName]: <T: HTMLElement>(node: T) => DOMConversion | null,};export type DOMConversion = { conversion: DOMConversionFn, priority: 0 | 1 | 2 | 3 | 4,};export type DOMConversionFn = ( element: Node, parent?: Node, preformatted?: boolean,) => DOMConversionOutput;export type DOMConversionOutput = { after?: (childLexicalNodes: Array<LexicalNode>) => Array<LexicalNode>, forChild?: DOMChildConversion, node: LexicalNode | null,};export type DOMChildConversion = ( lexicalNode: LexicalNode,) => LexicalNode | null | void;
+
+@lexical/code provides a good example of the usefulness of this design. GitHub uses HTML <table> elements to represent the structure of copied code in HTML. If we interpreted all HTML <table> elements as literal tables, then code pasted from GitHub would appear in Lexical as a Lexical TableNode. Instead, CodeNode specifies that it can handle <table> elements too:
+
+class CodeNode extends ElementNode {...static importDOM(): DOMConversionMap | null { return { ... table: (node: Node) => { if (isGitHubCodeTable(node as HTMLTableElement)) { return { conversion: convertTableElement, priority: 3, }; } return null; }, ... };}...}
+
+If the imported <table> doesn't align with the expected GitHub code HTML, then we return null and allow the node to be handled by lower priority conversions. Much like exportDOM, importDOM exposes APIs to allow for post-processing of converted Nodes. The conversion function returns a DOMConversionOutput which can specify a function to run for each converted child (forChild) or on all the child nodes after the conversion is complete (after). The key difference here is that forChild runs for every deeply nested child node of the current node, whereas after will run only once after the transformation of the node and all its children is complete. Finally, preformatted flag indicates that nested text content is preformatted (similar to <pre> tag) and all newlines and spaces should be preserved as is.
+
+export type DOMConversionFn = ( element: Node, parent?: Node, preformatted?: boolean,) => DOMConversionOutput;export type DOMConversionOutput = { after?: (childLexicalNodes: Array<LexicalNode>) => Array<LexicalNode>, forChild?: DOMChildConversion, node: LexicalNode | null,};export type DOMChildConversion = ( lexicalNode: LexicalNode, parentLexicalNode: LexicalNode | null | undefined,) => LexicalNode | null;
+
+JSON​
+
+Lexical -> JSON​
+
+To generate a JSON snapshot from an EditorState, you can call the toJSON() method on the EditorState object.
+
+const editorState = editor.getEditorState();const json = editorState.toJSON();
+
+Alternatively, if you are trying to generate a stringified version of the EditorState, you can simply using JSON.stringify directly:
+
+const editorState = editor.getEditorState();const jsonString = JSON.stringify(editorState);
+
+LexicalNode.exportJSON()​
+
+You can control how a LexicalNode is represented as JSON by adding an exportJSON() method. It's important to ensure your serialized JSON node has a type field and a children field if it's an ElementNode.
+
+export type SerializedLexicalNode = { type: string; version: number;};exportJSON(): SerializedLexicalNode
+
+When transforming an editor state into JSON, we simply traverse the current editor state and call the exportJSON method for each Node in order to convert it to a SerializedLexicalNode object that represents the JSON object for the given node. The built-in nodes from Lexical already have a JSON representation defined, but you'll need to define ones for your own custom nodes. Here's an example of exportJSON for the HeadingNode:
+
+export type SerializedHeadingNode = Spread< { tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'; }, SerializedElementNode>;exportJSON(): SerializedHeadingNode { return { ...super.exportJSON(), tag: this.getTag(), type: 'heading', version: 1, };}
+
+LexicalNode.importJSON()​
+
+You can control how a LexicalNode is serialized back into a node from JSON by adding an importJSON() method.
+
+export type SerializedLexicalNode = { type: string; version: number;};importJSON(jsonNode: SerializedLexicalNode): LexicalNode
+
+This method works in the opposite way to how exportJSON works. Lexical uses the type field on the JSON object to determine what Lexical node class it needs to map to, so keeping the type field consistent with the getType() of the LexicalNode is essential. Here's an example of importJSON for the HeadingNode:
+
+static importJSON(serializedNode: SerializedHeadingNode): HeadingNode { const node = $createHeadingNode(serializedNode.tag); node.setFormat(serializedNode.format); node.setIndent(serializedNode.indent); node.setDirection(serializedNode.direction); return node;}
+
+Versioning & Breaking Changes​
+
+It's important to note that you should avoid making breaking changes to existing fields in your JSON object, especially if backwards compatibility is an important part of your editor. That's why we recommend using a version field to separate the different changes in your node as you add or change functionality of custom nodes. Here's the serialized type definition for Lexical's base TextNode class:
+
+import type {Spread} from 'lexical';// Spread is a Typescript utility that allows us to spread the properties// over the base SerializedLexicalNode type.export type SerializedTextNode = Spread< { detail: number; format: number; mode: TextModeType; style: string; text: string; }, SerializedLexicalNode>;
+
+If we wanted to make changes to the above TextNode, we should be sure to not remove or change an existing property, as this can cause data corruption. Instead, opt to add the functionality as a new property field instead, and use the version to determine how to handle the differences in your node.
+
+export type SerializedTextNodeV1 = Spread< { detail: number; format: number; mode: TextModeType; style: string; text: string; }, SerializedLexicalNode>;export type SerializedTextNodeV2 = Spread< { detail: number; format: number; mode: TextModeType; style: string; text: string; // Our new field we've added newField: string, // Notice the version is now 2 version: 2, }, SerializedLexicalNode>;export type SerializedTextNode = SerializedTextNodeV1 | SerializedTextNodeV2;
+
+Handling extended HTML styling​
+
+Since the TextNode is foundational to all Lexical packages, including the plain text use case. Handling any rich text logic is undesirable. This creates the need to override the TextNode to handle serialization and deserialization of HTML/CSS styling properties to achieve full fidelity between JSON <-> HTML. Since this is a very popular use case, below we are proving a recipe to handle the most common use cases. You need to override the base TextNode:
+
+const initialConfig: InitialConfigType = { namespace: 'editor', theme: editorThemeClasses, onError: (error: any) => console.log(error), nodes: [ ExtendedTextNode, { replace: TextNode, with: (node: TextNode) => new ExtendedTextNode(node.__text, node.__key) }, ListNode, ListItemNode, ] };
+
+and create a new Extended Text Node plugin
+
+import { $isTextNode, DOMConversion, DOMConversionMap, DOMConversionOutput, NodeKey, TextNode, SerializedTextNode} from 'lexical';export class ExtendedTextNode extends TextNode { constructor(text: string, key?: NodeKey) { super(text, key); } static getType(): string { return 'extended-text'; } static clone(node: ExtendedTextNode): ExtendedTextNode { return new ExtendedTextNode(node.__text, node.__key); } static importDOM(): DOMConversionMap | null { const importers = TextNode.importDOM(); return { ...importers, code: () => ({ conversion: patchStyleConversion(importers?.code), priority: 1 }), em: () => ({ conversion: patchStyleConversion(importers?.em), priority: 1 }), span: () => ({ conversion: patchStyleConversion(importers?.span), priority: 1 }), strong: () => ({ conversion: patchStyleConversion(importers?.strong), priority: 1 }), sub: () => ({ conversion: patchStyleConversion(importers?.sub), priority: 1 }), sup: () => ({ conversion: patchStyleConversion(importers?.sup), priority: 1 }), }; } static importJSON(serializedNode: SerializedTextNode): TextNode { return TextNode.importJSON(serializedNode); }}function patchStyleConversion( originalDOMConverter?: (node: HTMLElement) => DOMConversion | null): (node: HTMLElement) => DOMConversionOutput | null { return (node) => { const original = originalDOMConverter?.(node); if (!original) { return null; } const originalOutput = original.conversion(node); if (!originalOutput) { return originalOutput; } const backgroundColor = node.style.backgroundColor; const color = node.style.color; const fontFamily = node.style.fontFamily; const fontWeight = node.style.fontWeight; const fontSize = node.style.fontSize; const textDecoration = node.style.textDecoration; return { ...originalOutput, forChild: (lexicalNode, parent) => { const originalForChild = originalOutput?.forChild ?? ((x) => x); const result = originalForChild(lexicalNode, parent); if ($isTextNode(result)) { const style = [ backgroundColor ? `background-color: ${backgroundColor}` : null, color ? `color: ${color}` : null, fontFamily ? `font-family: ${fontFamily}` : null, fontWeight ? `font-weight: ${fontWeight}` : null, fontSize ? `font-size: ${fontSize}` : null, textDecoration ? `text-decoration: ${textDecoration}` : null, ] .filter((value) => value != null) .join('; '); if (style.length) { return result.setStyle(style); } } return result; } }; };}
+
+
+Concepts - Working with DOM Events page:
+
+Working with DOM Events Sometimes, when working with Lexical, it might be necessary or useful for you to attach a DOM Event Listener to the underlying DOM nodes that Lexical controls. For instance, you might want to to show a popover when a user mouses over a specific node or open a modal when they click on a node. Either of these use cases (and many others) can be accomplished via native DOM Event Listeners. There are 3 main ways that you can listen for DOM Events on nodes controlled by Lexical: 1. Event Delegation​
+
+One way to handle events inside the editor is to set a listener on the editor root element (the contentEditable Lexical attaches to). You can do this using a Root Listener.
+
+function myListener(event) { // You may want to filter on the event target here // to only include clicks on certain types of DOM Nodes. alert('Nice!');}const removeRootListener = editor.registerRootListener((rootElement, prevRootElement) => { // add the listener to the current root element rootElement.addEventListener('click', myListener); // remove the listener from the old root element - make sure the ref to myListener // is stable so the removal works and you avoid a memory leak. prevRootElement.removeEventListener('click', myListener);});// teardown the listener - return this from your useEffect callback if you're using React.removeRootListener();
+
+This can be a simple, efficient way to handle some use cases, since it's not necessary to attach a listener to each DOM node individually. 2. Directly Attach Handlers​
+
+In some cases, it may be better to attach an event handler directly to the underlying DOM node of each specific node. With this approach, you generally don't need to filter the event target in the handler, which can make it a bit simpler. It will also guarantee that you're handler isn't running for events that you don't care about. This approach is implemented via a Mutation Listener.
+
+const removeMutationListener = editor.registerMutationListener(nodeType, (mutations) => { const registeredElements: WeakSet<HTMLElement> = new WeakSet(); editor.getEditorState().read(() => { for (const [key, mutation] of mutations) { const element: null | HTMLElement = editor.getElementByKey(key); if ( // Updated might be a move, so that might mean a new DOM element // is created. In this case, we need to add and event listener too. (mutation === 'created' || mutation === 'updated') && element !== null && !registeredElements.has(element) ) { registeredElements.add(element); element.addEventListener('click', (event: Event) => { alert('Nice!'); }); } } });});// teardown the listener - return this from your useEffect callback if you're using React.removeMutationListener();
+
+Notice that here we don't worry about cleaning up, as Lexical will dereference the underlying DOM nodes and allow the JavaScript runtime garbage collector to clean up their listeners. 3. Use NodeEventPlugin​
+
+If you're using React, we've wrapped approach #2 up into a simple LexicalComposer plugin that you can use to achieve the same effect, without worrying about the details:
+
+<LexicalComposer> <NodeEventPlugin nodeType={LinkNode} eventType={'click'} eventListener={(e: Event) => { alert('Nice!'); }} /></LexicalComposer>
+
+
