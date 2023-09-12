@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ReactQuill from 'react-quill';
 import './quill.bubble.css'; // import styles
 import ai_icon from '../Images/ai_icon.svg'
+import Divider from './Divider';
 
 // RichTextEditor.jsx integrates the Quill.js editor and manages its features.
 
@@ -34,6 +35,13 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       const dropdown = document.getElementById('slashDropdown');
       if (dropdown) {  // Null check
         dropdown.style.display = 'block';
+        
+        // Add this line to highlight the first item in the dropdown
+        const firstItem = dropdown.querySelector('li');
+        if (firstItem) {
+          firstItem.classList.add('highlighted');
+        }
+    
         setTimeout(() => {
           const searchInput = document.getElementById('dropdownSearch');
           if (searchInput) {
@@ -41,40 +49,68 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
           }
         }, 100);
       }
-    };  
-
-    const formatText = (format, line, offset) => {
-      const quill = quillRef.current.getEditor(); // Access the Quill instance
-      const selection = quill.getSelection(); // Get the current selection range
-      const index = quill.getIndex(line);   // Get the index and length of the line
-      const length = line.length();
-
-      console.log("Quill instance:", quill);
-      console.log("Current selection:", selection);
-      
-      if (format === 'h1') {
-        quill.formatLine(index, length, 'header', 1);
-      } else if (format === 'h2') {
-        quill.formatLine(index, length, 'header', 2);
-      } else if (format === 'body') {
-        quill.formatLine(index, length, 'header', false);  // Removes header formatting
-      }
-      
-      // Hide the dropdown after formatting
-        const dropdown = document.getElementById('slashDropdown');
-        const searchInput = document.getElementById('dropdownSearch');
-        if (dropdown) {
-          dropdown.style.display = 'none';
-        }
-        if (searchInput) {
-          searchInput.value = '';  // Clear the search input
-        }
     };
+
+  // Reset highlighted dropdown option
+    const resetHighlighted = () => {
+      console.log("resetHighlighted called");
+      const dropdown = document.getElementById('slashDropdown');
+      const highlighted = dropdown.querySelector('.highlighted');
+      if (highlighted) {
+        highlighted.classList.remove('highlighted');
+      }
+    };
+  
+  // Formats the text
+  const formatText = (format, line, offset) => {
+    const quill = quillRef.current.getEditor(); // Access the Quill instance
+    const selection = quill.getSelection(); // Get the current selection range
+    const index = quill.getIndex(line);   // Get the index and length of the line
+    const length = line.length();
+
+    console.log("Quill instance:", quill);
+    console.log("Current selection:", selection);
+    
+    if (format === 'h1') {
+      quill.formatLine(index, length, 'header', 1);
+    } else if (format === 'h2') {
+      quill.formatLine(index, length, 'header', 2);
+    } else if (format === 'body') {
+      quill.formatLine(index, length, 'header', false);  // Removes header formatting
+    }
+    
+    // Hide the dropdown after formatting and reset search and results
+      const dropdown = document.getElementById('slashDropdown');
+      const searchInput = document.getElementById('dropdownSearch');
+      const items = dropdown.querySelectorAll('li');
+      if (dropdown) {
+        dropdown.style.display = 'none';
+      }
+    // Step 1: Clear the search input
+      if (searchInput) {
+        searchInput.value = '';
+      }
+      // Step 2: Reset the display property for all items
+      items.forEach(item => {
+        item.style.display = 'block';
+      });
+      // Step 3: Highlight the first item in the list
+      if (items[0]) {
+        items[0].classList.add('highlighted');
+      }
+      resetHighlighted();  // Reset the highlighted option
+  };
 
   // Code for Slash Search
     const handleSearch = (searchTerm) => {
       const dropdown = document.getElementById('slashDropdown');
       const items = dropdown.querySelectorAll('li');
+      
+      // Step 1: Remove highlighted class from all items
+      items.forEach(item => {
+        item.classList.remove('highlighted');
+      });
+      
       // Filter list items based on the search term
       items.forEach(item => {
         const values = item.getAttribute('data-value').split(',');
@@ -84,7 +120,16 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
           item.style.display = 'none';
         }
       });
-    };  
+      
+      // Step 2: Loop to find the first visible item
+      for (const item of items) {
+        if (item.style.display !== 'none') {
+          // Step 3: Add highlighted class to the first visible item
+          item.classList.add('highlighted');
+          break;
+        }
+      }
+    };
 
   useEffect(() => {
     if (quillRef.current) {
@@ -137,26 +182,69 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         }
       });
 
-    // Close dropdown on escape key
+    // Close dropdown on escape key and reset search and results
       const handleGlobalKeydown = (event) => {
         if (event.key === 'Escape') {
           const dropdown = document.getElementById('slashDropdown');
+          const searchInput = document.getElementById('dropdownSearch');
+          const items = dropdown.querySelectorAll('li');
           dropdown.style.display = 'none';
+          resetHighlighted();  // Reset the highlighted option
+      
+          // Step 1: Clear the search input
+          if (searchInput) {
+            searchInput.value = '';
+          }
+      
+          // Step 2: Reset the display property for all items
+          items.forEach(item => {
+            item.style.display = 'block';
+          });
+      
+          // Step 3: Highlight the first item in the list
+          if (items[0]) {
+            items[0].classList.add('highlighted');
+          }
         }
       };
     
-    // Close dropdown on clicking outside
+    // Close dropdown on clicking outside and reset search and results
       const handleClickOutside = (event) => {
         const dropdown = document.getElementById('slashDropdown');
+        const searchInput = document.getElementById('dropdownSearch');
+        const items = dropdown.querySelectorAll('li');
+      
         if (!dropdown.contains(event.target)) {
           dropdown.style.display = 'none';
+          resetHighlighted();  // Reset the highlighted option
+          
+          // Step 1: Clear the search input
+          if (searchInput) {
+            searchInput.value = '';
+          }
+          
+          // Step 2: Reset the display property for all items
+          items.forEach(item => {
+            item.style.display = 'block';
+          });
+      
+          // Step 3: Highlight the first item in the list
+          if (items[0]) {
+            items[0].classList.add('highlighted');
+          }
         }
-      };
+      }; 
 
     // Listen for global keydown event
       document.addEventListener('keydown', handleGlobalKeydown);
     // Listen for clicks outside the dropdown
       document.addEventListener('click', handleClickOutside);
+
+    // Listen for Keydown
+      const searchInput = document.getElementById('dropdownSearch');
+      if (searchInput) {
+      searchInput.addEventListener('keydown', handleSearchKeydown);
+      }
 
       // Cleanup event listener when the component unmounts
       return () => {
@@ -169,33 +257,42 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         // Cleanup
         document.removeEventListener('keydown', handleGlobalKeydown);
         document.removeEventListener('click', handleClickOutside);
+        if (searchInput) {
+          searchInput.removeEventListener('keydown', handleSearchKeydown);
+        }
       };
     }
   }, []);
 
   // Add a keydown event for the search input to handle Enter and arrow keys
     const handleSearchKeydown = (event) => {
+      if (['Enter', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+        event.preventDefault();  // Prevent default behavior
+      }
+      console.log("Key pressed:", event.key);
       const dropdown = document.getElementById('slashDropdown');
       const items = Array.from(dropdown.querySelectorAll('li'));
       const highlighted = dropdown.querySelector('.highlighted');
       let index = items.indexOf(highlighted);
-  
+    
       if (event.key === 'Enter') {
         if (highlighted) {
-          highlighted.click();  // Trigger the click event to apply formatting
+          // Manually trigger the click event on the highlighted item
+          const clickEvent = new Event('click', { 'bubbles': true });
+          highlighted.dispatchEvent(clickEvent);
         }
       } else if (event.key === 'ArrowDown') {
         if (index < items.length - 1) {
-          items[index + 1].classList.add('highlighted');
           if (highlighted) highlighted.classList.remove('highlighted');
+          items[index + 1].classList.add('highlighted');
         }
       } else if (event.key === 'ArrowUp') {
         if (index > 0) {
-          items[index - 1].classList.add('highlighted');
           if (highlighted) highlighted.classList.remove('highlighted');
+          items[index - 1].classList.add('highlighted');
         }
       }
-    };
+    };  
 
   return (
     <div className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none">
@@ -206,7 +303,12 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
           type="text"
           placeholder="Type to search..."
           onInput={(e) => handleSearch(e.target.value)}
+          autocomplete="off"
           />
+        {/** Divider */}
+        <div className="px-2">
+          <Divider />
+        </div>
         <ul>
           <li data-value="h1,H1,heading 1,Heading 1" onClick={() => formatText('h1', currentLine, currentOffset)}>Heading 1</li>
           <li data-value="h2,H2,heading 2,Heading 2" onClick={() => formatText('h2', currentLine, currentOffset)}>Heading 2</li>
