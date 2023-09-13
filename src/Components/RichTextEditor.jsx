@@ -12,6 +12,9 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
   const [currentLine, setCurrentLine] = useState(null);
   const [currentOffset, setCurrentOffset] = useState(null);
 
+  // Sets isFormatting to false - to be used in deletion of typed '/'
+  let isFormatting = false;
+
   const handleChange = (editorContent) => {
     onContentChange(editorContent);
   };
@@ -70,6 +73,9 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
 
     console.log("Quill instance:", quill);
     console.log("Current selection:", selection);
+
+    // Sets isFormatting to true - triggering the removal of typed '/'
+    isFormatting = true;
     
     if (format === 'h1') {
       quill.formatLine(index, length, 'header', 1);
@@ -83,8 +89,10 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       quill.formatLine(index, length, 'header', false);  // Removes header formatting
     }
 
-    // Rremove the typed '/'
-      quill.deleteText(index + offset, 1);  // Deletes one character at the position where '/' was typed
+    // Remove the typed '/'
+      if (isFormatting) {
+        quill.deleteText(index + offset - 1, 1);  // Deletes one character at the position where '/' was typed
+      }
     
     // Hide the dropdown after formatting and reset search and results
       const dropdown = document.getElementById('slashDropdown');
@@ -105,7 +113,8 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       if (items[0]) {
         items[0].classList.add('highlighted');
       }
-      resetHighlighted();  // Reset the highlighted option
+      resetHighlighted(); // Reset the highlighted option
+      isFormatting = false; // Reset the flag
   };
 
   // Code for Slash Search
@@ -161,17 +170,22 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       }
       
       // Detects typed '/' to show Dropdown
-      quill.on('text-change', function(delta, oldDelta, source) {
-        const text = quill.getText();
-        const slashIndex = text.lastIndexOf('/');
-        if (slashIndex !== -1) {
-          const [line, offset] = quill.getLine(slashIndex);
+        // Add a keyboard binding for '/'
+        quill.keyboard.addBinding({
+          key: 191,  // ASCII code for '/'
+        }, (range, context) => {
+          const { index } = range;
 
-          //Capture the position of typed '/'
-          const bounds = quill.getBounds(slashIndex);
+          // Insert the '/' character back into the editor at the index where it was typed.
+          quill.insertText(index, '/');
+
+          const [line, offset] = quill.getLine(index + 1); // Increment index by 1 since we've inserted '/'
+
+          // Capture the position of typed '/'
+          const bounds = quill.getBounds(index);
           console.log("Bounds:", bounds); // Console log for capturing location
-          if (line) {
 
+          if (line) {
             // Position Dropdown
             const dropdown = document.getElementById('slashDropdown');
             if (dropdown) {
@@ -184,8 +198,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
             // to use later in `formatText` function
             showDropdown(line, offset);
           }
-        }
-      });      
+        });
 
       // Detects selection to show Tooltip
       quill.on('selection-change', function (range, oldRange, source) {
