@@ -82,6 +82,9 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     } else if (format === 'body') {
       quill.formatLine(index, length, 'header', false);  // Removes header formatting
     }
+
+    // Rremove the typed '/'
+      quill.deleteText(index + offset, 1);  // Deletes one character at the position where '/' was typed
     
     // Hide the dropdown after formatting and reset search and results
       const dropdown = document.getElementById('slashDropdown');
@@ -301,18 +304,22 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
   return (
     <div className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none">
       <ReactQuill ref={quillRef} placeholder="Start writing..." theme="bubble" value={initialContent} onChange={handleChange} className="ql-editor"  bounds=".rich-text-editor" modules={modules}/>
+      
+      {/* Slash Command Dropdown */}
       <div className="slash-dropdown" id="slashDropdown">
         <input
           id="dropdownSearch"
           type="text"
           placeholder="Type to search..."
           onInput={(e) => handleSearch(e.target.value)}
-          autocomplete="off"
+          autoComplete="off"
           />
         {/** Divider */}
         <div className="px-2">
           <Divider />
         </div>
+        
+        {/* List of Formatting Options */}
         <ul>
           <li data-value="h1,H1,heading 1,Heading 1" onClick={() => formatText('h1', currentLine, currentOffset)}>Heading 1</li>
           <li data-value="h2,H2,heading 2,Heading 2" onClick={() => formatText('h2', currentLine, currentOffset)}>Heading 2</li>
