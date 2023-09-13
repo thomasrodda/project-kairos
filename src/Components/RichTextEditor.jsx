@@ -159,13 +159,27 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
           // Add your future AI logic here
         });
       }
-
+      
+      // Detects typed '/' to show Dropdown
       quill.on('text-change', function(delta, oldDelta, source) {
         const text = quill.getText();
         const slashIndex = text.lastIndexOf('/');
         if (slashIndex !== -1) {
           const [line, offset] = quill.getLine(slashIndex);
+
+          //Capture the position of typed '/'
+          const bounds = quill.getBounds(slashIndex);
+          console.log("Bounds:", bounds); // Console log for capturing location
           if (line) {
+
+            // Position Dropdown
+            const dropdown = document.getElementById('slashDropdown');
+            if (dropdown) {
+              dropdown.style.left = `${bounds.left}px`;
+              dropdown.style.top = `${bounds.top + bounds.height}px`; // positioning it below '/'
+              dropdown.style.display = 'block';
+            }
+
             // Save the line and offset in a state or some variable
             // to use later in `formatText` function
             showDropdown(line, offset);
@@ -173,6 +187,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         }
       });      
 
+      // Detects selection to show Tooltip
       quill.on('selection-change', function (range, oldRange, source) {
         if (range) {
           const tooltip = document.querySelector('.ql-tooltip');
@@ -302,7 +317,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     };  
 
   return (
-    <div className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none">
+    <div className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none relative">
       <ReactQuill ref={quillRef} placeholder="Start writing..." theme="bubble" value={initialContent} onChange={handleChange} className="ql-editor"  bounds=".rich-text-editor" modules={modules}/>
       
       {/* Slash Command Dropdown */}
