@@ -32,31 +32,20 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     const showDropdown = (line, offset) => {
       setCurrentLine(line);
       setCurrentOffset(offset);
-      
-      const quill = quillRef.current.getEditor();
-
       const dropdown = document.getElementById('slashDropdown');
-      const quillContainer = document.getElementById('quillEditor');
-      
-      if (quill && dropdown && quillContainer) {
-        const bounds = quill.getBounds(offset);
-        const containerRect = quillContainer.getBoundingClientRect();
-    
-        dropdown.style.left = `${bounds.left + containerRect.left}px`;
-        dropdown.style.top = `${bounds.top + bounds.height + containerRect.top}px`;
+      if (dropdown) {  // Null check
         dropdown.style.display = 'block';
-          
-        // Highlight the first item in the dropdown
+        
+        // Add this line to highlight the first item in the dropdown
         const firstItem = dropdown.querySelector('li');
         if (firstItem) {
           firstItem.classList.add('highlighted');
         }
-      }
-        
+    
         setTimeout(() => {
           const searchInput = document.getElementById('dropdownSearch');
           if (searchInput) {
-            searchInput.focus();
+            searchInput.focus();  // This will focus the input field
           }
         }, 100);
       }
@@ -75,7 +64,12 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
   // Formats the text
   const formatText = (format, line, offset) => {
     const quill = quillRef.current.getEditor(); // Access the Quill instance
+    const selection = quill.getSelection(); // Get the current selection range
     const index = quill.getIndex(line);   // Get the index and length of the line
+    const length = line.length();
+
+    console.log("Quill instance:", quill);
+    console.log("Current selection:", selection);
     
     if (format === 'h1') {
       quill.formatLine(index, length, 'header', 1);
@@ -84,17 +78,14 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     } else if (format === 'body') {
       quill.formatLine(index, length, 'header', false);  // Removes header formatting
     }
-
-    // Remove the typed '/' character from the editor
-      quill.deleteText(index + offset - 1, 1);  // Delete '/' at its position
     
-
     // Hide the dropdown after formatting and reset search and results
       const dropdown = document.getElementById('slashDropdown');
+      const searchInput = document.getElementById('dropdownSearch');
+      const items = dropdown.querySelectorAll('li');
       if (dropdown) {
         dropdown.style.display = 'none';
       }
-
     // Step 1: Clear the search input
       if (searchInput) {
         searchInput.value = '';
@@ -175,18 +166,21 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         }
       });      
 
-      quill.on('text-change', function(delta, oldDelta, source) {
-        if (source === 'user') { // Only trigger for user interactions
-          const text = quill.getText();
-          const slashIndex = text.lastIndexOf('/');
-          if (slashIndex !== -1) {
-            const [line, offset] = quill.getLine(slashIndex);
-            if (line) {
-              showDropdown(line, offset);
+      quill.on('selection-change', function (range, oldRange, source) {
+        if (range) {
+          const tooltip = document.querySelector('.ql-tooltip');
+          if (tooltip) {
+            const editorBounds = document.querySelector('.ql-editor').getBoundingClientRect();
+            const tooltipBounds = tooltip.getBoundingClientRect();
+
+            if (tooltipBounds.right > editorBounds.right) {
+              const difference = tooltipBounds.right - editorBounds.right;
+              tooltip.style.left = `${tooltipBounds.left - difference}px`;
             }
+            // Add similar logic for other boundaries and the sidebar
           }
         }
-    }, []);
+      });
 
     // Close dropdown on escape key and reset search and results
       const handleGlobalKeydown = (event) => {
@@ -301,7 +295,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     };  
 
   return (
-    <div id="quillEditor" className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none">
+    <div className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none">
       <ReactQuill ref={quillRef} placeholder="Start writing..." theme="bubble" value={initialContent} onChange={handleChange} className="ql-editor"  bounds=".rich-text-editor" modules={modules}/>
       <div className="slash-dropdown" id="slashDropdown">
         <input
