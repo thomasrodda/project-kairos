@@ -32,20 +32,32 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     const showDropdown = (line, offset) => {
       setCurrentLine(line);
       setCurrentOffset(offset);
-      const dropdown = document.getElementById('slashDropdown');
-      if (dropdown) {  // Null check
-        dropdown.style.display = 'block';
-        
-        // Add this line to highlight the first item in the dropdown
-        const firstItem = dropdown.querySelector('li');
-        if (firstItem) {
-          firstItem.classList.add('highlighted');
-        }
+      
+      const quill = quillRef.current.getEditor();
+      
+      if (quill) {
+        const bounds = quill.getBounds(offset);
+        const dropdown = document.getElementById('slashDropdown');
+        const quillContainer = document.getElementById('quillEditor');
     
+        if (dropdown && quillContainer) {
+          const containerRect = quillContainer.getBoundingClientRect();
+          
+          dropdown.style.left = `${bounds.left + containerRect.left}px`;
+          dropdown.style.top = `${bounds.top + bounds.height + containerRect.top}px`;
+          dropdown.style.display = 'block';
+          
+          // Highlight the first item in the dropdown
+          const firstItem = dropdown.querySelector('li');
+          if (firstItem) {
+            firstItem.classList.add('highlighted');
+          }
+        }
+        
         setTimeout(() => {
           const searchInput = document.getElementById('dropdownSearch');
           if (searchInput) {
-            searchInput.focus();  // This will focus the input field
+            searchInput.focus();
           }
         }, 100);
       }
@@ -78,6 +90,9 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     } else if (format === 'body') {
       quill.formatLine(index, length, 'header', false);  // Removes header formatting
     }
+
+    // Remove the typed '/' character from the editor
+      quill.deleteText(index + offset - 1, 1);  // Delete '/' at its position
     
     // Hide the dropdown after formatting and reset search and results
       const dropdown = document.getElementById('slashDropdown');
@@ -295,7 +310,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     };  
 
   return (
-    <div className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none">
+    <div id="quillEditor" className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none">
       <ReactQuill ref={quillRef} placeholder="Start writing..." theme="bubble" value={initialContent} onChange={handleChange} className="ql-editor"  bounds=".rich-text-editor" modules={modules}/>
       <div className="slash-dropdown" id="slashDropdown">
         <input

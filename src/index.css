@@ -233,6 +233,8 @@
     width: 200px;
     max-height: 400px;
     padding: 4px;
+    position: absolute;
+    z-index: 1000;
     @apply bg-darkest-grey rounded-md drop-shadow-xl
   }
   .slash-dropdown input, .slash-dropdown li {
