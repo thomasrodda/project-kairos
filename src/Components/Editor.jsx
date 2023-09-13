@@ -6,7 +6,8 @@ import RichTextEditor from './RichTextEditor'
 
 const Editor = ({ selectedPage, setPages }) => {
     const handleContentChange = (newContent) => {
-        console.log("Editor received new content:", newContent);
+        //console.log("Editor received new content:", newContent);
+        //console.log("Content before saving:", newContent);
         setPages((prevPages) => {
             const updatedPages = prevPages.map((page) => {
                 if (page.id === selectedPage.id) {
@@ -15,6 +16,7 @@ const Editor = ({ selectedPage, setPages }) => {
                 return page;
             });
             localStorage.setItem('pages', JSON.stringify(updatedPages));
+            //console.log("Content after saving:", newContent);
             return updatedPages;
         });
     };

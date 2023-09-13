@@ -6,6 +6,8 @@ import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import CreatePage from './Components/CreatePage';
 
+// App.jsx serves as the entry point for the Kairos app, managing state and rendering major components.
+
 function App() {
 
   /*Page Creation*/
@@ -23,7 +25,7 @@ function App() {
   const [showPopup, setShowPopup] = useState(false);
 
   const selectedPage = pages.find(page => page.id === selectedPageId);
-  console.log("Selected Page:", JSON.stringify(selectedPage));
+  //console.log("Selected Page:", JSON.stringify(selectedPage));
 
   const createPage = (pageName) => {
     const newPage = { id: uuidv4(), name: pageName, content: '' };

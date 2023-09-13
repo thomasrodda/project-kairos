@@ -7,6 +7,7 @@ import Divider from './Divider';
 // RichTextEditor.jsx integrates the Quill.js editor and manages its features.
 
 const RichTextEditor = ({ initialContent, onContentChange }) => {
+  //console.log("Initial content passed to RichTextEditor:", initialContent);
   const quillRef = useRef(null); // To store the ReactQuill element reference
 
   const [currentLine, setCurrentLine] = useState(null);
@@ -56,7 +57,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
 
   // Reset highlighted dropdown option
     const resetHighlighted = () => {
-      console.log("resetHighlighted called");
+      //console.log("resetHighlighted called");
       const dropdown = document.getElementById('slashDropdown');
       const highlighted = dropdown.querySelector('.highlighted');
       if (highlighted) {
@@ -71,8 +72,8 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
     const index = quill.getIndex(line);   // Get the index and length of the line
     const length = line.length();
 
-    console.log("Quill instance:", quill);
-    console.log("Current selection:", selection);
+    //console.log("Quill instance:", quill);
+    //console.log("Current selection:", selection);
 
     // Sets isFormatting to true - triggering the removal of typed '/'
     isFormatting = true;
@@ -164,7 +165,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
 
         // Add event listener to custom button
         aiButton.addEventListener('click', () => {
-          console.log('AI Assistant clicked');
+          //console.log('AI Assistant clicked');
           // Add your future AI logic here
         });
       }
@@ -183,7 +184,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
 
           // Capture the position of typed '/'
           const bounds = quill.getBounds(index);
-          console.log("Bounds:", bounds); // Console log for capturing location
+          //console.log("Bounds:", bounds); // Console log for capturing location
 
           if (line) {
             // Position Dropdown
@@ -286,7 +287,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         const aiButton = document.querySelector('.ql-aiAssistant');
         if (aiButton) {
           aiButton.removeEventListener('click', () => {
-            console.log('AI Assistant clicked');
+            //console.log('AI Assistant clicked');
           });
         }
         // Cleanup
@@ -304,7 +305,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       if (['Enter', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
         event.preventDefault();  // Prevent default behavior
       }
-      console.log("Key pressed:", event.key);
+      //console.log("Key pressed:", event.key);
       const dropdown = document.getElementById('slashDropdown');
       const items = Array.from(dropdown.querySelectorAll('li'));
       const highlighted = dropdown.querySelector('.highlighted');
