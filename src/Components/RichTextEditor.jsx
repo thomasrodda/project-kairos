@@ -75,6 +75,10 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       quill.formatLine(index, length, 'header', 1);
     } else if (format === 'h2') {
       quill.formatLine(index, length, 'header', 2);
+    } else if (format === 'h3') {
+      quill.formatLine(index, length, 'header', 3);
+    } else if (format === 'h4') {
+      quill.formatLine(index, length, 'header', 4);
     } else if (format === 'body') {
       quill.formatLine(index, length, 'header', false);  // Removes header formatting
     }
@@ -312,6 +316,8 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         <ul>
           <li data-value="h1,H1,heading 1,Heading 1" onClick={() => formatText('h1', currentLine, currentOffset)}>Heading 1</li>
           <li data-value="h2,H2,heading 2,Heading 2" onClick={() => formatText('h2', currentLine, currentOffset)}>Heading 2</li>
+          <li data-value="h3,H3,heading 3,Heading 3" onClick={() => formatText('h3', currentLine, currentOffset)}>Heading 3</li>
+          <li data-value="h4,H4,heading 4,Heading 4" onClick={() => formatText('h4', currentLine, currentOffset)}>Heading 4</li>
           <li data-value="body,Body,text,Text" onClick={() => formatText('body', currentLine, currentOffset)}>Body</li>
         </ul>
       </div>

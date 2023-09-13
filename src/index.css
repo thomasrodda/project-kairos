@@ -165,7 +165,7 @@
   }
   /* Page List Items */
     .pageListItem {
-      @apply py-1 px-2 text-info rounded hover:bg-darker-grey cursor-pointer;
+      @apply py-1 px-2 mb-1 text-info rounded hover:bg-darker-grey cursor-pointer;
       @apply rounded flex items-center;
     }
     .pageListItem.selected {
