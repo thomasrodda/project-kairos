@@ -92,7 +92,14 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
 
     // Remove the typed '/'
       if (isFormatting) {
-        quill.deleteText(index + offset - 1, 1);  // Deletes one character at the position where '/' was typed
+        // Your existing code to delete '/'
+        quill.deleteText(index + offset - 1, 1);  
+        
+        // Refocus the editor
+        quill.focus();
+        
+        // Adjust the cursor position by one character to the left
+        quill.setSelection(index + offset - 1, 0);
       }
     
     // Hide the dropdown after formatting and reset search and results
@@ -102,6 +109,8 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       if (dropdown) {
         dropdown.style.display = 'none';
       }
+      resetHighlighted(); // Reset the highlighted option
+      
     // Step 1: Clear the search input
       if (searchInput) {
         searchInput.value = '';
@@ -114,7 +123,6 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       if (items[0]) {
         items[0].classList.add('highlighted');
       }
-      resetHighlighted(); // Reset the highlighted option
       isFormatting = false; // Reset the flag
   };
 
@@ -226,6 +234,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
           const items = dropdown.querySelectorAll('li');
           dropdown.style.display = 'none';
           resetHighlighted();  // Reset the highlighted option
+          quill.focus(); // Focus the editor again
       
           // Step 1: Clear the search input
           if (searchInput) {
@@ -253,6 +262,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         if (!dropdown.contains(event.target)) {
           dropdown.style.display = 'none';
           resetHighlighted();  // Reset the highlighted option
+          quill.focus(); // Focus the editor again
           
           // Step 1: Clear the search input
           if (searchInput) {
