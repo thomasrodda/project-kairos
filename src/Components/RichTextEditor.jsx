@@ -95,8 +95,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         // Your existing code to delete '/'
         quill.deleteText(index + offset - 1, 1);  
         
-        // Refocus the editor
-        quill.focus();
+        //quill.focus(); // Focuses the editor again - Not needed
         
         // Adjust the cursor position by one character to the left
         quill.setSelection(index + offset - 1, 0);
@@ -234,7 +233,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
           const items = dropdown.querySelectorAll('li');
           dropdown.style.display = 'none';
           resetHighlighted();  // Reset the highlighted option
-          quill.focus(); // Focus the editor again
+          //quill.focus(); // Focus the editor again - Not needed
       
           // Step 1: Clear the search input
           if (searchInput) {
@@ -262,7 +261,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         if (!dropdown.contains(event.target)) {
           dropdown.style.display = 'none';
           resetHighlighted();  // Reset the highlighted option
-          quill.focus(); // Focus the editor again
+          //quill.focus(); // Focus the editor again - Not needed
           
           // Step 1: Clear the search input
           if (searchInput) {
