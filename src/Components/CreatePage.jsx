@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import closeIcon from '../Images/close_icon.png'
 import placeholderIcon from '../Images/placeholder_icon.png'
 
@@ -6,6 +6,13 @@ import placeholderIcon from '../Images/placeholder_icon.png'
 
 const CreatePage = ({ createPage, closePopup }) => {
   const [name, setName] = useState('');
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);  
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -33,7 +40,7 @@ const CreatePage = ({ createPage, closePopup }) => {
                 </div>
                 <div id="pageNameField" className="flex flex-col space-y-2 flex-grow">
                     <label className='formLabels'>Page Name</label>
-                    <input type="text" className='formFields' value={name} onChange={(e) => setName(e.target.value)} />
+                    <input type="text" className='formFields' value={name} onChange={(e) => setName(e.target.value)} ref={inputRef} />
                 </div>
             </div>
             <div id="formButtonContainer" className="flex justify-center">
