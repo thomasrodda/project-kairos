@@ -1,38 +1,46 @@
-import logo from './favicon.ico';
+import { db } from './firebase.js';
+import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
 import './App.css';
 import SideBar from './Components/SideBar';
 import Editor from './Components/Editor';
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useState, useEffect } from 'react';
 import CreatePage from './Components/CreatePage';
 
 // App.jsx serves as the entry point for the Kairos app, managing state and rendering major components.
 
 function App() {
 
-  /*Page Creation*/
-  const [pages, setPages] = useState(() => {
-    const savedPages = localStorage.getItem('pages');
-    if (savedPages) {
-      return JSON.parse(savedPages);
-    } else {
-      return [{ id: uuidv4(), name: 'Default Page', content: '' }];
-    }
-  });
-
-  const [selectedPageId, setSelectedPageId] = useState(pages[0].id);
-
+  // Initialize pages state
+  const [pages, setPages] = useState([]);
+  const [selectedPageId, setSelectedPageId] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+
+  // Fetch pages from Firestore when component mounts
+  useEffect(() => {
+    getDocs(collection(db, 'pages')).then((querySnapshot) => {
+      const pagesData = [];
+      querySnapshot.forEach((doc) => {
+        pagesData.push({ id: doc.id, ...doc.data() });
+      });
+      setPages(pagesData);
+      if (pagesData.length > 0) {
+        setSelectedPageId(pagesData[0].id);
+        console.log("SelectedPageId set to:", pagesData[0].id);
+    }
+    });
+  }, []); // Empty dependency array means this useEffect runs once when the component mounts
 
   const selectedPage = pages.find(page => page.id === selectedPageId);
   //console.log("Selected Page:", JSON.stringify(selectedPage));
 
   const createPage = (pageName) => {
-    const newPage = { id: uuidv4(), name: pageName, content: '' };
-    setPages((prevPages) => {
-      const newPages = [...prevPages, newPage];
-      localStorage.setItem('pages', JSON.stringify(newPages));  // Save pages to local storage
-      return newPages;
+    const newPageRef = doc(db, "pages");
+    setDoc(newPageRef, {
+      id: newPageRef.id,
+      name: pageName,
+      content: ''
+    }).then(() => {
+      setPages([...pages, { id: newPageRef.id, name: pageName, content: '' }]);
     });
   };
 
@@ -43,7 +51,7 @@ function App() {
       <SideBar createPage={() => setShowPopup(true)} pages={pages} selectedPageId={selectedPageId} setSelectedPageId={setSelectedPageId}/>
       </div>
       <div className="flex-grow overflow-auto ml-60">
-        <Editor selectedPageId={selectedPageId} pages={pages} setPages={setPages} selectedPage={selectedPage}/>
+        {selectedPage && <Editor selectedPageId={selectedPageId} pages={pages} setPages={setPages} selectedPage={selectedPage} />}
       </div>
       {showPopup && <div className="backdrop"></div>}
       {showPopup && <CreatePage createPage={createPage} closePopup={() => setShowPopup(false)} />}

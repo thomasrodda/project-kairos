@@ -1,3 +1,5 @@
+import { db } from '../firebase.js';
+import { doc, updateDoc } from 'firebase/firestore';
 import '../index.css';
 import React from 'react';
 import RichTextEditor from './RichTextEditor'
@@ -6,18 +8,21 @@ import RichTextEditor from './RichTextEditor'
 
 const Editor = ({ selectedPage, setPages }) => {
     const handleContentChange = (newContent) => {
-        //console.log("Editor received new content:", newContent);
-        //console.log("Content before saving:", newContent);
-        setPages((prevPages) => {
-            const updatedPages = prevPages.map((page) => {
-                if (page.id === selectedPage.id) {
-                    return { ...page, content: newContent };
-                }
-                return page;
+        // Update page content in Firestore
+        const pageRef = doc(db, "pages", selectedPage.id);
+        updateDoc(pageRef, {        
+            content: newContent
+        }).then(() => {
+            // Update local state
+            setPages((prevPages) => {
+                const updatedPages = prevPages.map((page) => {
+                    if (page.id === selectedPage.id) {
+                        return { ...page, content: newContent };
+                    }
+                    return page;
+                });
+                return updatedPages;
             });
-            localStorage.setItem('pages', JSON.stringify(updatedPages));
-            //console.log("Content after saving:", newContent);
-            return updatedPages;
         });
     };
     

@@ -16,6 +16,7 @@ import updatesIcon from '../Images/updates_icon.png'
 // SideBar.jsx renders the sidebar, containing the PageList and other features.
 
 const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId }) => {
+    console.log("Selected Page ID in SideBar:", selectedPageId);
     console.log(createPage);
     return (
         // SideBar //

@@ -5,6 +5,7 @@ import pageIcon from '../Images/page_icon.png'
 // PageList.jsx renders the list of pages in the sidebar.
 
 const PageList = ({ pages, selectedPageId, setSelectedPageId }) => {
+  console.log("Selected Page ID in PageList:", selectedPageId);
   return (
     <div>
       {pages.map(page =>
