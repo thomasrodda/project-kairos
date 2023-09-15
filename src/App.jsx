@@ -13,7 +13,9 @@ function App() {
   // Initialize pages state
   const [pages, setPages] = useState([]);
   const [selectedPageId, setSelectedPageId] = useState(null);
+  const [selectedPage, setSelectedPage] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Fetch pages from Firestore when component mounts
   useEffect(() => {
@@ -23,14 +25,20 @@ function App() {
         pagesData.push({ id: doc.id, ...doc.data() });
       });
       setPages(pagesData);
-      if (pagesData.length > 0) {
-        setSelectedPageId(pagesData[0].id);
-        console.log("SelectedPageId set to:", pagesData[0].id);
-    }
+      console.log("Fetched pages:", pagesData);
+      setSelectedPageId(prevSelectedPageId => {
+        console.log("Previous SelectedPageId:", prevSelectedPageId);  // <-- Add this line
+        return pagesData[0].id;
+      });
+      setIsLoading(false);
     });
   }, []); // Empty dependency array means this useEffect runs once when the component mounts
 
-  const selectedPage = pages.find(page => page.id === selectedPageId);
+  useEffect(() => {
+    const newSelectedPage = pages.find(page => page.id === selectedPageId);
+    setSelectedPage(newSelectedPage);
+    console.log("SelectedPage set to:", newSelectedPage);
+  }, [selectedPageId, pages]);  
   //console.log("Selected Page:", JSON.stringify(selectedPage));
 
   const createPage = (pageName) => {
@@ -47,14 +55,20 @@ function App() {
   /*Displayed App*/
   return (
     <div className="App flex h-screen overflow-hidden">
-      <div className="fixed w-60 h-screen overflow-auto">
-      <SideBar createPage={() => setShowPopup(true)} pages={pages} selectedPageId={selectedPageId} setSelectedPageId={setSelectedPageId}/>
-      </div>
-      <div className="flex-grow overflow-auto ml-60">
-        {selectedPage && <Editor selectedPageId={selectedPageId} pages={pages} setPages={setPages} selectedPage={selectedPage} />}
-      </div>
-      {showPopup && <div className="backdrop"></div>}
-      {showPopup && <CreatePage createPage={createPage} closePopup={() => setShowPopup(false)} />}
+      {isLoading ? (
+        <div>Loading...</div>  // <-- Add this line
+      ) : (
+        <>
+          <div className="fixed w-60 h-screen overflow-auto">
+            <SideBar createPage={() => setShowPopup(true)} pages={pages} selectedPageId={selectedPageId} setSelectedPageId={setSelectedPageId}/>
+          </div>
+          <div className="flex-grow overflow-auto ml-60">
+            {selectedPage && <Editor selectedPageId={selectedPageId} pages={pages} setPages={setPages} selectedPage={selectedPage} />}
+          </div>
+          {showPopup && <div className="backdrop"></div>}
+          {showPopup && <CreatePage createPage={createPage} closePopup={() => setShowPopup(false)} />}
+        </>
+      )}
     </div>
   );
 }
