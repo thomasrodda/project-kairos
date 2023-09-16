@@ -3,6 +3,7 @@ import ReactQuill from 'react-quill';
 import './quill.bubble.css'; // import styles
 import ai_icon from '../Images/ai_icon.svg'
 import Divider from './Divider';
+import pageIcon from '../Images/page_icon.png'
 
 // RichTextEditor.jsx integrates the Quill.js editor and manages its features.
 
@@ -88,6 +89,10 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
       quill.formatLine(index, length, 'header', 4);
     } else if (format === 'body') {
       quill.formatLine(index, length, 'header', false);  // Removes header formatting
+    } else if (format === 'ol') {
+      quill.formatLine(index, length, 'list', 'ordered');
+    } else if (format === 'ul') {
+      quill.formatLine(index, length, 'list', 'bullet');
     }
 
     // Remove the typed '/'
@@ -359,11 +364,16 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
         
         {/* List of Formatting Options */}
         <ul>
-          <li data-value="h1,H1,heading 1,Heading 1" onClick={() => formatText('h1', currentLine, currentOffset)}>Heading 1</li>
+          <li data-value="h1,H1,heading 1,Heading 1" onClick={() => formatText('h1', currentLine, currentOffset)}>
+            <img src={pageIcon} alt="Page" className='IconSize'/>
+            Heading 1
+          </li>
           <li data-value="h2,H2,heading 2,Heading 2" onClick={() => formatText('h2', currentLine, currentOffset)}>Heading 2</li>
           <li data-value="h3,H3,heading 3,Heading 3" onClick={() => formatText('h3', currentLine, currentOffset)}>Heading 3</li>
           <li data-value="h4,H4,heading 4,Heading 4" onClick={() => formatText('h4', currentLine, currentOffset)}>Heading 4</li>
           <li data-value="body,Body,text,Text" onClick={() => formatText('body', currentLine, currentOffset)}>Body</li>
+          <li data-value="Numbered List,ordered list,ol,list with numbers,enumerate" onClick={() => formatText('ol', currentLine, currentOffset)}>Numbered List</li>
+          <li data-value="Bulleted List,unordered list,ul,list with bullets,points" onClick={() => formatText('ul', currentLine, currentOffset)}>Bulleted List</li>
         </ul>
       </div>
     </div>

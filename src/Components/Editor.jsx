@@ -12,19 +12,25 @@ const Editor = ({ selectedPage, setPages }) => {
     let timerId;  // Declare timerId outside of useEffect
 
     const handleContentChange = (newContent) => {
+        console.log("handleContentChange triggered");
         setCurrentContent(newContent); // Update real-time content
         setDebouncedContent(newContent); // Update debounced content
     };
 
     useEffect(() => {
+        console.log("First useEffect triggered");
         setCurrentContent(selectedPage.content);
         setDebouncedContent(selectedPage.content);
     }, [selectedPage]);
 
+    // Saves content automatically when user inactive
     useEffect(() => {
+        console.log("Second useEffect triggered");
         timerId = setTimeout(() => {
+            console.log("Inside setTimeout")
             const pageRef = doc(db, "pages", selectedPage.id);
             updateDoc(pageRef, { content: debouncedContent }).then(() => {
+                console.log("Firestore update successful");
                 setPages((prevPages) => {
                     const updatedPages = prevPages.map((page) => {
                         if (page.id === selectedPage.id) {
@@ -35,7 +41,7 @@ const Editor = ({ selectedPage, setPages }) => {
                     return updatedPages;
                 });
             });
-        }, 2000);
+        }, 1000); // User inactivity time /ms
 
         return () => {
             clearTimeout(timerId);
