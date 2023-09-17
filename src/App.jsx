@@ -5,6 +5,10 @@ import SideBar from './Components/SideBar';
 import Editor from './Components/Editor';
 import React, { useState, useEffect } from 'react';
 import CreatePage from './Components/CreatePage';
+import MainMenu from './Components/MainMenu';
+import WorkspaceSelection from './Components/WorkspaceSelection';
+import CreateWorkspace from './Components/CreateWorkspace';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 // App.jsx serves as the entry point for the Kairos app, managing state and rendering major components.
 
@@ -52,26 +56,39 @@ function App() {
     });
   };
 
-  /*Displayed App*/
-  return (
-    <div className="App flex h-screen overflow-hidden">
-      {isLoading ? (
-        <div>Loading...</div>  // <-- Add this line
-      ) : (
-        <>
-          <div className="fixed w-60 h-screen overflow-auto">
-            <SideBar createPage={() => setShowPopup(true)} pages={pages} selectedPageId={selectedPageId} setSelectedPageId={setSelectedPageId}/>
-          </div>
-          <div className="flex-grow overflow-auto ml-60">
-            {selectedPage && <Editor selectedPageId={selectedPageId} pages={pages} setPages={setPages} selectedPage={selectedPage} />}
-          </div>
-          {showPopup && <div className="backdrop"></div>}
-          {showPopup && <CreatePage createPage={createPage} closePopup={() => setShowPopup(false)} />}
-        </>
-      )}
-    </div>
-  );
-}
+  // Main App
+  const RenderApp = () => {
+    return (
+      <div className="App flex h-screen overflow-hidden">
+        {isLoading ? (
+          <div>Loading...</div>
+        ) : (
+          <>
+            <div className="fixed w-60 h-screen overflow-auto">
+              <SideBar createPage={() => setShowPopup(true)} pages={pages} selectedPageId={selectedPageId} setSelectedPageId={setSelectedPageId}/>
+            </div>
+            <div className="flex-grow overflow-auto ml-60">
+              {selectedPage && <Editor selectedPageId={selectedPageId} pages={pages} setPages={setPages} selectedPage={selectedPage} />}
+            </div>
+            {showPopup && <div className="backdrop"></div>}
+            {showPopup && <CreatePage createPage={createPage} closePopup={() => setShowPopup(false)} />}
+          </>
+        )}
+      </div>
+    );
+  };
 
+  // App Routes
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainMenu />} />
+        <Route path="/workspace-selection" element={<WorkspaceSelection />} />
+        <Route path="/create-workspace" element={<CreateWorkspace />} />
+        <Route path="/app" element={RenderApp()} />
+      </Routes>
+    </Router>
+  );  
+}
 
 export default App;
