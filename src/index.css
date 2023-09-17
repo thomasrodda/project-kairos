@@ -129,6 +129,7 @@
     width: 100vw;
     align-items: center;
     display: flex;
+    padding: 40px;
   }
   .menuBackground {
     background-image: url(Images/main_menu_background.png);
@@ -172,6 +173,51 @@
   .mainMenuSubheading {
     font-weight: 700;
     @apply text-h3
+  }
+
+/*Workspace Selection*/
+  .workspaceSelection {
+    max-width: 1420px;
+    max-height: 800px;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    padding: 100px;
+    border-radius: 100px;
+    align-items: flex-start;
+    display: block;
+    justify-content: center;
+    @apply bg-almost-black shadow-2xl
+  }
+  .workspaceHeading {
+    display: block;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 60px;
+  }
+  .workspaceTemplateOptions {
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+    height: auto;
+    display: flex;
+    @apply flex justify-between items-start
+  }
+  .workspaceTemplateCard {
+    width: 300px;
+    height: auto;
+    min-height: 300px;
+    @apply bg-darkest-grey rounded-xl p-8
+  }
+  .workspaceTemplateHeader {
+    @apply text-h2 font-bold tracking-wider
+  }
+  .workspaceTemplateSubheader {
+    margin-bottom: 8px;
+    @apply text-info text-grey
+  }
+  .workspaceTemplateListItem {
+
   }
 
 /*SideBar*/
