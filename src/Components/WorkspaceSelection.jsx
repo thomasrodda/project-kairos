@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import '../index.css';
 import profileIcon from '../Images/profile_icon.png'
 import helpIcon from '../Images/help_icon.png'
@@ -7,6 +8,20 @@ import addIcon from '../Images/add_icon.png'
 import settingsIcon from '../Images/settings_icon.png'
 
 const WorkspaceSelection = () => {
+    // State to hold the list of workspaces
+    const [workspaces, setWorkspaces] = useState([]);
+
+    // Fetch the list of workspaces (Dummy data for now)
+    useEffect(() => {
+        const dummyWorkspaces = [
+            { id: '1', name: 'Workspace 1' },
+            { id: '2', name: 'Workspace 2' },
+            { id: '3', name: 'Workspace 3' },
+        ];
+
+        setWorkspaces(dummyWorkspaces);
+    }, []);
+    
     return (
         <div className="mainMenu menuBackground">
             <div className="menuContentArea flex justify-between">
@@ -18,26 +33,28 @@ const WorkspaceSelection = () => {
                     </div>
                     {/* Workspaces */}
                     <div className="workspaceItemList">
-                        <button className="workspaceItem">
+                        {/* Dynamic rendering of workspaces */}
+                        {workspaces.map((workspace) => (
+                        <button
+                            key={workspace.id}
+                            className="workspaceItem"
+                            onClick={() => alert(`Loading ${workspace.name}`)}
+                        >
                             <img src={profileIcon} alt="Profile" className='IconSize'/>
                             <h2 className="workspaceItemText">
-                                Workspace 1
+                            {workspace.name}
                             </h2>
                         </button>
-                        <button className="workspaceItem">
-                            <img src={profileIcon} alt="Profile" className='IconSize'/>
-                            <h2 className="workspaceItemText">
-                                Workspace 2
-                            </h2>
-                        </button>
-                        <button className="newWorkspaceItem">
-                            <img src={addIcon} alt="Profile" className='IconSize'/>
+                        ))}
+                        {/* Create New Workspace button */}
+                        <Link to="/create-workspace" className="newWorkspaceItem">  {/* The path should match the route you've set up for CreateWorkspace */}
+                            <img src={addIcon} alt="Add" className='IconSize'/>
                             <h2 className="text-grey text-h4 mx-2">
-                                Create New Workspace
+                            Create New Workspace
                             </h2>
-                        </button>
+                        </Link>
                     </div>
-                </div>
+                </div>      
                 {/* Account & Settings */}
                 <div className=" flex flex-col p-2 space-y-1 items-end">
                     {/* Members */}

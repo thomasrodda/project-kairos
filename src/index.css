@@ -175,6 +175,7 @@
   }
   .menuContentArea {
     max-width: 1420px;
+    min-height: 600px;
     width: 100%;
     height: auto;
     margin: auto;
