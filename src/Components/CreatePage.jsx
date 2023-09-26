@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import closeIcon from '../Images/close_icon.png'
 import placeholderIcon from '../Images/placeholder_icon.png'
+import '../index.css';
 
 // CreatePage.jsx is responsible for rendering a popup to create a new page.
 
@@ -46,9 +47,9 @@ const CreatePage = ({ createPage, closePopup }) => {
             <div id="formButtonContainer" className="flex justify-center">
                 <button type="submit" className="w-64">
                     <div id="createButton" className="SpecialButton gradient-border gradient-border:after">
-                    <h2 className="SpecialButtonText">
-                        Create Page
-                    </h2>
+                      <h2 className="SpecialButtonText">
+                          Create Page
+                      </h2>
                     </div>
                 </button>
             </div>

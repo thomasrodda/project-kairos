@@ -65,8 +65,8 @@
     height: calc(100% + var(--borderWidth) * 2);
     width: calc(100% + var(--borderWidth) * 2);
     background: linear-gradient(60deg, #FEBB63, #B373FC, #F992E0, #FEBB63, #B373FC, #F992E0);
-    border-radius: 8px;
     z-index: -1;
+    border-radius: 8px;
     animation: animatedgradient 3s ease alternate infinite;
     background-size: 300% 300%;
   }
@@ -106,8 +106,8 @@
   height: calc(100% + var(--borderWidth) * 2);
   width: calc(100% + var(--borderWidth) * 2);
   background: linear-gradient(60deg, #FEBB63, #B373FC, #F992E0, #FEBB63, #B373FC, #F992E0);
-  border-radius: 4px;
   z-index: -1;
+  border-radius: 4px;
   animation: animatedgradient 3s ease alternate infinite;
   background-size: 300% 300%;
 }
@@ -129,7 +129,7 @@
     width: 100vw;
     align-items: center;
     display: flex;
-    padding: 40px;
+    padding: 80px;
   }
   .menuBackground {
     background-image: url(Images/main_menu_background.png);
@@ -177,7 +177,7 @@
     max-width: 1420px;
     min-height: 600px;
     width: 100%;
-    height: auto;
+    height: 100%;
     margin: auto;
     padding: 100px;
     border-radius: 100px;
@@ -215,6 +215,12 @@
   .workspaceTemplateListItem {
 
   }
+
+  /* Workspace Creation Form */
+    .createWorkspaceForm {
+      max-width: 600px;
+      margin: auto;
+    }
 
 /*Workspace Selection*/
   .workspaceItemList {

@@ -17,6 +17,9 @@ module.exports = {
         "off-black": "#16181A",
         "almost-black": "#0B0C0D",
         "black": "#000000",
+        "pink": "#F992E0",
+        "purple": "#B373FC",
+        "orange": "#FEBB63",
       },
       fontSize: {
         pageName: ['36px', { lineHeight: '1.5', letterSpacing: '0em' }],
