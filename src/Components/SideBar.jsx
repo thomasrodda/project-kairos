@@ -25,9 +25,9 @@ const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId }) => {
             {/** Workspace */}
             <div id="workspace" className="p-3 flex items-center hover:bg-darker-grey">
                 <img src={profileIcon} alt="Profile" className='IconSize'/>
-                <h1 className="text-white text-h4 ml-2 mr-2">
+                <h2 className="text-white text-h4 ml-2 mr-2">
                     Workspace Name
-                </h1>
+                </h2>
                 <img src={switchWorkspaceIcon} alt="Switch Workspace" className="h-[15px]" />
             </div>
 
