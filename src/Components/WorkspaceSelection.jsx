@@ -24,7 +24,7 @@ const WorkspaceSelection = () => {
     
     return (
         <div className="mainMenu menuBackground">
-            <div className="menuContentArea flex justify-between">
+            <div className="menuContentArea boxShadowBlackL flex flex-row justify-between">
                 {/* Choose Your Workspace */}
                 <div className="flex flex-col">
                     <div className="workspaceHeading mb-10">

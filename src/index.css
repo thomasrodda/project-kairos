@@ -34,6 +34,14 @@
     display: inline-block;
   }
 
+/*Default Shadows*/
+  .boxShadowBlack {
+    box-shadow: 0px 0px 15px black;
+  }
+  .boxShadowBlackL {
+    box-shadow: 0px 0px 10px #0B0C0D;
+  }
+
 /*Form Labels*/
   .formLabels {
     @apply text-body text-light-grey;
@@ -46,7 +54,11 @@
 
 /*Special Button*/
   .SpecialButton {
+    transition: background-color 0.1s ease-in-out;
     @apply p-3 bg-off-black text-white cursor-pointer;
+  }
+  .SpecialButton:hover {
+    @apply bg-almost-black;
   }
   .SpecialButtonText {
     @apply text-body mx-2 text-center;
@@ -146,7 +158,6 @@
     border-radius: 100px;
     align-items: center;
     display: flex;
-    @apply bg-white shadow-2xl
   }
   .grainyGradient {
     position: relative;
@@ -177,11 +188,13 @@
     max-width: 1420px;
     min-height: 600px;
     width: 100%;
-    height: 100%;
+    height: auto;
     margin: auto;
     padding: 100px;
     border-radius: 100px;
-    @apply bg-almost-black shadow-2xl
+    display: flex;
+    justify-content: space-between;
+    @apply bg-almost-black
   }
 
 /*Workspace Creation*/
@@ -189,7 +202,7 @@
     display: block;
     text-align: center;
     width: 100%;
-    margin-bottom: 60px;
+    margin-bottom: 40px;
   }
   .workspaceTemplateOptions {
     width: 100%;
@@ -200,8 +213,11 @@
     @apply flex justify-between items-start
   }
   .workspaceTemplateCard {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     width: 300px;
-    height: auto;
+    height: 400px;
     min-height: 300px;
     @apply bg-darkest-grey rounded-xl p-8
   }
@@ -209,16 +225,21 @@
     @apply text-h2 font-bold tracking-wider
   }
   .workspaceTemplateSubheader {
-    margin-bottom: 8px;
-    @apply text-info text-grey
+    @apply text-info text-grey my-2
   }
-  .workspaceTemplateListItem {
-
+  .blankSlate {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 300px;
+    height: 400px;
+    min-height: 300px;
+    @apply bg-none border-solid border-4 border-darkest-grey rounded-xl p-7
   }
 
   /* Workspace Creation Form */
     .createWorkspaceForm {
-      max-width: 600px;
+      width: 600px;
       margin: auto;
     }
 
@@ -230,9 +251,15 @@
     width: 260px;
     @apply p-3 flex items-center bg-darker-grey rounded
   }
+  .workspaceItem:hover {
+    @apply bg-darkest-grey
+  }
   .newWorkspaceItem {
     width: 260px;
     @apply p-2 py-3 flex items-center border-solid border-2 border-darker-grey rounded
+  }
+  .newWorkspaceItem:hover {
+    @apply bg-black
   }
   .workspaceItemText {
     @apply text-h4 mx-2

@@ -32,7 +32,7 @@ const MainMenu = () => {
 
   return (
     <div className="mainMenu menuBackground" onClick={goToLogin}>
-      <div className="mainMenuContentArea grainyGradient">
+      <div className="mainMenuContentArea boxShadowBlackL grainyGradient">
         <div className="mainMenuContent">
             <h1 className="mainMenuHeading">Slate-Ai</h1>
             <h2 className="mainMenuSubheading">Start writing...</h2>

@@ -28,7 +28,7 @@ const CreatePage = ({ createPage, closePopup }) => {
         <div className='flex justify-between items-start'>
             <h2 className="text-pageName font-bold mb-6">Create Page</h2>
             <button type="button" onClick={closePopup}>
-                <img src={closeIcon} className='IconSize opacity-50 hover:opacity-100'></img>
+                <img src={closeIcon} alt="Close" className='IconSize opacity-50 hover:opacity-100'></img>
             </button>
         </div>
         <form onSubmit={handleSubmit} className='flex flex-col space-y-10'>
@@ -36,7 +36,7 @@ const CreatePage = ({ createPage, closePopup }) => {
                 <div id="pageIconSelector" className='flex flex-col space-y-2'>
                     <label className='formLabels'>Icon</label>
                     <div className='formFields'>
-                        <img src={placeholderIcon} className='IconSize'></img>
+                        <img src={placeholderIcon} alt="Page Icon" className='IconSize'></img>
                     </div>
                 </div>
                 <div id="pageNameField" className="flex flex-col space-y-2 flex-grow">
@@ -46,7 +46,7 @@ const CreatePage = ({ createPage, closePopup }) => {
             </div>
             <div id="formButtonContainer" className="flex justify-center">
                 <button type="submit" className="w-64">
-                    <div id="createButton" className="SpecialButton gradient-border gradient-border:after">
+                    <div id="createButton" className="SpecialButton SpecialButton:hover gradient-border gradient-border:after">
                       <h2 className="SpecialButtonText">
                           Create Page
                       </h2>
