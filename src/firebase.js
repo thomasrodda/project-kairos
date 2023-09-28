@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import "firebase/auth"; // If you are going to use authentication
+import { getAuth } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 
@@ -19,4 +19,7 @@ const analytics = getAnalytics(app);
 
 const db = getFirestore(app);
 
-export { db };
+// Initialise Authentication
+const auth = getAuth(app);
+
+export { db, auth };

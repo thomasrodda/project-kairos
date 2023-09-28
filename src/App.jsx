@@ -1,6 +1,7 @@
 import { db } from './firebase.js';
 import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
 import './App.css';
+import Login from './Components/Login';
 import SideBar from './Components/SideBar';
 import Editor from './Components/Editor';
 import React, { useState, useEffect } from 'react';
@@ -83,6 +84,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MainMenu />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/workspace-selection" element={<WorkspaceSelection />} />
         <Route path="/create-workspace" element={<CreateWorkspace />} />
         <Route path="/app" element={RenderApp()} />

@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../index.css';
 
 const MainMenu = () => {
@@ -25,9 +26,11 @@ const MainMenu = () => {
         const existingBackground = getComputedStyle(grainyGradientElement).backgroundImage;
         grainyGradientElement.style.backgroundImage = `url(${canvas.toDataURL()}), ${existingBackground}`;
       }, []);
+  
+  const navigate = useNavigate();
 
   const goToLogin = () => {
-    // Navigate to Login Screen (to be implemented)
+    navigate('/login'); // Navigate to Login Screen
   };
 
   return (
