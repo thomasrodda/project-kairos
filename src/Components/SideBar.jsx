@@ -1,3 +1,5 @@
+import React, { useContext } from 'react';
+import { UserContext } from '../UserContext';
 import '../index.css';
 import Divider from './Divider';
 import PageList from './PageList';
@@ -16,6 +18,9 @@ import updatesIcon from '../Images/updates_icon.png'
 // SideBar.jsx renders the sidebar, containing the PageList and other features.
 
 const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId }) => {
+    const user = useContext(UserContext);  // Get the current user
+
+    console.log("Current user in SideBar:", user);  // Log current user for debugging
     console.log("Selected Page ID in SideBar:", selectedPageId);
     console.log(createPage);
     return (

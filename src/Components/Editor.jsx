@@ -1,10 +1,14 @@
 import { db } from '../firebase.js';
 import { doc, updateDoc } from 'firebase/firestore';
 import '../index.css';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { UserContext } from '../UserContext.jsx';
 import RichTextEditor from './RichTextEditor'
 
 const Editor = ({ selectedPage, setPages }) => {
+    const user = useContext(UserContext);  // Get the current user
+
+    console.log("Current user in Editor:", user);  // Log current user for debugging
     console.log("SelectedPage in Editor:", selectedPage);
     const [currentContent, setCurrentContent] = useState(selectedPage.content);
     const [debouncedContent, setDebouncedContent] = useState(selectedPage.content);

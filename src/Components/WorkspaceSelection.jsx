@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { UserContext } from '../UserContext';
 import '../index.css';
 import profileIcon from '../Images/profile_icon.png'
 import helpIcon from '../Images/help_icon.png'
@@ -11,8 +12,13 @@ const WorkspaceSelection = () => {
     // State to hold the list of workspaces
     const [workspaces, setWorkspaces] = useState([]);
 
+    // Get user from UserContext
+    const { user } = useContext(UserContext);
+
     // Fetch the list of workspaces (Dummy data for now)
     useEffect(() => {
+        // TODO: Fetch user-specific workspaces from Firestore
+        // For now, using dummy data
         const dummyWorkspaces = [
             { id: '1', name: 'Workspace 1' },
             { id: '2', name: 'Workspace 2' },
@@ -20,7 +26,7 @@ const WorkspaceSelection = () => {
         ];
 
         setWorkspaces(dummyWorkspaces);
-    }, []);
+    }, [user]); // Dependency on 'user' so it re-fetches when user changes
     
     return (
         <div className="mainMenu menuBackground">

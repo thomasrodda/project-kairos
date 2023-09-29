@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { UserContext } from '../UserContext';
 import '../index.css';
 import checkIcon from '../Images/check_icon.png'
 import backIcon from '../Images/back_icon.png'
@@ -13,13 +14,17 @@ const CreateWorkspace = () => {
     setSelectedTemplate(template);
   };
 
+  // Get user from UserContext
+  const { user } = useContext(UserContext);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (workspaceName.trim() === '') {
       alert('Workspace name cannot be empty');
       return;
     }
-    alert(`Creating workspace: ${workspaceName} with template: ${selectedTemplate}`);
+    alert(`Creating workspace: ${workspaceName} with template: ${selectedTemplate} for user: ${user.email}`);
+    // TODO: Actually create the workspace in Firestore tied to the user
   };
 
   return (

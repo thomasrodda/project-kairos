@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useContext} from 'react';
+import { UserContext } from '../UserContext';
 import { auth } from '../firebase';
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
 import '../index.css';
 
 const signInWithGoogle = () => {
@@ -9,6 +10,30 @@ const signInWithGoogle = () => {
 };
 
 const Login = () => {
+
+  // Get user and setUser from UserContext
+  const { user, setUser } = useContext(UserContext);
+
+  // Listen for changes in authentication state
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
+      if (authUser) {
+        setUser(authUser);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [setUser]);
+
+  const signInWithGoogle = () => {
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider).then((result) => {
+      setUser(result.user);
+    });
+  };
+  
   return (
     <div className="mainMenu menuBackground">
         <div className="menuContentArea boxShadowBlackL flex flex-col items-center justify-center">
