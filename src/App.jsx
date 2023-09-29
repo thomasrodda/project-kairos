@@ -11,6 +11,7 @@ import MainMenu from './Components/MainMenu';
 import WorkspaceSelection from './Components/WorkspaceSelection';
 import CreateWorkspace from './Components/CreateWorkspace';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 // App.jsx serves as the entry point for the Kairos app, managing state and rendering major components.
 

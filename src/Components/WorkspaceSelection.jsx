@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../UserContext';
+import { db } from '../firebase';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import '../index.css';
 import profileIcon from '../Images/profile_icon.png'
 import helpIcon from '../Images/help_icon.png'
@@ -15,17 +17,26 @@ const WorkspaceSelection = () => {
     // Get user from UserContext
     const { user } = useContext(UserContext);
 
-    // Fetch the list of workspaces (Dummy data for now)
+    // Fetch the list of Workspaces
     useEffect(() => {
-        // TODO: Fetch user-specific workspaces from Firestore
-        // For now, using dummy data
-        const dummyWorkspaces = [
-            { id: '1', name: 'Workspace 1' },
-            { id: '2', name: 'Workspace 2' },
-            { id: '3', name: 'Workspace 3' },
-        ];
+        // Check if user is not null before proceeding
+        if (user && user.uid) {  // Check if user and user.uid are not null
+            // Create a query against the 'workspaces' collection where 'userId' matches the current user's ID
+            const workspaceRef = collection(db, 'users', user.uid, 'workspaces');
+    
+            // Fetch the workspaces
+            const fetchData = async () => {
+                const querySnapshot = await getDocs(workspaceRef);
+                const fetchedWorkspaces = [];
+                querySnapshot.forEach((doc) => {
+                    fetchedWorkspaces.push({ id: doc.id, ...doc.data() });
+                });
+                setWorkspaces(fetchedWorkspaces);
+            };
 
-        setWorkspaces(dummyWorkspaces);
+            // Call the fetchData function
+            fetchData();
+        }
     }, [user]); // Dependency on 'user' so it re-fetches when user changes
     
     return (

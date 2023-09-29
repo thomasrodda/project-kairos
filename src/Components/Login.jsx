@@ -1,24 +1,24 @@
 import React, { useEffect, useContext} from 'react';
 import { UserContext } from '../UserContext';
+import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
+import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { db } from '../firebase';
 import '../index.css';
 
-const signInWithGoogle = () => {
-  const provider = new GoogleAuthProvider();
-  signInWithPopup(auth, provider);
-};
-
 const Login = () => {
-
   // Get user and setUser from UserContext
   const { user, setUser } = useContext(UserContext);
+
+  const navigate = useNavigate();
 
   // Listen for changes in authentication state
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
         setUser(authUser);
+        console.log("User set in Login:", authUser);
       }
     });
 
@@ -27,11 +27,33 @@ const Login = () => {
     };
   }, [setUser]);
 
-  const signInWithGoogle = () => {
+  // Sign in with Google
+  const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    signInWithPopup(auth, provider).then((result) => {
-      setUser(result.user);
-    });
+    const userCredential = await signInWithPopup(auth, provider);  // Await the promise
+    const authUser = userCredential.user;
+    setUser(authUser);  // Set the authenticated user
+
+    // Fetch user data
+    const userId = authUser.uid;
+    const email = authUser.email;
+    const name = authUser.displayName;
+
+    // Check if a document for this user ID already exists
+    const userDocRef = doc(db, 'users', userId);
+    const userDocSnap = await getDoc(userDocRef);  // Await the promise
+
+    // If it doesn't exist, create a new document
+    if (!userDocSnap.exists()) {
+      await setDoc(userDocRef, {  // Await the promise
+        email: email,
+        name: name,
+      });
+    }
+
+    // Redirect to workspace selection after successful login
+    navigate("/workspace-selection");
+
   };
   
   return (

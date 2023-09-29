@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, browserLocalPersistence, setPersistence } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
 
@@ -21,5 +21,6 @@ const db = getFirestore(app);
 
 // Initialise Authentication
 const auth = getAuth(app);
+setPersistence(auth, browserLocalPersistence); // User Login Persistence
 
 export { db, auth };

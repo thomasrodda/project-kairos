@@ -1,6 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../UserContext';
+import { db } from '../firebase';
+import { collection, addDoc, doc } from 'firebase/firestore';
 import '../index.css';
 import checkIcon from '../Images/check_icon.png'
 import backIcon from '../Images/back_icon.png'
@@ -16,16 +18,44 @@ const CreateWorkspace = () => {
 
   // Get user from UserContext
   const { user } = useContext(UserContext);
+  console.log('User from context at component load:', user);
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Log the current user from the context when the component mounts
+    console.log('User from context at component load:', user);
+
+    // Here, fetch the latest user data if needed and update the UserContext
+  }, []);
+
+  const handleSubmit = async (e) => {
+    console.log('User from context:', user);
     e.preventDefault();
     if (workspaceName.trim() === '') {
       alert('Workspace name cannot be empty');
       return;
     }
-    alert(`Creating workspace: ${workspaceName} with template: ${selectedTemplate} for user: ${user.email}`);
-    // TODO: Actually create the workspace in Firestore tied to the user
-  };
+  
+    if (!user || !user.uid) {
+      alert('User not authenticated. Please login again.');
+      return;
+    }
+  
+    try {
+      // Add a new workspace to Firestore
+      const workspaceRef = collection(db, 'users', user.uid, 'workspaces');  // Updated path
+      const workspaceData = {
+        name: workspaceName,
+        description: workspaceDescription,
+        template: selectedTemplate,
+      };
+      await addDoc(workspaceRef, workspaceData);
+      
+      alert(`Successfully created workspace: ${workspaceName}`);
+    } catch (e) {
+      console.error("Error adding workspace: ", e);
+      alert('Failed to create workspace. Please try again.');
+    }
+  };  
 
   return (
     <div className="mainMenu menuBackground">
