@@ -10,7 +10,7 @@ const Editor = ({ selectedPage, setPages }) => {
 
     console.log("Current user in Editor:", user);  // Log current user for debugging
     console.log("SelectedPage in Editor:", selectedPage);
-    const [currentContent, setCurrentContent] = useState(selectedPage.content);
+    const [currentContent, setCurrentContent] = useState(selectedPage ? selectedPage.content : "");
     const [debouncedContent, setDebouncedContent] = useState(selectedPage.content);
 
     let timerId;  // Declare timerId outside of useEffect

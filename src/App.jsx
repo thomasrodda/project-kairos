@@ -34,9 +34,11 @@ function App() {
       setPages(pagesData);
       console.log("Fetched pages:", pagesData);
       setSelectedPageId(prevSelectedPageId => {
-        console.log("Previous SelectedPageId:", prevSelectedPageId);  // <-- Add this line
-        return pagesData[0].id;
-      });
+        if (pagesData.length > 0) {
+          return pagesData[0].id;
+        }
+        return null;
+      });      
       setIsLoading(false);
     });
   }, []); // Empty dependency array means this useEffect runs once when the component mounts
