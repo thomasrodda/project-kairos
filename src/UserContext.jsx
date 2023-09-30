@@ -15,7 +15,7 @@ export const UserProvider = ({ children }) => {
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(null);
 
   useEffect(() => {
-    // Move this logic to UserProvider
+    // This effect sets up and tears down Firebase authentication state listener
     const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       if (authUser) {
         setUser(authUser);

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
+import { getAuth, setPersistence, browserSessionPersistence } from "firebase/auth";
+// import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -15,7 +15,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// const analytics = getAnalytics(app);
 
 const db = getFirestore(app);
 
@@ -26,8 +26,8 @@ const auth = getAuth(app);
 setPersistence(auth, browserSessionPersistence)
   .catch((error) => {
     // Handle Errors here.
-    var errorCode = error.code;
-    var errorMessage = error.message;
+    // var errorCode = error.code;
+    // var errorMessage = error.message;
   });
 
 export { db, auth };

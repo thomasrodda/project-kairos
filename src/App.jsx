@@ -26,10 +26,12 @@ function App() {
 
   // Save the selectedWorkspaceId to Firebase
   const saveWorkspaceIdToFirebase = async (workspaceId, userId) => {
-    const userRef = doc(db, 'users', userId);
-    await updateDoc(userRef, {
-      selectedWorkspaceId: workspaceId
-    });
+    try {
+      const userRef = doc(db, 'users', userId);
+      await updateDoc(userRef, { selectedWorkspaceId: workspaceId });
+    } catch (error) {
+      console.error("Failed to save workspace ID to Firebase:", error);
+    }
   };
 
   // Fetch the selectedWorkspaceId from Firebase when the user logs in
@@ -38,8 +40,6 @@ function App() {
       const userDoc = await getDoc(doc(db, 'users', userId));
       const userData = userDoc.data();
       if (userData && userData.selectedWorkspaceId) {
-        // Assuming you have a function to set the selectedWorkspaceId in your UserContext
-        // Replace `setSelectedWorkspaceId` with your actual function
         setSelectedWorkspaceId(userData.selectedWorkspaceId);
       }
     };
@@ -47,10 +47,11 @@ function App() {
     if (user && user.uid) {
       fetchWorkspaceIdFromFirebase(user.uid);
     }
-  }, [user]);
+  }, [user, setSelectedWorkspaceId]); // This effect runs when the user object changes
 
   // Fetch pages from Firestore when component mounts
   useEffect(() => {
+    // This effect fetches pages and sets the loading state
     // Check if a workspace is selected and if the user is authenticated
     if (selectedWorkspaceId && user && user.uid) {
       const pagesRef = collection(db, 'users', user.uid, 'workspaces', selectedWorkspaceId, 'pages');
@@ -74,14 +75,15 @@ function App() {
     } else {
       setIsLoading(false);  // Set isLoading to false because either user or workspace is missing
     }
-  }, [selectedWorkspaceId, user]); // Add selectedWorkspaceId to the dependency array 
+  }, [selectedWorkspaceId, user]); // This effect runs when either selectedWorkspaceId or user changes
 
   // Save the selectedWorkspaceId to Firebase when it changes
   useEffect(() => {
+    // This effect saves the selectedWorkspaceId to Firebase
     if (selectedWorkspaceId && user && user.uid) {
       saveWorkspaceIdToFirebase(selectedWorkspaceId, user.uid);
     }
-  }, [selectedWorkspaceId, user]);
+  }, [selectedWorkspaceId, user]); // This effect runs when either selectedWorkspaceId or user changes
 
   useEffect(() => {
     const newSelectedPage = pages.find(page => page.id === selectedPageId);
