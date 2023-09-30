@@ -48,7 +48,16 @@ const CreateWorkspace = () => {
         description: workspaceDescription,
         template: selectedTemplate,
       };
-      await addDoc(workspaceRef, workspaceData);
+      
+      // This line creates a new workspace and also captures its document reference
+      const workspaceDoc = await addDoc(workspaceRef, workspaceData); // Store the workspace doc
+       // After the workspace is successfully created, create a default page
+      const pageRef = collection(db, 'users', user.uid, 'workspaces', workspaceDoc.id, 'pages'); // Set the path for the new page
+      const defaultPageData = {
+        name: "Default Page",
+        content: "This is placeholder content."
+      };
+      await addDoc(pageRef, defaultPageData); // Create the default page in Firestore
       
       alert(`Successfully created workspace: ${workspaceName}`);
     } catch (e) {
