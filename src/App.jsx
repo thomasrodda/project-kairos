@@ -1,8 +1,8 @@
 import { db } from './firebase.js';
-import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
 import './App.css';
 import Login from './Components/Login';
-import { UserProvider, UserContext } from './UserContext';
+import { UserContext } from './UserContext';
 import SideBar from './Components/SideBar';
 import Editor from './Components/Editor';
 import React, { useState, useEffect, useContext } from 'react';
@@ -22,14 +22,37 @@ function App() {
   const [selectedPage, setSelectedPage] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const { selectedWorkspaceId, user } = useContext(UserContext);
+  const { setSelectedWorkspaceId, selectedWorkspaceId, user } = useContext(UserContext);
+
+  // Save the selectedWorkspaceId to Firebase
+  const saveWorkspaceIdToFirebase = async (workspaceId, userId) => {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      selectedWorkspaceId: workspaceId
+    });
+  };
+
+  // Fetch the selectedWorkspaceId from Firebase when the user logs in
+  useEffect(() => {
+    const fetchWorkspaceIdFromFirebase = async (userId) => {
+      const userDoc = await getDoc(doc(db, 'users', userId));
+      const userData = userDoc.data();
+      if (userData && userData.selectedWorkspaceId) {
+        // Assuming you have a function to set the selectedWorkspaceId in your UserContext
+        // Replace `setSelectedWorkspaceId` with your actual function
+        setSelectedWorkspaceId(userData.selectedWorkspaceId);
+      }
+    };
+
+    if (user && user.uid) {
+      fetchWorkspaceIdFromFirebase(user.uid);
+    }
+  }, [user]);
 
   // Fetch pages from Firestore when component mounts
   useEffect(() => {
-    console.log("Selected Workspace ID:", selectedWorkspaceId);
-    // Check if a workspace is selected
-    if (selectedWorkspaceId) {
-      // Adjust Firestore query to fetch pages for the selected workspace
+    // Check if a workspace is selected and if the user is authenticated
+    if (selectedWorkspaceId && user && user.uid) {
       const pagesRef = collection(db, 'users', user.uid, 'workspaces', selectedWorkspaceId, 'pages');
       
       getDocs(pagesRef).then((querySnapshot) => {
@@ -38,19 +61,27 @@ function App() {
           pagesData.push({ id: doc.id, ...doc.data() });
         });
         setPages(pagesData);
-        console.log("Fetched pages:", pagesData);
         
         setSelectedPageId(prevSelectedPageId => {
           if (pagesData.length > 0) {
             return pagesData[0].id;
           }
           return null;
-        });
-        
-        setIsLoading(false);
+        }); 
+      }).finally(() => {
+        setIsLoading(false);  // Set isLoading to false after fetching, regardless of success or failure
       });
+    } else {
+      setIsLoading(false);  // Set isLoading to false because either user or workspace is missing
     }
-  }, [selectedWorkspaceId]); // Add selectedWorkspaceId to the dependency array  
+  }, [selectedWorkspaceId, user]); // Add selectedWorkspaceId to the dependency array 
+
+  // Save the selectedWorkspaceId to Firebase when it changes
+  useEffect(() => {
+    if (selectedWorkspaceId && user && user.uid) {
+      saveWorkspaceIdToFirebase(selectedWorkspaceId, user.uid);
+    }
+  }, [selectedWorkspaceId, user]);
 
   useEffect(() => {
     const newSelectedPage = pages.find(page => page.id === selectedPageId);

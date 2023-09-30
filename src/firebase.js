@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, browserLocalPersistence, setPersistence } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
 import { getAnalytics } from "firebase/analytics";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -19,8 +19,15 @@ const analytics = getAnalytics(app);
 
 const db = getFirestore(app);
 
-// Initialise Authentication
+// Initialize Authentication
 const auth = getAuth(app);
-setPersistence(auth, browserLocalPersistence); // User Login Persistence
+
+// Set persistence for the session
+setPersistence(auth, browserSessionPersistence)
+  .catch((error) => {
+    // Handle Errors here.
+    var errorCode = error.code;
+    var errorMessage = error.message;
+  });
 
 export { db, auth };
