@@ -38,23 +38,27 @@ const Editor = ({ selectedPage, setPages, selectedWorkspaceId }) => {
             "selectedPage.id": selectedPage?.id || "selectedPage.id is undefined",
         });
 
-        timerId = setTimeout(() => {
-            console.log("Inside setTimeout")
-            // Make sure to include the full path to the page in Firestore
-            const pageRef = doc(db, 'users', user.uid, 'workspaces', selectedWorkspaceId, 'pages', selectedPage.id);
-            updateDoc(pageRef, { content: debouncedContent }).then(() => {
-                console.log("Firestore update successful");
-                setPages((prevPages) => {
-                    const updatedPages = prevPages.map((page) => {
-                        if (page.id === selectedPage.id) {
-                            return { ...page, content: debouncedContent };
-                        }
-                        return page;
+        if (user && user.uid && selectedWorkspaceId && selectedPage && selectedPage.id) {
+            timerId = setTimeout(() => {
+                console.log("Inside setTimeout")
+                // Make sure to include the full path to the page in Firestore
+                const pageRef = doc(db, 'users', user.uid, 'workspaces', selectedWorkspaceId, 'pages', selectedPage.id);
+                updateDoc(pageRef, { content: debouncedContent }).then(() => {
+                    console.log("Firestore update successful");
+                    setPages((prevPages) => {
+                        const updatedPages = prevPages.map((page) => {
+                            if (page.id === selectedPage.id) {
+                                return { ...page, content: debouncedContent };
+                            }
+                            return page;
+                        });
+                        return updatedPages;
                     });
-                    return updatedPages;
                 });
-            });
-        }, 1000); // User inactivity time /ms
+            }, 1000); // User inactivity time /ms
+        } else {
+            console.log("One of the required fields is undefined. Halting operation.");
+        }
 
         return () => {
             clearTimeout(timerId);
