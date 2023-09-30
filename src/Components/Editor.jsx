@@ -9,6 +9,8 @@ const Editor = ({ selectedPage, setPages, selectedWorkspaceId }) => {
     const { user } = useContext(UserContext);  // Get the current user and destructure it
     const timerIdRef = useRef(null); // Declare timerIdRef
 
+    const focusEditor = useRef(null);  // Create a ref to hold the focusEditor function
+
     console.log("Current user in Editor:", user);  // Log current user for debugging
     console.log("SelectedPage in Editor:", selectedPage);
     const [currentContent, setCurrentContent] = useState(selectedPage ? selectedPage.content : "");
@@ -50,6 +52,7 @@ const Editor = ({ selectedPage, setPages, selectedWorkspaceId }) => {
 
                     updateDoc(pageRef, { content: debouncedContent }).then(() => {
                         console.log("Firestore update successful");
+                        focusEditor();  // Focus the editor here
                         setPages((prevPages) => {
                             return prevPages.map((page) => {
                                 if (page.id === selectedPage.id) {
@@ -78,7 +81,7 @@ const Editor = ({ selectedPage, setPages, selectedWorkspaceId }) => {
                 <h2 className="text-pageName font-bold text-left">{selectedPage.name}</h2>
             </div>
             <div>
-                <RichTextEditor initialContent={currentContent} onContentChange={handleContentChange} />
+                <RichTextEditor initialContent={currentContent} onContentChange={handleContentChange} focusEditor={focusEditor} />
             </div>
         </div>
     );

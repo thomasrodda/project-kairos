@@ -7,10 +7,9 @@ import pageIcon from '../Images/page_icon.png'
 
 // RichTextEditor.jsx integrates the Quill.js editor and manages its features.
 
-const RichTextEditor = ({ initialContent, onContentChange }) => {
+const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
   //console.log("Initial content passed to RichTextEditor:", initialContent);
   const quillRef = useRef(null); // To store the ReactQuill element reference
-
   const [currentLine, setCurrentLine] = useState(null);
   const [currentOffset, setCurrentOffset] = useState(null);
 
@@ -18,7 +17,14 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
   let isFormatting = false;
 
   const handleChange = (editorContent) => {
+    console.log("handleChange called");
     onContentChange(editorContent);
+  };
+
+  // Refocus editor after content save
+  focusEditor = () => {
+    const quill = quillRef.current.getEditor();
+    quill.focus();
   };
 
   // Configuration object for the Quill.js toolbar.
@@ -69,7 +75,7 @@ const RichTextEditor = ({ initialContent, onContentChange }) => {
   // Formats the text
   const formatText = (format, line, offset) => {
     const quill = quillRef.current.getEditor(); // Access the Quill instance
-    const selection = quill.getSelection(); // Get the current selection range
+    // const selection = quill.getSelection(); // Get the current selection range - I think not needed, check this with GPT!!!!!!!!!!!!!!!!!!!!!!!!!!!
     const index = quill.getIndex(line);   // Get the index and length of the line
     const length = line.length();
 
