@@ -5,7 +5,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { UserContext } from '../UserContext.jsx';
 import RichTextEditor from './RichTextEditor'
 
-const Editor = ({ selectedPage, setPages }) => {
+const Editor = ({ selectedPage, setPages, selectedWorkspaceId }) => {
     const user = useContext(UserContext);  // Get the current user
 
     console.log("Current user in Editor:", user);  // Log current user for debugging
@@ -30,9 +30,18 @@ const Editor = ({ selectedPage, setPages }) => {
     // Saves content automatically when user inactive
     useEffect(() => {
         console.log("Second useEffect triggered");
+
+        // Debug: Log the values to check for undefined
+        console.log("Debug Values (Explicit):", {
+            "user.uid": user?.uid || "user.uid is undefined",
+            "selectedWorkspaceId": selectedWorkspaceId || "selectedWorkspaceId is undefined",
+            "selectedPage.id": selectedPage?.id || "selectedPage.id is undefined",
+        });
+
         timerId = setTimeout(() => {
             console.log("Inside setTimeout")
-            const pageRef = doc(db, "pages", selectedPage.id);
+            // Make sure to include the full path to the page in Firestore
+            const pageRef = doc(db, 'users', user.uid, 'workspaces', selectedWorkspaceId, 'pages', selectedPage.id);
             updateDoc(pageRef, { content: debouncedContent }).then(() => {
                 console.log("Firestore update successful");
                 setPages((prevPages) => {

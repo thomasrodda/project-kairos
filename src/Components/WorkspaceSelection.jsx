@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../UserContext';
 import { db } from '../firebase';
@@ -16,6 +17,12 @@ const WorkspaceSelection = () => {
 
     // Get user from UserContext
     const { user } = useContext(UserContext);
+
+    // For Selecting a Workspace to Render
+    const { setSelectedWorkspaceId } = useContext(UserContext);
+
+    // Initialize navigate function
+    const navigate = useNavigate();
 
     // Fetch the list of Workspaces
     useEffect(() => {
@@ -38,6 +45,13 @@ const WorkspaceSelection = () => {
             fetchData();
         }
     }, [user]); // Dependency on 'user' so it re-fetches when user changes
+
+    // 
+    const handleWorkspaceSelection = (workspaceId) => {
+        setSelectedWorkspaceId(workspaceId);
+        console.log("Workspace ID set:", workspaceId);
+        navigate('/app');
+      };     
     
     return (
         <div className="mainMenu menuBackground">
@@ -55,7 +69,7 @@ const WorkspaceSelection = () => {
                         <button
                             key={workspace.id}
                             className="workspaceItem"
-                            onClick={() => alert(`Loading ${workspace.name}`)}
+                            onClick={() => handleWorkspaceSelection(workspace.id)} // Selects Workspace
                         >
                             <img src={profileIcon} alt="Profile" className='IconSize'/>
                             <h2 className="workspaceItemText">
