@@ -1,5 +1,5 @@
 import { db } from './firebase.js';
-import { collection, getDocs, doc, setDoc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, getDoc, addDoc } from 'firebase/firestore';
 import './App.css';
 import Login from './Components/Login';
 import { UserContext } from './UserContext';
@@ -92,18 +92,17 @@ function App() {
   }, [selectedPageId, pages]);  
   //console.log("Selected Page:", JSON.stringify(selectedPage));
 
-  const createPage = (pageName) => {
+  const createPage = async (pageName) => {
     // Ensure the Firestore reference includes user ID and workspace ID
-    const newPageRef = doc(db, 'users', user.uid, 'workspaces', selectedWorkspaceId, 'pages');
+    const pagesCollection = collection(db, 'users', user.uid, 'workspaces', selectedWorkspaceId, 'pages');
 
     // Create the new page
-    setDoc(newPageRef, {
-      id: newPageRef.id,
+    const newPageRef = await addDoc(pagesCollection, {
       name: pageName,
       content: ''
-    }).then(() => {
-      setPages([...pages, { id: newPageRef.id, name: pageName, content: '' }]);
     });
+    
+    setPages([...pages, { id: newPageRef.id, name: pageName, content: '' }]);
   };
 
   // Main App
