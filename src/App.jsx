@@ -1,3 +1,4 @@
+// Import required modules, components, and Firebase functions
 import { db } from './firebase.js';
 import { collection, getDocs, doc, updateDoc, getDoc, addDoc } from 'firebase/firestore';
 import './App.css';
@@ -12,11 +13,10 @@ import WorkspaceSelection from './Components/WorkspaceSelection';
 import CreateWorkspace from './Components/CreateWorkspace';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-// App.jsx serves as the entry point for the Kairos app, managing state and rendering major components.
-
+// Entry point for the Kairos app, managing state and rendering major components.
 function App() {
 
-  // Initialize pages state
+  // State variables for managing pages, selected pages, popups, and loading status
   const [pages, setPages] = useState([]);
   const [selectedPageId, setSelectedPageId] = useState(null);
   const [selectedPage, setSelectedPage] = useState(null);
@@ -24,7 +24,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const { setSelectedWorkspaceId, selectedWorkspaceId, user } = useContext(UserContext);
 
-  // Save the selectedWorkspaceId to Firebase
+  // Asynchronous function to save selected workspace ID to Firebase
   const saveWorkspaceIdToFirebase = async (workspaceId, userId) => {
     try {
       const userRef = doc(db, 'users', userId);
@@ -49,7 +49,7 @@ function App() {
     }
   }, [user, setSelectedWorkspaceId]); // This effect runs when the user object changes
 
-  // Fetch pages from Firestore when component mounts
+  // Fetch pages from Firestore when component mounts and update loading status
   useEffect(() => {
     // This effect fetches pages and sets the loading state
     // Check if a workspace is selected and if the user is authenticated
@@ -77,7 +77,7 @@ function App() {
     }
   }, [selectedWorkspaceId, user]); // This effect runs when either selectedWorkspaceId or user changes
 
-  // Save the selectedWorkspaceId to Firebase when it changes
+  // Save selectedWorkspaceId to Firebase when it changes
   useEffect(() => {
     // This effect saves the selectedWorkspaceId to Firebase
     if (selectedWorkspaceId && user && user.uid) {
@@ -85,6 +85,7 @@ function App() {
     }
   }, [selectedWorkspaceId, user]); // This effect runs when either selectedWorkspaceId or user changes
 
+  // Update selectedPage state when selectedPageId changes
   useEffect(() => {
     const newSelectedPage = pages.find(page => page.id === selectedPageId);
     setSelectedPage(newSelectedPage);
@@ -92,6 +93,7 @@ function App() {
   }, [selectedPageId, pages]);  
   //console.log("Selected Page:", JSON.stringify(selectedPage));
 
+  // Asynchronous function to create a new page in Firebase
   const createPage = async (pageName) => {
     // Ensure the Firestore reference includes user ID and workspace ID
     const pagesCollection = collection(db, 'users', user.uid, 'workspaces', selectedWorkspaceId, 'pages');
@@ -105,7 +107,7 @@ function App() {
     setPages([...pages, { id: newPageRef.id, name: pageName, content: '' }]);
   };
 
-  // Main App
+  // Main rendering logic for the app
   const RenderApp = () => {
     return (
       <div className="App flex h-screen overflow-hidden">
@@ -127,7 +129,7 @@ function App() {
     );
   };
 
-  // App Routes
+  // Routing setup for different views in the app
   return (
     <Router>
       <Routes>

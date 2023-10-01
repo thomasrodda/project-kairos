@@ -1,3 +1,4 @@
+// Import required modules and components
 import { db } from '../firebase.js';
 import { doc, updateDoc } from 'firebase/firestore';
 import '../index.css';
@@ -5,23 +6,26 @@ import React, { useEffect, useState, useContext, useRef } from 'react';
 import { UserContext } from '../UserContext.jsx';
 import RichTextEditor from './RichTextEditor'
 
+// Editor component definition
 const Editor = ({ selectedPage, setPages, selectedWorkspaceId }) => {
+
+    // Declare states and context
     const { user } = useContext(UserContext);  // Get the current user and destructure it
     const timerIdRef = useRef(null); // Declare timerIdRef
-
     const focusEditor = useRef(null);  // Create a ref to hold the focusEditor function
-
     console.log("Current user in Editor:", user);  // Log current user for debugging
     console.log("SelectedPage in Editor:", selectedPage);
     const [currentContent, setCurrentContent] = useState(selectedPage ? selectedPage.content : "");
     const [debouncedContent, setDebouncedContent] = useState(selectedPage ? selectedPage.content : "");
 
+    // Function to handle content change
     const handleContentChange = (newContent) => {
         console.log("handleContentChange triggered");
         setCurrentContent(newContent); // Update real-time content
         setDebouncedContent(newContent); // Update debounced content
     };
 
+    // useEffect to initialize content when a new page is selected
     useEffect(() => {
         console.log("First useEffect triggered");
         if (selectedPage) {
@@ -30,7 +34,7 @@ const Editor = ({ selectedPage, setPages, selectedWorkspaceId }) => {
         }
     }, [selectedPage]);
 
-    // Saves content automatically when user inactive
+    // useEffect to handle auto-saving of content
     useEffect(() => {
 
         console.log("Second useEffect triggered");
@@ -75,6 +79,7 @@ const Editor = ({ selectedPage, setPages, selectedWorkspaceId }) => {
         };
     }, [debouncedContent, user, selectedWorkspaceId, selectedPage, setPages]);
 
+    // Render the editor
     return (
         <div id="editor" className="editor h-screen overflow-scroll overflow-x-hidden m-0 flex items-center flex-col p-20 bg-off-black">
             <div className='w-[800px] mb-2'>

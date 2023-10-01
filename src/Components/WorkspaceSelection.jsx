@@ -1,9 +1,10 @@
+// Import required modules
 import React, { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../UserContext';
 import { db } from '../firebase';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs } from 'firebase/firestore';
 import '../index.css';
 import profileIcon from '../Images/profile_icon.png'
 import helpIcon from '../Images/help_icon.png'
@@ -11,20 +12,15 @@ import updatesIcon from '../Images/updates_icon.png'
 import addIcon from '../Images/add_icon.png'
 import settingsIcon from '../Images/settings_icon.png'
 
+// WorkspaceSelection component definition
 const WorkspaceSelection = () => {
-    // State to hold the list of workspaces
+    // Initialize state and context variables
     const [workspaces, setWorkspaces] = useState([]);
-
-    // Get user from UserContext
     const { user } = useContext(UserContext);
-
-    // For Selecting a Workspace to Render
     const { setSelectedWorkspaceId } = useContext(UserContext);
-
-    // Initialize navigate function
     const navigate = useNavigate();
 
-    // Fetch the list of Workspaces
+    // Fetch workspaces from Firestore based on the user's ID
     useEffect(() => {
         // Check if user is not null before proceeding
         if (user && user.uid) {  // Check if user and user.uid are not null
@@ -46,13 +42,14 @@ const WorkspaceSelection = () => {
         }
     }, [user]); // Dependency on 'user' so it re-fetches when user changes
 
-    // 
+    // Handle workspace selection and navigation
     const handleWorkspaceSelection = (workspaceId) => {
         setSelectedWorkspaceId(workspaceId);
         console.log("Workspace ID set:", workspaceId);
         navigate('/app');
       };     
     
+    // Render the workspace selection UI
     return (
         <div className="mainMenu menuBackground">
             <div className="menuContentArea boxShadowBlackL flex flex-row justify-between">

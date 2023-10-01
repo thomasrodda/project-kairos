@@ -1,3 +1,4 @@
+// Import required modules and styles
 import React, { useEffect, useRef, useState } from 'react';
 import ReactQuill from 'react-quill';
 import './quill.bubble.css'; // import styles
@@ -6,8 +7,9 @@ import Divider from './Divider';
 import pageIcon from '../Images/page_icon.png'
 
 // RichTextEditor.jsx integrates the Quill.js editor and manages its features.
-
 const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
+
+  // Declare states and refs
   //console.log("Initial content passed to RichTextEditor:", initialContent);
   const quillRef = useRef(null); // To store the ReactQuill element reference
   const [currentLine, setCurrentLine] = useState(null);
@@ -16,6 +18,7 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
   // Sets isFormatting to false - to be used in deletion of typed '/'
   let isFormatting = false;
 
+  // Handle content changes in the editor
   const handleChange = (editorContent) => {
     console.log("handleChange called");
     onContentChange(editorContent);
@@ -39,8 +42,8 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
     ],
   };
   
-  // Code to Display Slash Dropdown
-    const showDropdown = (line, offset) => {
+  // Show slash command dropdown
+  const showDropdown = (line, offset) => {
       setCurrentLine(line);
       setCurrentOffset(offset);
       const dropdown = document.getElementById('slashDropdown');
@@ -63,19 +66,19 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
     };
 
   // Reset highlighted dropdown option
-    const resetHighlighted = () => {
-      //console.log("resetHighlighted called");
-      const dropdown = document.getElementById('slashDropdown');
-      const highlighted = dropdown.querySelector('.highlighted');
-      if (highlighted) {
-        highlighted.classList.remove('highlighted');
-      }
-    };
+  const resetHighlighted = () => {
+    //console.log("resetHighlighted called");
+    const dropdown = document.getElementById('slashDropdown');
+    const highlighted = dropdown.querySelector('.highlighted');
+    if (highlighted) {
+      highlighted.classList.remove('highlighted');
+    }
+  };
   
   // Formats the text
   const formatText = (format, line, offset) => {
     const quill = quillRef.current.getEditor(); // Access the Quill instance
-    // const selection = quill.getSelection(); // Get the current selection range - I think not needed, check this with GPT!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // const selection = quill.getSelection(); // Get the current selection range - I think not needed.
     const index = quill.getIndex(line);   // Get the index and length of the line
     const length = line.length();
 
@@ -102,70 +105,71 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
     }
 
     // Remove the typed '/'
-      if (isFormatting) {
-        // Your existing code to delete '/'
-        quill.deleteText(index + offset - 1, 1);  
-        
-        //quill.focus(); // Focuses the editor again - Not needed
-        
-        // Adjust the cursor position by one character to the left
-        quill.setSelection(index + offset - 1, 0);
-      }
+    if (isFormatting) {
+      // Your existing code to delete '/'
+      quill.deleteText(index + offset - 1, 1);  
+      
+      //quill.focus(); // Focuses the editor again - Not needed
+      
+      // Adjust the cursor position by one character to the left
+      quill.setSelection(index + offset - 1, 0);
+    }
     
     // Hide the dropdown after formatting and reset search and results
-      const dropdown = document.getElementById('slashDropdown');
-      const searchInput = document.getElementById('dropdownSearch');
-      const items = dropdown.querySelectorAll('li');
-      if (dropdown) {
-        dropdown.style.display = 'none';
-      }
-      resetHighlighted(); // Reset the highlighted option
+    const dropdown = document.getElementById('slashDropdown');
+    const searchInput = document.getElementById('dropdownSearch');
+    const items = dropdown.querySelectorAll('li');
+    if (dropdown) {
+      dropdown.style.display = 'none';
+    }
+    resetHighlighted(); // Reset the highlighted option
       
     // Step 1: Clear the search input
-      if (searchInput) {
-        searchInput.value = '';
-      }
-      // Step 2: Reset the display property for all items
-      items.forEach(item => {
-        item.style.display = 'block';
-      });
-      // Step 3: Highlight the first item in the list
-      if (items[0]) {
-        items[0].classList.add('highlighted');
-      }
-      isFormatting = false; // Reset the flag
+    if (searchInput) {
+      searchInput.value = '';
+    }
+    // Step 2: Reset the display property for all items
+    items.forEach(item => {
+      item.style.display = 'block';
+    });
+    // Step 3: Highlight the first item in the list
+    if (items[0]) {
+      items[0].classList.add('highlighted');
+    }
+    isFormatting = false; // Reset the flag
   };
 
-  // Code for Slash Search
-    const handleSearch = (searchTerm) => {
-      const dropdown = document.getElementById('slashDropdown');
-      const items = dropdown.querySelectorAll('li');
-      
-      // Step 1: Remove highlighted class from all items
-      items.forEach(item => {
-        item.classList.remove('highlighted');
-      });
-      
-      // Filter list items based on the search term
-      items.forEach(item => {
-        const values = item.getAttribute('data-value').split(',');
-        if (values.some(value => value.toLowerCase().startsWith(searchTerm.toLowerCase()))) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
-      
-      // Step 2: Loop to find the first visible item
-      for (const item of items) {
-        if (item.style.display !== 'none') {
-          // Step 3: Add highlighted class to the first visible item
-          item.classList.add('highlighted');
-          break;
-        }
+  // Search functionality for slash command
+  const handleSearch = (searchTerm) => {
+    const dropdown = document.getElementById('slashDropdown');
+    const items = dropdown.querySelectorAll('li');
+    
+    // Step 1: Remove highlighted class from all items
+    items.forEach(item => {
+      item.classList.remove('highlighted');
+    });
+    
+    // Filter list items based on the search term
+    items.forEach(item => {
+      const values = item.getAttribute('data-value').split(',');
+      if (values.some(value => value.toLowerCase().startsWith(searchTerm.toLowerCase()))) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
       }
-    };
+    });
+    
+    // Step 2: Loop to find the first visible item
+    for (const item of items) {
+      if (item.style.display !== 'none') {
+        // Step 3: Add highlighted class to the first visible item
+        item.classList.add('highlighted');
+        break;
+      }
+    }
+  };
 
+  // useEffect for event handling and cleanup
   useEffect(() => {
     if (quillRef.current) {
       const quill = quillRef.current.getEditor();
@@ -237,118 +241,118 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
       });
 
     // Close dropdown on escape key and reset search and results
-      const handleGlobalKeydown = (event) => {
-        if (event.key === 'Escape') {
-          const dropdown = document.getElementById('slashDropdown');
-          const searchInput = document.getElementById('dropdownSearch');
-          const items = dropdown.querySelectorAll('li');
-          dropdown.style.display = 'none';
-          resetHighlighted();  // Reset the highlighted option
-          //quill.focus(); // Focus the editor again - Not needed
-      
-          // Step 1: Clear the search input
-          if (searchInput) {
-            searchInput.value = '';
-          }
-      
-          // Step 2: Reset the display property for all items
-          items.forEach(item => {
-            item.style.display = 'block';
-          });
-      
-          // Step 3: Highlight the first item in the list
-          if (items[0]) {
-            items[0].classList.add('highlighted');
-          }
-        }
-      };
-    
-    // Close dropdown on clicking outside and reset search and results
-      const handleClickOutside = (event) => {
+    const handleGlobalKeydown = (event) => {
+      if (event.key === 'Escape') {
         const dropdown = document.getElementById('slashDropdown');
         const searchInput = document.getElementById('dropdownSearch');
         const items = dropdown.querySelectorAll('li');
-      
-        if (!dropdown.contains(event.target)) {
-          dropdown.style.display = 'none';
-          resetHighlighted();  // Reset the highlighted option
-          //quill.focus(); // Focus the editor again - Not needed
-          
-          // Step 1: Clear the search input
-          if (searchInput) {
-            searchInput.value = '';
-          }
-          
-          // Step 2: Reset the display property for all items
-          items.forEach(item => {
-            item.style.display = 'block';
-          });
-      
-          // Step 3: Highlight the first item in the list
-          if (items[0]) {
-            items[0].classList.add('highlighted');
-          }
+        dropdown.style.display = 'none';
+        resetHighlighted();  // Reset the highlighted option
+        //quill.focus(); // Focus the editor again - Not needed
+    
+        // Step 1: Clear the search input
+        if (searchInput) {
+          searchInput.value = '';
         }
-      }; 
+    
+        // Step 2: Reset the display property for all items
+        items.forEach(item => {
+          item.style.display = 'block';
+        });
+    
+        // Step 3: Highlight the first item in the list
+        if (items[0]) {
+          items[0].classList.add('highlighted');
+        }
+      }
+    };
+    
+    // Close dropdown on clicking outside and reset search and results
+    const handleClickOutside = (event) => {
+      const dropdown = document.getElementById('slashDropdown');
+      const searchInput = document.getElementById('dropdownSearch');
+      const items = dropdown.querySelectorAll('li');
+    
+      if (!dropdown.contains(event.target)) {
+        dropdown.style.display = 'none';
+        resetHighlighted();  // Reset the highlighted option
+        //quill.focus(); // Focus the editor again - Not needed
+        
+        // Step 1: Clear the search input
+        if (searchInput) {
+          searchInput.value = '';
+        }
+        
+        // Step 2: Reset the display property for all items
+        items.forEach(item => {
+          item.style.display = 'block';
+        });
+    
+        // Step 3: Highlight the first item in the list
+        if (items[0]) {
+          items[0].classList.add('highlighted');
+        }
+      }
+    }; 
 
     // Listen for global keydown event
-      document.addEventListener('keydown', handleGlobalKeydown);
+    document.addEventListener('keydown', handleGlobalKeydown);
     // Listen for clicks outside the dropdown
-      document.addEventListener('click', handleClickOutside);
+    document.addEventListener('click', handleClickOutside);
 
     // Listen for Keydown
-      const searchInput = document.getElementById('dropdownSearch');
-      if (searchInput) {
-      searchInput.addEventListener('keydown', handleSearchKeydown);
-      }
-
-      // Cleanup event listener when the component unmounts
-      return () => {
-        const aiButton = document.querySelector('.ql-aiAssistant');
-        if (aiButton) {
-          aiButton.removeEventListener('click', () => {
-            //console.log('AI Assistant clicked');
-          });
-        }
-        // Cleanup
-        document.removeEventListener('keydown', handleGlobalKeydown);
-        document.removeEventListener('click', handleClickOutside);
-        if (searchInput) {
-          searchInput.removeEventListener('keydown', handleSearchKeydown);
-        }
-      };
+    const searchInput = document.getElementById('dropdownSearch');
+    if (searchInput) {
+    searchInput.addEventListener('keydown', handleSearchKeydown);
     }
-  }, []);
+
+    // Cleanup event listener when the component unmounts
+    return () => {
+      const aiButton = document.querySelector('.ql-aiAssistant');
+      if (aiButton) {
+        aiButton.removeEventListener('click', () => {
+          //console.log('AI Assistant clicked');
+        });
+      }
+      // Cleanup
+      document.removeEventListener('keydown', handleGlobalKeydown);
+      document.removeEventListener('click', handleClickOutside);
+      if (searchInput) {
+        searchInput.removeEventListener('keydown', handleSearchKeydown);
+      }
+    };
+  }
+}, []);
 
   // Add a keydown event for the search input to handle Enter and arrow keys
-    const handleSearchKeydown = (event) => {
-      if (['Enter', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
-        event.preventDefault();  // Prevent default behavior
+  const handleSearchKeydown = (event) => {
+    if (['Enter', 'ArrowUp', 'ArrowDown'].includes(event.key)) {
+      event.preventDefault();  // Prevent default behavior
+    }
+    //console.log("Key pressed:", event.key);
+    const dropdown = document.getElementById('slashDropdown');
+    const items = Array.from(dropdown.querySelectorAll('li'));
+    const highlighted = dropdown.querySelector('.highlighted');
+    let index = items.indexOf(highlighted);
+  
+    if (event.key === 'Enter') {
+      if (highlighted) {
+        // Manually trigger the click event on the highlighted item
+        const clickEvent = new Event('click', { 'bubbles': true });
+        highlighted.dispatchEvent(clickEvent);
       }
-      //console.log("Key pressed:", event.key);
-      const dropdown = document.getElementById('slashDropdown');
-      const items = Array.from(dropdown.querySelectorAll('li'));
-      const highlighted = dropdown.querySelector('.highlighted');
-      let index = items.indexOf(highlighted);
-    
-      if (event.key === 'Enter') {
-        if (highlighted) {
-          // Manually trigger the click event on the highlighted item
-          const clickEvent = new Event('click', { 'bubbles': true });
-          highlighted.dispatchEvent(clickEvent);
-        }
-      } else if (event.key === 'ArrowDown') {
-        if (index < items.length - 1) {
-          if (highlighted) highlighted.classList.remove('highlighted');
-          items[index + 1].classList.add('highlighted');
-        }
-      } else if (event.key === 'ArrowUp') {
-        if (index > 0) {
-          if (highlighted) highlighted.classList.remove('highlighted');
-          items[index - 1].classList.add('highlighted');
-        }
+    } else if (event.key === 'ArrowDown') {
+      if (index < items.length - 1) {
+        if (highlighted) highlighted.classList.remove('highlighted');
+        items[index + 1].classList.add('highlighted');
       }
-    };  
+    } else if (event.key === 'ArrowUp') {
+      if (index > 0) {
+        if (highlighted) highlighted.classList.remove('highlighted');
+        items[index - 1].classList.add('highlighted');
+      }
+    }
+  };  
 
   return (
     <div className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none relative">

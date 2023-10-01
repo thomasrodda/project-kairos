@@ -1,3 +1,4 @@
+// Import required modules and components
 import React, { useContext } from 'react';
 import { UserContext } from '../UserContext';
 import '../index.css';
@@ -16,13 +17,17 @@ import helpIcon from '../Images/help_icon.png'
 import updatesIcon from '../Images/updates_icon.png'
 
 // SideBar.jsx renders the sidebar, containing the PageList and other features.
-
 const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId }) => {
-    const user = useContext(UserContext);  // Get the current user
 
-    console.log("Current user in SideBar:", user);  // Log current user for debugging
+    // Fetch current user from UserContext
+    const user = useContext(UserContext);
+
+    // Debugging logs
+    console.log("Current user in SideBar:", user);
     console.log("Selected Page ID in SideBar:", selectedPageId);
     console.log(createPage);
+
+    // Sidebar main content
     return (
         // SideBar //
         <div id="sideBar" className="fixed h-screen w-60 m-0 flex flex-col bg-darkest-grey">
@@ -54,7 +59,7 @@ const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId }) => {
                 </div>
                 {/** Image Library */}
                 <div id="imageLibrary" className="MenuItem MenuItem:hover">
-                    <img src={imageIcon} alt="Image Library" className='IconSize'/>
+                    <img src={imageIcon} alt="Images Library" className='IconSize'/>
                     <h2 className="MenuItemText">
                         Image Library
                     </h2>

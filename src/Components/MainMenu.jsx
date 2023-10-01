@@ -1,10 +1,12 @@
+// Import required modules
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../index.css';
 
+// MainMenu component definition
 const MainMenu = () => {
 
-    // Grainy Texture
+    // Create a grainy texture background using canvas and set it as background
     useEffect(() => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -27,12 +29,15 @@ const MainMenu = () => {
         grainyGradientElement.style.backgroundImage = `url(${canvas.toDataURL()}), ${existingBackground}`;
       }, []);
   
+  // Hook for navigation
   const navigate = useNavigate();
 
+  // Navigate to Login Screen when MainMenu is clicked
   const goToLogin = () => {
     navigate('/login'); // Navigate to Login Screen
   };
-
+  
+  // Render main menu UI elements
   return (
     <div className="mainMenu menuBackground" onClick={goToLogin}>
       <div className="mainMenuContentArea boxShadowBlackL grainyGradient">

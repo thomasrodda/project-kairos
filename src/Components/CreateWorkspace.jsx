@@ -1,33 +1,39 @@
+// Import necessary modules and components
 import React, { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { UserContext } from '../UserContext';
 import { db } from '../firebase';
-import { collection, addDoc, doc } from 'firebase/firestore';
+import { collection, addDoc } from 'firebase/firestore';
 import '../index.css';
 import checkIcon from '../Images/check_icon.png'
 import backIcon from '../Images/back_icon.png'
 
 const CreateWorkspace = () => {
+  // Initialize state variables
   const [selectedTemplate, setSelectedTemplate] = useState(null);
   const [workspaceName, setWorkspaceName] = useState('');
   const [workspaceDescription, setWorkspaceDescription] = useState('');
 
+  // Function to handle template selection
   const handleTemplateSelection = (template) => {
     setSelectedTemplate(template);
   };
 
-  // Get user from UserContext
+  // Fetch user from UserContext
   const { user } = useContext(UserContext);
   console.log('User from context at component load:', user);
 
+  // Effect for any component mount logic
   useEffect(() => {
     // Log the current user from the context when the component mounts
     console.log('User from context at component load:', user);
 
     // Here, fetch the latest user data if needed and update the UserContext
-  }, []);
+  }, [user]);
 
+  // Function to handle workspace creation form submission
   const handleSubmit = async (e) => {
+    // Perform validation and Firestore operations
     console.log('User from context:', user);
     e.preventDefault();
     if (workspaceName.trim() === '') {
@@ -66,6 +72,7 @@ const CreateWorkspace = () => {
     }
   };  
 
+  // Render the workspace creation UI
   return (
     <div className="mainMenu menuBackground">
       <div className="menuContentArea flex-col items-center boxShadowBlackL">

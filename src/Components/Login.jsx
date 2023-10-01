@@ -1,16 +1,19 @@
+// Import required modules
 import React, { useEffect, useContext} from 'react';
 import { UserContext } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
-import { collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import '../index.css';
 
+// Login component definition
 const Login = () => {
   // Get user and setUser from UserContext
-  const { user, setUser } = useContext(UserContext);
+  const { setUser } = useContext(UserContext);
 
+  // Hook for navigation
   const navigate = useNavigate();
 
   // Listen for changes in authentication state
@@ -27,7 +30,7 @@ const Login = () => {
     };
   }, [setUser]);
 
-  // Sign in with Google
+  // Handle Google Sign-In
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     const userCredential = await signInWithPopup(auth, provider);  // Await the promise
@@ -56,6 +59,7 @@ const Login = () => {
 
   };
   
+  // Render login UI elements
   return (
     <div className="mainMenu menuBackground">
         <div className="menuContentArea boxShadowBlackL flex flex-col items-center justify-center">

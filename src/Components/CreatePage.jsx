@@ -1,20 +1,24 @@
+// Import required modules and components
 import React, { useState, useRef, useEffect } from 'react';
 import closeIcon from '../Images/close_icon.png'
 import placeholderIcon from '../Images/placeholder_icon.png'
 import '../index.css';
 
-// CreatePage.jsx is responsible for rendering a popup to create a new page.
-
+// CreatePage component definition
 const CreatePage = ({ createPage, closePopup }) => {
+
+  // State management for the page name
   const [name, setName] = useState('');
   const inputRef = useRef(null);
 
+  // Automatically focus the input field when the component mounts
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);  
 
+  // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
     if (name.trim() !== '') { // only proceed if name is not an empty string
@@ -23,6 +27,7 @@ const CreatePage = ({ createPage, closePopup }) => {
     }
   };
 
+  // Popup form content
   return (
     <div className="createPagePopup">
         <div className='flex justify-between items-start'>

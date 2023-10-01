@@ -1,16 +1,19 @@
+// Import required modules and components
 import React, { useContext } from 'react';
 import { UserContext } from '../UserContext';
 import '../index.css';
 import pageIcon from '../Images/page_icon.png'
 
 // PageList.jsx renders the list of pages in the sidebar.
-
 const PageList = ({ pages, selectedPageId, setSelectedPageId }) => {
-  const user = useContext(UserContext);  // Get the current user
+  // Access the current user from UserContext
+  const user = useContext(UserContext);
 
   console.log("Current user in PageList:", user);  // Log current user for debugging
   console.log("Pages in PageList:", pages);
   console.log("Selected Page ID in PageList:", selectedPageId);
+
+  // Render the list of pages or a message if no pages are available
   return (
     <div>
       {pages.length === 0 ? (

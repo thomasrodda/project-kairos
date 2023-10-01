@@ -1,0 +1,184 @@
+- Project Overview:
+
+Using react and tailwindcss inside of visual code studio, I am creating a web app
+
+An overview of the App, codename Project Kairos: Kairos will be a web app for creative writers, aimed more at people wanting to do worldbuilding for things like Dungeons and Dragons homebrew campaigns, novels and more. The app will provide a space for the user to write called the 'Editor', a space for the user to organise their pages of writing and access other features and settings called the 'SideBar', and an AI assistant feature to help with the creative writing.
+
+The Editor will take up most of the screen and will be a minimalistic space for creative writing. The Editor will allow the user to write text to pages and apply basic formatting using the standard ctrl + b for bold for example, as well as typing slash commands in the text editor such as /h1 to format the text in that block as a h1 heading. Regarding the text 'blocks', I would like the editor to function similarly to Notion's. Where each time the user hits enter in the editor, they can then type on a new line, but it also starts a new 'text block'. These text blocks can be individually formatted by the user, using the slash commands mentioned previously, or through a context menu access through a right click on the text block. The Editor will save the user's writing automatically as they write. Their writing will be saved to the page that they are currently working on. The name of this page will be displayed at the top of the editor, and will show as selected in the SideBar.
+
+The SideBar will contain menu options like settings, search and image library. It will also contain the page file tree that will display a tree of all the pages created by the user. By default there will be one page listed, but the user can click a button in the sidebar to create a new page. You will also be able to right click on the pages listed to bring up a context menu to delete them. The user will be able to left click on a page in the SideBar to display the contents of the page in the Editor.
+
+The AI assistant will be using the openAI api and a vector database service. This feature will be added at a later date. In short, the vector database will store all of the content that the user has written in the app. This will be updated either everytime the app saves the content of a page, or everytime the user uses the AI. The vector database will allow the AI to access relevant information to the user prompt, to allow the AI to create a more well informed and lore-accurate response.
+
+- File Overviews:
+
+- - Index.js:
+
+Overall Summary.
+The index.js file serves as the entry point for the React application. It initializes and renders the main App component, wrapping it with the UserProvider to supply user context throughout the app.
+
+Detailed Summary.
+Import Statements: Imports React, ReactDOM, the main App component, the UserProvider, and other necessary files like index.css and reportWebVitals.
+React Strict Mode: Initializes the app in React's Strict Mode, which helps in highlighting potential problems during development.
+Root Rendering: Uses ReactDOM to create a root and render the App component into the HTML element with the ID 'root'.
+UserProvider: Wraps the App component with UserProvider to make user context available to all nested components.
+Performance Metrics: Contains a call to reportWebVitals for optional performance measurement.
+
+- - App.jsx:
+
+Overall Summary.
+The App.jsx file serves as the core of the Kairos app, managing global state, handling interactions with Firebase for workspace and page management, and setting up routing for different views in the application.
+
+Detailed Summary.
+Import Statements: Imports all necessary modules, components, and Firebase functions.
+State Initialization: Sets up state variables for managing pages, selected pages, popups, loading status, and user context.
+Firebase Interactions: Uses asynchronous functions and useEffect hooks to interact with Firebase. It fetches and updates workspace IDs and pages based on the user's context.
+Rendering Logic: Contains the RenderApp function, which sets up the main UI, integrating the SideBar, Editor, and optional CreatePage popup based on state.
+Routing: Uses React Router to set up different routes for the application, including login, workspace selection, and the main app view.
+
+- - firebase.js:
+
+Overall Summary.
+The firebase.js file initializes and configures Firebase services used in the Kairos app. This includes setting up Firestore for database interactions and Firebase Authentication for user management.
+
+Detailed Summary.
+Import Statements: Imports Firebase services needed for the app, including Firestore and Authentication.
+Firebase Configuration: Sets up the configuration parameters for initializing Firebase, such as API key, project ID, etc.
+Firebase Initialization: Initializes the Firebase app using the provided configuration.
+Firestore Setup: Initializes Firestore to be used as the database service for the app.
+Authentication Setup: Initializes Firebase Authentication and sets the session persistence to browser session.
+
+- - UserContext.jsx:
+
+Overall Summary.
+The UserContext.jsx file is responsible for managing the user's state, including authentication and selected workspace ID, across the Kairos app. It uses React Context for state management.
+
+Detailed Summary.
+Context Definition: Defines UserContext to hold the user's state and provides a custom hook useUser() for easy access to this context.
+Firebase Authentication Listener: Uses useEffect to set up a listener on Firebase authentication states. This updates the user state whenever a user logs in or out.
+User and Workspace State: Manages the user state for authentication and selectedWorkspaceId state for identifying the workspace a user is working in.
+Context Provider: Provides the UserContext to children components, allowing them to access and manipulate the user's state.
+
+- - WorkspaceContext.jsx:
+
+Overall Summary.
+The WorkspaceContext.jsx file is responsible for managing the workspace state in the Kairos app, allowing different components to access and manipulate the current workspace information.
+
+Detailed Summary.
+Context Definition: WorkspaceContext is defined to hold the workspace's state, and a custom hook useWorkspace() is provided for easy access to this context.
+State Management: Manages a workspace state variable that holds the current workspace's information.
+Debugging: Uses useEffect to log the current workspace to the console whenever the workspace state changes, assisting in debugging.
+Context Provider: WorkspaceContext.Provider passes down the workspace and setWorkspace to child components, enabling them to read or modify the current workspace.
+
+- - MainMenu.jsx:
+
+Overall Summary.
+The MainMenu.jsx file is responsible for rendering the main menu screen of the Kairos app. Clicking on this screen takes the user to the login page.
+
+Detailed Summary.
+Grainy Texture: A useEffect hook creates a grainy texture by generating small circles on a canvas. This is then set as the background of an element, combined with any existing background.
+Navigation: Employs useNavigate from react-router-dom to handle navigation. Clicking on the main menu navigates the user to the login screen.
+UI Elements: Contains the UI elements for the main menu, such as the main heading labeled "Slate-Ai" and a subheading that prompts the user to "Start writing...".
+
+- - Login.jsx:
+
+Overall Summary.
+The Login.jsx file is responsible for the login screen of the Kairos app. It allows users to sign in with their Google accounts and navigates them to the workspace selection screen upon successful login.
+
+Detailed Summary.
+User Context: Uses UserContext to get and set the user state.
+Firebase Authentication: Employs Firebase's onAuthStateChanged to listen for changes in the user's authentication state.
+Google Sign-In: Contains a function signInWithGoogle to handle Google sign-in. This function also checks if the user already exists in Firestore and creates a new document for them if not.
+Navigation: Redirects the user to the workspace selection screen via useNavigate from react-router-dom after a successful login.
+
+- - WorkspaceSelection.jsx:
+
+Overall Summary.
+The WorkspaceSelection.jsx file manages the workspace selection screen of the Kairos app. Users can select from existing workspaces or opt to create a new one.
+
+Detailed Summary.
+User Context: Extracts the current user's ID from UserContext to fetch associated workspaces from Firestore.
+Firestore Query: Utilizes Firestore to fetch the workspaces that belong to the logged-in user and updates the state accordingly.
+Workspace Selection: Allows the user to select a workspace, updates the selectedWorkspaceId in UserContext, and navigates to the main app interface.
+Dynamic UI: Lists all the fetched workspaces dynamically and also provides options for account settings.
+
+- - CreateWorkspace.jsx:
+
+Overall Summary.
+The CreateWorkspace.jsx file manages the user interface and logic for creating a new workspace in the Kairos app. Users can select from a set of predefined templates, input a workspace name and description, and then submit the form to create a new workspace.
+
+Detailed Summary.
+Template Selection: Users can choose from predefined workspace templates (e.g., Game Master, Novelist, Blank Slate), which may affect the structure of the workspace.
+User Context: The component utilizes UserContext to get the user's ID, ensuring the workspace is associated with the correct user in Firestore.
+Form Submission: Utilizes an HTML form for capturing user inputs. The form includes validation checks to ensure the name is not empty and the user is authenticated.
+Firestore Interaction: The component uses Firestore to add a new workspace and also creates a default page within the new workspace.
+Dynamic UI: The UI dynamically changes based on whether a template is selected, displaying the appropriate form fields.
+
+- - SideBar.jsx:
+
+Overall Summary.
+The SideBar.jsx file manages the sidebar of the Kairos application. It is a key element in the application's navigation and provides quick access to various features such as workspace information, searching, settings, page creation, and more.
+
+Detailed Summary.
+Dynamic Updating: The sidebar is designed to dynamically update based on the state of the application. For example, the selected page is highlighted in the page list.
+Component Structure: The sidebar is broken down into smaller components like Divider and PageList for better code structure and reusability.
+Event Handling: The sidebar has interactive elements like the "Create" button, which triggers the createPage function passed as a prop.
+User Context: It fetches the current user from the UserContext but doesn't appear to use it for specific functionalities as of the current implementation.
+Styling: It uses Tailwind CSS classes for styling, making it easier to manage and adjust the UI.
+
+- - CreatePage.jsx:
+
+Overall Summary.
+The CreatePage.jsx file defines a React functional component that renders a popup form for creating a new page in the application. It plays a crucial role in extending the application's content by facilitating the addition of new pages.
+
+Detailed Summary.
+Dynamic Interaction: The popup dynamically appears based on user actions and allows for the creation of a new page.
+State Management: The name state variable is used to manage the name of the new page.
+Focus Management: The useEffect and useRef hooks are used to automatically focus on the page name input field when the popup appears, enhancing user experience.
+Event Handling: The handleSubmit function handles the form submission, validates the input, and calls the createPage function passed as a prop to actually create the page.
+Styling: The component is styled using Tailwind CSS for a consistent and visually appealing user interface.
+Icon Selector: Though an icon selector is visible, it's currently static and doesn't allow for actual icon selection.
+
+- - PageList.jsx:
+
+Overall Summary.
+The PageList.jsx component is designed to show a list of pages on the sidebar of the application. It's a functional component that takes in three props: pages, selectedPageId, and setSelectedPageId.
+
+Detailed Summary.
+Dynamic List Rendering: The component uses the map function to iterate through the pages array and renders each page as a clickable item.
+User Interaction: Clicking on a page item calls the setSelectedPageId function to update the selected page, which also changes the styling of the selected item.
+Conditional Rendering: In the absence of any pages, the component renders a message indicating that no pages are available.
+Debugging: The component logs the current user and selected page ID to the console for debugging purposes. This can be helpful during development.
+Styling: The component uses Tailwind CSS for styling and applies conditional classes to visually indicate the currently selected page.
+
+- - Editor.jsx:
+
+Overall Summary.
+The Editor.jsx component serves as the main text editor in the application. It is responsible for displaying the content of the currently selected page and for managing updates to that content.
+
+Detailed Summary.
+Props: The component receives selectedPage, setPages, and selectedWorkspaceId as props. These are used for fetching and updating the content.
+State Management: It uses useState to manage the content of the editor (currentContent and debouncedContent) and useContext to fetch the current user's data.
+Child Component: It utilizes a child component named RichTextEditor for the actual editor UI.
+Content Update: The handleContentChange function is used to update both the real-time and debounced content when there is a change in the editor.
+Auto-Save: The component features an auto-save function that updates the Firestore database after a 1-second delay of user inactivity.
+Debounce Mechanism: It uses useRef to keep track of the timer used for debouncing updates.
+Firebase: It uses Firestore to update the content of the page when a change is detected.
+
+- - RichTextEditor.jsx:
+
+Overall Summary.
+The RichTextEditor.jsx component serves as the text editor in the application, integrating the Quill.js editor. It is responsible for all the rich text editing functionalities.
+
+Detailed Summary.
+Props: It receives initialContent, onContentChange, and focusEditor as props for initialization, handling changes, and focusing the editor.
+State and Ref: The component uses React's useState to manage the state and useRef to keep a reference to the Quill editor.
+Event Handling: The component listens to various keyboard and mouse events to provide advanced features.
+handleChange: Called when there's a change in the editor content.
+showDropdown: Used to display the slash command dropdown.
+formatText: Directly manipulates the Quill editor to apply formatting.
+handleSearch: Handles search in the slash command dropdown.
+Dropdown Positioning: The dropdown is dynamically positioned based on the position of the typed '/'.
+Toolbar Configuration: It customizes the Quill toolbar to include various formatting options.
+AI Integration: Placeholder logic exists for future AI assistant integration.
+Memory Management: The component cleans up event listeners on unmount to prevent memory leaks.
