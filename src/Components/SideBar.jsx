@@ -1,5 +1,6 @@
 // Import required modules and components
 import React, { useContext, useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../UserContext';
 import '../index.css';
 import Divider from './Divider';
@@ -19,8 +20,9 @@ import updatesIcon from '../Images/updates_icon.png'
 // SideBar.jsx renders the sidebar, containing the PageList and other features.
 const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId, workspaces, selectedWorkspaceId, setSelectedWorkspaceId }) => {
 
-    // Fetch current user from UserContext
+    // Initialize state and context variables
     const user = useContext(UserContext);
+    const navigate = useNavigate();
 
     // Debugging logs
     console.log("Current user in SideBar:", user);
@@ -73,7 +75,7 @@ const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId, workspa
                     <img src={switchWorkspaceIcon} alt="Switch Workspace" className="h-[15px]" />
                 </div>
                 {isDropdownOpen && (
-                    <div className="customDropdownList">
+                    <div id="workspaceDropdown" className="customDropdownList">
                         <div className="px-4 pt-4 pb-2 text-info text-light-grey">
                             <h2>Choose a Workspace</h2>
                         </div>
@@ -82,6 +84,18 @@ const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId, workspa
                                 {workspace.name}
                             </div>
                         ))}
+                        {/** Divider */}
+                        <div className="px-4">
+                            <Divider />
+                        </div>
+                        {/** Account */}
+                        <div id="workspaceDropdownMenu" onClick={() => navigate('/workspace-selection')} className="px-4 text-info text-light-grey hover:text-white">
+                            <h2>Workspace Menu</h2>
+                        </div>
+                        {/** Log Out */}
+                        <div id="workspaceDropdownCreate" onClick={() => navigate('/create-workspace')} className="px-4 py-1 text-info text-light-grey hover:text-white">
+                            <h2>Create a New Workspace</h2>
+                        </div>
                         {/** Divider */}
                         <div className="px-4">
                             <Divider />
@@ -99,7 +113,7 @@ const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId, workspa
             </div>
             
             {/** Top Menu */}
-            <div id="TopMenu" className="p-2 space-y-1">
+            <div id="topMenu" className="p-2 space-y-1">
                 {/** Search */}
                 <div id="search" className="MenuItem MenuItem:hover">
                     <img src={searchIcon} alt="Search" className='IconSize'/>
