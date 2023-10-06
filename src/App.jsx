@@ -65,18 +65,19 @@ function App() {
         setPages(pagesData);
         
         setSelectedPageId(prevSelectedPageId => {
-          if (pagesData.length > 0) {
+          // Always select the first page if you're switching workspaces
+          if (pagesData.length > 0 && (!prevSelectedPageId || !pagesData.some(page => page.id === prevSelectedPageId))) {
             return pagesData[0].id;
           }
-          return null;
-        }); 
+          return prevSelectedPageId || null;
+        });
       }).finally(() => {
         setIsLoading(false);  // Set isLoading to false after fetching, regardless of success or failure
       });
     } else {
       setIsLoading(false);  // Set isLoading to false because either user or workspace is missing
     }
-  }, [selectedWorkspaceId, user]); // This effect runs when either selectedWorkspaceId or user changes
+  }, [selectedWorkspaceId, user, selectedPageId]); // This effect runs when either selectedWorkspaceId, user, or selectedPageId changes  
 
   // Save selectedWorkspaceId to Firebase when it changes
   useEffect(() => {
