@@ -29,12 +29,6 @@ const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId, workspa
     console.log("Selected Page ID in SideBar:", selectedPageId);
     console.log(createPage);
 
-    // Function to handle workspace selection from the dropdown
-    const handleWorkspaceChange = (event) => {
-        const newWorkspaceId = event.target.value;
-        setSelectedWorkspaceId(newWorkspaceId);
-    };
-
     // Custom Dropdown Code
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const workspaceRef = useRef(null);    
