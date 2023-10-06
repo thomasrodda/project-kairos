@@ -1,5 +1,5 @@
 // Import required modules and components
-import React, { useContext } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import { UserContext } from '../UserContext';
 import '../index.css';
 import Divider from './Divider';
@@ -17,7 +17,7 @@ import helpIcon from '../Images/help_icon.png'
 import updatesIcon from '../Images/updates_icon.png'
 
 // SideBar.jsx renders the sidebar, containing the PageList and other features.
-const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId }) => {
+const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId, workspaces, selectedWorkspaceId, setSelectedWorkspaceId }) => {
 
     // Fetch current user from UserContext
     const user = useContext(UserContext);
@@ -27,20 +27,77 @@ const SideBar = ({ createPage, pages, selectedPageId, setSelectedPageId }) => {
     console.log("Selected Page ID in SideBar:", selectedPageId);
     console.log(createPage);
 
+    // Function to handle workspace selection from the dropdown
+    const handleWorkspaceChange = (event) => {
+        const newWorkspaceId = event.target.value;
+        setSelectedWorkspaceId(newWorkspaceId);
+    };
+
+    // Custom Dropdown Code
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const workspaceRef = useRef(null);    
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+    
+    useEffect(() => {
+        const closeDropdown = (e) => {
+            if (workspaceRef.current && workspaceRef.current.contains(e.target)) {
+                return;
+            }
+            setIsDropdownOpen(false);
+        };
+        
+        if (isDropdownOpen) {
+            window.addEventListener('click', closeDropdown);
+        }
+        
+        return () => {
+            window.removeEventListener('click', closeDropdown);
+        };
+    }, [isDropdownOpen]);
+    
     // Sidebar main content
     return (
         // SideBar //
         <div id="sideBar" className="fixed h-screen w-60 m-0 flex flex-col bg-darkest-grey">
 
             {/** Workspace */}
-            <div id="workspace" className="p-3 flex items-center hover:bg-darker-grey">
-                <img src={profileIcon} alt="Profile" className='IconSize'/>
-                <h2 className="text-white text-h4 ml-2 mr-2">
-                    Workspace Name
-                </h2>
-                <img src={switchWorkspaceIcon} alt="Switch Workspace" className="h-[15px]" />
+            <div id="workspaceContainer">
+                <div id="workspace" ref={workspaceRef} className="p-3 flex items-center hover:bg-darker-grey space-x-3" onClick={toggleDropdown}>
+                    <img src={profileIcon} alt="Profile" className='IconSize'/>
+                    <span>
+                        {workspaces.find(ws => ws.id === selectedWorkspaceId)?.name || 'Select a Workspace'}
+                    </span>
+                    <img src={switchWorkspaceIcon} alt="Switch Workspace" className="h-[15px]" />
+                </div>
+                {isDropdownOpen && (
+                    <div className="customDropdownList">
+                        <div className="px-4 pt-4 pb-2 text-info text-light-grey">
+                            <h2>Choose a Workspace</h2>
+                        </div>
+                        {workspaces.map((workspace) => (
+                            <div className="workspaceDropdownItem" key={workspace.id} onClick={() => setSelectedWorkspaceId(workspace.id)}>
+                                {workspace.name}
+                            </div>
+                        ))}
+                        {/** Divider */}
+                        <div className="px-4">
+                            <Divider />
+                        </div>
+                        {/** Account */}
+                        <div id="account" className="px-4 text-info text-light-grey hover:text-white">
+                            <h2>Account Settings</h2>
+                        </div>
+                        {/** Log Out */}
+                        <div id="logOut" className="px-4 pt-1 pb-4 text-info text-light-grey hover:text-white">
+                            <h2>Log Out</h2>
+                        </div>
+                    </div>
+                )}
             </div>
-
+            
             {/** Top Menu */}
             <div id="TopMenu" className="p-2 space-y-1">
                 {/** Search */}

@@ -22,6 +22,7 @@ function App() {
   const [selectedPage, setSelectedPage] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [workspaces, setWorkspaces] = useState([]);
   const { setSelectedWorkspaceId, selectedWorkspaceId, user } = useContext(UserContext);
 
   // Asynchronous function to save selected workspace ID to Firebase
@@ -107,6 +108,22 @@ function App() {
     setPages([...pages, { id: newPageRef.id, name: pageName, content: '' }]);
   };
 
+  // Fetch workspaces
+  useEffect(() => {
+    if (user && user.uid) {  
+      const workspaceRef = collection(db, 'users', user.uid, 'workspaces');
+      const fetchData = async () => {
+        const querySnapshot = await getDocs(workspaceRef);
+        const fetchedWorkspaces = [];
+        querySnapshot.forEach((doc) => {
+          fetchedWorkspaces.push({ id: doc.id, ...doc.data() });
+        });
+        setWorkspaces(fetchedWorkspaces);
+      };
+      fetchData();
+    }
+  }, [user]);
+
   // Main rendering logic for the app
   const RenderApp = () => {
     return (
@@ -116,7 +133,7 @@ function App() {
         ) : (
           <>
             <div className="fixed w-60 h-screen overflow-auto">
-              <SideBar createPage={() => setShowPopup(true)} pages={pages} selectedPageId={selectedPageId} setSelectedPageId={setSelectedPageId}/>
+              <SideBar createPage={() => setShowPopup(true)} pages={pages} selectedPageId={selectedPageId} setSelectedPageId={setSelectedPageId} workspaces={workspaces} selectedWorkspaceId={selectedWorkspaceId} setSelectedWorkspaceId={setSelectedWorkspaceId} />
             </div>
             <div className="flex-grow overflow-auto ml-60">
               {selectedPage && <Editor selectedPageId={selectedPageId} pages={pages} setPages={setPages} selectedPage={selectedPage} selectedWorkspaceId={selectedWorkspaceId} />}
@@ -135,9 +152,9 @@ function App() {
       <Routes>
         <Route path="/" element={<MainMenu />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/workspace-selection" element={<WorkspaceSelection />} />
+        <Route path="/workspace-selection" element={<WorkspaceSelection workspaces={workspaces} />} />
         <Route path="/create-workspace" element={<CreateWorkspace />} />
-        <Route path="/app" element={<RenderApp />} />
+        <Route path="/app" element={<RenderApp workspaces={workspaces} />} />
       </Routes>
     </Router>
   );
