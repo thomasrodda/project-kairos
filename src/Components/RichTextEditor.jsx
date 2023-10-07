@@ -2,9 +2,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ReactQuill from 'react-quill';
 import './quill.bubble.css'; // import styles
-import ai_icon from '../Images/ai_icon.svg'
+import { fetchGeneratedText } from '../AiService';
+import ai_icon from '../Images/ai_icon.svg';
+import ai_send_icon from '../Images/ai_send_icon.png';
+import placeholder_icon from '../Images/placeholder_icon.png';
 import Divider from './Divider';
-import pageIcon from '../Images/page_icon.png'
+import pageIcon from '../Images/page_icon.png';
 
 // RichTextEditor.jsx integrates the Quill.js editor and manages its features.
 const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
@@ -352,7 +355,73 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
         items[index - 1].classList.add('highlighted');
       }
     }
-  };  
+  }; 
+
+  // AI Feature
+
+    // Detect 'space' press on new line
+    useEffect(() => {
+      if (quillRef.current) {
+        const quill = quillRef.current.getEditor();
+    
+        // Add a keyboard binding for 'space'
+        quill.keyboard.addBinding({
+          key: 32,  // ASCII code for 'space'
+        }, (range, context) => {
+          const { index } = range;
+    
+          // Your code here to show the AI UI
+          showAiUI(index);
+        });
+      }
+    }, []);
+    
+    // Function to show the AI UI
+    const showAiUI = (index) => {
+      const bounds = quillRef.current.getEditor().getBounds(index);
+    
+      const aiDropdown = document.getElementById('aiDropdown');
+      if (aiDropdown) {
+        aiDropdown.style.left = `${bounds.left}px`;
+        aiDropdown.style.top = `${bounds.top + bounds.height}px`;
+        aiDropdown.style.display = 'block';
+      }
+    };
+  
+    //Fetch generated text from AiService.js
+    const fetchAndDisplayText = async () => {
+      const promptInput = document.getElementById('aiCustomPrompt');
+      if (promptInput) {
+        const prompt = promptInput.value;
+        const generatedText = await fetchGeneratedText(prompt);
+        if (generatedText) {
+          document.getElementById('generatedTextArea').innerText = generatedText;
+        }
+      }
+    };    
+    
+    // Ai button Icons
+    const placeholderIcon = placeholder_icon;
+    const aiIcon = ai_icon;
+  
+    const handleMouseOver = (e) => {
+      const imgElement = e.currentTarget.querySelector('img');
+      if (imgElement) {
+        imgElement.src = aiIcon;
+      }
+    };
+  
+    const handleMouseOut = (e) => {
+      const imgElement = e.currentTarget.querySelector('img');
+      if (imgElement) {
+        imgElement.src = placeholderIcon;
+      }
+    };
+  
+    const handleClick = (label) => {
+      // Your individual function for each button can go here
+      console.log(`You clicked ${label}`);
+    };
 
   return (
     <div className="rich-text-editor w-[800px] border-none bg-transparent mx-auto text-white text-body overflow-visible resize-none focus:outline-none relative">
@@ -367,7 +436,7 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
           onInput={(e) => handleSearch(e.target.value)}
           autoComplete="off"
           />
-        {/** Divider */}
+        {/* Divider */}
         <div className="px-2">
           <Divider />
         </div>
@@ -385,6 +454,37 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
           <li data-value="Numbered List,ordered list,ol,list with numbers,enumerate" onClick={() => formatText('ol', currentLine, currentOffset)}>Numbered List</li>
           <li data-value="Bulleted List,unordered list,ul,list with bullets,points" onClick={() => formatText('ul', currentLine, currentOffset)}>Bulleted List</li>
         </ul>
+      </div>
+
+      {/* AI Service */}
+      <div id="aiDropdown" style={{display: 'none'}} className="aiDropdown"> {/* This is your aiDropdown div */}
+        <div id="aiCustomPromptContainer">
+          <img src={ai_icon} alt="AI" className='IconSize'/>
+          <input type="text" id="aiCustomPrompt" placeholder="Type your custom prompt..." autoComplete="off" />
+          <button onClick={fetchAndDisplayText}> 
+            <img src={ai_send_icon} alt="AI Send" className='IconSize'/>
+          </button>
+        </div>
+        <div id="aiPresetPromptsContainer">
+      {['Continue Writing', 'Lore Checker', 'Summarise', 'Improve Writing', 'Spelling & Grammar', 'Change Perspective', 'Change Tone', 'Make Shorter', 'Make Longer'].map((label, index) => (
+        <button className="aiButtonPrompt" key={index}
+          onMouseOver={handleMouseOver}
+          onMouseOut={handleMouseOut}
+        >
+          <img src={placeholderIcon} alt="Preset" className='IconSize' />
+          <span className="aiButtonLabel">
+            {label}
+          </span>
+        </button>
+      ))}
+    </div>
+        
+        <div id="generatedTextArea">
+          {/*} Generated text will be displayed here */}
+        </div>
+        
+        <button id="insertText">Insert Text</button>
+        <button id="cancelOperation">Cancel</button>
       </div>
     </div>
   );

@@ -40,6 +40,9 @@ module.exports = {
         'md': '8px',
         'lg': '16px',
         'xl': '24px',
+      },
+      boxShadow: {
+        'custom': '0 4px 10px -1px rgb(0 0 0 / 0.5)',
       }
     },
   },
