@@ -34,6 +34,24 @@
     display: inline-block;
   }
 
+/*Fade Up Small Bounce*/
+  @keyframes bounce {
+    0% {
+      transform: translateY(40px);
+      opacity: 0;
+    }
+    30% {
+      transform: translateY(-10px);
+      opacity: 1;
+    }
+    60% {
+      transform: translateY(5px);
+    }
+    100% {
+      transform: translateY(0px);
+    }
+  }
+
 /*Custom Dropdown*/
   .customDropdown {
     -webkit-appearance: none;
@@ -461,6 +479,15 @@
     .aiDropdown {
       width: 100%;
       max-width: 800px;
+      position: absolute;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: 0.15s ease-in-out;
+    }
+    .aiDropdown.show {
+      opacity: 1;
+      transform: translateY(0);
+      animation: bounce 0.5s;
     }
     #aiCustomPromptContainer {
       display: flex;
@@ -474,6 +501,9 @@
     #aiCustomPrompt:focus {
       outline: none;
       border: none;
+    }
+    #aiCustomPrompt::placeholder {
+      @apply text-grey
     }
     #aiPresetPromptsContainer {
       width: 100%;

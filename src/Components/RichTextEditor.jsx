@@ -17,6 +17,7 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
   const quillRef = useRef(null); // To store the ReactQuill element reference
   const [currentLine, setCurrentLine] = useState(null);
   const [currentOffset, setCurrentOffset] = useState(null);
+  const [realTimeText, setRealTimeText] = useState("");
 
   // Sets isFormatting to false - to be used in deletion of typed '/'
   let isFormatting = false;
@@ -363,28 +364,57 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
     useEffect(() => {
       if (quillRef.current) {
         const quill = quillRef.current.getEditor();
-    
+
         // Add a keyboard binding for 'space'
         quill.keyboard.addBinding({
           key: 32,  // ASCII code for 'space'
         }, (range, context) => {
           const { index } = range;
-    
-          // Your code here to show the AI UI
-          showAiUI(index);
+          const [line, offset] = quill.getLine(index);
+
+          if (line) {
+            const lineText = quill.getText(index - offset, offset).trim();
+            if (lineText === '') {
+              // Only show the AI UI if the line is blank and it's a new line
+              showAiUI(index);
+            } else {
+              // Insert a space character if the line is not empty
+              quill.insertText(index, ' ');
+            }
+          }
         });
       }
     }, []);
+
+    // useEffect for real-time text update
+    useEffect(() => {
+      document.getElementById('generatedTextArea').innerText = realTimeText;
+    }, [realTimeText]);    
     
     // Function to show the AI UI
     const showAiUI = (index) => {
       const bounds = quillRef.current.getEditor().getBounds(index);
-    
       const aiDropdown = document.getElementById('aiDropdown');
       if (aiDropdown) {
         aiDropdown.style.left = `${bounds.left}px`;
         aiDropdown.style.top = `${bounds.top + bounds.height}px`;
-        aiDropdown.style.display = 'block';
+
+        // Add a 'show' class to trigger the fade-in effect
+        aiDropdown.classList.add('show');
+
+        // Automatically focus the input field
+        const aiCustomPrompt = document.getElementById('aiCustomPrompt');
+        if (aiCustomPrompt) {
+          aiCustomPrompt.focus();
+        }
+      }
+    };
+
+    // Function to hide the AI UI
+    const hideAiUI = () => {
+      const aiDropdown = document.getElementById('aiDropdown');
+      if (aiDropdown) {
+        aiDropdown.classList.remove('show');
       }
     };
   
@@ -393,12 +423,22 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
       const promptInput = document.getElementById('aiCustomPrompt');
       if (promptInput) {
         const prompt = promptInput.value;
-        const generatedText = await fetchGeneratedText(prompt);
+        const generatedText = await fetchGeneratedText(prompt);  // Existing AiService function
         if (generatedText) {
-          document.getElementById('generatedTextArea').innerText = generatedText;
+          const words = generatedText.split(' ');
+          let i = 0;
+          const interval = setInterval(() => {
+            if (i < words.length) {
+              const nextFewWords = words.slice(i, i + 1).join(' ');  // The number of words you want to append at a time
+              setRealTimeText(prevText => prevText + ' ' + nextFewWords);
+              i += 1;  // Increment by the same number of words you append at a time
+            } else {
+              clearInterval(interval);
+            }
+          }, 80);  // Change this to adjust the speed
         }
       }
-    };    
+    };     
     
     // Ai button Icons
     const placeholderIcon = placeholder_icon;
@@ -457,7 +497,7 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
       </div>
 
       {/* AI Service */}
-      <div id="aiDropdown" style={{display: 'none'}} className="aiDropdown"> {/* This is your aiDropdown div */}
+      <div id="aiDropdown" className="aiDropdown"> {/* This is your aiDropdown div */}
         <div id="aiCustomPromptContainer">
           <img src={ai_icon} alt="AI" className='IconSize'/>
           <input type="text" id="aiCustomPrompt" placeholder="Type your custom prompt..." autoComplete="off" />
@@ -466,18 +506,18 @@ const RichTextEditor = ({ initialContent, onContentChange, focusEditor }) => {
           </button>
         </div>
         <div id="aiPresetPromptsContainer">
-      {['Continue Writing', 'Lore Checker', 'Summarise', 'Improve Writing', 'Spelling & Grammar', 'Change Perspective', 'Change Tone', 'Make Shorter', 'Make Longer'].map((label, index) => (
-        <button className="aiButtonPrompt" key={index}
-          onMouseOver={handleMouseOver}
-          onMouseOut={handleMouseOut}
-        >
-          <img src={placeholderIcon} alt="Preset" className='IconSize' />
-          <span className="aiButtonLabel">
-            {label}
-          </span>
-        </button>
-      ))}
-    </div>
+          {['Continue Writing', 'Lore Checker', 'Summarise', 'Improve Writing', 'Spelling & Grammar', 'Change Perspective', 'Change Tone', 'Make Shorter', 'Make Longer'].map((label, index) => (
+            <button className="aiButtonPrompt" key={index}
+              onMouseOver={handleMouseOver}
+              onMouseOut={handleMouseOut}
+            >
+              <img src={placeholderIcon} alt="Preset" className='IconSize' />
+              <span className="aiButtonLabel">
+                {label}
+              </span>
+            </button>
+          ))}
+        </div>
         
         <div id="generatedTextArea">
           {/*} Generated text will be displayed here */}
