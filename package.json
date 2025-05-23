@@ -16,17 +16,17 @@
     "postinstall": "chmod +x ./fix-permissions.sh && ./fix-permissions.sh"
   },
   "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.0.0",
-    "@typescript-eslint/parser": "^6.0.0",
-    "eslint": "^8.50.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "husky": "^8.0.0",
-    "lint-staged": "^15.0.0",
-    "prettier": "^3.0.0",
-    "typescript": "^5.2.0"
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "typescript": "^5.8.3"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -38,7 +38,7 @@
     ]
   },
   "engines": {
-    "node": ">=18.0.0",
+    "node": ">=22.0.0",
     "yarn": ">=1.22.0"
   }
 }
