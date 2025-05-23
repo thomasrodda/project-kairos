@@ -14,10 +14,10 @@ You don’t need to use technical language to request changes. Just describe wha
 
 Include as many of the following details as you can:
 
-* **What you want built** (e.g. "a slash command menu in the editor")
-* **Where it belongs** (e.g. "when you type '/' inside a block")
-* **How it should behave** (e.g. "shows formatting options and converts the block type")
-* **Any references** you want me to follow (e.g. "like Notion")
+- **What you want built** (e.g. "a slash command menu in the editor")
+- **Where it belongs** (e.g. "when you type '/' inside a block")
+- **How it should behave** (e.g. "shows formatting options and converts the block type")
+- **Any references** you want me to follow (e.g. "like Notion")
 
 You can format this like:
 
@@ -34,9 +34,9 @@ Like: Similar to Notion's floating toolbar
 
 If something doesn’t look right or doesn’t work how you expected:
 
-* Point out the **specific issue**
-* Mention the **file or component** (if you know it)
-* Suggest a **preferred outcome**
+- Point out the **specific issue**
+- Mention the **file or component** (if you know it)
+- Suggest a **preferred outcome**
 
 Example:
 
@@ -50,9 +50,9 @@ The floating toolbar appears too far from selected text. Can we adjust its posit
 
 If you want a new UI element or interaction:
 
-* Describe its purpose
-* Mention where it will live or how it’s triggered
-* List the expected props or options (if known)
+- Describe its purpose
+- Mention where it will live or how it’s triggered
+- List the expected props or options (if known)
 
 Example:
 
@@ -69,15 +69,15 @@ Options: Heading 1, Heading 2, Paragraph, Bullet List
 
 You can use everyday language to describe how something should look. Examples:
 
-* "Make this sidebar look more modern"
-* "Use a light theme with dark text"
-* "Can this button be more compact and centered?"
+- "Make this sidebar look more modern"
+- "Use a light theme with dark text"
+- "Can this button be more compact and centered?"
 
 ---
 
 ## Best Practices
 
-* Be clear about the purpose of your request
-* Include context if it relates to a specific flow or feature
-* Feel free to sketch or link visuals if that helps explain your idea
-* Ask questions any time—I'll guide you through options
+- Be clear about the purpose of your request
+- Include context if it relates to a specific flow or feature
+- Feel free to sketch or link visuals if that helps explain your idea
+- Ask questions any time—I'll guide you through options

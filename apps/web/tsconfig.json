@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": ["vite/client", "jest", "@testing-library/jest-dom"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@kairos/ui": ["../../packages/ui/src"],
+      "@kairos/utils": ["../../packages/utils/src"],
+      "@kairos/types": ["../../packages/types/src"]
+    }
+  },
+  "include": ["src/**/*", "vite.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}

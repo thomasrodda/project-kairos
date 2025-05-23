@@ -13,6 +13,7 @@ Handle errors gracefully to maintain user trust and provide developers with debu
 ## Error Boundaries
 
 Place React error boundaries around:
+
 - Top-level App component
 - Editor component (prevent typing crashes)
 - Sidebar and navigation
@@ -25,6 +26,7 @@ Error boundaries should log to monitoring service and show user-friendly fallbac
 ## API Error Format
 
 Use consistent error response structure across all endpoints:
+
 - Include error code for programmatic handling
 - Provide user-friendly message
 - Add field name for validation errors
@@ -37,6 +39,7 @@ Standard error codes: `VALIDATION_FAILED`, `UNAUTHORIZED`, `FORBIDDEN`, `RESOURC
 ## Input Validation
 
 Validate all inputs at API level:
+
 - Check authentication first
 - Validate required fields and formats
 - Sanitize user input
@@ -50,6 +53,7 @@ Never trust client-side validation alone.
 ## User Error Display
 
 Show clear, actionable error messages:
+
 - Use plain language, avoid technical jargon
 - Provide retry mechanisms for failed operations
 - Preserve user work when possible (autosave, local backup)
@@ -62,6 +66,7 @@ Never show stack traces or internal error details to users.
 ## Logging Strategy
 
 Log structured data with consistent format:
+
 - **Always log**: API requests, auth events, errors, performance issues
 - **Never log**: Passwords, tokens, personal data
 - **Levels**: ERROR (broken), WARN (concerning), INFO (important events), DEBUG (development)
@@ -73,6 +78,7 @@ Include context: userId, pageId, duration, error details.
 ## Performance Monitoring
 
 Track key metrics:
+
 - API response times and error rates
 - Page load times and Core Web Vitals
 - Database query performance
@@ -85,12 +91,14 @@ Set up alerts for error rates >5%, response times >2s, and system resource issue
 ## Implementation Requirements
 
 **Every API endpoint must**:
+
 - Validate authentication and inputs
 - Return consistent error format
 - Log requests and results
 - Handle database connection errors
 
 **Every React component must**:
+
 - Handle loading and error states
 - Display user-friendly error messages
 - Provide retry mechanisms for failed operations

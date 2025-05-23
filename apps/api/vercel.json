@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "*.ts": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/$1"
+    }
+  ]
+}

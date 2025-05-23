@@ -1,0 +1,44 @@
+{
+  "name": "project-kairos",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "yarn workspace @kairos/web dev & yarn workspace @kairos/api dev",
+    "build": "yarn workspaces run build",
+    "lint": "node ./node_modules/.bin/eslint . --ext .ts,.tsx,.js,.jsx",
+    "typecheck": "yarn workspaces run typecheck",
+    "test": "yarn workspaces run test",
+    "format": "node ./node_modules/.bin/prettier --write \"**/*.{ts,tsx,js,jsx,json,md,scss,css}\"",
+    "postinstall": "chmod +x ./fix-permissions.sh && ./fix-permissions.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "typescript": "^5.2.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,scss,css}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "yarn": ">=1.22.0"
+  }
+}

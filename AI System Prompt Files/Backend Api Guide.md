@@ -39,9 +39,9 @@ We use **Firebase Authentication** on the frontend. After logging in, the client
 
 On each API call:
 
-* The backend receives the token in the `Authorization` header
-* Verifies it using the Firebase Admin SDK
-* Proceeds only if the token is valid
+- The backend receives the token in the `Authorization` header
+- Verifies it using the Firebase Admin SDK
+- Proceeds only if the token is valid
 
 This protects all secure routes.
 
@@ -55,16 +55,16 @@ This protects all secure routes.
 
 ## Testing API Routes
 
-* Use tools like Postman or curl for manual testing
-* Use integration tests to simulate requests and validate responses
-* Keep tests simple, fast, and scoped to logic
+- Use tools like Postman or curl for manual testing
+- Use integration tests to simulate requests and validate responses
+- Keep tests simple, fast, and scoped to logic
 
 ---
 
 ## Best Practices
 
-* Keep each function small and focused
-* Validate request inputs before processing
-* Return meaningful HTTP status codes and error messages
-* Avoid unnecessary external dependencies
-* Prefer JSON responses over HTML or plain text
+- Keep each function small and focused
+- Validate request inputs before processing
+- Return meaningful HTTP status codes and error messages
+- Avoid unnecessary external dependencies
+- Prefer JSON responses over HTML or plain text

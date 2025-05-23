@@ -8,9 +8,9 @@
 
 Testing helps catch bugs early and verify that new features don’t break existing functionality. We’ll use:
 
-* **Jest** for unit and integration tests
-* **Cypress** for end-to-end (e2e) tests
-* **GitHub Actions** for running tests on every pull request
+- **Jest** for unit and integration tests
+- **Cypress** for end-to-end (e2e) tests
+- **GitHub Actions** for running tests on every pull request
 
 ---
 
@@ -28,9 +28,9 @@ Testing helps catch bugs early and verify that new features don’t break existi
 
 The Assistant will write tests as part of feature implementation. Every new feature should be accompanied by:
 
-* Unit tests for key logic and utilities
-* Integration tests for interactive components
-* End-to-end tests for core user flows (if user-visible)
+- Unit tests for key logic and utilities
+- Integration tests for interactive components
+- End-to-end tests for core user flows (if user-visible)
 
 Tests will be written **during development**, not after.
 
@@ -40,9 +40,9 @@ Tests will be written **during development**, not after.
 
 ### What to test:
 
-* Functions with logic (e.g. text formatting utils)
-* React components (props, rendering, interaction)
-* Custom hooks
+- Functions with logic (e.g. text formatting utils)
+- React components (props, rendering, interaction)
+- Custom hooks
 
 ### How to run tests:
 
@@ -52,10 +52,10 @@ npm run test
 
 ### Tips:
 
-* Keep tests close to code: `MyComponent.test.tsx`
-* Use `describe()` to group related tests
-* Use `mock` functions to isolate dependencies
-* Write small, focused tests (1 behavior per test)
+- Keep tests close to code: `MyComponent.test.tsx`
+- Use `describe()` to group related tests
+- Use `mock` functions to isolate dependencies
+- Write small, focused tests (1 behavior per test)
 
 ---
 
@@ -63,10 +63,10 @@ npm run test
 
 ### What to test:
 
-* Creating and editing a page
-* Formatting blocks
-* Reordering with drag-and-drop
-* Linking pages
+- Creating and editing a page
+- Formatting blocks
+- Reordering with drag-and-drop
+- Linking pages
 
 ### How to run Cypress:
 
@@ -82,8 +82,8 @@ npx cypress open
 
 ### Test file location:
 
-* Place in: `apps/web/cypress/e2e/`
-* Example: `editor-blocks.cy.ts`
+- Place in: `apps/web/cypress/e2e/`
+- Example: `editor-blocks.cy.ts`
 
 ---
 
@@ -93,23 +93,23 @@ We’ll configure **GitHub Actions** to run all tests automatically when you pus
 
 ### CI Features:
 
-* Linting
-* Type checking
-* Unit tests (Jest)
-* End-to-end tests (Cypress)
+- Linting
+- Type checking
+- Unit tests (Jest)
+- End-to-end tests (Cypress)
 
 ### Benefits:
 
-* Catch bugs before they reach `main`
-* Prevent broken features from being merged
-* Fast feedback loop
+- Catch bugs before they reach `main`
+- Prevent broken features from being merged
+- Fast feedback loop
 
 ---
 
 ## Best Practices
 
-* The Assistant writes tests during feature implementation
-* Tests reflect real use cases, not just internal logic
-* Avoid overly fragile or overly broad tests
-* Fix broken or flaky tests before merging
-* Don’t skip tests without documenting the reason
+- The Assistant writes tests during feature implementation
+- Tests reflect real use cases, not just internal logic
+- Avoid overly fragile or overly broad tests
+- Fix broken or flaky tests before merging
+- Don’t skip tests without documenting the reason

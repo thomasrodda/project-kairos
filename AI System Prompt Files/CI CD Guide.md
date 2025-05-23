@@ -14,10 +14,10 @@ We use **GitHub Actions** for our CI/CD pipeline. Every pull request runs automa
 
 For every push or pull request:
 
-* Linting (ESLint)
-* Type checking (TypeScript)
-* Unit tests (Jest)
-* End-to-end tests (Cypress)
+- Linting (ESLint)
+- Type checking (TypeScript)
+- Unit tests (Jest)
+- End-to-end tests (Cypress)
 
 These steps run automatically via GitHub Actions.
 
@@ -27,8 +27,8 @@ These steps run automatically via GitHub Actions.
 
 We maintain two environments:
 
-* **Development** (branch: `dev`) – used for staging and testing
-* **Production** (branch: `main`) – stable and deployed to users
+- **Development** (branch: `dev`) – used for staging and testing
+- **Production** (branch: `main`) – stable and deployed to users
 
 Merging to `main` represents a production-ready build.
 
@@ -36,8 +36,8 @@ Merging to `main` represents a production-ready build.
 
 ## Deployment Targets
 
-* **Frontend** and **Backend** are hosted on **Vercel**
-* Vercel automatically deploys from branches or PRs for preview
+- **Frontend** and **Backend** are hosted on **Vercel**
+- Vercel automatically deploys from branches or PRs for preview
 
 ---
 
@@ -45,16 +45,16 @@ Merging to `main` represents a production-ready build.
 
 GitHub Actions config lives in `.github/workflows/` and includes jobs for:
 
-* Checking out code
-* Installing dependencies
-* Running linter, tests, and build
-* Optionally deploying if branch = `main`
+- Checking out code
+- Installing dependencies
+- Running linter, tests, and build
+- Optionally deploying if branch = `main`
 
 ---
 
 ## Best Practices
 
-* Keep `main` clean and always deployable
-* Use `dev` for integrating feature branches
-* Run all tests locally before pushing if possible
-* Don’t bypass checks or force merges
+- Keep `main` clean and always deployable
+- Use `dev` for integrating feature branches
+- Run all tests locally before pushing if possible
+- Don’t bypass checks or force merges

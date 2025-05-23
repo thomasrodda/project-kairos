@@ -31,9 +31,9 @@ This structure makes it easy to locate all related files.
 
 Use PascalCase for file and folder names:
 
-* `EditorToolbar.tsx`
-* `PageList.scss`
-* `BlockMenu.test.tsx`
+- `EditorToolbar.tsx`
+- `PageList.scss`
+- `BlockMenu.test.tsx`
 
 Avoid suffixes like `.component.tsx` — keep names simple and consistent.
 
@@ -44,7 +44,7 @@ Avoid suffixes like `.component.tsx` — keep names simple and consistent.
 Use an `index.ts` file inside each component folder to re-export the main component. This allows clean imports:
 
 ```tsx
-import { EditorToolbar } from '@/components/EditorToolbar';
+import { EditorToolbar } from '@/components/EditorToolbar'
 ```
 
 ---
@@ -53,10 +53,10 @@ import { EditorToolbar } from '@/components/EditorToolbar';
 
 We use the following types of components:
 
-* **UI components**: Buttons, inputs, toolbars, icons
-* **Layout components**: Grids, containers, sidebars
-* **Feature components**: Editor, FileTree, BlockList
-* **Page-level components**: Wrapped route content (if applicable)
+- **UI components**: Buttons, inputs, toolbars, icons
+- **Layout components**: Grids, containers, sidebars
+- **Feature components**: Editor, FileTree, BlockList
+- **Page-level components**: Wrapped route content (if applicable)
 
 ---
 
@@ -66,8 +66,8 @@ All components are written in TypeScript with strongly typed props. Define props
 
 ```ts
 interface EditorToolbarProps {
-  onSave: () => void;
-  isSaving: boolean;
+  onSave: () => void
+  isSaving: boolean
 }
 ```
 
@@ -89,13 +89,13 @@ Write a test file alongside the component to cover key logic, rendering, and use
 
 ## Best Practices
 
-* Keep components small and focused (single responsibility)
-* Co-locate tests and styles with components
-* Use clear, consistent naming
-* Avoid props drilling—lift state where appropriate
-* Prefer composition over inheritance
-* Document expected props in code
-* Use dynamic rendering and registry patterns for pluggable UI components (e.g., editor blocks)
+- Keep components small and focused (single responsibility)
+- Co-locate tests and styles with components
+- Use clear, consistent naming
+- Avoid props drilling—lift state where appropriate
+- Prefer composition over inheritance
+- Document expected props in code
+- Use dynamic rendering and registry patterns for pluggable UI components (e.g., editor blocks)
 
 The block-based editor uses a plugin-friendly architecture.
 

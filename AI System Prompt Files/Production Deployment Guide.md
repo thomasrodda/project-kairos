@@ -13,6 +13,7 @@ Deploy features safely with proper environment separation, automated testing, an
 ## Environment Configuration
 
 Maintain separate environments with distinct configurations:
+
 - **Development**: Local development with test data
 - **Staging**: Production-like environment for final testing
 - **Production**: Live user environment with real data
@@ -24,6 +25,7 @@ Use environment variables for all configuration differences. Never hard-code env
 ## Database Migrations
 
 Handle schema changes safely:
+
 - **Version all migrations** with timestamps and descriptions
 - **Test migrations** on staging data before production
 - **Backup database** before running production migrations
@@ -37,6 +39,7 @@ Never modify production database directly - always use migration scripts.
 ## Deployment Process
 
 Follow consistent deployment steps:
+
 - **Run full test suite** before deploying
 - **Deploy to staging first** and verify functionality
 - **Database migrations** run automatically with deployments
@@ -50,6 +53,7 @@ Use automated deployment pipelines to reduce human error.
 ## Health Monitoring
 
 Monitor application health continuously:
+
 - **Health check endpoints** for service status
 - **Database connectivity** and performance monitoring
 - **Error rate tracking** and alerting
@@ -63,6 +67,7 @@ Set up alerts for critical issues that require immediate attention.
 ## Rollback Procedures
 
 Prepare for quick recovery from deployment issues:
+
 - **Automated rollback** triggers for critical failures
 - **Database rollback scripts** for schema changes
 - **Feature flags** to disable problematic features
@@ -75,6 +80,7 @@ Test rollback procedures regularly to ensure they work when needed.
 ## Security in Production
 
 Secure production environment:
+
 - **HTTPS enforcement** for all traffic
 - **Security headers** configured properly
 - **Access logging** for audit trails
@@ -88,6 +94,7 @@ Monitor for security threats and unusual access patterns.
 ## Performance Optimization
 
 Optimize production performance:
+
 - **CDN configuration** for static assets
 - **Database query optimization** and indexing
 - **Caching strategies** for frequently accessed data
@@ -101,6 +108,7 @@ Monitor performance metrics and optimize bottlenecks proactively.
 ## Backup & Recovery
 
 Protect against data loss:
+
 - **Automated daily backups** of database and user files
 - **Backup verification** to ensure data integrity
 - **Point-in-time recovery** capabilities
@@ -114,6 +122,7 @@ Store backups in separate geographic locations from primary data.
 ## Monitoring & Alerting
 
 Set up comprehensive monitoring:
+
 - **Application performance** monitoring with dashboards
 - **Error tracking** with automatic notification
 - **Uptime monitoring** from external services
@@ -127,6 +136,7 @@ Configure alerts for issues that require immediate attention vs. those that can 
 ## Implementation Requirements
 
 **Every deployment must**:
+
 - Pass all automated tests
 - Include database migration scripts
 - Update staging environment first
@@ -134,6 +144,7 @@ Configure alerts for issues that require immediate attention vs. those that can 
 - Verify health checks pass
 
 **Every feature must**:
+
 - Include monitoring and logging
 - Handle failure gracefully
 - Support feature flag controls
@@ -141,6 +152,7 @@ Configure alerts for issues that require immediate attention vs. those that can 
 - Document operational requirements
 
 **Every environment must**:
+
 - Use separate configuration
 - Have proper security controls
 - Include monitoring and alerting
@@ -148,6 +160,7 @@ Configure alerts for issues that require immediate attention vs. those that can 
 - Maintain audit logs
 
 **Every release must**:
+
 - Include release notes
 - Follow semantic versioning
 - Tag repository with version

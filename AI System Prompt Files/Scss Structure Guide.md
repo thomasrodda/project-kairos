@@ -10,10 +10,10 @@ We use **SCSS** instead of Tailwind or external UI libraries. SCSS gives us cont
 
 This guide supports:
 
-* Modular component styles
-* Light/dark theme support
-* Design tokens (colors, fonts, spacing, etc.)
-* Global resets for consistent cross-browser styling
+- Modular component styles
+- Light/dark theme support
+- Design tokens (colors, fonts, spacing, etc.)
+- Global resets for consistent cross-browser styling
 
 ---
 
@@ -66,8 +66,8 @@ Follow a clear naming system, such as BEM (Block\_\_Element--Modifier), and scop
 
 Component-specific SCSS can be placed either:
 
-* In the central `styles/components/` folder for shared UI elements
-* Or inside the component folder alongside its logic and markup
+- In the central `styles/components/` folder for shared UI elements
+- Or inside the component folder alongside its logic and markup
 
 Choose based on how reusable and isolated the component is. Import the SCSS file at the top of the React component when applicable.
 
@@ -81,10 +81,10 @@ Define reusable mixins for things like media queries or flexbox shortcuts. Use u
 
 ## Best Practices
 
-* Keep global styles minimal and in one place
-* Use SCSS variables for color, spacing, font, etc.
-* Keep specificity low
-* Group and comment related rules
-* Avoid !important unless absolutely necessary
-* Theme using CSS variables and attribute selectors
-* Keep component styles close to the logic they support when possible
+- Keep global styles minimal and in one place
+- Use SCSS variables for color, spacing, font, etc.
+- Keep specificity low
+- Group and comment related rules
+- Avoid !important unless absolutely necessary
+- Theme using CSS variables and attribute selectors
+- Keep component styles close to the logic they support when possible

@@ -53,6 +53,7 @@ The following commands will be available once the project is scaffolded:
 ## AI System Prompts
 
 The `AI System Prompt Files/` directory contains comprehensive development guidance including:
+
 - Project vision, user stories, and MVP requirements
 - Architecture patterns and component structure guidelines
 - Testing, styling (SCSS), and backend API conventions

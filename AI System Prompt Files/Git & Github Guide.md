@@ -26,9 +26,9 @@ We follow a simple and scalable branching model:
 
 **Example feature branches**:
 
-* `feature/editor-blocks`
-* `feature/oauth-login`
-* `fix/sidebar-bug`
+- `feature/editor-blocks`
+- `feature/oauth-login`
+- `fix/sidebar-bug`
 
 ---
 
@@ -46,21 +46,23 @@ We follow a simple and scalable branching model:
 
 3. **Commit regularly**:
 
-   * Commit when you've completed a small, meaningful chunk of work:
+   - Commit when you've completed a small, meaningful chunk of work:
 
-     * A new component
-     * A bug fix
-     * A completed unit of functionality (e.g. slash command works)
-   * Avoid giant commits that combine unrelated changes.
-   * Use clear, concise commit messages:
+     - A new component
+     - A bug fix
+     - A completed unit of functionality (e.g. slash command works)
 
-     * Format: `type: short description`
+   - Avoid giant commits that combine unrelated changes.
+   - Use clear, concise commit messages:
 
-       * `feat:` = new feature
-       * `fix:` = bug fix
-       * `chore:` = cleanup/tooling
-       * `docs:` = documentation only
-     * Example:
+     - Format: `type: short description`
+
+       - `feat:` = new feature
+       - `fix:` = bug fix
+       - `chore:` = cleanup/tooling
+       - `docs:` = documentation only
+
+     - Example:
 
        ```bash
        git commit -m "feat: add slash menu to editor blocks"
@@ -74,19 +76,20 @@ We follow a simple and scalable branching model:
 
 5. **Open a Pull Request**:
 
-   * Target branch: `dev`
-   * Use the PR template
-   * Review your changes before submitting (self-check for clarity and scope)
+   - Target branch: `dev`
+   - Use the PR template
+   - Review your changes before submitting (self-check for clarity and scope)
 
 6. **Merge** after review:
 
-   * If needed, rebase to sync with `dev`:
+   - If needed, rebase to sync with `dev`:
 
      ```bash
      git checkout feature/my-feature
      git pull --rebase origin dev
      ```
-   * Use "Squash & Merge" to combine commits into a single, clean commit
+
+   - Use "Squash & Merge" to combine commits into a single, clean commit
 
 7. **Sync `main`** periodically:
 
@@ -101,12 +104,12 @@ We follow a simple and scalable branching model:
 
 ## Best Practices
 
-* Keep commits small and focused — aim for 1 logical change per commit
-* Sync with `dev` frequently to avoid big merge conflicts
-* Use clear, consistent branch names: `feature/`, `fix/`, `chore/`
-* Delete feature branches after merging to keep things tidy
-* Never commit directly to `main`
-* Add files to `.gitignore` to avoid committing build or sensitive files
+- Keep commits small and focused — aim for 1 logical change per commit
+- Sync with `dev` frequently to avoid big merge conflicts
+- Use clear, consistent branch names: `feature/`, `fix/`, `chore/`
+- Delete feature branches after merging to keep things tidy
+- Never commit directly to `main`
+- Add files to `.gitignore` to avoid committing build or sensitive files
 
 ---
 
@@ -114,8 +117,8 @@ We follow a simple and scalable branching model:
 
 We can use **Husky** + **lint-staged** to automate code checks before each commit:
 
-* Format code with Prettier
-* Lint with ESLint
-* Optionally run tests
+- Format code with Prettier
+- Lint with ESLint
+- Optionally run tests
 
 These checks will be configured in the `package.json` file during setup.
