@@ -5,10 +5,10 @@
 if command -v tree >/dev/null 2>&1; then
   echo "🌳 Updating FILE_TREE.md..."
   
-  # Use a more robust tree command for Git hooks
+  # Use tree command with explicit depth and better formatting
   tree -L 8 \
        -I 'node_modules|dist|build|coverage|.turbo|.next|.vercel|*.log' \
-       -F --dirsfirst --noreport -a \
+       --dirsfirst --noreport -a --charset utf8 \
        .claude .github .husky .vscode "AI System Prompt Files" apps packages prisma \
        > FILE_TREE.md
   
