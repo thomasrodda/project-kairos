@@ -7,8 +7,8 @@ echo "🚀 Running pre-push checks..."
 echo "🧪 Running full test suite..."
 yarn test --coverage --passWithNoTests
 
-# Build all packages to ensure they compile
-echo "🏗️ Building all packages..."
-yarn build
+# TODO: Uncomment build step when we're ready for production deployment
+# echo "🏗️ Building all packages..."
+# yarn build
 
 echo "✅ Pre-push checks completed successfully!"

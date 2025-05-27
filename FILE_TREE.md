@@ -65,6 +65,11 @@ apps/
 │   │   ├── components.ts*
 │   │   └── e2e.ts*
 │   └── tsconfig.json*
+├── dist/
+│   ├── assets/
+│   │   ├── index-C9z5RDxT.js*
+│   │   └── index-DmofnpWE.css*
+│   └── index.html*
 ├── index.html*
 ├── jest.config.js*
 ├── node_modules/
@@ -129,6 +134,6 @@ packages/
 ├── src/
 │   ├── env.ts*
 │   └── index.ts*
-└── tsconfig.json*
+└── tsconfig.json\*
 
 12 directories, 14 files
