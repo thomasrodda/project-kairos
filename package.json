@@ -21,7 +21,7 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md,scss,css}\"",
     "postinstall": "chmod +x ./fix-permissions.sh && ./fix-permissions.sh && husky",
     "prepare": "husky",
-    "update-tree": "tree -L 4 -F .claude .github .vscode \"AI System Prompt Files\" apps packages > FILE_TREE.md",
+    "update-tree": "tree -L 8 -I 'node_modules|dist|build|coverage|.turbo|.next|.vercel|*.log' -F --dirsfirst --charset ascii --noreport -a .claude .github .husky .vscode \"AI System Prompt Files\" apps packages prisma > FILE_TREE.md",
     "db:migrate": "yarn workspace @kairos/database db:migrate",
     "db:deploy": "yarn workspace @kairos/database db:deploy",
     "db:reset": "yarn workspace @kairos/database db:reset",
