@@ -1,0 +1,99 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  firebaseUid String   @unique
+  email       String   @unique
+  displayName String?
+  photoURL    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  workspaces Workspace[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id        String   @id @default(cuid())
+  name      String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pages Page[]
+
+  @@map("workspaces")
+}
+
+model Page {
+  id          String  @id @default(cuid())
+  title       String  @default("Untitled")
+  workspaceId String
+  parentId    String?
+  order       Int     @default(0)
+  isFolder    Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parent       Page?     @relation("PageHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children     Page[]    @relation("PageHierarchy")
+  blocks       Block[]
+  incomingLinks Link[]   @relation("LinkTarget")
+  outgoingLinks Link[]   @relation("LinkSource")
+
+  @@index([workspaceId])
+  @@index([parentId])
+  @@map("pages")
+}
+
+model Block {
+  id        String   @id @default(cuid())
+  pageId    String
+  type      BlockType
+  content   String   @default("")
+  order     Int      @default(0)
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@map("blocks")
+}
+
+model Link {
+  id         String   @id @default(cuid())
+  sourceId   String
+  targetId   String
+  createdAt  DateTime @default(now())
+
+  // Relations
+  source Page @relation("LinkSource", fields: [sourceId], references: [id], onDelete: Cascade)
+  target Page @relation("LinkTarget", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, targetId])
+  @@map("links")
+}
+
+enum BlockType {
+  PARAGRAPH
+  HEADING1
+  HEADING2
+  BULLET
+}

@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "types": ["vite/client", "@testing-library/jest-dom", "jest", "node"],
+    "types": ["vite/client", "@testing-library/jest-dom", "jest", "node", "cypress"],
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
     "paths": {
@@ -12,6 +12,6 @@
       "@kairos/types": ["../../packages/types/src"]
     }
   },
-  "include": ["src/**/*", "vite.config.ts"],
+  "include": ["src/**/*", "vite.config.ts", "cypress/**/*"],
   "exclude": ["node_modules", "dist"]
 }

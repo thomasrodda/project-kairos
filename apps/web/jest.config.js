@@ -4,7 +4,14 @@ module.exports = {
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        tsconfig: {
+          jsx: 'react-jsx',
+        },
+      },
+    ],
   },
   moduleNameMapper: {
     '\\.(css|scss|sass)$': 'identity-obj-proxy',
@@ -22,5 +29,4 @@ module.exports = {
     '!src/main.tsx',
     '!src/vite-env.d.ts',
   ],
-  passWithNoTests: true,
 }

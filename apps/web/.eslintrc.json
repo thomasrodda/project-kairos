@@ -1,0 +1,12 @@
+{
+  "extends": ["../../.eslintrc.json"],
+  "overrides": [
+    {
+      "files": ["cypress/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/triple-slash-reference": "off"
+      }
+    }
+  ]
+}

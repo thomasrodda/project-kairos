@@ -1,1 +1,21 @@
+#!/bin/sh
+# .husky/pre-commit
+
+# Update FILE_TREE.md before commit (if tree command is available)
+if command -v tree >/dev/null 2>&1; then
+  echo "🌳 Updating FILE_TREE.md..."
+  yarn update-tree
+  git add FILE_TREE.md
+fi
+
+# Run lint-staged for code quality checks
+echo "🧹 Running lint-staged..."
 yarn lint-staged
+
+# Run type checking
+echo "🔍 Running type checks..."
+yarn typecheck
+
+# Run tests (quick unit tests only, not e2e)
+echo "🧪 Running tests..."
+yarn test --passWithNoTests --bail

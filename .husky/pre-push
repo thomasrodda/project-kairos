@@ -1,0 +1,14 @@
+#!/bin/sh
+# .husky/pre-push
+
+echo "🚀 Running pre-push checks..."
+
+# Run all tests including coverage
+echo "🧪 Running full test suite..."
+yarn test --coverage --passWithNoTests
+
+# Build all packages to ensure they compile
+echo "🏗️ Building all packages..."
+yarn build
+
+echo "✅ Pre-push checks completed successfully!"

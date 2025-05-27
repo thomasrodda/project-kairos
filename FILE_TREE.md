@@ -12,7 +12,8 @@ AI System Prompt Files/
 ├── # 3. MVP.md*
 ├── # 5. Architecture.md*
 ├── # Assistant Guidelines.md*
-├── # Project Framwork Guide.md*
+├── # Development Plan.md*
+├── # Project Framework.md*
 ├── # Project Overview.md*
 ├── # Project Plan.md*
 ├── Analytics Feature Flags Guide.md*
@@ -32,21 +33,63 @@ AI System Prompt Files/
 apps/
 ├── api/
 │   ├── hello.ts*
+│   ├── jest.config.js*
 │   ├── node_modules/
+│   │   └── ts-node/
+│   │   ├── LICENSE*
+│   │   ├── README.md*
+│   │   ├── child-loader.mjs*
+│   │   ├── dist/
+│   │   ├── dist-raw/
+│   │   ├── esm/
+│   │   ├── esm.mjs*
+│   │   ├── node10/
+│   │   ├── node12/
+│   │   ├── node14/
+│   │   ├── node16/
+│   │   ├── node_modules/
+│   │   ├── package.json*
+│   │   ├── register/
+│   │   ├── transpilers/
+│   │   ├── tsconfig.schema.json*
+│   │   └── tsconfig.schemastore-schema.json*
 │   ├── package.json*
 │   ├── tsconfig.json*
 │   └── vercel.json*
 └── web/
-├── dist/
-│   ├── assets/
-│   │   ├── index-CqndIPVR.js*
-│   │   └── index-DmofnpWE.css*
-│   └── index.html*
+├── cypress/
+│   ├── e2e/
+│   │   └── app.cy.ts*
+│   ├── support/
+│   │   ├── commands.ts*
+│   │   ├── components.ts*
+│   │   └── e2e.ts*
+│   └── tsconfig.json*
 ├── index.html*
+├── jest.config.js*
 ├── node_modules/
+│   └── ts-node/
+│   ├── LICENSE*
+│   ├── README.md*
+│   ├── child-loader.mjs*
+│   ├── dist/
+│   ├── dist-raw/
+│   ├── esm/
+│   ├── esm.mjs*
+│   ├── node10/
+│   ├── node12/
+│   ├── node14/
+│   ├── node16/
+│   ├── node_modules/
+│   ├── package.json*
+│   ├── register/
+│   ├── transpilers/
+│   ├── tsconfig.schema.json*
+│   └── tsconfig.schemastore-schema.json*
 ├── package.json*
 ├── public/
 ├── src/
+│   ├── App.test.tsx*
 │   ├── App.tsx*
 │   ├── components/
 │   ├── hooks/
@@ -54,11 +97,20 @@ apps/
 │   ├── pages/
 │   ├── styles/
 │   │   └── index.scss*
+│   ├── test/
+│   │   └── setup.ts*
 │   ├── utils/
 │   └── vite-env.d.ts*
 ├── tsconfig.json*
 └── vite.config.ts*
 packages/
+├── database/
+│   ├── node_modules/
+│   ├── package.json*
+│   ├── src/
+│   │   ├── index.ts*
+│   │   └── seed.ts*
+│   └── tsconfig.json*
 ├── types/
 │   ├── node_modules/
 │   ├── package.json*
@@ -75,9 +127,8 @@ packages/
 ├── node_modules/
 ├── package.json*
 ├── src/
+│   ├── env.ts*
 │   └── index.ts*
 └── tsconfig.json*
 
-9 directories, 9 files
-
-tree -L 4 -F .claude .github .vscode "AI System Prompt Files" apps packages > FILE_TREE.md
+12 directories, 14 files

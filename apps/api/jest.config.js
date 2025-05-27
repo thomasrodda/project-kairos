@@ -13,5 +13,4 @@ module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.ts$',
   moduleFileExtensions: ['ts', 'js', 'json', 'node'],
   collectCoverageFrom: ['**/*.ts', '!**/node_modules/**', '!**/dist/**'],
-  passWithNoTests: true,
 }
