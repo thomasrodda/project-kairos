@@ -4,7 +4,14 @@
 # Update FILE_TREE.md before commit (if tree command is available)
 if command -v tree >/dev/null 2>&1; then
   echo "🌳 Updating FILE_TREE.md..."
-  yarn update-tree
+  
+  # Use a more robust tree command for Git hooks
+  tree -L 8 \
+       -I 'node_modules|dist|build|coverage|.turbo|.next|.vercel|*.log' \
+       -F --dirsfirst --noreport -a \
+       .claude .github .husky .vscode "AI System Prompt Files" apps packages prisma \
+       > FILE_TREE.md
+  
   git add FILE_TREE.md
 fi
 
