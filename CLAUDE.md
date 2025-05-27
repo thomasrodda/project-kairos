@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Project Kairos is a creative writing and worldbuilding web application designed for novelists, writers, and D&D campaign planners. It combines block-based editing with AI-driven tools for consistency checking and writing assistance.
 
-**Current Status**: Planning/Documentation phase - no source code exists yet.
+**Current Status**: Development phase - foundational architecture and tooling implemented, ready for feature development.
 
 ## Technology Stack
 
@@ -33,7 +33,7 @@ project-root/
 
 ## Development Setup (To Be Implemented)
 
-The following commands will be available once the project is scaffolded:
+Available development commands:
 
 - `yarn install` - Install dependencies
 - `yarn dev` - Start development servers
@@ -63,8 +63,10 @@ When implementing features, reference these files for consistent development pat
 
 ## Next Development Steps
 
-1. Initialize monorepo with Yarn Workspaces
-2. Set up React frontend with TypeScript and Vite
-3. Configure Vercel serverless functions
-4. Implement Firebase authentication
-5. Create core block editor components
+1. ✅ Initialize monorepo with Yarn Workspaces
+2. ✅ Set up React frontend with TypeScript and Vite
+3. ✅ Configure Vercel serverless functions
+4. Set up Firebase authentication (environment variables needed)
+5. Set up PostgreSQL database (local or cloud)
+6. Create core block editor components
+7. Implement basic UI layout with sidebar and editor area

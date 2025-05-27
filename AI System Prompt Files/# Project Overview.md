@@ -26,7 +26,7 @@
 ## Technology Stack (Preliminary)
 
 - **Frontend**: React (with TypeScript), Tailwind CSS, shadcn/ui components.
-- **Backend**: Node.js with Express (or serverless functions); PostgreSQL or MongoDB; vector search via Pinecone/Weaviate.
+- **Backend**: Vercel serverless functions; PostgreSQL with Prisma ORM; vector search via Pinecone/Weaviate.
 - **Storage**: Cloud database + optional local file storage and sync.
 - **Auth**: OAuth with Google (expandable to other providers).
 - **Testing & CI**: Jest (unit), Cypress (e2e), GitHub Actions for CI/CD.
