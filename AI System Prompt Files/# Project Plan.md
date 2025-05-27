@@ -49,7 +49,3 @@ This document outlines the eight phases we will tackle—each in its own dedicat
 - Establish processes for bug triage and feature requests
 - Plan recurring roadmap review cycles
 - Iterate on features based on user feedback and metrics
-
----
-
-_Each section will be discussed and fleshed out in a separate chat._

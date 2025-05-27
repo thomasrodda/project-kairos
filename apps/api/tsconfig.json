@@ -8,8 +8,9 @@
     "paths": {
       "@kairos/utils": ["../../packages/utils/src"],
       "@kairos/types": ["../../packages/types/src"]
-    }
+    },
+    "types": ["node", "jest"]
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts"]
 }

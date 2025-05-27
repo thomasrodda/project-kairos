@@ -13,7 +13,8 @@
     "typecheck": "yarn workspaces run typecheck",
     "test": "yarn workspaces run test",
     "format": "node ./node_modules/.bin/prettier --write \"**/*.{ts,tsx,js,jsx,json,md,scss,css}\"",
-    "postinstall": "chmod +x ./fix-permissions.sh && ./fix-permissions.sh"
+    "postinstall": "chmod +x ./fix-permissions.sh && ./fix-permissions.sh",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

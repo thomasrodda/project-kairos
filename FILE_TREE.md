@@ -2,7 +2,7 @@
 └── settings.local.json*
 .github/
 └── workflows/
-    └── ci.yml*
+└── ci.yml*
 .vscode/
 ├── extensions.json*
 └── settings.json*
@@ -37,27 +37,27 @@ apps/
 │   ├── tsconfig.json*
 │   └── vercel.json*
 └── web/
-    ├── dist/
-    │   ├── assets/
-    │   │   ├── index-CqndIPVR.js*
-    │   │   └── index-DmofnpWE.css*
-    │   └── index.html*
-    ├── index.html*
-    ├── node_modules/
-    ├── package.json*
-    ├── public/
-    ├── src/
-    │   ├── App.tsx*
-    │   ├── components/
-    │   ├── hooks/
-    │   ├── main.tsx*
-    │   ├── pages/
-    │   ├── styles/
-    │   │   └── index.scss*
-    │   ├── utils/
-    │   └── vite-env.d.ts*
-    ├── tsconfig.json*
-    └── vite.config.ts*
+├── dist/
+│   ├── assets/
+│   │   ├── index-CqndIPVR.js*
+│   │   └── index-DmofnpWE.css*
+│   └── index.html*
+├── index.html*
+├── node_modules/
+├── package.json*
+├── public/
+├── src/
+│   ├── App.tsx*
+│   ├── components/
+│   ├── hooks/
+│   ├── main.tsx*
+│   ├── pages/
+│   ├── styles/
+│   │   └── index.scss*
+│   ├── utils/
+│   └── vite-env.d.ts*
+├── tsconfig.json*
+└── vite.config.ts*
 packages/
 ├── types/
 │   ├── node_modules/
@@ -72,10 +72,12 @@ packages/
 │   │   └── index.ts*
 │   └── tsconfig.json*
 └── utils/
-    ├── node_modules/
-    ├── package.json*
-    ├── src/
-    │   └── index.ts*
-    └── tsconfig.json*
+├── node_modules/
+├── package.json*
+├── src/
+│   └── index.ts*
+└── tsconfig.json*
 
 9 directories, 9 files
+
+tree -L 4 -F .claude .github .vscode "AI System Prompt Files" apps packages > FILE_TREE.md

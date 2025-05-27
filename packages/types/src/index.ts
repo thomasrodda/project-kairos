@@ -28,5 +28,5 @@ export interface Block {
   order: number
   createdAt: Date
   updatedAt: Date
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
