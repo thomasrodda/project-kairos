@@ -1,0 +1,12 @@
+{
+  "name": "@kairos/design-tokens",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.scss",
+  "scripts": {
+    "typecheck": "echo 'No TypeScript in design tokens package'"
+  },
+  "devDependencies": {
+    "sass": "^1.81.0"
+  }
+}

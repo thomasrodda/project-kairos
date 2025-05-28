@@ -1,0 +1,89 @@
+// packages/design-tokens/src/colors.scss
+// =============================================================================
+// PROJECT KAIROS DESIGN SYSTEM - COLORS
+// =============================================================================
+
+// =============================================================================
+// BRAND COLORS
+// =============================================================================
+:root {
+  // Primary brand colors
+  --color-primary-100: #efe1fe; // lightest
+  --color-primary-200: #e1c8f3; // light
+  --color-primary-300: #d1aafd; // medium light
+  --color-primary-400: #c391fd; // medium
+  --color-primary-500: #b373fc; // main brand color
+  --color-primary-600: #8d2dfb; // medium dark
+  --color-primary-700: #6705d7; // dark
+  --color-primary-800: #450391; // darker
+  --color-primary-900: #200046; // darkest
+
+  // =============================================================================
+  // NEUTRAL COLORS - Comprehensive grayscale
+  // =============================================================================
+
+  // Pure colors
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  // Neutral palette
+  --color-neutral-100: #f0f1f2; // very light gray
+  --color-neutral-200: #d3d6d9; // light gray
+  --color-neutral-300: #b8bdc1; // medium light gray
+  --color-neutral-400: #9aa1a7; // medium gray
+  --color-neutral-500: #828890; // true middle gray
+  --color-neutral-600: #686d73; // medium dark gray
+  --color-neutral-650: #575c61; // custom step for better contrast
+  --color-neutral-700: #393d40; // dark gray
+  --color-neutral-750: #292c2e; // custom step for surfaces
+  --color-neutral-800: #202224; // very dark gray
+  --color-neutral-900: #121314; // almost black
+
+  // =============================================================================
+  // STATUS COLORS - Enhanced with full palettes
+  // =============================================================================
+
+  // Success (Green)
+  --color-success-100: #d9f2de;
+  --color-success-200: #b0ebbb;
+  --color-success-300: #8ee59e;
+  --color-success-400: #65e07b;
+  --color-success-500: #39d355; // main success
+  --color-success-600: #21a639;
+  --color-success-700: #0d7f22;
+  --color-success-800: #025612;
+  --color-success-900: #00400c;
+
+  // Warning (Amber)
+  --color-warning-100: #faf2e1;
+  --color-warning-200: #f7e2b5;
+  --color-warning-300: #f2d085;
+  --color-warning-400: #edbe58;
+  --color-warning-500: #e2a626; // main warning
+  --color-warning-600: #bf8813;
+  --color-warning-700: #94680a;
+  --color-warning-800: #694803;
+  --color-warning-900: #402b00;
+
+  // Error (Red)
+  --color-error-100: #fceae4;
+  --color-error-200: #fac6b6;
+  --color-error-300: #f29f85;
+  --color-error-400: #e87451;
+  --color-error-500: #dd5025; // main error
+  --color-error-600: #b23712;
+  --color-error-700: #8c2607;
+  --color-error-200: #661902;
+  --color-error-900: #3f0f00;
+
+  // Info (Blue)
+  --color-info-100: #e4f9fc;
+  --color-info-200: #b4f0fa;
+  --color-info-300: #87e6f5;
+  --color-info-400: #5bdbf0;
+  --color-info-500: #2cd0ea; // main info
+  --color-info-600: #19a8bf;
+  --color-info-700: #0b8699;
+  --color-info-800: #035d6b;
+  --color-info-900: #003740;
+}
