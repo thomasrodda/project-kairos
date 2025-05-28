@@ -1,0 +1,90 @@
+// packages/design-tokens/src/spacing.scss
+// =============================================================================
+// PROJECT KAIROS DESIGN SYSTEM - SPACING
+// =============================================================================
+
+:root {
+  // =============================================================================
+  // BASE SPACING SCALE - Powers of 4px for consistency
+  // =============================================================================
+
+  --spacing-0: 0; // 0px
+  --spacing-1: 0.25rem; // 4px
+  --spacing-2: 0.5rem; // 8px
+  --spacing-3: 0.75rem; // 12px
+  --spacing-4: 1rem; // 16px
+  --spacing-5: 1.25rem; // 20px
+  --spacing-6: 1.5rem; // 24px
+  --spacing-8: 2rem; // 32px
+  --spacing-10: 2.5rem; // 40px
+  --spacing-12: 3rem; // 48px
+  --spacing-16: 4rem; // 64px
+  --spacing-20: 5rem; // 80px
+  --spacing-24: 6rem; // 96px
+  --spacing-32: 8rem; // 128px
+
+  // =============================================================================
+  // SEMANTIC SPACING - Easy to remember names
+  // =============================================================================
+
+  --spacing-xs: var(--spacing-1); // 4px
+  --spacing-sm: var(--spacing-2); // 8px
+  --spacing-md: var(--spacing-4); // 16px
+  --spacing-lg: var(--spacing-6); // 24px
+  --spacing-xl: var(--spacing-8); // 32px
+  --spacing-2xl: var(--spacing-12); // 48px
+  --spacing-3xl: var(--spacing-16); // 64px
+
+  // =============================================================================
+  // COMPONENT-SPECIFIC SPACING
+  // =============================================================================
+
+  // Buttons
+  --spacing-button-sm: var(--spacing-2) var(--spacing-3); // 8px 12px
+  --spacing-button-md: var(--spacing-3) var(--spacing-4); // 12px 16px
+  --spacing-button-lg: var(--spacing-4) var(--spacing-6); // 16px 24px
+
+  // Form elements
+  --spacing-input-padding: var(--spacing-3) var(--spacing-4); // 12px 16px
+  --spacing-form-gap: var(--spacing-4); // 16px between form elements
+
+  // Layout containers
+  --spacing-container-padding: var(--spacing-4); // 16px
+  --spacing-section-gap: var(--spacing-8); // 32px between sections
+  --spacing-content-gap: var(--spacing-6); // 24px between content blocks
+
+  // =============================================================================
+  // BORDER RADIUS
+  // =============================================================================
+
+  --radius-none: 0;
+  --radius-sm: 0.5rem; // 8px
+  --radius-md: 0.75rem; // 12px
+  --radius-lg: 1rem; // 16px
+  --radius-xl: 1.25rem; // 20px
+  --radius-2xl: 2.5rem; // 40px
+  --radius-3xl: 3.75rem; // 60px
+  --radius-4xl: 5rem; // 80px
+  --radius-full: 9999px; // Fully rounded
+
+  // Semantic radius values
+  --radius-button: var(--radius-md);
+  --radius-input: var(--radius-md);
+  --radius-card: var(--radius-lg);
+  --radius-modal: var(--radius-xl);
+
+  // =============================================================================
+  // SHADOWS
+  // =============================================================================
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  // Semantic shadows
+  --shadow-button: var(--shadow-sm);
+  --shadow-card: var(--shadow-md);
+  --shadow-modal: var(--shadow-xl);
+  --shadow-dropdown: var(--shadow-lg);
+}

@@ -1,0 +1,13 @@
+// packages/design-tokens/src/index.scss
+// =============================================================================
+// PROJECT KAIROS DESIGN SYSTEM - MAIN EXPORT
+// =============================================================================
+// This file imports all design tokens in the correct order
+
+// Import raw tokens first
+@use './colors';
+@use './typography';
+@use './spacing';
+
+// Import semantic assignments last (they reference the raw tokens)
+@use './semantic';

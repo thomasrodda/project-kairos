@@ -73,6 +73,10 @@ apps
 │   ├── hooks
 │   ├── pages
 │   ├── styles
+│   │   ├── base
+│   │   │   └── reset.scss
+│   │   ├── tokens
+│   │   │   └── index.scss
 │   │   └── index.scss
 │   ├── test
 │   │   └── setup.ts
@@ -96,7 +100,11 @@ packages
 │   └── tsconfig.json
 ├── design-tokens
 │   ├── src
-│   │   └── colors.scss
+│   │   ├── colors.scss
+│   │   ├── index.scss
+│   │   ├── semantic.scss
+│   │   ├── spacing.scss
+│   │   └── typography.scss
 │   └── package.json
 ├── types
 │   ├── src

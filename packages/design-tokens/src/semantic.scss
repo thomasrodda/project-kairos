@@ -1,0 +1,92 @@
+// packages/design-tokens/src/semantic.scss
+// =============================================================================
+// PROJECT KAIROS DESIGN SYSTEM - SEMANTIC ASSIGNMENTS
+// =============================================================================
+// This file assigns raw tokens to semantic meanings that change between themes
+
+:root {
+  // =============================================================================
+  // SEMANTIC COLOR ASSIGNMENTS - Dark Theme (Default)
+  // =============================================================================
+
+  // Background colors
+  --color-background: var(--color-neutral-900); // Main app background
+  --color-surface: var(--color-neutral-800); // Card/panel backgrounds
+  --color-surface-hover: var(--color-neutral-750); // Hover states
+  --color-surface-active: var(--color-neutral-700); // Active/pressed states
+
+  // Text colors
+  --color-text-primary: var(--color-neutral-100); // Main text
+  --color-text-secondary: var(--color-neutral-400); // Secondary text
+  --color-text-muted: var(--color-neutral-500); // Muted/disabled text
+  --color-text-inverse: var(--color-neutral-900); // Text on light backgrounds
+
+  // Border colors
+  --color-border: var(--color-neutral-700); // Default borders
+  --color-border-light: var(--color-neutral-750); // Subtle borders
+  --color-border-focus: var(--color-primary-500); // Focus borders
+
+  // Interactive states
+  --color-interactive: var(--color-primary-500); // Links, buttons
+  --color-interactive-hover: var(--color-primary-400);
+  --color-interactive-active: var(--color-primary-600);
+
+  // =============================================================================
+  // SEMANTIC TYPOGRAPHY ASSIGNMENTS
+  // =============================================================================
+
+  // Body text styles
+  --text-body-sm: var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
+  --text-body: var(--font-size-16) / var(--line-height-normal) var(--font-family-primary);
+  --text-body-lg: var(--font-size-18) / var(--line-height-relaxed) var(--font-family-primary);
+
+  // Heading styles
+  --text-heading-6: var(--font-size-16) / var(--line-height-snug) var(--font-family-secondary);
+  --text-heading-5: var(--font-size-18) / var(--line-height-snug) var(--font-family-secondary);
+  --text-heading-4: var(--font-size-20) / var(--line-height-snug) var(--font-family-secondary);
+  --text-heading-3: var(--font-size-24) / var(--line-height-tight) var(--font-family-secondary);
+  --text-heading-2: var(--font-size-30) / var(--line-height-tight) var(--font-family-secondary);
+  --text-heading-1: var(--font-size-36) / var(--line-height-tight) var(--font-family-secondary);
+
+  // UI text styles
+  --text-caption: var(--font-size-12) / var(--line-height-normal) var(--font-family-primary);
+  --text-label: var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
+  --text-button: var(--font-size-14) / var(--line-height-tight) var(--font-family-primary);
+
+  // Editor-specific typography
+  --editor-font-paragraph: var(--font-size-16) / var(--line-height-relaxed)
+    var(--font-family-primary);
+  --editor-font-heading-1: var(--font-size-36) / var(--line-height-tight)
+    var(--font-family-secondary);
+  --editor-font-heading-2: var(--font-size-30) / var(--line-height-tight)
+    var(--font-family-secondary);
+
+  // Font weight assignments
+  --font-weight-body: var(--font-weight-regular);
+  --font-weight-emphasis: var(--font-weight-medium);
+  --font-weight-strong: var(--font-weight-semibold);
+  --font-weight-heading: var(--font-weight-bold);
+}
+
+// =============================================================================
+// LIGHT THEME OVERRIDES (Future)
+// =============================================================================
+
+[data-theme='light'] {
+  // Background colors
+  --color-background: var(--color-neutral-100);
+  --color-surface: var(--color-white);
+  --color-surface-hover: var(--color-neutral-200);
+  --color-surface-active: var(--color-neutral-300);
+
+  // Text colors
+  --color-text-primary: var(--color-neutral-900);
+  --color-text-secondary: var(--color-neutral-600);
+  --color-text-muted: var(--color-neutral-500);
+  --color-text-inverse: var(--color-neutral-100);
+
+  // Border colors
+  --color-border: var(--color-neutral-300);
+  --color-border-light: var(--color-neutral-200);
+  // Focus border stays the same
+}
