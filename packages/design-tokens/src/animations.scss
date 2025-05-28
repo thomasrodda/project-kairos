@@ -1,0 +1,271 @@
+// packages/design-tokens/src/animation.scss
+// =============================================================================
+// PROJECT KAIROS DESIGN SYSTEM - ANIMATION & MOTION
+// =============================================================================
+
+:root {
+  // =============================================================================
+  // DURATION TOKENS - Consistent timing across the app
+  // =============================================================================
+
+  // Base durations
+  --duration-instant: 0ms; // No animation
+  --duration-fast: 150ms; // Quick interactions (hover states)
+  --duration-normal: 250ms; // Standard transitions
+  --duration-slow: 350ms; // Deliberate animations
+  --duration-slower: 500ms; // Complex animations
+  --duration-slowest: 700ms; // Page transitions
+
+  // Semantic durations
+  --duration-hover: var(--duration-fast);
+  --duration-fade: var(--duration-normal);
+  --duration-slide: var(--duration-slow);
+  --duration-collapse: var(--duration-slow);
+  --duration-page: var(--duration-slower);
+  --duration-skeleton: 1500ms; // Skeleton loading pulse
+
+  // =============================================================================
+  // EASING FUNCTIONS - Natural motion curves
+  // =============================================================================
+
+  // Basic easings
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  // Advanced easings for specific use cases
+  --ease-in-quad: cubic-bezier(0.55, 0.085, 0.68, 0.53);
+  --ease-out-quad: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-in-out-quad: cubic-bezier(0.455, 0.03, 0.515, 0.955);
+
+  // Expressive easings
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1); // Dramatic deceleration
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1); // Slight overshoot
+  --ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55); // Anticipation
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55); // Playful bounce
+
+  // Semantic easings
+  --ease-default: var(--ease-out);
+  --ease-smooth: var(--ease-in-out);
+  --ease-snappy: var(--ease-out-expo);
+  --ease-playful: var(--ease-out-back);
+
+  // =============================================================================
+  // TRANSITION PRESETS - Common transition patterns
+  // =============================================================================
+
+  // Basic transitions
+  --transition-colors:
+    color var(--duration-fast) var(--ease-default),
+    background-color var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default);
+
+  --transition-opacity: opacity var(--duration-fade) var(--ease-default);
+
+  --transition-transform: transform var(--duration-normal) var(--ease-default);
+
+  --transition-shadow: box-shadow var(--duration-normal) var(--ease-default);
+
+  // Combined transitions
+  --transition-all-fast: all var(--duration-fast) var(--ease-default);
+  --transition-all: all var(--duration-normal) var(--ease-default);
+
+  // Component-specific transitions
+  --transition-button:
+    var(--transition-colors), var(--transition-transform), var(--transition-shadow);
+
+  --transition-input: var(--transition-colors), var(--transition-shadow);
+
+  --transition-card: var(--transition-shadow), transform var(--duration-normal) var(--ease-smooth);
+
+  --transition-menu:
+    opacity var(--duration-fade) var(--ease-default),
+    transform var(--duration-slide) var(--ease-snappy);
+
+  // =============================================================================
+  // ANIMATION DELAYS - For staggered animations
+  // =============================================================================
+
+  --delay-none: 0ms;
+  --delay-1: 50ms;
+  --delay-2: 100ms;
+  --delay-3: 150ms;
+  --delay-4: 200ms;
+  --delay-5: 250ms;
+  --delay-6: 300ms;
+
+  // =============================================================================
+  // KEYFRAME ANIMATIONS - Reusable animation definitions
+  // =============================================================================
+}
+
+// Fade animations
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+// Slide animations
+@keyframes slide-in-up {
+  from {
+    transform: translateY(var(--spacing-md));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    transform: translateY(calc(-1 * var(--spacing-md)));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    transform: translateX(calc(-1 * var(--spacing-md)));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(var(--spacing-md));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+// Scale animations
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+// Pulse animation (for loading states)
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Skeleton loading animation
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Spin animation (for loading spinners)
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// =============================================================================
+// ANIMATION UTILITIES - Ready-to-use animation classes
+// =============================================================================
+
+.animate-fade-in {
+  animation: fade-in var(--duration-fade) var(--ease-default) both;
+}
+
+.animate-slide-up {
+  animation: slide-in-up var(--duration-slide) var(--ease-snappy) both;
+}
+
+.animate-scale-in {
+  animation: scale-in var(--duration-normal) var(--ease-smooth) both;
+}
+
+.animate-pop {
+  animation: pop-in var(--duration-slow) var(--ease-playful) both;
+}
+
+.animate-pulse {
+  animation: pulse var(--duration-skeleton) var(--ease-in-out) infinite;
+}
+
+.animate-spin {
+  animation: spin var(--duration-slower) var(--ease-linear) infinite;
+}
+
+// Staggered animation utilities
+@for $i from 1 through 6 {
+  .animate-delay-#{$i} {
+    animation-delay: calc(var(--delay-1) * #{$i});
+  }
+}
+
+// =============================================================================
+// REDUCED MOTION SUPPORT - Accessibility
+// =============================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

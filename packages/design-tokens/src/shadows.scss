@@ -1,0 +1,132 @@
+// packages/design-tokens/src/shadows.scss
+// =============================================================================
+// PROJECT KAIROS DESIGN SYSTEM - SHADOWS & ELEVATION
+// =============================================================================
+
+:root {
+  // =============================================================================
+  // SHADOW COLORS - For more realistic shadows
+  // =============================================================================
+
+  // Dark theme shadows (subtle, using primary color tint)
+  --shadow-color-dark: 0deg 0% 0%;
+  --shadow-color-dark-primary: 264deg 98% 50%; // Primary color for glow effects
+
+  // Light theme shadows (will be used when light theme is active)
+  --shadow-color-light: 220deg 3% 15%;
+  --shadow-color-light-primary: 264deg 98% 60%;
+
+  // =============================================================================
+  // ELEVATION SYSTEM - Consistent depth levels
+  // =============================================================================
+
+  // Elevation 0 - No shadow (flat)
+  --elevation-0: none;
+
+  // Elevation 1 - Subtle lift (cards at rest)
+  --elevation-1:
+    0 1px 1px 0 rgb(var(--shadow-color-dark) / 0.14),
+    0 2px 1px -1px rgb(var(--shadow-color-dark) / 0.12),
+    0 1px 3px 0 rgb(var(--shadow-color-dark) / 0.2);
+
+  // Elevation 2 - Hover state for cards
+  --elevation-2:
+    0 2px 2px 0 rgb(var(--shadow-color-dark) / 0.14),
+    0 3px 1px -2px rgb(var(--shadow-color-dark) / 0.12),
+    0 1px 5px 0 rgb(var(--shadow-color-dark) / 0.2);
+
+  // Elevation 3 - Active/pressed state
+  --elevation-3:
+    0 3px 4px 0 rgb(var(--shadow-color-dark) / 0.14),
+    0 3px 3px -2px rgb(var(--shadow-color-dark) / 0.12),
+    0 1px 8px 0 rgb(var(--shadow-color-dark) / 0.2);
+
+  // Elevation 4 - Floating elements (toolbar, dropdown)
+  --elevation-4:
+    0 4px 5px 0 rgb(var(--shadow-color-dark) / 0.14),
+    0 1px 10px 0 rgb(var(--shadow-color-dark) / 0.12),
+    0 2px 4px -1px rgb(var(--shadow-color-dark) / 0.2);
+
+  // Elevation 5 - Modal dialogs
+  --elevation-5:
+    0 8px 10px 1px rgb(var(--shadow-color-dark) / 0.14),
+    0 3px 14px 2px rgb(var(--shadow-color-dark) / 0.12),
+    0 5px 5px -3px rgb(var(--shadow-color-dark) / 0.2);
+
+  // =============================================================================
+  // COLORED SHADOWS - For special effects
+  // =============================================================================
+
+  // Primary glow (for buttons, focus states)
+  --shadow-glow-primary:
+    0 0 0 3px rgb(var(--shadow-color-dark-primary) / 0.1),
+    0 4px 12px 0 rgb(var(--shadow-color-dark-primary) / 0.15);
+
+  // Success glow
+  --shadow-glow-success: 0 0 0 3px rgb(57 211 85 / 0.1), 0 4px 12px 0 rgb(57 211 85 / 0.15);
+
+  // Error glow
+  --shadow-glow-error: 0 0 0 3px rgb(221 80 37 / 0.1), 0 4px 12px 0 rgb(221 80 37 / 0.15);
+
+  // =============================================================================
+  // INNER SHADOWS - For inset effects
+  // =============================================================================
+
+  --shadow-inner-sm: inset 0 1px 2px 0 rgb(var(--shadow-color-dark) / 0.05);
+  --shadow-inner-md: inset 0 2px 4px 0 rgb(var(--shadow-color-dark) / 0.06);
+  --shadow-inner-lg: inset 0 4px 6px 0 rgb(var(--shadow-color-dark) / 0.07);
+
+  // =============================================================================
+  // SEMANTIC SHADOW ASSIGNMENTS
+  // =============================================================================
+
+  // Component shadows
+  --shadow-button: var(--elevation-1);
+  --shadow-button-hover: var(--elevation-2);
+  --shadow-button-active: var(--elevation-0);
+
+  --shadow-card: var(--elevation-1);
+  --shadow-card-hover: var(--elevation-2);
+
+  --shadow-dropdown: var(--elevation-4);
+  --shadow-modal: var(--elevation-5);
+  --shadow-toolbar: var(--elevation-4);
+
+  // Focus shadows
+  --shadow-focus: var(--shadow-glow-primary);
+  --shadow-focus-error: var(--shadow-glow-error);
+  --shadow-focus-success: var(--shadow-glow-success);
+
+  // Input shadows
+  --shadow-input: var(--shadow-inner-sm);
+  --shadow-input-focus: var(--shadow-focus);
+}
+
+// =============================================================================
+// LIGHT THEME SHADOW OVERRIDES
+// =============================================================================
+
+[data-theme='light'] {
+  // Use light shadow colors
+  --shadow-color-dark: var(--shadow-color-light);
+  --shadow-color-dark-primary: var(--shadow-color-light-primary);
+
+  // Slightly stronger shadows in light theme for better visibility
+  --elevation-1:
+    0 1px 3px 0 rgb(var(--shadow-color-light) / 0.12),
+    0 1px 2px 0 rgb(var(--shadow-color-light) / 0.24);
+
+  --elevation-2:
+    0 3px 6px 0 rgb(var(--shadow-color-light) / 0.15),
+    0 2px 4px 0 rgb(var(--shadow-color-light) / 0.12);
+
+  --elevation-3:
+    0 10px 20px 0 rgb(var(--shadow-color-light) / 0.15),
+    0 3px 6px 0 rgb(var(--shadow-color-light) / 0.1);
+
+  --elevation-4:
+    0 15px 25px 0 rgb(var(--shadow-color-light) / 0.15),
+    0 5px 10px 0 rgb(var(--shadow-color-light) / 0.05);
+
+  --elevation-5: 0 20px 40px 0 rgb(var(--shadow-color-light) / 0.2);
+}

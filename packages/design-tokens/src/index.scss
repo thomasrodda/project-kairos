@@ -8,6 +8,9 @@
 @use './colors';
 @use './typography';
 @use './spacing';
+@use './layout.scss';
+@use './shadows.scss';
+@use './animations.scss';
 
 // Import semantic assignments last (they reference the raw tokens)
 @use './semantic';

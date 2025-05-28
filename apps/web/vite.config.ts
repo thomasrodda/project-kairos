@@ -13,6 +13,7 @@ export default defineConfig({
       '@kairos/ui': resolve(__dirname, '../../packages/ui/src'),
       '@kairos/utils': resolve(__dirname, '../../packages/utils/src'),
       '@kairos/types': resolve(__dirname, '../../packages/types/src'),
+      '@kairos/design-tokens': resolve(__dirname, '../../packages/design-tokens/src/index.scss'),
     },
   },
   server: {
