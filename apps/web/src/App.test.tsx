@@ -1,17 +1,22 @@
-// apps/web/src/App.test.tsx
 import { render, screen } from '@testing-library/react'
 import App from './App'
 
 describe('App', () => {
-  it('renders the heading', () => {
+  it('renders the workspace with editor', () => {
     render(<App />)
-    const heading = screen.getByText(/Project Kairos/i)
+    // Check for the editor heading
+    const heading = screen.getByRole('heading', { name: /Editor/i })
     expect(heading).toBeInTheDocument()
+
+    // Check for the editor description
+    const description = screen.getByText(/This is where your blocks will appear/i)
+    expect(description).toBeInTheDocument()
   })
 
-  it('shows welcome message', () => {
+  it('renders the sidebar with toggle button', () => {
     render(<App />)
-    const welcomeText = screen.getByText(/Welcome to your creative writing workspace/i)
-    expect(welcomeText).toBeInTheDocument()
+    // Check for the sidebar toggle button
+    const toggleButton = screen.getByRole('button', { name: /Collapse sidebar/i })
+    expect(toggleButton).toBeInTheDocument()
   })
 })

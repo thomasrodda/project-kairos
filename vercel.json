@@ -1,0 +1,14 @@
+{
+  "devCommand": "echo 'Vercel dev server running'",
+  "functions": {
+    "apps/api/*.ts": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/apps/api/$1"
+    }
+  ]
+}

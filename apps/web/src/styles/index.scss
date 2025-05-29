@@ -9,20 +9,18 @@
 // Import base styles
 @use './base/reset';
 
-// Temporary demo styles for the current App component
-.app {
-  padding: var(--spacing-xl);
-  text-align: center;
+// Global styles for the app
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
 
-  h1 {
-    font: var(--text-heading-1);
-    color: var(--color-text-primary);
-    margin-bottom: var(--spacing-md);
-  }
-
-  p {
-    font: var(--text-body);
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-sm);
-  }
+body {
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
 }

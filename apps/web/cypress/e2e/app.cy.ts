@@ -34,3 +34,5 @@ describe('Editor E2E (Future)', () => {
     // cy.get('[data-testid="slash-menu"]').should('be.visible')
   })
 })
+
+export {}

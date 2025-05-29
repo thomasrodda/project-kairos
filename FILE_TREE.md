@@ -53,11 +53,11 @@ AI System Prompt Files
 └── Testing Guide.md
 apps
 ├── api
+│   ├── dev-server.ts
 │   ├── hello.ts
 │   ├── jest.config.js
 │   ├── package.json
-│   ├── tsconfig.json
-│   └── vercel.json
+│   └── tsconfig.json
 └── web
 ├── cypress
 │   ├── e2e
@@ -70,6 +70,18 @@ apps
 ├── public
 ├── src
 │   ├── components
+│   │   ├── Editor
+│   │   │   ├── Editor.scss
+│   │   │   ├── Editor.tsx
+│   │   │   └── index.ts
+│   │   ├── Sidebar
+│   │   │   ├── Sidebar.scss
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── index.ts
+│   │   └── Workspace
+│   │   ├── Workspace.scss
+│   │   ├── Workspace.tsx
+│   │   └── index.ts
 │   ├── hooks
 │   ├── pages
 │   ├── styles

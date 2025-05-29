@@ -7,7 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "yarn workspace @kairos/web dev & yarn workspace @kairos/api dev",
+    "dev": "concurrently \"yarn workspace @kairos/web dev\" \"yarn workspace @kairos/api dev\" --names \"web,api\" --prefix-colors \"blue,green\"",
     "build": "yarn workspaces run build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx",
@@ -28,12 +28,14 @@
     "db:seed": "yarn workspace @kairos/database db:seed",
     "db:studio": "yarn workspace @kairos/database db:studio",
     "db:generate": "yarn workspace @kairos/database generate",
-    "setup": "chmod +x ./setup.sh && ./setup.sh"
+    "setup": "chmod +x ./setup.sh && ./setup.sh",
+    "kill-ports": "./kill-ports.sh"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
+    "concurrently": "^9.1.2",
     "cypress": "^14.4.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",

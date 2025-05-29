@@ -1,13 +1,7 @@
-import { generateId } from '@kairos/utils'
+import { Workspace } from './components/Workspace'
 
 function App() {
-  return (
-    <div className="app">
-      <h1>Project Kairos</h1>
-      <p>Welcome to your creative writing workspace!</p>
-      <p>Random ID example: {generateId()}</p>
-    </div>
-  )
+  return <Workspace />
 }
 
 export default App

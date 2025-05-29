@@ -1,0 +1,24 @@
+.editor {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  overflow-y: auto;
+  padding: var(--spacing-xl);
+
+  &__content {
+    width: 100%;
+    max-width: 800px;
+    padding: var(--spacing-2xl) 0;
+
+    // Temporary styles for placeholder content
+    h1 {
+      font: var(--text-heading-xl);
+      margin-bottom: var(--spacing-md);
+    }
+
+    p {
+      font: var(--text-body-md);
+      color: var(--color-text-secondary);
+    }
+  }
+}
