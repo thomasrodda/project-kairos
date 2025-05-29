@@ -1,4 +1,6 @@
+// apps/web/src/components/Sidebar/Sidebar.tsx
 import { useState } from 'react'
+import { SidebarButton } from '../SidebarButton'
 import './Sidebar.scss'
 
 export function Sidebar() {
@@ -10,10 +12,10 @@ export function Sidebar() {
 
   // Primary buttons data (4 buttons)
   const primaryButtons = [
-    { icon: '📝', text: 'New Page', id: 'new-page' },
+    { icon: '📝', text: 'Workspace Name', id: 'workspace-name' },
     { icon: '🔍', text: 'Search', id: 'search' },
-    { icon: '📊', text: 'Analytics', id: 'analytics' },
-    { icon: '⚡', text: 'AI Assistant', id: 'ai-assistant' },
+    { icon: '📊', text: 'Image Library', id: 'image-library' },
+    { icon: '📝', text: 'Create Page', id: 'create-page' },
   ]
 
   // Bottom panel buttons data (5 buttons)
@@ -30,11 +32,7 @@ export function Sidebar() {
       {/* Header with logo and toggle */}
       <div className="sidebar__header">
         <div className="sidebar__logo">{isExpanded ? 'Kairos' : 'K'}</div>
-        <button
-          className="sidebar__toggle"
-          onClick={toggleExpanded}
-          aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
-        >
+        <button className="sidebar__toggle" onClick={toggleExpanded} aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}>
           {isExpanded ? '←' : '→'}
         </button>
       </div>
@@ -42,10 +40,7 @@ export function Sidebar() {
       {/* Primary buttons section */}
       <div className="sidebar__primary-buttons">
         {primaryButtons.map((button) => (
-          <button key={button.id} className="sidebar__button sidebar__button--primary">
-            <span className="sidebar__button-icon">{button.icon}</span>
-            {isExpanded && <span className="sidebar__button-text">{button.text}</span>}
-          </button>
+          <SidebarButton key={button.id} icon={button.icon} text={button.text} variant="standard" isCollapsed={!isExpanded} id={button.id} />
         ))}
       </div>
 
@@ -62,10 +57,7 @@ export function Sidebar() {
       <div className="sidebar__bottom-panel">
         <div className="sidebar__bottom-buttons">
           {bottomButtons.map((button) => (
-            <button key={button.id} className="sidebar__button sidebar__button--secondary">
-              <span className="sidebar__button-icon">{button.icon}</span>
-              {isExpanded && <span className="sidebar__button-text">{button.text}</span>}
-            </button>
+            <SidebarButton key={button.id} icon={button.icon} text={button.text} variant="slim" isCollapsed={!isExpanded} id={button.id} />
           ))}
         </div>
       </div>

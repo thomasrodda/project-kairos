@@ -46,12 +46,12 @@
   --text-body-lg: var(--font-size-18) / var(--line-height-relaxed) var(--font-family-primary);
 
   // Heading styles
-  --text-heading-xs: var(--font-size-16) / var(--line-height-snug) var(--font-family-secondary);
-  --text-heading-sm: var(--font-size-18) / var(--line-height-snug) var(--font-family-secondary);
-  --text-heading-md: var(--font-size-20) / var(--line-height-snug) var(--font-family-secondary);
-  --text-heading-lg: var(--font-size-24) / var(--line-height-tight) var(--font-family-secondary);
-  --text-heading-xl: var(--font-size-30) / var(--line-height-tight) var(--font-family-secondary);
-  --text-heading-2xl: var(--font-size-36) / var(--line-height-tight) var(--font-family-secondary);
+  --text-heading-xs: var(--font-weight-bold) var(--font-size-16) / var(--line-height-snug) var(--font-family-primary);
+  --text-heading-sm: var(--font-weight-bold) var(--font-size-18) / var(--line-height-snug) var(--font-family-primary);
+  --text-heading-md: var(--font-weight-bold) var(--font-size-20) / var(--line-height-snug) var(--font-family-primary);
+  --text-heading-lg: var(--font-weight-bold) var(--font-size-24) / var(--line-height-tight) var(--font-family-primary);
+  --text-heading-xl: var(--font-weight-bold) var(--font-size-30) / var(--line-height-tight) var(--font-family-primary);
+  --text-heading-2xl: var(--font-weight-bold) var(--font-size-36) / var(--line-height-tight) var(--font-family-primary);
 
   // UI text styles
   --text-caption: var(--font-size-12) / var(--line-height-normal) var(--font-family-primary);
@@ -59,12 +59,9 @@
   --text-button: var(--font-size-14) / var(--line-height-tight) var(--font-family-primary);
 
   // Editor-specific typography
-  --editor-font-paragraph: var(--font-size-16) / var(--line-height-relaxed)
-    var(--font-family-primary);
-  --editor-font-heading-1: var(--font-size-36) / var(--line-height-tight)
-    var(--font-family-secondary);
-  --editor-font-heading-2: var(--font-size-30) / var(--line-height-tight)
-    var(--font-family-secondary);
+  --editor-font-paragraph: var(--font-size-16) / var(--line-height-relaxed) var(--font-family-primary);
+  --editor-font-heading-1: var(--font-size-36) / var(--line-height-tight) var(--font-family-secondary);
+  --editor-font-heading-2: var(--font-size-30) / var(--line-height-tight) var(--font-family-secondary);
 
   // Font weight assignments
   --font-weight-body: var(--font-weight-regular);

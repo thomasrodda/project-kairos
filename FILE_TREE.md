@@ -78,6 +78,11 @@ apps
 │   │   │   ├── Sidebar.scss
 │   │   │   ├── Sidebar.tsx
 │   │   │   └── index.ts
+│   │   ├── SidebarButton
+│   │   │   ├── SidebarButton.scss
+│   │   │   ├── SidebarButton.test.tsx
+│   │   │   ├── SidebarButton.tsx
+│   │   │   └── index.ts
 │   │   └── Workspace
 │   │   ├── Workspace.scss
 │   │   ├── Workspace.tsx
