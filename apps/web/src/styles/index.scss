@@ -4,7 +4,7 @@
 // =============================================================================
 
 // Import design tokens first (this makes all CSS custom properties available)
-@use './tokens/index';
+@use '@kairos/design-tokens';
 
 // Import base styles
 @use './base/reset';

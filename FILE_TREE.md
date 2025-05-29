@@ -75,8 +75,6 @@ apps
 │   ├── styles
 │   │   ├── base
 │   │   │   └── reset.scss
-│   │   ├── tokens
-│   │   │   └── index.scss
 │   │   └── index.scss
 │   ├── test
 │   │   └── setup.ts
