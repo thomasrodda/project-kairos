@@ -3,9 +3,9 @@
 
 echo "🚀 Running pre-push checks..."
 
-# Run all tests including coverage
-echo "🧪 Running full test suite..."
-yarn test --coverage --passWithNoTests
+# 🛑 Commenting out tests (since they're run on commit)
+# echo "🧪 Running full test suite..."
+# yarn test --coverage --passWithNoTests
 
 # TODO: Uncomment build step when we're ready for production deployment
 # echo "🏗️ Building all packages..."
