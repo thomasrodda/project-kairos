@@ -28,7 +28,7 @@ This document defines our working agreement, roles, process, and future document
 2. **User Stories** ✅
 3. **MVP Definition** ✅
 4. **Design** (User-led) ✅
-5. **Architecture & Setup**
+5. **Architecture & Setup** ✅
 6. **Development**
 7. **Testing & Deployment**
 

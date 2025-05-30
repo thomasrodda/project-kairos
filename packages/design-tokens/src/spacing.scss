@@ -21,21 +21,9 @@
   --spacing-40: 2.5rem; // 40px
   --spacing-48: 3rem; // 48px
   --spacing-64: 4rem; // 64px
-  --spacing-60: 5rem; // 80px
+  --spacing-80: 5rem; // 80px
   --spacing-96: 6rem; // 96px
   --spacing-128: 8rem; // 128px
-
-  // =============================================================================
-  // SEMANTIC SPACING - Easy to remember names
-  // =============================================================================
-
-  --spacing-xs: var(--spacing-4); // 4px
-  --spacing-sm: var(--spacing-12); // 12px
-  --spacing-md: var(--spacing-16); // 16px
-  --spacing-lg: var(--spacing-24); // 24px
-  --spacing-xl: var(--spacing-32); // 32px
-  --spacing-2xl: var(--spacing-48); // 48px
-  --spacing-3xl: var(--spacing-64); // 64px
 
   // =============================================================================
   // COMPONENT-SPECIFIC SPACING
@@ -60,18 +48,12 @@
   // =============================================================================
 
   --radius-none: 0;
-  --radius-sm: 0.5rem; // 8px
-  --radius-md: 0.75rem; // 12px
-  --radius-lg: 1rem; // 16px
-  --radius-xl: 1.25rem; // 20px
-  --radius-2xl: 2.5rem; // 40px
-  --radius-3xl: 3.75rem; // 60px
-  --radius-4xl: 5rem; // 80px
+  --radius-8: 0.5rem; // 8px
+  --radius-12: 0.75rem; // 12px
+  --radius-16: 1rem; // 16px
+  --radius-20: 1.25rem; // 20px
+  --radius-40: 2.5rem; // 40px
+  --radius-60: 3.75rem; // 60px
+  --radius-80: 5rem; // 80px
   --radius-full: 9999px; // Fully rounded
-
-  // Semantic radius values
-  --radius-button: var(--radius-md);
-  --radius-input: var(--radius-md);
-  --radius-card: var(--radius-lg);
-  --radius-modal: var(--radius-xl);
 }

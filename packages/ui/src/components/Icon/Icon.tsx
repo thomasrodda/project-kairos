@@ -1,6 +1,7 @@
 // packages/ui/src/components/Icon/Icon.tsx
 import React from 'react'
 import { IconName, iconMap } from '../../utils/iconLoader'
+import './Icon.scss'
 
 export interface IconProps {
   name: IconName
@@ -10,6 +11,8 @@ export interface IconProps {
   'aria-label'?: string
 }
 
+// For now, we'll use a simple img approach that works reliably
+// In the future, we can optimize this to inline SVGs for better styling
 export function Icon({ name, size = 20, className = '', color, 'aria-label': ariaLabel }: IconProps) {
   const fileName = iconMap[name]
 
@@ -21,10 +24,16 @@ export function Icon({ name, size = 20, className = '', color, 'aria-label': ari
         style={{
           width: typeof size === 'number' ? `${size}px` : size,
           height: typeof size === 'number' ? `${size}px` : size,
-          display: 'inline-block',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           flexShrink: 0,
+          fontSize: '12px',
+          fontWeight: 'bold',
+          color: 'var(--color-text-muted)',
         }}
         aria-label={ariaLabel || name}
+        role="img"
       >
         ?
       </span>
@@ -36,12 +45,11 @@ export function Icon({ name, size = 20, className = '', color, 'aria-label': ari
     height: typeof size === 'number' ? `${size}px` : size,
     display: 'inline-block',
     flexShrink: 0,
-    ...(color && { color }),
   }
 
-  // For now, we'll use an img tag to load the SVG
-  // This approach works immediately without build configuration
-  const iconSrc = `/packages/ui/src/assets/icons/${fileName}`
+  // We need to copy the SVG files to the public directory for this to work
+  // For now, let's use a relative import path
+  const iconSrc = new URL(`../../assets/icons/${fileName}`, import.meta.url).href
 
-  return <img src={iconSrc} alt={ariaLabel || name} className={`icon ${className}`} style={iconStyle} role="img" />
+  return <img src={iconSrc} alt={ariaLabel || name} className={`icon ${className}`} style={iconStyle} role="img" loading="lazy" />
 }

@@ -3,25 +3,20 @@
 .sidebar-button {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--radius-button);
-  color: var(--color-text-secondary);
-  font: var(--text-label);
-  font-weight: var(--font-weight-medium);
+  gap: var(--spacing-12);
+  border-radius: var(--radius-8);
+  color: var(--color-button-text-default);
+  font: var(--text-ui-label-md);
   text-align: left;
-  transition: var(--transition-button);
   position: relative;
   overflow: hidden;
-  background: none;
-  border: none;
   cursor: pointer;
   width: 100%;
+  height: auto;
 
   &:hover {
-    background-color: var(--color-surface-elevated);
-    color: var(--color-text-primary);
-    transform: translateY(-1px);
+    background-color: var(--color-surface-elevated-1);
+    color: var(--color-button-text-hover);
   }
 
   &:active {
@@ -35,12 +30,16 @@
 
   // Standard variant (for primary buttons)
   &--standard {
-    height: 44px;
+    padding: var(--spacing-8) var(--spacing-8);
   }
 
   // Slim variant (for bottom panel buttons)
   &--slim {
-    height: 36px;
+    padding: var(--spacing-4) var(--spacing-8);
+  }
+
+  &--slim:hover {
+    background-color: var(--color-surface-elevated-2);
   }
 
   // =============================================================================
@@ -49,18 +48,6 @@
 
   &--collapsed {
     justify-content: center;
-
-    &.sidebar-button--standard {
-      padding: var(--spacing-sm);
-    }
-
-    &.sidebar-button--slim {
-      padding: var(--spacing-xs);
-    }
-
-    .sidebar-button__icon {
-      font-size: var(--font-size-18);
-    }
   }
 
   // =============================================================================

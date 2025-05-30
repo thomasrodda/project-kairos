@@ -1,0 +1,39 @@
+// packages/ui/src/components/Icon/Icon.scss
+
+.icon {
+  // Ensure icons don't shrink in flex containers
+  flex-shrink: 0;
+
+  // Smooth rendering
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  // Default display
+  display: inline-block;
+  vertical-align: middle;
+
+  // Transition for hover effects
+  transition: opacity var(--duration-fast) var(--ease-default);
+
+  &--missing {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  &--loading {
+    background-color: var(--color-surface-elevated);
+    border-radius: var(--radius-sm);
+    animation: pulse var(--duration-skeleton) var(--ease-in-out) infinite;
+  }
+}
+
+// When icons are inside buttons, ensure proper alignment
+button .icon,
+.button .icon {
+  vertical-align: middle;
+  margin-top: -2px; // Slight adjustment for optical alignment
+}

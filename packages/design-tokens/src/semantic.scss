@@ -12,13 +12,18 @@
   // Background colors
   --color-background: var(--color-neutral-900); // Main app background
   --color-surface: var(--color-neutral-800); // Panel backgrounds
-  --color-surface-elevated: var(--color-neutral-750); // Card backgrounds
+  --color-surface-elevated-1: var(--color-neutral-750); // Card backgrounds, Sidebar button hover backgrounds
+  --color-surface-elevated-2: var(--color-neutral-700); // Card backgrounds, Sidebar slim button hover backgrounds
 
   // Text colors
   --color-text-primary: var(--color-neutral-100); // Main text
   --color-text-secondary: var(--color-neutral-400); // Secondary text
   --color-text-muted: var(--color-neutral-500); // Muted/disabled text
   --color-text-inverse: var(--color-neutral-900); // Text on light backgrounds
+
+  // Button Text colors
+  --color-button-text-default: var(--color-neutral-300); // Dimmed-white text
+  --color-button-text-hover: var(--color-neutral-100); // Bright-white text
 
   // Border colors
   --color-border: var(--color-neutral-700); // Default borders
@@ -42,7 +47,7 @@
 
   // Body text styles
   --text-body-sm: var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
-  --text-body-md: var(--font-size-16) / var(--line-height-normal) var(--font-family-primary);
+  --text-body-md: var(--font-size-16) / var(--line-height-relaxed) var(--font-family-primary);
   --text-body-lg: var(--font-size-18) / var(--line-height-relaxed) var(--font-family-primary);
 
   // Heading styles
@@ -57,6 +62,7 @@
   --text-caption: var(--font-size-12) / var(--line-height-normal) var(--font-family-primary);
   --text-label: var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
   --text-button: var(--font-size-14) / var(--line-height-tight) var(--font-family-primary);
+  --text-ui-label-md: var(--font-weight-medium) var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
 
   // Editor-specific typography
   --editor-font-paragraph: var(--font-size-16) / var(--line-height-relaxed) var(--font-family-primary);

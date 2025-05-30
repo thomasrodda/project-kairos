@@ -3,7 +3,6 @@
 .sidebar {
   width: var(--sidebar-width-expanded); // 256px
   background-color: var(--color-surface);
-  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   transition: width var(--duration-normal) var(--ease-default);
@@ -67,16 +66,11 @@
   // =============================================================================
 
   &__primary-buttons {
-    padding: var(--spacing-lg) var(--spacing-md);
+    padding: var(--spacing-12) var(--spacing-8);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-border);
+    gap: var(--spacing-2);
     flex-shrink: 0;
-
-    .sidebar--collapsed & {
-      padding: var(--spacing-lg) var(--spacing-xs);
-    }
   }
 
   // =============================================================================
@@ -106,26 +100,22 @@
   // =============================================================================
 
   &__bottom-panel {
-    padding: var(--spacing-md);
+    padding: var(--spacing-8);
     flex-shrink: 0;
-
-    .sidebar--collapsed & {
-      padding: var(--spacing-md) var(--spacing-xs);
-    }
   }
 
   &__bottom-buttons {
-    background-color: var(--color-surface-elevated);
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-sm);
+    background-color: var(--color-surface-elevated-1);
+    border-radius: var(--radius-12);
+    padding: var(--spacing-8);
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--spacing-4);
     box-shadow: var(--shadow-card);
 
     .sidebar--collapsed & {
-      padding: var(--spacing-xs);
+      padding: var(--spacing-8) var(--spacing-0);
+      background-color: transparent;
     }
   }
 

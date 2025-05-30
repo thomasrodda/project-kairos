@@ -3,17 +3,17 @@
   display: flex;
   justify-content: center;
   overflow-y: auto;
-  padding: var(--spacing-xl);
+  padding: var(--spacing-64);
 
   &__content {
     width: 100%;
     max-width: 800px;
-    padding: var(--spacing-2xl) 0;
+    padding: var(--spacing-80) 0;
 
     // Temporary styles for placeholder content
     h1 {
-      font: var(--text-heading-xl);
-      margin-bottom: var(--spacing-md);
+      font: var(--text-heading-2xl);
+      margin-bottom: var(--spacing-12);
     }
 
     p {

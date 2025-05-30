@@ -68,40 +68,6 @@ apps
 │   │   └── e2e.ts
 │   └── tsconfig.json
 ├── public
-│   └── packages
-│   └── ui
-│   └── src
-│   └── assets
-│   └── icons
-│   ├── AI Icon.svg
-│   ├── AIEnter.svg
-│   ├── AISend-1.svg
-│   ├── AISend.svg
-│   ├── AddIcon.svg
-│   ├── ArchiveIcon.svg
-│   ├── BackIcon.svg
-│   ├── BulletedListIcon.svg
-│   ├── BurgerMenuIcon.svg
-│   ├── CheckIcon.svg
-│   ├── CloseIcon.svg
-│   ├── ColourProfileIcon.svg
-│   ├── CopyIcon.svg
-│   ├── DoubleArrowIcon.svg
-│   ├── Focus.svg
-│   ├── FolderIcon.svg
-│   ├── Grab Icon.svg
-│   ├── HelpIcon.svg
-│   ├── ImageIcon.svg
-│   ├── LargeArrowIcon.svg
-│   ├── MembersIcon.svg
-│   ├── MoreIcon.svg
-│   ├── OpenPage.svg
-│   ├── PageIcon.svg
-│   ├── ProfileIcon.svg
-│   ├── SearchIcon.svg
-│   ├── SettingsIcon.svg
-│   ├── UpdatesIcon.svg
-│   └── Workspace Selection.svg
 ├── src
 │   ├── components
 │   │   ├── Editor
@@ -198,6 +164,7 @@ packages
 │   │   │   └── Workspace Selection.svg
 │   │   ├── components
 │   │   │   └── Icon
+│   │   │   ├── Icon.scss
 │   │   │   ├── Icon.tsx
 │   │   │   └── index.ts
 │   │   ├── utils
