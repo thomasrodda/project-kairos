@@ -13,79 +13,85 @@ export interface IconProps {
   stroke?: string // Explicit stroke color override
   opacity?: number | string // Explicit opacity control
   'aria-label'?: string
+  dangerouslySetInnerHTML?: { __html: string } // Add this prop type
+}
+
+interface SvgProps extends Record<string, unknown> {
+  dangerouslySetInnerHTML?: { __html: string }
+  className?: string
+  style?: React.CSSProperties
 }
 
 export function Icon({ name, size = 20, className = '', color, fill, stroke, opacity, 'aria-label': ariaLabel }: IconProps) {
-  const [svgProps, setSvgProps] = useState<Record<string, any> | null>(null)
+  const [svgProps, setSvgProps] = useState<SvgProps | null>(null)
   const [svgContent, setSvgContent] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
 
     const fetchSvg = async () => {
-      setIsLoading(true);
-      setError(null);
-      setSvgProps(null);
-      setSvgContent(null);
+      setIsLoading(true)
+      setError(null)
+      setSvgProps(null)
+      setSvgContent(null)
 
       if (!iconMap[name]) {
         if (isMounted) {
-          setError(`Icon "${name}" not found`);
-          setIsLoading(false);
+          setError(`Icon "${name}" not found`)
+          setIsLoading(false)
         }
-        console.warn(`Icon "${name}" not found in map.`);
-        return;
+        console.warn(`Icon "${name}" not found in map.`)
+        return
       }
 
       try {
-        const content = await loadSvgContent(name);
-        if (!isMounted) return;
+        const content = await loadSvgContent(name)
+        if (!isMounted) return
 
         if (!content) {
-           setError(`Failed to load SVG content for icon "${name}"`);
-           setIsLoading(false);
-           console.warn(`Failed to load SVG content for icon "${name}". Content is empty.`);
-           return;
+          setError(`Failed to load SVG content for icon "${name}"`)
+          setIsLoading(false)
+          console.warn(`Failed to load SVG content for icon "${name}". Content is empty.`)
+          return
         }
 
-        const svgElement = parseSvgContent(content, name);
-        if (!isMounted) return;
+        const svgElement = parseSvgContent(content, name)
+        if (!isMounted) return
 
         if (!svgElement) {
-          setError(`Failed to parse SVG content for icon "${name}"`);
-          setIsLoading(false);
-          console.warn(`Failed to parse SVG content for icon "${name}". Parsing returned null.`);
-          return;
+          setError(`Failed to parse SVG content for icon "${name}"`)
+          setIsLoading(false)
+          console.warn(`Failed to parse SVG content for icon "${name}". Parsing returned null.`)
+          return
         }
 
-        const props = svgElementToProps(svgElement);
+        const props = svgElementToProps(svgElement) as SvgProps
         if (isMounted) {
-          setSvgProps(props);
-          setSvgContent(props.dangerouslySetInnerHTML.__html);
-          setIsLoading(false);
+          setSvgProps(props)
+          setSvgContent(props.dangerouslySetInnerHTML?.__html || '')
+          setIsLoading(false)
         }
-
       } catch (err) {
         if (isMounted) {
-          setError(`Error loading or parsing icon "${name}"`);
-          setIsLoading(false);
+          setError(`Error loading or parsing icon "${name}"`)
+          setIsLoading(false)
         }
-        console.error(`Error processing icon "${name}":`, err);
+        console.error(`Error processing icon "${name}":`, err)
       }
-    };
+    }
 
-    fetchSvg();
+    fetchSvg()
 
     return () => {
-      isMounted = false;
-    };
-  }, [name]); // Rerun effect when icon name changes
+      isMounted = false
+    }
+  }, [name]) // Rerun effect when icon name changes
 
   // Fallback for missing or failed icons
   if (error || (!isLoading && !svgProps)) {
-    console.warn(`Rendering fallback for icon "${name}". Error: ${error}`);
+    console.warn(`Rendering fallback for icon "${name}". Error: ${error}`)
     return (
       <span
         className={`icon icon--missing ${className}`}
@@ -105,7 +111,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
       >
         ?
       </span>
-    );
+    )
   }
 
   if (isLoading || !svgProps || !svgContent) {
@@ -124,7 +130,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
       >
         {/* You could add a spinner or placeholder here */}
       </span>
-    );
+    )
   }
 
   const iconStyle: React.CSSProperties = {
@@ -138,7 +144,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
     fill: fill || 'currentColor', // Default fill to currentColor or specified
     stroke: stroke || 'none', // Default stroke to none or specified
     opacity: opacity !== undefined ? opacity : 1, // Default opacity to 1 if not specified
-  };
+  }
 
   // Combine original svg props with our desired props (className, style, aria-label)
   const finalSvgProps = {
@@ -148,7 +154,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
     'aria-label': ariaLabel || name,
     role: 'img',
     // dangerouslySetInnerHTML is already included in svgProps from svgElementToProps
-  };
+  }
 
   // Remove explicit style attributes from original SVG if they conflict with our props
   // This is handled in parseSvgContent, but double-check here if needed.
@@ -156,7 +162,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
 
   return React.createElement(
     'svg',
-    finalSvgProps,
+    finalSvgProps
     // The SVG content is injected via dangerouslySetInnerHTML in finalSvgProps
-  );
+  )
 }

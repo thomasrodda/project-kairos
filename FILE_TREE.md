@@ -74,6 +74,8 @@ apps
 │   │   │   ├── Editor.scss
 │   │   │   ├── Editor.tsx
 │   │   │   └── index.ts
+│   │   ├── PerformanceTest
+│   │   │   └── PerformanceTest.tsx
 │   │   ├── Sidebar
 │   │   │   ├── Sidebar.scss
 │   │   │   ├── Sidebar.tsx
@@ -171,6 +173,7 @@ packages
 │   │   │   └── setup.ts
 │   │   ├── utils
 │   │   │   ├── iconLoader.ts
+│   │   │   ├── iconPerformance.ts
 │   │   │   ├── svgContentLoader.test.ts
 │   │   │   ├── svgContentLoader.ts
 │   │   │   └── svgTestUtils.ts
