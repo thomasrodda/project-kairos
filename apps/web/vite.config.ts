@@ -1,3 +1,4 @@
+// apps/web/vite.config.ts
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
@@ -20,12 +21,31 @@ export default defineConfig({
     port: 3000,
     open: true,
     watch: {
-      usePolling: true, // Add this line
+      usePolling: true,
     },
     host: true,
   },
   build: {
     target: 'es2022',
   },
+  // Enhanced asset handling for SVGs
   assetsInclude: ['**/*.svg'],
+
+  // Configure how different SVG imports are handled
+  define: {
+    // Help with development debugging
+    __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
+  },
+
+  optimizeDeps: {
+    // Include SVG files in dependency optimization
+    include: ['**/*.svg?raw'],
+  },
+
+  // Handle SVG imports with different suffixes
+  esbuild: {
+    // Enable JSX in .js files (not needed for this specific change but good practice)
+    loader: 'tsx',
+    include: /src\/.*\.[tj]sx?$/,
+  },
 })

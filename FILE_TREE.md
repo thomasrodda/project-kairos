@@ -167,8 +167,13 @@ packages
 │   │   │   ├── Icon.scss
 │   │   │   ├── Icon.tsx
 │   │   │   └── index.ts
+│   │   ├── test
+│   │   │   └── setup.ts
 │   │   ├── utils
-│   │   │   └── iconLoader.ts
+│   │   │   ├── iconLoader.ts
+│   │   │   ├── svgContentLoader.test.ts
+│   │   │   ├── svgContentLoader.ts
+│   │   │   └── svgTestUtils.ts
 │   │   └── index.ts
 │   ├── package.json
 │   └── tsconfig.json
