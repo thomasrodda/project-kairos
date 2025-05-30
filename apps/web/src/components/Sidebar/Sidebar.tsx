@@ -1,6 +1,7 @@
 // apps/web/src/components/Sidebar/Sidebar.tsx
 import { useState } from 'react'
 import { SidebarButton } from '../SidebarButton'
+import { Icon } from '@kairos/ui'
 import './Sidebar.scss'
 
 export function Sidebar() {
@@ -31,9 +32,9 @@ export function Sidebar() {
     <aside className={`sidebar ${isExpanded ? '' : 'sidebar--collapsed'}`}>
       {/* Header with logo and toggle */}
       <div className="sidebar__header">
-        <div className="sidebar__logo">{isExpanded ? 'Kairos' : 'K'}</div>
+        <div className="sidebar__logo">{isExpanded ? <Icon name="color-profile" size={24} /> : <Icon name="color-profile" size={20} />}</div>
         <button className="sidebar__toggle" onClick={toggleExpanded} aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}>
-          {isExpanded ? '←' : '→'}
+          <span className={`sidebar__toggle-arrow ${isExpanded ? 'sidebar__toggle-arrow--expanded' : ''}`}>←</span>
         </button>
       </div>
 
