@@ -4,7 +4,7 @@ import { SidebarButton } from './SidebarButton'
 
 describe('SidebarButton', () => {
   const defaultProps = {
-    icon: '📝',
+    icon: 'search' as const,
     text: 'Test Button',
     id: 'test-button',
   }
@@ -12,14 +12,15 @@ describe('SidebarButton', () => {
   it('renders with icon and text when expanded', () => {
     render(<SidebarButton {...defaultProps} />)
 
-    expect(screen.getByText('📝')).toBeInTheDocument()
     expect(screen.getByText('Test Button')).toBeInTheDocument()
+    // Icon will be an img element now
+    expect(screen.getByRole('img')).toBeInTheDocument()
   })
 
   it('hides text when collapsed', () => {
     render(<SidebarButton {...defaultProps} isCollapsed={true} />)
 
-    expect(screen.getByText('📝')).toBeInTheDocument()
+    expect(screen.getByRole('img')).toBeInTheDocument()
     expect(screen.queryByText('Test Button')).not.toBeInTheDocument()
   })
 

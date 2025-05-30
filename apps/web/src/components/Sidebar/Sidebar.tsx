@@ -12,19 +12,19 @@ export function Sidebar() {
 
   // Primary buttons data (4 buttons)
   const primaryButtons = [
-    { icon: '📝', text: 'Workspace Name', id: 'workspace-name' },
-    { icon: '🔍', text: 'Search', id: 'search' },
-    { icon: '📊', text: 'Image Library', id: 'image-library' },
-    { icon: '📝', text: 'Create Page', id: 'create-page' },
+    { icon: 'profile' as const, text: 'Workspace Name', id: 'workspace-name' },
+    { icon: 'search' as const, text: 'Search', id: 'search' },
+    { icon: 'image' as const, text: 'Image Library', id: 'image-library' },
+    { icon: 'add' as const, text: 'Create Page', id: 'create-page' },
   ]
 
   // Bottom panel buttons data (5 buttons)
   const bottomButtons = [
-    { icon: '⚙️', text: 'Settings', id: 'settings' },
-    { icon: '👤', text: 'Profile', id: 'profile' },
-    { icon: '💾', text: 'Export', id: 'export' },
-    { icon: '📱', text: 'Mobile App', id: 'mobile' },
-    { icon: '❓', text: 'Help', id: 'help' },
+    { icon: 'folder' as const, text: 'Page Templates', id: 'page-templates' },
+    { icon: 'archive' as const, text: 'Archive', id: 'archive' },
+    { icon: 'help' as const, text: 'Help', id: 'help' },
+    { icon: 'settings' as const, text: 'Settings & Members', id: 'settings' },
+    { icon: 'updates' as const, text: 'Updates & News', id: 'updates' },
   ]
 
   return (
