@@ -45,6 +45,7 @@ AI System Prompt Files
 ├── Error Handling Guide.md
 ├── Extensibility & Plugin Architecture Guide.md
 ├── Git & Github Guide.md
+├── Inline SVG System Guide.md
 ├── Performance Optimization Guide.md
 ├── Production Deployment Guide.md
 ├── Prompting Guide.md

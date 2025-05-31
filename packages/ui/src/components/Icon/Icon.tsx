@@ -1,5 +1,5 @@
 // packages/ui/src/components/Icon/Icon.tsx
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { IconName, iconMap } from '../../utils/iconLoader'
 import { loadSvgContent, parseSvgContent, svgElementToProps } from '../../utils/svgContentLoader'
 import './Icon.scss'
@@ -8,12 +8,11 @@ export interface IconProps {
   name: IconName
   size?: number | string
   className?: string
-  color?: string // Use for general color control (applies to fill/stroke by default)
-  fill?: string // Explicit fill color override
-  stroke?: string // Explicit stroke color override
-  opacity?: number | string // Explicit opacity control
+  color?: string
+  fill?: string
+  stroke?: string
+  opacity?: number | string
   'aria-label'?: string
-  dangerouslySetInnerHTML?: { __html: string } // Add this prop type
 }
 
 interface SvgProps extends Record<string, unknown> {
@@ -24,9 +23,23 @@ interface SvgProps extends Record<string, unknown> {
 
 export function Icon({ name, size = 20, className = '', color, fill, stroke, opacity, 'aria-label': ariaLabel }: IconProps) {
   const [svgProps, setSvgProps] = useState<SvgProps | null>(null)
-  const [svgContent, setSvgContent] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Memoize style object to prevent unnecessary re-renders
+  const iconStyle = useMemo(
+    (): React.CSSProperties => ({
+      width: typeof size === 'number' ? `${size}px` : size,
+      height: typeof size === 'number' ? `${size}px` : size,
+      display: 'inline-block',
+      flexShrink: 0,
+      color: color || 'currentColor',
+      fill: fill || 'currentColor',
+      stroke: stroke || 'none',
+      opacity: opacity !== undefined ? opacity : 1,
+    }),
+    [size, color, fill, stroke, opacity]
+  )
 
   useEffect(() => {
     let isMounted = true
@@ -35,7 +48,6 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
       setIsLoading(true)
       setError(null)
       setSvgProps(null)
-      setSvgContent(null)
 
       if (!iconMap[name]) {
         if (isMounted) {
@@ -70,99 +82,46 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
         const props = svgElementToProps(svgElement) as SvgProps
         if (isMounted) {
           setSvgProps(props)
-          setSvgContent(props.dangerouslySetInnerHTML?.__html || '')
           setIsLoading(false)
         }
-      } catch (err) {
+      } catch (_error) {
+        // Use underscore prefix to indicate intentionally unused parameter
         if (isMounted) {
-          setError(`Error loading or parsing icon "${name}"`)
+          setError(`Error loading icon "${name}"`)
           setIsLoading(false)
         }
-        console.error(`Error processing icon "${name}":`, err)
+        console.error(`Error processing icon "${name}":`, _error)
       }
     }
 
     fetchSvg()
-
     return () => {
       isMounted = false
     }
-  }, [name]) // Rerun effect when icon name changes
+  }, [name])
 
   // Fallback for missing or failed icons
   if (error || (!isLoading && !svgProps)) {
-    console.warn(`Rendering fallback for icon "${name}". Error: ${error}`)
     return (
-      <span
-        className={`icon icon--missing ${className}`}
-        style={{
-          width: typeof size === 'number' ? `${size}px` : size,
-          height: typeof size === 'number' ? `${size}px` : size,
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          fontSize: '12px',
-          fontWeight: 'bold',
-          color: 'var(--color-text-muted)',
-        }}
-        aria-label={ariaLabel || name}
-        role="img"
-      >
+      <span className={`icon icon--missing ${className}`} style={iconStyle} aria-label={ariaLabel || name} role="img">
         ?
       </span>
     )
   }
 
-  if (isLoading || !svgProps || !svgContent) {
-    // Optionally render a loading state or null while loading
-    return (
-      <span
-        className={`icon icon--loading ${className}`}
-        style={{
-          width: typeof size === 'number' ? `${size}px` : size,
-          height: typeof size === 'number' ? `${size}px` : size,
-          display: 'inline-block',
-          flexShrink: 0,
-        }}
-        role="img"
-        aria-label={ariaLabel || `${name} loading`}
-      >
-        {/* You could add a spinner or placeholder here */}
-      </span>
-    )
+  // Loading state
+  if (isLoading || !svgProps) {
+    return <span className={`icon icon--loading ${className}`} style={iconStyle} role="img" aria-label={ariaLabel || `${name} loading`} />
   }
 
-  const iconStyle: React.CSSProperties = {
-    width: typeof size === 'number' ? `${size}px` : size,
-    height: typeof size === 'number' ? `${size}px` : size,
-    display: 'inline-block',
-    flexShrink: 0,
-    // Apply general color control
-    color: color || 'currentColor',
-    // Apply specific fill, stroke, opacity if provided, overriding 'color'
-    fill: fill || 'currentColor', // Default fill to currentColor or specified
-    stroke: stroke || 'none', // Default stroke to none or specified
-    opacity: opacity !== undefined ? opacity : 1, // Default opacity to 1 if not specified
-  }
-
-  // Combine original svg props with our desired props (className, style, aria-label)
+  // At this point, svgProps is guaranteed to be non-null due to the checks above
   const finalSvgProps = {
     ...svgProps,
     className: `icon ${className} ${svgProps.className || ''}`.trim(),
     style: { ...svgProps.style, ...iconStyle },
     'aria-label': ariaLabel || name,
     role: 'img',
-    // dangerouslySetInnerHTML is already included in svgProps from svgElementToProps
   }
 
-  // Remove explicit style attributes from original SVG if they conflict with our props
-  // This is handled in parseSvgContent, but double-check here if needed.
-  // For now, the spread order should handle overrides correctly.
-
-  return React.createElement(
-    'svg',
-    finalSvgProps
-    // The SVG content is injected via dangerouslySetInnerHTML in finalSvgProps
-  )
+  return React.createElement('svg', finalSvgProps)
 }
