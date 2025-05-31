@@ -16,84 +16,52 @@ Data is stored in a cloud database and accessed via serverless API endpoints.
 
 ---
 
-## User
+## App Flow & Hierarchy
 
-- Identified via Firebase Auth (Google login)
-- Can own multiple workspaces
-- User data is minimal; mostly used for access control
+### User Journey
 
----
+```
+User → Login (Google OAuth) → Account → Workspace Selection → Main Workspace View
+```
 
-## Workspace
+### Data Hierarchy
 
-A workspace is a top-level project folder. It contains:
+```
+User (authenticated via Firebase)
+└── Account
+    └── Workspaces (multiple projects)
+        └── Workspace (e.g., "My Fantasy Novel" or "D&D Campaign")
+            └── Pages (documents within the project)
+                └── Page
+                    ├── Title (editable, always visible)
+                    └── Blocks (content units)
+```
 
-- `id`: Unique identifier
-- `userId`: Owner's user ID
-- `name`: Workspace name
-- `createdAt`, `updatedAt`
-- `pages`: Root-level pages or folders
+### Main Workspace View Layout
 
-Workspaces support nested content and switching between different creative projects.
+```
+┌─────────────────────────────────────────────────────────┐
+│ Navigation Bar (recent pages, future features)          │
+├─────────────┬───────────────────────────────────────────┤
+│             │                                           │
+│   Sidebar   │              Editor                      │
+│             │                                           │
+│ ┌─────────┐ │  ┌─────────────────────────────────┐   │
+│ │Workspace│ │  │ Page Title (editable)           │   │
+│ │ Pages:  │ │  ├─────────────────────────────────┤   │
+│ │         │ │  │ Block 1 (paragraph)             │   │
+│ │ Page 1  │ │  │ Block 2 (heading)               │   │
+│ │ Page 2 ←│ │  │ Block 3 (bullet list)           │   │
+│ │ Page 3  │ │  │ ...                             │   │
+│ └─────────┘ │  └─────────────────────────────────┘   │
+│             │                                           │
+└─────────────┴───────────────────────────────────────────┘
+                                              Future AI Panel →
+```
 
----
+### Key Concepts
 
-## Page
-
-A page is a document made up of blocks. It includes:
-
-- `id`: Unique identifier
-- `workspaceId`: Parent workspace
-- `parentId`: (optional) ID of parent folder page
-- `title`: Page name
-- `order`: Sort index within the file tree
-- `isFolder`: Boolean flag
-- `blocks`: Array of block IDs or embedded blocks
-- `metadata` (optional): A key-value object for storing custom attributes like tags, filters, or AI annotations. Reserved for future extensibility.
-
-Pages support nesting, drag-and-drop, and linking.
-
----
-
-## Block
-
-A block is a unit of content. It includes:
-
-- `id`: Unique identifier
-- `pageId`: Parent page
-- `type`: e.g. heading, paragraph, bullet
-- `content`: Text or data payload
-- `order`: Position in page
-- `createdAt`, `updatedAt`
-- `metadata` (optional): A flexible object to store extra information, such as user-defined tags, AI suggestions, formatting state, or other block-level attributes.
-
-Blocks can be reordered, formatted, and transformed via commands.
-
----
-
-## Linking & Backlinks
-
-Links are created by referencing other page IDs using @mentions. Each page tracks:
-
-- `incomingLinks`: Pages that link to this one
-- `outgoingLinks`: Pages this one links to
-
-Used for backlink panel and workspace graph.
-
----
-
-## Sync & Storage
-
-- Cloud-first model with optional local-first editing
-- Real-time cloud sync for all data
-- Conflict resolution handled on merge
-
----
-
-## Best Practices
-
-- Use UUIDs for IDs
-- Keep data schemas flat but well-referenced
-- Normalize nested entities (pages, blocks)
-- Always include timestamps for tracking edits
-- Design for scalability: large workspaces, many pages
+- **Workspace**: The main working environment, contains all pages for a single project
+- **Editor**: Displays ONE page at a time, selected from the sidebar
+- **Page**: An individual document with its own title and blocks
+- **Blocks**: The atomic units of content (paragraphs, headings, lists, etc.)
