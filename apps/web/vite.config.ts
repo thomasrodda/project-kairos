@@ -19,10 +19,14 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true,
-    host: true,
+    host: '0.0.0.0', // Important for WSL
+    open: false, // Don't auto-open browser (can cause issues in WSL)
+    watch: {
+      usePolling: true, // Essential for WSL file watching
+      interval: 100, // Check for changes every 100ms
+    },
     fs: {
-      allow: ['..', '../..'],
+      allow: ['..', '../..'], // Allow accessing parent directories
     },
   },
   build: {

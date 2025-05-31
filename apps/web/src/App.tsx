@@ -1,6 +1,7 @@
 // apps/web/src/App.tsx
 import { useEffect } from 'react'
 import { Workspace } from './components/Workspace'
+import { PerformanceTest } from './components/PerformanceTest/PerformanceTest'
 import { initializeIconPerformance } from '@kairos/ui'
 
 function App() {
@@ -14,7 +15,13 @@ function App() {
     }
   }, [])
 
-  return <Workspace />
+  return (
+    <>
+      <Workspace />
+      {/* Show performance monitoring in development */}
+      {process.env.NODE_ENV === 'development' && <PerformanceTest />}
+    </>
+  )
 }
 
 export default App

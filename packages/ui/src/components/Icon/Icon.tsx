@@ -1,7 +1,8 @@
 // packages/ui/src/components/Icon/Icon.tsx
 import React, { useState, useEffect, useMemo } from 'react'
 import { IconName, iconMap } from '../../utils/iconLoader'
-import { loadSvgContent, parseSvgContent, svgElementToProps } from '../../utils/svgContentLoader'
+import { parseSvgContent, svgElementToProps } from '../../utils/svgContentLoader'
+import { loadIconWithMonitoring } from '../../utils/iconPerformance'
 import './Icon.scss'
 
 export interface IconProps {
@@ -59,7 +60,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
       }
 
       try {
-        const content = await loadSvgContent(name)
+        const content = await loadIconWithMonitoring(name)
         if (!isMounted) return
 
         if (!content) {

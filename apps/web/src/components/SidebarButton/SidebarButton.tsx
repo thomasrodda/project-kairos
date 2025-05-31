@@ -17,7 +17,7 @@ export function SidebarButton({ icon, text, variant = 'standard', isCollapsed = 
   return (
     <button className={className} onClick={onClick} data-testid={id}>
       <span className="sidebar-button__icon">
-        <Icon name={icon} size={20} />
+        <Icon name={icon} size={24} />
       </span>
       {!isCollapsed && <span className="sidebar-button__text">{text}</span>}
     </button>

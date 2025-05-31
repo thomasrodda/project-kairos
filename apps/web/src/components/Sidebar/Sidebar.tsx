@@ -32,9 +32,16 @@ export function Sidebar() {
     <aside className={`sidebar ${isExpanded ? '' : 'sidebar--collapsed'}`}>
       {/* Header with logo and toggle */}
       <div className="sidebar__header">
-        <div className="sidebar__logo">{isExpanded ? <Icon name="color-profile" size={24} /> : <Icon name="color-profile" size={20} />}</div>
+        {/* Logo - only visible when expanded */}
+        {isExpanded && (
+          <div className="sidebar__logo">
+            <Icon name="color-profile" size={24} />
+          </div>
+        )}
+
+        {/* Toggle button - always visible */}
         <button className="sidebar__toggle" onClick={toggleExpanded} aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}>
-          <span className={`sidebar__toggle-arrow ${isExpanded ? 'sidebar__toggle-arrow--expanded' : ''}`}>←</span>
+          <Icon name="double-arrow" size={20} className={`sidebar__toggle-icon ${isExpanded ? '' : 'sidebar__toggle-icon--flipped'}`} />
         </button>
       </div>
 

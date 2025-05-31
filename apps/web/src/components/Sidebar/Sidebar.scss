@@ -25,6 +25,18 @@
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+
+    // When collapsed, center the toggle button
+    .sidebar--collapsed & {
+      justify-content: center;
+      padding-left: var(--spacing-8);
+      padding-right: var(--spacing-8);
+    }
+  }
+
+  &__logo {
+    flex-shrink: 0;
+    transition: var(--animate-opacity);
   }
 
   &__toggle {
@@ -37,6 +49,27 @@
     background: none;
     border: none;
     cursor: pointer;
+    border-radius: var(--radius-8);
+    color: var(--color-button-text-default);
+    transition: var(--animate-colors);
+
+    &:hover {
+      background-color: var(--color-surface-elevated-1);
+      color: var(--color-button-text-hover);
+    }
+
+    &:active {
+      background-color: var(--color-surface);
+    }
+  }
+
+  &__toggle-icon {
+    transition: transform var(--speed-normal) var(--ease-smooth);
+
+    // Flip the arrows when collapsed (rotate 180 degrees)
+    &--flipped {
+      transform: rotate(180deg);
+    }
   }
 
   // =============================================================================

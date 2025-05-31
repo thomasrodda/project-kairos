@@ -20,7 +20,6 @@
   }
 
   &:active {
-    transform: translateY(0);
     background-color: var(--color-surface);
   }
 
@@ -55,9 +54,7 @@
   // =============================================================================
 
   &__icon {
-    font-size: var(--font-size-16);
     flex-shrink: 0;
-    width: 20px;
     text-align: center;
     transition: font-size var(--duration-normal) var(--ease-default);
   }
