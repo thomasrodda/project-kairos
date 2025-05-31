@@ -3,8 +3,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "rootDir": "./src",
-    "types": ["jest", "@testing-library/jest-dom", "node"]
+    "types": ["jest", "@testing-library/jest-dom", "node", "vite/client"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/vite-env.d.ts"],
   "exclude": ["node_modules"]
 }
