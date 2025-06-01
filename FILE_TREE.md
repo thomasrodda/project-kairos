@@ -126,6 +126,7 @@ apps
 │   │   │   └── index.ts
 │   │   └── Workspace
 │   │   ├── Workspace.scss
+│   │   ├── Workspace.test.tsx
 │   │   ├── Workspace.tsx
 │   │   └── index.ts
 │   ├── hooks
