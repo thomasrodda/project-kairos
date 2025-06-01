@@ -10,6 +10,11 @@ export type { ClientEnv, ServerEnv } from './env'
 
 // Date utilities
 export const formatDate = (date: Date): string => {
+  // Check if date is valid
+  if (isNaN(date.getTime())) {
+    return 'Invalid Date'
+  }
+
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'short',
