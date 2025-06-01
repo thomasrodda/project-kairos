@@ -116,6 +116,7 @@ apps
 │   │   │   └── PerformanceTest.tsx
 │   │   ├── Sidebar
 │   │   │   ├── Sidebar.scss
+│   │   │   ├── Sidebar.test.tsx
 │   │   │   ├── Sidebar.tsx
 │   │   │   └── index.ts
 │   │   ├── SidebarButton

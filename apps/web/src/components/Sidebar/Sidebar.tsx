@@ -1,17 +1,37 @@
 // apps/web/src/components/Sidebar/Sidebar.tsx
+// Main navigation sidebar containing workspace controls, search, file tree,
+// and settings. Supports collapsed/expanded states with smooth transitions.
+//
+// Features:
+// - Collapsible sidebar with toggle button
+// - Primary action buttons (workspace, search, image library, create page)
+// - File tree section (placeholder for now)
+// - Bottom elevated panel with secondary actions
+// - Icon-based navigation with text labels when expanded
+//
+// Props: None (self-contained component)
+// State: isExpanded (boolean) - controls sidebar collapse/expand
+
 import { useState } from 'react'
 import { SidebarButton } from '../SidebarButton'
 import { Icon } from '@kairos/ui'
 import './Sidebar.scss'
 
 export function Sidebar() {
+  // Component state - manages sidebar collapse/expand
+
   const [isExpanded, setIsExpanded] = useState(true)
 
+  // Event handlers
+
+  // Toggle sidebar expanded/collapsed state
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
   }
 
-  // Primary buttons data (4 buttons)
+  // Button configuration data
+
+  // Primary buttons data (4 buttons) - main workspace actions
   const primaryButtons = [
     { icon: 'profile' as const, text: 'Workspace Name', id: 'workspace-name' },
     { icon: 'search' as const, text: 'Search', id: 'search' },
@@ -19,7 +39,7 @@ export function Sidebar() {
     { icon: 'add' as const, text: 'Create Page', id: 'create-page' },
   ]
 
-  // Bottom panel buttons data (5 buttons)
+  // Bottom panel buttons data (5 buttons) - secondary actions and settings
   const bottomButtons = [
     { icon: 'folder' as const, text: 'Page Templates', id: 'page-templates' },
     { icon: 'archive' as const, text: 'Archive', id: 'archive' },
@@ -28,9 +48,11 @@ export function Sidebar() {
     { icon: 'updates' as const, text: 'Updates & News', id: 'updates' },
   ]
 
+  // Render component
+
   return (
     <aside className={`sidebar ${isExpanded ? '' : 'sidebar--collapsed'}`}>
-      {/* Header with logo and toggle */}
+      {/* Header section - Logo and collapse/expand toggle */}
       <div className="sidebar__header">
         {/* Logo - only visible when expanded */}
         {isExpanded && (
@@ -39,20 +61,20 @@ export function Sidebar() {
           </div>
         )}
 
-        {/* Toggle button - always visible */}
+        {/* Toggle button - always visible, flips arrow direction based on state */}
         <button className="sidebar__toggle" onClick={toggleExpanded} aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}>
           <Icon name="double-arrow" size={20} className={`sidebar__toggle-icon ${isExpanded ? '' : 'sidebar__toggle-icon--flipped'}`} />
         </button>
       </div>
 
-      {/* Primary buttons section */}
+      {/* Primary buttons section - Main workspace actions */}
       <div className="sidebar__primary-buttons">
         {primaryButtons.map((button) => (
           <SidebarButton key={button.id} icon={button.icon} text={button.text} variant="standard" isCollapsed={!isExpanded} id={button.id} />
         ))}
       </div>
 
-      {/* File tree section - empty for now */}
+      {/* File tree section - Expandable file/page navigation (placeholder) */}
       <div className="sidebar__file-tree">
         {isExpanded && (
           <div className="sidebar__file-tree-placeholder">
@@ -61,7 +83,7 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Bottom elevated panel */}
+      {/* Bottom panel section - Elevated secondary actions and settings */}
       <div className="sidebar__bottom-panel">
         <div className="sidebar__bottom-buttons">
           {bottomButtons.map((button) => (
