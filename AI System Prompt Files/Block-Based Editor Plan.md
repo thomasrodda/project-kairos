@@ -8,15 +8,52 @@
 
 ### Editor Features
 
-- **Block Types**: H1, H2, H3, Paragraph, Bullet List
-- **Block Creation**: Enter key creates new blocks, Shift+Enter for line breaks
-- **Slash Commands**: Type `/` after space to open block type menu
-- **Formatting Toolbar**: Bold, Italic, Underline on text selection
+- **Block Types**: H1, H2, H3, Paragraph, Bullet List. More to come later.
+- **Block Creation**: Enter key creates new blocks, Shift+Enter for line breaks within the current block
+- **Slash Commands**: Type `/` in an empty block or after ` ` in any block to open Slash Command menu. Appears above focused block.
+- **Formatting Toolbar**: Bold, Italic, Underline on text selection. Appears above selected text.
 - **Drag & Drop**: Reorder blocks via drag handles
 - **Markdown Support**: Live conversion + export/copy as markdown
 - **Multi-block Selection**: Select across blocks, copy as markdown
 - **Undo/Redo**: Full history for all operations
 - **Autosave**: Every 5 minutes + 1 second after inactivity
+
+---
+
+## 🎯 Implementation Decisions
+
+### Agreed Technical Approaches
+
+1. **ContentEditable Strategy**
+
+   - Use `contentEditable` for rich text support and cross-block text selection
+   - Wrap carefully to control browser inconsistencies
+   - Each block will have its own `contentEditable` element
+   - Custom handling for cross-block selection tracking
+
+2. **State Management Architecture**
+
+   - Use React Context WITH useReducer pattern
+   - Provides global access with organized state updates
+   - Better support for complex operations (undo/redo, multi-block operations)
+
+3. **Component Structure**
+
+   - Create `EditorContent` as its own component (inside the existing Editor layout)
+   - Keep Editor.tsx as the main container
+   - EditorContent will house all blocks and editing functionality
+
+4. **Testing Strategy**
+
+   - "Test critical parts" approach
+   - Test individual components as built
+   - Skip complex integration tests until features complete
+   - Focus on happy path testing first
+
+5. **Styling Approach**
+   - Use existing design tokens from the design system
+   - Keep styling minimal during development
+   - Style tweaks will come after functionality is complete
 
 ---
 
@@ -26,8 +63,11 @@
 
 ```
 Editor/
-├── Editor.tsx                    # Main container, manages all blocks
-├── EditorContext.tsx            # Global editor state (React Context)
+├── Editor.tsx                    # Main container, layout wrapper
+├── EditorContent/
+│   ├── EditorContent.tsx        # Houses all blocks and manages editing
+│   └── EditorContent.scss       # Specific styles for content area
+├── EditorContext.tsx            # Global editor state (React Context + useReducer)
 ├── PageTitle.tsx                # Editable page title component
 ├── Block/
 │   ├── Block.tsx                # Wrapper with drag handle
@@ -139,19 +179,21 @@ const blockToMarkdown = (block: EditorBlock): string => {
 ### 1. Slash Command Flow
 
 ```
-User types " /" → Detect slash after space → Show menu at cursor
+User types "/" in an empty block or after " " in any block → Detect slash in correct situation → Show menu above focused block and focus menu, highlight first formatting option
 ↓
 User types "hea" → Filter to "Heading 1, Heading 2, Heading 3"
 ↓
-User presses Enter → Convert block → Remove "/" → Focus block
+User can use arrow keys or mouse → Change which formatting option is highlighted
+↓
+User presses Enter → Convert block to highlighted option → Remove "/" → Focus block
 ```
 
 ### 2. Markdown Conversion Flow
 
 ```
-User types "# " → Detect markdown pattern → Convert to H1
+User types "# " at the start of a block → Detect markdown pattern → Convert to relevant block type
 ↓
-Remove "# " from content → Update block type → Continue typing
+Remove "# " from content → Continue typing
 ```
 
 ### 3. Copy/Paste Flow
@@ -178,15 +220,19 @@ Download as .md file or copy to clipboard
 
 ## 🏗️ Implementation Phases
 
+**Testing Approach**: Test critical functionality as we build each phase, focusing on component rendering and basic interactions. Complex integration tests will come after features are complete.
+
 ### Phase 1: Core Block System
 
-1. Create `PageTitle` component (editable, non-removable)
-2. Create `EditorBlock` component with contentEditable
-3. Implement basic typing and content updates
-4. Add Enter key handling for new blocks
-5. Add placeholder text for empty blocks
-6. Style different block types (H1, H2, H3, P)
-7. Initialize new pages with title "New Page" and one empty paragraph
+1. Create `EditorContext` with useReducer pattern
+2. Create `EditorContent` component
+3. Create `PageTitle` component (editable, non-removable)
+4. Create `EditorBlock` component with contentEditable
+5. Implement basic typing and content updates
+6. Add Enter key handling for new blocks
+7. Add placeholder text for empty blocks
+8. Style different block types (H1, H2, H3, P) using design tokens
+9. Initialize new pages with title "New Page" and one empty paragraph
 
 ### Phase 2: Block Management
 
@@ -228,17 +274,20 @@ Download as .md file or copy to clipboard
 
 ## 🔧 Technical Decisions
 
-### ContentEditable vs Input
+### ContentEditable Implementation
 
 - Use `contentEditable` for rich text support
-- Carefully manage cursor position
-- Prevent default formatting (no <div> wrapping)
+- Each block has its own `contentEditable` element
+- Carefully manage cursor position and selection state
+- Prevent default formatting (no `<div>` wrapping)
+- Custom implementation for cross-block text selection
 
 ### State Management
 
-- React Context for global editor state
-- Local state for individual block editing
-- Immutable updates for undo/redo
+- React Context with useReducer pattern for global editor state
+- Actions for all state changes (better debugging and undo/redo)
+- Immutable updates for undo/redo support
+- Centralized state for selection tracking across blocks
 
 ### Unique IDs
 
@@ -267,6 +316,8 @@ Download as .md file or copy to clipboard
    - Track selection that spans multiple blocks
    - Handle partial block selection
    - Maintain selection during operations
+   - Coordinate selection state between individual contentEditable elements
+   - Custom implementation for cross-block text selection and operations
 
 3. **Paste Handling**
 
@@ -330,6 +381,8 @@ interface FormattingToolbarProps {
 ---
 
 ## 🎨 Styling Guidelines
+
+**Note**: All styling will use existing design tokens from the design system. Final style adjustments will be made after functionality is complete.
 
 ### Block Spacing
 
