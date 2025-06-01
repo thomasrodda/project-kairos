@@ -205,6 +205,7 @@ packages
 │   │   ├── components
 │   │   │   └── Icon
 │   │   │   ├── Icon.scss
+│   │   │   ├── Icon.test.tsx
 │   │   │   ├── Icon.tsx
 │   │   │   └── index.ts
 │   │   ├── test

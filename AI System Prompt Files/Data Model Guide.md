@@ -44,16 +44,16 @@ User (authenticated via Firebase)
 │ Navigation Bar (recent pages, future features)          │
 ├─────────────┬───────────────────────────────────────────┤
 │             │                                           │
-│   Sidebar   │              Editor                      │
+│   Sidebar   │              Editor                       │
 │             │                                           │
-│ ┌─────────┐ │  ┌─────────────────────────────────┐   │
-│ │Workspace│ │  │ Page Title (editable)           │   │
-│ │ Pages:  │ │  ├─────────────────────────────────┤   │
-│ │         │ │  │ Block 1 (paragraph)             │   │
-│ │ Page 1  │ │  │ Block 2 (heading)               │   │
-│ │ Page 2 ←│ │  │ Block 3 (bullet list)           │   │
-│ │ Page 3  │ │  │ ...                             │   │
-│ └─────────┘ │  └─────────────────────────────────┘   │
+│ ┌─────────┐ │  ┌─────────────────────────────────┐      │
+│ │Workspace│ │  │ Page Title (editable)           │      │
+│ │ Pages:  │ │  ├─────────────────────────────────┤      │
+│ │         │ │  │ Block 1 (paragraph)             │      │
+│ │ Page 1  │ │  │ Block 2 (heading)               │      │
+│ │ Page 2 ←│ │  │ Block 3 (bullet list)           │      │
+│ │ Page 3  │ │  │ ...                             │      │
+│ └─────────┘ │  └─────────────────────────────────┘      │
 │             │                                           │
 └─────────────┴───────────────────────────────────────────┘
                                               Future AI Panel →

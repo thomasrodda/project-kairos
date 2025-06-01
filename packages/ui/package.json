@@ -19,7 +19,7 @@
       "**/*.test.ts",
       "**/*.test.tsx"
     ],
-    "moduleNameMapping": {
+    "moduleNameMapper": {
       "\\.(css|scss|sass)$": "identity-obj-proxy"
     },
     "setupFilesAfterEnv": [
