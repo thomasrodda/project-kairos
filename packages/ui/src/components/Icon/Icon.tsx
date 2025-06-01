@@ -1,10 +1,14 @@
 // packages/ui/src/components/Icon/Icon.tsx
+// A React component that renders SVG icons inline with full performance optimization and accessibility support.
+// It loads SVG content dynamically, handles loading/error states gracefully, and provides TypeScript autocompletion for all available icon names.
+
 import React, { useState, useEffect, useMemo } from 'react'
 import { IconName, iconMap } from '../../utils/iconLoader'
 import { parseSvgContent, svgElementToProps } from '../../utils/svgContentLoader'
 import { loadIconWithMonitoring } from '../../utils/iconPerformance'
 import './Icon.scss'
 
+// Props interface with TypeScript autocompletion for icon names
 export interface IconProps {
   name: IconName
   size?: number | string
@@ -16,6 +20,7 @@ export interface IconProps {
   'aria-label'?: string
 }
 
+// Internal type for processed SVG props
 interface SvgProps extends Record<string, unknown> {
   dangerouslySetInnerHTML?: { __html: string }
   className?: string
@@ -23,11 +28,12 @@ interface SvgProps extends Record<string, unknown> {
 }
 
 export function Icon({ name, size = 20, className = '', color, fill, stroke, opacity, 'aria-label': ariaLabel }: IconProps) {
+  // State management for async SVG loading
   const [svgProps, setSvgProps] = useState<SvgProps | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Memoize style object to prevent unnecessary re-renders
+  // Memoized styles to prevent unnecessary re-renders
   const iconStyle = useMemo(
     (): React.CSSProperties => ({
       width: typeof size === 'number' ? `${size}px` : size,
@@ -42,6 +48,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
     [size, color, fill, stroke, opacity]
   )
 
+  // Main effect for loading and processing SVG content
   useEffect(() => {
     let isMounted = true
 
@@ -50,6 +57,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
       setError(null)
       setSvgProps(null)
 
+      // Check if icon exists in our icon map
       if (!iconMap[name]) {
         if (isMounted) {
           setError(`Icon "${name}" not found`)
@@ -60,6 +68,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
       }
 
       try {
+        // Load SVG content with performance monitoring
         const content = await loadIconWithMonitoring(name)
         if (!isMounted) return
 
@@ -70,6 +79,7 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
           return
         }
 
+        // Parse SVG string into DOM element
         const svgElement = parseSvgContent(content, name)
         if (!isMounted) return
 
@@ -80,13 +90,14 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
           return
         }
 
+        // Convert SVG element to React props
         const props = svgElementToProps(svgElement) as SvgProps
         if (isMounted) {
           setSvgProps(props)
           setIsLoading(false)
         }
       } catch (_error) {
-        // Use underscore prefix to indicate intentionally unused parameter
+        // Handle any errors during loading/processing
         if (isMounted) {
           setError(`Error loading icon "${name}"`)
           setIsLoading(false)
@@ -96,12 +107,14 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
     }
 
     fetchSvg()
+
+    // Cleanup function to prevent state updates after unmount
     return () => {
       isMounted = false
     }
   }, [name])
 
-  // Fallback for missing or failed icons
+  // Error/missing icon fallback
   if (error || (!isLoading && !svgProps)) {
     return (
       <span className={`icon icon--missing ${className}`} style={iconStyle} aria-label={ariaLabel || name} role="img">
@@ -110,12 +123,12 @@ export function Icon({ name, size = 20, className = '', color, fill, stroke, opa
     )
   }
 
-  // Loading state
+  // Loading state placeholder
   if (isLoading || !svgProps) {
     return <span className={`icon icon--loading ${className}`} style={iconStyle} role="img" aria-label={ariaLabel || `${name} loading`} />
   }
 
-  // At this point, svgProps is guaranteed to be non-null due to the checks above
+  // Successful render: merge SVG props with our styles and accessibility attributes
   const finalSvgProps = {
     ...svgProps,
     className: `icon ${className} ${svgProps.className || ''}`.trim(),

@@ -10,6 +10,64 @@ Components are written in **React + TypeScript**, using a feature-based folder s
 
 ---
 
+## Code Documentation Format
+
+### File Header Comments
+
+Every component file should start with a standardized header comment format:
+
+```typescript
+// path/to/ComponentName.tsx
+// Brief description of what this component does and its key features.
+// Mention any important integrations, performance considerations, or accessibility features.
+
+import React from 'react'
+// ... other imports
+```
+
+**Example:**
+
+```typescript
+// packages/ui/src/components/Icon/Icon.tsx
+// A React component that renders SVG icons inline with full performance optimization and accessibility support.
+// It loads SVG content dynamically, handles loading/error states gracefully, and provides TypeScript autocompletion for all available icon names.
+```
+
+### Inline Comments
+
+Use **focused, meaningful comments** that explain:
+
+- **Why** something is done (not what is obvious)
+- **Complex logic** or business rules
+- **State management** patterns
+- **Performance optimizations**
+- **Accessibility considerations**
+
+**Good commenting examples:**
+
+```typescript
+// Memoized styles to prevent unnecessary re-renders
+const iconStyle = useMemo(() => ({ ... }), [dependencies])
+
+// Cleanup function to prevent state updates after unmount
+return () => { isMounted = false }
+
+// Check if icon exists in our icon map
+if (!iconMap[name]) { ... }
+```
+
+**Avoid over-commenting:**
+
+```typescript
+// ❌ Bad - states the obvious
+const [isLoading, setIsLoading] = useState(true) // Set loading to true
+
+// ✅ Good - explains purpose or context
+const [isLoading, setIsLoading] = useState(true) // Loading state for async SVG loading
+```
+
+---
+
 ## Folder Structure
 
 Each feature or component lives in its own folder within `apps/web/src/components/`:
@@ -94,10 +152,13 @@ Write a test file alongside the component to cover key logic, rendering, and use
 - Use clear, consistent naming
 - Avoid props drilling—lift state where appropriate
 - Prefer composition over inheritance
-- Document expected props in code
+- Document expected props in code with proper TypeScript interfaces
 - Use dynamic rendering and registry patterns for pluggable UI components (e.g., editor blocks)
+- **Follow standardized file header comments** for consistency
+- **Comment complex logic and business rules**, not obvious code
+- **Explain performance optimizations** and accessibility considerations
 
-The block-based editor uses a plugin-friendly architecture.
+The block-based editor uses a plugin-friendly architecture:
 
 - A central `blockRegistry.ts` defines block types and how to render them.
 - Each block type includes:
