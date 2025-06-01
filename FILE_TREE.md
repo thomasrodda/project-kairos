@@ -215,6 +215,7 @@ packages
 │   │   │   └── setup.ts
 │   │   ├── utils
 │   │   │   ├── iconLoader.ts
+│   │   │   ├── iconPerformance.test.ts
 │   │   │   ├── iconPerformance.ts
 │   │   │   ├── svgContentLoader.test.ts
 │   │   │   ├── svgContentLoader.ts
