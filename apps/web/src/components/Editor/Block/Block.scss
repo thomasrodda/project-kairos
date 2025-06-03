@@ -1,0 +1,94 @@
+// apps/web/src/components/Editor/Block/Block.scss
+
+.block {
+  position: relative;
+
+  &__content {
+    outline: none;
+    cursor: text;
+    min-height: 1.5em; // Prevent collapse when empty
+    white-space: pre-wrap; // Preserve line breaks
+    word-break: break-word; // Break long words
+
+    // Remove default contentEditable styling
+    &:focus {
+      outline: none;
+    }
+
+    // Show placeholder when empty
+    &:empty::before {
+      content: attr(data-placeholder);
+      color: var(--color-text-muted);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+  }
+
+  // =============================================================================
+  // BLOCK TYPE SPECIFIC STYLES
+  // =============================================================================
+
+  &--h1 .block__content {
+    font: var(--text-heading-xl);
+    color: var(--color-text-primary);
+    margin: var(--spacing-32) 0 var(--spacing-16);
+  }
+
+  &--h2 .block__content {
+    font: var(--text-heading-lg);
+    color: var(--color-text-primary);
+    margin: var(--spacing-24) 0 var(--spacing-12);
+  }
+
+  &--h3 .block__content {
+    font: var(--text-heading-md);
+    color: var(--color-text-primary);
+    margin: var(--spacing-20) 0 var(--spacing-8);
+  }
+
+  &--paragraph .block__content {
+    font: var(--text-body-md);
+    color: var(--color-text-primary);
+    margin: var(--spacing-8) 0;
+    line-height: var(--line-height-relaxed);
+  }
+
+  &--bullet {
+    display: flex;
+    align-items: flex-start;
+
+    &::before {
+      content: '•';
+      color: var(--color-text-secondary);
+      margin-right: var(--spacing-12);
+      font-size: var(--font-size-20);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .block__content {
+      font: var(--text-body-md);
+      color: var(--color-text-primary);
+      margin: var(--spacing-4) 0;
+      line-height: var(--line-height-relaxed);
+      flex: 1;
+    }
+  }
+
+  // =============================================================================
+  // FIRST/LAST BLOCK ADJUSTMENTS
+  // =============================================================================
+
+  &:first-child {
+    &--h1 .block__content,
+    &--h2 .block__content,
+    &--h3 .block__content {
+      margin-top: 0;
+    }
+  }
+
+  &:last-child {
+    .block__content {
+      margin-bottom: 0;
+    }
+  }
+}

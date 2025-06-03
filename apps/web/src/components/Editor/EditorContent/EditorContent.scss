@@ -1,0 +1,13 @@
+// apps/web/src/components/Editor/EditorContent/EditorContent.scss
+
+.editor-content {
+  width: 100%;
+  max-width: 750px; // Comfortable reading width
+  margin: 0 auto;
+  padding: var(--spacing-32) 0;
+
+  &__blocks {
+    // Blocks container
+    margin-top: var(--spacing-32);
+  }
+}

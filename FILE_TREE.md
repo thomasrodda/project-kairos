@@ -110,6 +110,18 @@ apps
 ├── src
 │   ├── components
 │   │   ├── Editor
+│   │   │   ├── Block
+│   │   │   │   ├── Block.scss
+│   │   │   │   ├── Block.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── EditorContent
+│   │   │   │   ├── EditorContent.scss
+│   │   │   │   ├── EditorContent.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── PageTitle
+│   │   │   │   ├── PageTitle.scss
+│   │   │   │   ├── PageTitle.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── Editor.scss
 │   │   │   ├── Editor.tsx
 │   │   │   └── index.ts
@@ -130,6 +142,8 @@ apps
 │   │   ├── Workspace.test.tsx
 │   │   ├── Workspace.tsx
 │   │   └── index.ts
+│   ├── contexts
+│   │   └── EditorContext.tsx
 │   ├── hooks
 │   ├── pages
 │   ├── styles
