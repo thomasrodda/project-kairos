@@ -8,10 +8,10 @@
   ],
   "scripts": {
     "dev": "concurrently \"yarn workspace @kairos/web dev\" \"yarn workspace @kairos/api dev\" --names \"web,api\" --prefix-colors \"blue,green\"",
-    "build": "yarn workspaces run build",
+    "build": "yarn workspaces foreach -A run build",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "typecheck": "yarn workspaces run typecheck",
+    "typecheck": "yarn workspaces foreach -A run typecheck",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
