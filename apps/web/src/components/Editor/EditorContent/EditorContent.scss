@@ -8,8 +8,14 @@
   // Add left padding to accommodate drag handles
   padding-left: 48px; // Space for drag handles that appear at -40px
 
+  // Take full height to register clicks in empty space
+  min-height: 100%;
+  cursor: text; // Show text cursor when hovering over empty space
+
   &__blocks {
     // Blocks container
     margin-top: var(--spacing-32);
+    // Add minimum height to ensure click area below blocks
+    min-height: 50vh;
   }
 }

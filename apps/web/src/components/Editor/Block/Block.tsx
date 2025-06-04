@@ -194,7 +194,7 @@ export function Block({ block, isFocused }: BlockProps) {
   }
 
   return (
-    <div className={`block block--${block.type} ${isSelected ? 'block--selected' : ''}`}>
+    <div className={`block block--${block.type} ${isSelected ? 'block--selected' : ''}`} data-block-id={block.id}>
       {/* Drag handle - shows on hover */}
       <BlockDragHandle blockId={block.id} onDragStart={handleDragStart} onSelect={handleBlockSelect} />
 
