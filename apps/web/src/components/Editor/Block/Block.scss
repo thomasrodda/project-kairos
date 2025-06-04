@@ -2,6 +2,7 @@
 
 .block {
   position: relative;
+  transition: var(--animate-colors);
 
   // Show drag handle on hover
   &:hover .block-drag-handle {
@@ -12,14 +13,17 @@
   &--selected {
     .block__content {
       background-color: color-mix(in srgb, var(--color-primary-400) 20%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-primary-500) 30%, transparent);
       border-radius: var(--radius-4);
+      // Add subtle shadow for depth
+      box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary-500) 10%, transparent);
     }
 
     .block-drag-handle {
       opacity: 1;
 
       .icon {
-        color: var(--color-white);
+        color: var(--color-primary-500);
       }
     }
   }
@@ -30,7 +34,11 @@
     min-height: 1.5em; // Prevent collapse when empty
     white-space: pre-wrap; // Preserve line breaks
     word-break: break-word; // Break long words
-    transition: var(--animate-colors);
+    transition:
+      var(--animate-colors),
+      border var(--speed-fast) var(--ease-smooth);
+    padding: var(--spacing-2) var(--spacing-4); // Add padding for better click targets
+    margin: var(--spacing-1) 0; // Small margin for visual separation
 
     // Remove default contentEditable styling
     &:focus {
@@ -60,18 +68,21 @@
     font: var(--text-heading-xl);
     color: var(--color-text-primary);
     margin: var(--spacing-32) 0 var(--spacing-16);
+    padding: var(--spacing-4) var(--spacing-8);
   }
 
   &--h2 .block__content {
     font: var(--text-heading-lg);
     color: var(--color-text-primary);
     margin: var(--spacing-24) 0 var(--spacing-12);
+    padding: var(--spacing-4) var(--spacing-8);
   }
 
   &--h3 .block__content {
     font: var(--text-heading-md);
     color: var(--color-text-primary);
     margin: var(--spacing-20) 0 var(--spacing-8);
+    padding: var(--spacing-4) var(--spacing-8);
   }
 
   &--paragraph .block__content {
@@ -79,6 +90,7 @@
     color: var(--color-text-primary);
     margin: var(--spacing-8) 0;
     line-height: var(--line-height-relaxed);
+    padding: var(--spacing-2) var(--spacing-4);
   }
 
   &--bullet {
@@ -91,6 +103,7 @@
       margin-right: var(--spacing-12);
       font-size: var(--font-size-20);
       line-height: var(--line-height-relaxed);
+      margin-top: var(--spacing-2); // Align with text
     }
 
     .block__content {
@@ -99,6 +112,7 @@
       margin: var(--spacing-4) 0;
       line-height: var(--line-height-relaxed);
       flex: 1;
+      padding: var(--spacing-2) var(--spacing-4);
     }
   }
 
@@ -119,4 +133,40 @@
       margin-bottom: 0;
     }
   }
+
+  // =============================================================================
+  // ACCESSIBILITY AND INTERACTION STATES
+  // =============================================================================
+
+  // Subtle hover effect for better user feedback
+  &:hover:not(&--selected) .block__content {
+    background-color: color-mix(in srgb, var(--color-surface-elevated-1) 50%, transparent);
+    border-radius: var(--radius-4);
+  }
+
+  /*
+  // Focus ring for keyboard navigation
+  .block__content:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-border-focus);
+    border-radius: var(--radius-4);
+  }
+  */
+}
+
+// Animation for selection state changes
+@keyframes block-select {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.01);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+// Apply subtle animation when block becomes selected
+.block--selected .block__content {
+  animation: block-select 200ms var(--ease-smooth);
 }

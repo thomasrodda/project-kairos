@@ -30,7 +30,7 @@ export interface EditorState {
   pageTitle: string // Editable page title
   blocks: EditorBlock[] // All blocks in the page
   focusedBlockId: string | null // Currently focused block
-  selectedBlockId: string | null // Currently selected block (via drag handle)
+  selectedBlockIds: string[] // Currently selected blocks (via drag handle)
   isDragging: boolean // Whether we're currently dragging a block
   selectedRange?: {
     // Text selection across blocks
@@ -53,10 +53,14 @@ export type EditorAction =
   | { type: 'ADD_BLOCK'; block: EditorBlock; afterBlockId?: string }
   | { type: 'UPDATE_BLOCK'; blockId: string; content: string }
   | { type: 'DELETE_BLOCK'; blockId: string }
+  | { type: 'DELETE_BLOCKS'; blockIds: string[] }
   | { type: 'CHANGE_BLOCK_TYPE'; blockId: string; blockType: BlockType }
   | { type: 'REORDER_BLOCKS'; blocks: EditorBlock[] }
   | { type: 'SET_FOCUSED_BLOCK'; blockId: string | null }
-  | { type: 'SET_SELECTED_BLOCK'; blockId: string | null }
+  | { type: 'SET_SELECTED_BLOCKS'; blockIds: string[] }
+  | { type: 'TOGGLE_BLOCK_SELECTION'; blockId: string }
+  | { type: 'SELECT_BLOCK_RANGE'; startBlockId: string; endBlockId: string }
+  | { type: 'CLEAR_SELECTION' }
   | { type: 'SET_DRAGGING'; isDragging: boolean }
   | { type: 'SET_SELECTION'; selection: EditorState['selectedRange'] }
   | { type: 'MARK_SAVED' }
@@ -80,7 +84,7 @@ const initialState: EditorState = {
   pageTitle: 'New Page',
   blocks: [createInitialBlock()],
   focusedBlockId: null,
-  selectedBlockId: null,
+  selectedBlockIds: [],
   isDragging: false,
   selectedRange: undefined,
   isDirty: false,
@@ -100,7 +104,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         pageTitle: action.title,
         blocks: action.blocks.length > 0 ? action.blocks : [createInitialBlock()],
         focusedBlockId: null,
-        selectedBlockId: null,
+        selectedBlockIds: [], // CHANGED: Clear selection
         selectedRange: undefined,
         isDirty: false,
         lastSaved: new Date(),
@@ -132,7 +136,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         blocks: newBlocks,
         focusedBlockId: block.id,
-        selectedBlockId: null, // Clear selection when adding new block
+        selectedBlockIds: [], // Clear selection when adding new block
         isDirty: true,
       }
     }
@@ -168,7 +172,36 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         blocks: newBlocks,
         focusedBlockId: newFocusedId,
-        selectedBlockId: null, // Clear selection when deleting block
+        selectedBlockIds: [], // Clear selection when deleting block
+        isDirty: true,
+      }
+    }
+
+    case 'DELETE_BLOCKS': {
+      // Don't delete all blocks - always keep at least one
+      const blocksToDelete = new Set(action.blockIds)
+      const remainingBlocks = state.blocks.filter((b) => !blocksToDelete.has(b.id))
+
+      // If we would delete all blocks, keep one empty paragraph
+      const newBlocks = remainingBlocks.length === 0 ? [createInitialBlock()] : remainingBlocks
+
+      // Find new focus target
+      let newFocusedId = null
+      if (remainingBlocks.length > 0) {
+        // Focus the block before the first deleted block, or the first remaining block
+        const firstDeletedIndex = state.blocks.findIndex((b) => blocksToDelete.has(b.id))
+        if (firstDeletedIndex > 0) {
+          newFocusedId = state.blocks[firstDeletedIndex - 1].id
+        } else {
+          newFocusedId = remainingBlocks[0].id
+        }
+      }
+
+      return {
+        ...state,
+        blocks: newBlocks,
+        focusedBlockId: newFocusedId,
+        selectedBlockIds: [], // Clear selection after deletion
         isDirty: true,
       }
     }
@@ -195,14 +228,48 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
       return {
         ...state,
         focusedBlockId: action.blockId,
-        selectedBlockId: null, // Clear selection when focusing for editing
+        selectedBlockIds: [], // Clear selection when focusing for editing
       }
 
-    case 'SET_SELECTED_BLOCK':
+    case 'SET_SELECTED_BLOCKS':
       return {
         ...state,
-        selectedBlockId: action.blockId,
+        selectedBlockIds: action.blockIds,
         focusedBlockId: null, // Clear focus when selecting
+      }
+
+    case 'TOGGLE_BLOCK_SELECTION': {
+      const { blockId } = action
+      const isSelected = state.selectedBlockIds.includes(blockId)
+
+      return {
+        ...state,
+        selectedBlockIds: isSelected ? state.selectedBlockIds.filter((id) => id !== blockId) : [...state.selectedBlockIds, blockId],
+        focusedBlockId: null, // Clear focus when selecting
+      }
+    }
+
+    case 'SELECT_BLOCK_RANGE': {
+      const { startBlockId, endBlockId } = action
+      const startIndex = state.blocks.findIndex((b) => b.id === startBlockId)
+      const endIndex = state.blocks.findIndex((b) => b.id === endBlockId)
+
+      if (startIndex === -1 || endIndex === -1) return state
+
+      const [minIndex, maxIndex] = [Math.min(startIndex, endIndex), Math.max(startIndex, endIndex)]
+      const selectedIds = state.blocks.slice(minIndex, maxIndex + 1).map((b) => b.id)
+
+      return {
+        ...state,
+        selectedBlockIds: selectedIds,
+        focusedBlockId: null, // Clear focus when selecting range
+      }
+    }
+
+    case 'CLEAR_SELECTION':
+      return {
+        ...state,
+        selectedBlockIds: [],
       }
 
     case 'SET_DRAGGING':

@@ -33,6 +33,14 @@
     transform: scale(1);
   }
 
+  // Remove all default focus styling and borders
+  &:focus,
+  &:focus-visible {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
   // Icon styling - muted until hovered
   .icon {
     color: var(--color-text-muted); // More muted default color
@@ -58,7 +66,7 @@
     }
   }
 
-  // Improve accessibility - show on focus
+  // Improve accessibility - show on focus but without unwanted borders
   &:focus {
     opacity: 1;
 

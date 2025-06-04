@@ -263,7 +263,12 @@ Download as .md file or copy to clipboard
 - [x] Implement block state management (focused vs selected states)
 - [x] Implement drag & drop reordering
 - [x] Add visual feedback during drag operations
-- [ ] Add multi-block selection
+- [x] **Add multi-block selection** ✅ **COMPLETE**
+  - [x] Shift+click for range selection
+  - [x] Ctrl/Cmd+click for toggle selection
+  - [x] Visual feedback for selected blocks
+  - [x] Keyboard shortcuts (Delete/Backspace, Escape to clear)
+  - [x] Multi-block deletion
 - [ ] Add text selection across multiple blocks
 - [ ] Add copy/pasting of selected blocks
 

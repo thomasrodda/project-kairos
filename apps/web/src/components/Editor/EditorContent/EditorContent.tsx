@@ -26,7 +26,7 @@ import './EditorContent.scss'
 export function EditorContent() {
   const editorState = useEditorState()
   const dispatch = useEditorDispatch()
-  const { pageTitle, blocks, focusedBlockId, selectedBlockId } = editorState
+  const { pageTitle, blocks, focusedBlockId, selectedBlockIds } = editorState
   const editorRef = useRef<HTMLDivElement>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
 
@@ -48,23 +48,37 @@ export function EditorContent() {
   // Handle keyboard shortcuts for selected blocks
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only handle if a block is selected (not focused for editing)
-      if (!selectedBlockId || focusedBlockId) return
+      // Only handle if blocks are selected (not focused for editing)
+      if (selectedBlockIds.length === 0 || focusedBlockId) return
 
-      // Delete or Backspace key deletes the selected block
+      // Delete or Backspace key deletes the selected blocks
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault()
-        dispatch({ type: 'DELETE_BLOCK', blockId: selectedBlockId })
 
-        // Announce deletion for screen readers
-        setAnnouncement('Block deleted')
+        if (selectedBlockIds.length === 1) {
+          // Single block deletion
+          dispatch({ type: 'DELETE_BLOCK', blockId: selectedBlockIds[0] })
+          setAnnouncement('Block deleted')
+        } else {
+          // Multiple block deletion
+          dispatch({ type: 'DELETE_BLOCKS', blockIds: selectedBlockIds })
+          setAnnouncement(`${selectedBlockIds.length} blocks deleted`)
+        }
+
+        setTimeout(() => setAnnouncement(''), 1000)
+      }
+
+      // Escape key clears selection
+      if (e.key === 'Escape') {
+        dispatch({ type: 'CLEAR_SELECTION' })
+        setAnnouncement('Selection cleared')
         setTimeout(() => setAnnouncement(''), 1000)
       }
     }
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [selectedBlockId, focusedBlockId, dispatch])
+  }, [selectedBlockIds, focusedBlockId, dispatch])
 
   // Handle clicks in empty space to focus the nearest block above cursor
   const handleEmptySpaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -131,10 +145,10 @@ export function EditorContent() {
   useDismiss(editorRef, {
     onDismiss: () => {
       // Clear both selection and focus
-      dispatch({ type: 'SET_SELECTED_BLOCK', blockId: null })
+      dispatch({ type: 'CLEAR_SELECTION' })
       dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: null })
     },
-    enabled: !!(selectedBlockId || focusedBlockId), // Only enable when something is selected/focused
+    enabled: !!(selectedBlockIds.length > 0 || focusedBlockId), // Fixed variable name
   })
 
   // Handle drag start

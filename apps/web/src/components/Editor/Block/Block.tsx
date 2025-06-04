@@ -2,7 +2,7 @@
 // Individual block component that renders editable content with contentEditable.
 // Handles text input, Enter key for new blocks, and displays placeholder text when empty.
 // Supports different block types (H1, H2, H3, paragraph, bullet) with appropriate styling.
-// Includes a drag handle that appears on hover for block reordering.
+// Includes a drag handle that appears on hover for block reordering and multi-block selection.
 
 import React, { useRef, useEffect, useState } from 'react'
 import { useEditorDispatch, useEditorState, BLOCK_PLACEHOLDERS } from '../../../contexts/EditorContext'
@@ -26,7 +26,7 @@ export function Block({ block, isFocused, dragHandleProps }: BlockProps) {
   const [isUpdating, setIsUpdating] = useState(false)
 
   // Check if this block is selected from centralized state
-  const isSelected = editorState.selectedBlockId === block.id
+  const isSelected = editorState.selectedBlockIds.includes(block.id)
 
   // Focus the block when isFocused changes to true
   useEffect(() => {
@@ -100,9 +100,20 @@ export function Block({ block, isFocused, dragHandleProps }: BlockProps) {
     selection.getRangeAt(0).insertNode(document.createTextNode(text))
   }
 
-  // Handle drag handle selection
-  const handleBlockSelect = (blockId: string) => {
-    dispatch({ type: 'SET_SELECTED_BLOCK', blockId })
+  // Handle drag handle selection with multi-block support
+  const handleBlockSelect = (blockId: string, event?: MouseEvent) => {
+    // Check if Shift key is held for multi-selection
+    if (event?.shiftKey && editorState.selectedBlockIds.length > 0) {
+      // Range selection: select from last selected to current
+      const lastSelectedId = editorState.selectedBlockIds[editorState.selectedBlockIds.length - 1]
+      dispatch({ type: 'SELECT_BLOCK_RANGE', startBlockId: lastSelectedId, endBlockId: blockId })
+    } else if (event?.ctrlKey || event?.metaKey) {
+      // Toggle individual block selection (Ctrl/Cmd+click)
+      dispatch({ type: 'TOGGLE_BLOCK_SELECTION', blockId })
+    } else {
+      // Single selection (clear others and select this one)
+      dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: [blockId] })
+    }
   }
 
   // Determine the appropriate placeholder text
