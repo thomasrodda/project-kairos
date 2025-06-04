@@ -264,6 +264,8 @@ Download as .md file or copy to clipboard
 - [x] Implement drag & drop reordering
 - [x] Add visual feedback during drag operations
 - [ ] Add multi-block selection
+- [ ] Add text selection across multiple blocks
+- [ ] Add copy/pasting of selected blocks
 
 ## Phase 3: Slash Commands
 
