@@ -109,6 +109,15 @@ export function Block({ block, isFocused }: BlockProps) {
     // Future: Implement drag & drop logic
   }
 
+  // Determine the appropriate placeholder text
+  const getPlaceholder = () => {
+    if (isFocused && block.content === '') {
+      return "Press '/' for commands, or 'space' for AI..."
+    }
+    // Return empty string for unfocused empty blocks (no placeholder)
+    return ''
+  }
+
   // Determine which HTML tag to use
   const getBlockTag = () => {
     switch (block.type) {
@@ -130,14 +139,14 @@ export function Block({ block, isFocused }: BlockProps) {
   const renderBlockContent = () => {
     // Props common to all tags (everything except ref)
     const commonProps = {
-      className: 'block__content',
+      className: `block__content ${isFocused && block.content === '' ? 'block__content--focused-empty' : ''}`,
       contentEditable: true as const,
       suppressContentEditableWarning: true as const,
       onInput: handleInput,
       onKeyDown: handleKeyDown,
       onFocus: handleFocus,
       onPaste: handlePaste,
-      'data-placeholder': block.metadata?.placeholder || BLOCK_PLACEHOLDERS[block.type],
+      'data-placeholder': getPlaceholder(),
     }
 
     switch (Tag) {

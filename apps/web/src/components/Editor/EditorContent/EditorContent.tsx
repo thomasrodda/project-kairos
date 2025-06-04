@@ -3,7 +3,7 @@
 // Manages the overall editor layout and coordinates between individual block components.
 // Acts as the container for all editing functionality within the Editor layout.
 
-import { useRef } from 'react'
+import { useRef, useEffect } from 'react'
 import { useEditorState, useEditorDispatch } from '../../../contexts/EditorContext'
 import { useDismiss } from '../../../hooks'
 import { PageTitle } from '../PageTitle'
@@ -15,6 +15,23 @@ export function EditorContent() {
   const dispatch = useEditorDispatch()
   const { pageTitle, blocks, focusedBlockId, selectedBlockId } = editorState
   const editorRef = useRef<HTMLDivElement>(null)
+
+  // Handle keyboard shortcuts for selected blocks
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle if a block is selected (not focused for editing)
+      if (!selectedBlockId || focusedBlockId) return
+
+      // Delete or Backspace key deletes the selected block
+      if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault()
+        dispatch({ type: 'DELETE_BLOCK', blockId: selectedBlockId })
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selectedBlockId, focusedBlockId, dispatch])
 
   // Dismiss selection when clicking outside editor or pressing escape
   useDismiss(editorRef, {

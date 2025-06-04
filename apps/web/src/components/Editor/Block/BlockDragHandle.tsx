@@ -25,7 +25,7 @@ export function BlockDragHandle({ blockId, onDragStart, onSelect }: BlockDragHan
   }
 
   return (
-    <div className="block-drag-handle" draggable onMouseDown={handleMouseDown} onDragStart={handleDragStart} title="Drag to reorder, click to select">
+    <div className="block-drag-handle" draggable onMouseDown={handleMouseDown} onDragStart={handleDragStart}>
       <Icon name="grab" size={16} />
     </div>
   )
