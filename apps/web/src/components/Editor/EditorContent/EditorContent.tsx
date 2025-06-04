@@ -30,6 +30,9 @@ export function EditorContent() {
   const editorRef = useRef<HTMLDivElement>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
 
+  // Screen reader announcements for accessibility
+  const [announcement, setAnnouncement] = useState<string>('')
+
   // Configure drag sensors for better UX
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -52,6 +55,10 @@ export function EditorContent() {
       if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault()
         dispatch({ type: 'DELETE_BLOCK', blockId: selectedBlockId })
+
+        // Announce deletion for screen readers
+        setAnnouncement('Block deleted')
+        setTimeout(() => setAnnouncement(''), 1000)
       }
     }
 
@@ -132,22 +139,36 @@ export function EditorContent() {
 
   // Handle drag start
   const handleDragStart = (event: DragStartEvent) => {
-    setActiveId(event.active.id as string)
+    const draggedBlockId = event.active.id as string
+    setActiveId(draggedBlockId)
     dispatch({ type: 'SET_DRAGGING', isDragging: true })
+
+    // Announce drag start for screen readers
+    const blockIndex = blocks.findIndex((b) => b.id === draggedBlockId)
+    setAnnouncement(`Started dragging block ${blockIndex + 1} of ${blocks.length}`)
+    setTimeout(() => setAnnouncement(''), 2000)
   }
 
   // Handle drag end
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (active.id !== over?.id) {
+    if (active.id !== over?.id && over?.id) {
       const oldIndex = blocks.findIndex((block) => block.id === active.id)
-      const newIndex = blocks.findIndex((block) => block.id === over?.id)
+      const newIndex = blocks.findIndex((block) => block.id === over.id)
 
       if (oldIndex !== -1 && newIndex !== -1) {
         const newBlocks = arrayMove(blocks, oldIndex, newIndex)
         dispatch({ type: 'REORDER_BLOCKS', blocks: newBlocks })
+
+        // Announce successful reorder for screen readers
+        setAnnouncement(`Block moved from position ${oldIndex + 1} to position ${newIndex + 1}`)
+        setTimeout(() => setAnnouncement(''), 2000)
       }
+    } else if (activeId) {
+      // Announce if drag was cancelled
+      setAnnouncement('Drag cancelled, block returned to original position')
+      setTimeout(() => setAnnouncement(''), 2000)
     }
 
     setActiveId(null)
@@ -159,15 +180,34 @@ export function EditorContent() {
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-      <div className={`editor-content ${activeId ? 'editor-content--sorting' : ''}`} ref={editorRef} onClick={handleEmptySpaceClick}>
+      <div
+        className={`editor-content ${activeId ? 'editor-content--sorting' : ''}`}
+        ref={editorRef}
+        onClick={handleEmptySpaceClick}
+        // Accessibility improvements
+        role="document"
+        aria-label="Document editor"
+      >
+        {/* Screen reader announcements */}
+        <div
+          aria-live="polite"
+          aria-atomic="true"
+          className="sr-only"
+          style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', overflow: 'hidden' }}
+        >
+          {announcement}
+        </div>
+
         {/* Page title - always visible and editable */}
         <PageTitle title={pageTitle} />
 
         {/* All blocks in the page */}
-        <div className="editor-content__blocks">
+        <div className="editor-content__blocks" role="group" aria-label="Document blocks">
           <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
-            {blocks.map((block) => (
-              <DraggableBlock key={block.id} block={block} isFocused={focusedBlockId === block.id} />
+            {blocks.map((block, index) => (
+              <div key={block.id} aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
+                <DraggableBlock block={block} isFocused={focusedBlockId === block.id} />
+              </div>
             ))}
           </SortableContext>
         </div>
@@ -176,7 +216,7 @@ export function EditorContent() {
       {/* Drag overlay for smooth dragging animation */}
       <DragOverlay>
         {activeBlock ? (
-          <div style={{ opacity: 0.8 }}>
+          <div style={{ opacity: 0.8 }} role="img" aria-label="Dragging block">
             <Block block={activeBlock} isFocused={false} />
           </div>
         ) : null}

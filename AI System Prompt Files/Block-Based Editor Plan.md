@@ -12,7 +12,7 @@
 - **Block Creation**: Enter key creates new blocks, Shift+Enter for line breaks within the current block
 - **Slash Commands**: Type `/` in an empty block or after ` ` in any block to open Slash Command menu. Appears above focused block.
 - **Formatting Toolbar**: Bold, Italic, Underline on text selection. Appears above selected text.
-- **Drag & Drop**: Reorder blocks via drag handles
+- **Drag & Drop**: Reorder blocks via drag handles with smooth animations
 - **Markdown Support**: Live conversion + export/copy as markdown
 - **Multi-block Selection**: Select across blocks, copy as markdown
 - **Undo/Redo**: Full history for all operations
@@ -43,14 +43,21 @@
    - Keep Editor.tsx as the main container
    - EditorContent will house all blocks and editing functionality
 
-4. **Testing Strategy**
+4. **Drag & Drop Implementation** ✨ **UPDATED**
+
+   - Use **@dnd-kit** library for smooth, accessible drag & drop
+   - Provides touch support, keyboard navigation, and beautiful animations
+   - Much more reliable than HTML5 Drag & Drop API
+   - Includes built-in accessibility features
+
+5. **Testing Strategy**
 
    - "Test critical parts" approach
    - Test individual components as built
    - Skip complex integration tests until features complete
    - Focus on happy path testing first
 
-5. **Styling Approach**
+6. **Styling Approach**
    - Use existing design tokens from the design system
    - Keep styling minimal during development
    - Style tweaks will come after functionality is complete
@@ -120,14 +127,20 @@ interface EditorBlock {
 type BlockType = 'h1' | 'h2' | 'h3' | 'paragraph' | 'bullet'
 
 interface EditorState {
+  pageId: string | null
+  pageTitle: string
   blocks: EditorBlock[]
   focusedBlockId: string | null
+  selectedBlockId: string | null
+  isDragging: boolean // Simplified from previous approach
   selectedRange?: {
     startBlockId: string
     startOffset: number
     endBlockId: string
     endOffset: number
   }
+  isDirty: boolean
+  lastSaved: Date | null
 }
 
 // Placeholder text map
@@ -248,8 +261,8 @@ Download as .md file or copy to clipboard
 - [x] Implement Shift+Enter for line breaks
 - [x] Add click-away and escape key dismiss behavior (useDismiss hook)
 - [x] Implement block state management (focused vs selected states)
-- [ ] Implement drag & drop reordering
-- [ ] Add visual feedback during drag operations
+- [x] Implement drag & drop reordering
+- [x] Add visual feedback during drag operations
 - [ ] Add multi-block selection
 
 ## Phase 3: Slash Commands

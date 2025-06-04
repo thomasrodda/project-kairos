@@ -2,9 +2,9 @@
 
 .block-drag-handle {
   position: absolute;
-  left: -40px; // Position to the left of the block
+  left: -24px; // Position to the left of the block
   top: 1px; // Align to top instead of center
-  width: 24px;
+  width: 16px;
   height: 24px;
   display: flex;
   align-items: center;
@@ -12,24 +12,70 @@
   border-radius: var(--radius-4);
   cursor: grab;
   opacity: 0;
-  transition: var(--animate-opacity);
+  transition: var(--animate-opacity), var(--animate-colors);
   z-index: 10;
 
+  // Subtle fade-in animation when appearing
+  animation: none;
+
   &:hover {
-    background: var(--color-surface-elevated-2);
+    background: var(--color-surface-elevated-1);
+    // Smooth scale effect on hover
+    transform: scale(1.1);
+    transition:
+      transform var(--speed-fast) var(--ease-smooth),
+      var(--animate-opacity),
+      var(--animate-colors);
   }
 
   &:active {
     cursor: grabbing;
+    transform: scale(1);
   }
 
-  // Icon styling
+  // Icon styling - muted until hovered
   .icon {
-    color: var(--color-text-secondary);
-    transition: var(--animate-colors);
+    color: var(--color-text-muted); // More muted default color
+    opacity: 0.4; // Additional muting
+    transition:
+      var(--animate-colors),
+      opacity var(--speed-fast) var(--ease-smooth);
   }
 
+  // Icon becomes more prominent on hover
   &:hover .icon {
-    color: var(--color-text-primary);
+    color: var(--color-text-secondary);
+    opacity: 1;
+  }
+
+  // When parent block is selected, make handle more visible
+  .block--selected & {
+    opacity: 1;
+
+    .icon {
+      color: var(--color-primary-500);
+      opacity: 1;
+    }
+  }
+
+  // Improve accessibility - show on focus
+  &:focus {
+    opacity: 1;
+
+    .icon {
+      color: var(--color-text-primary);
+      opacity: 1;
+    }
+  }
+
+  // Better touch targets for mobile
+  @media (hover: none) and (pointer: coarse) {
+    width: 32px;
+    height: 32px;
+    left: -44px;
+
+    .icon {
+      opacity: 0.6; // More visible on touch devices
+    }
   }
 }

@@ -11,7 +11,7 @@
   // Selected state for blocks
   &--selected {
     .block__content {
-      background-color: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
+      background-color: color-mix(in srgb, var(--color-primary-400) 20%, transparent);
       border-radius: var(--radius-4);
     }
 

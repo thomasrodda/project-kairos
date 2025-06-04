@@ -7,6 +7,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import { useEditorDispatch, useEditorState, BLOCK_PLACEHOLDERS } from '../../../contexts/EditorContext'
 import type { EditorBlock } from '../../../contexts/EditorContext'
+import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 import { generateId } from '@kairos/utils'
 import { BlockDragHandle } from './BlockDragHandle'
 import './Block.scss'
@@ -14,7 +15,7 @@ import './Block.scss'
 interface BlockProps {
   block: EditorBlock
   isFocused: boolean
-  dragHandleProps?: any // Listeners from @dnd-kit
+  dragHandleProps?: SyntheticListenerMap // Properly typed @dnd-kit listeners
 }
 
 export function Block({ block, isFocused, dragHandleProps }: BlockProps) {

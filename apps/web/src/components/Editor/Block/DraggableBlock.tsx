@@ -34,8 +34,8 @@ export function DraggableBlock({ block, isFocused }: DraggableBlockProps) {
     >
       <Block block={block} isFocused={isFocused} dragHandleProps={listeners} />
 
-      {/* Drop indicator line */}
-      <div className="draggable-block__drop-indicator" />
+      {/* Drop indicator line - COMMENTED OUT as requested */}
+      {/* <div className="draggable-block__drop-indicator" /> */}
     </div>
   )
 }

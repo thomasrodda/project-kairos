@@ -11,6 +11,7 @@ app.use(express.json())
 
 // Mount the hello function
 app.all('/api/hello', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   hello(req as any, res as any)
 })
 
