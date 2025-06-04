@@ -113,6 +113,8 @@ apps
 │   │   │   ├── Block
 │   │   │   │   ├── Block.scss
 │   │   │   │   ├── Block.tsx
+│   │   │   │   ├── BlockDragHandle.scss
+│   │   │   │   ├── BlockDragHandle.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── EditorContent
 │   │   │   │   ├── EditorContent.scss
@@ -145,6 +147,8 @@ apps
 │   ├── contexts
 │   │   └── EditorContext.tsx
 │   ├── hooks
+│   │   ├── index.ts
+│   │   └── useDismiss.ts
 │   ├── pages
 │   ├── styles
 │   │   ├── base

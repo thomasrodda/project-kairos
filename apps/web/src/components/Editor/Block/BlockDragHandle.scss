@@ -1,0 +1,35 @@
+// apps/web/src/components/Editor/Block/BlockDragHandle.scss
+
+.block-drag-handle {
+  position: absolute;
+  left: -40px; // Position to the left of the block
+  top: 1px; // Align to top instead of center
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-4);
+  cursor: grab;
+  opacity: 0;
+  transition: var(--animate-opacity);
+  z-index: 10;
+
+  &:hover {
+    background: var(--color-surface-elevated-2);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  // Icon styling
+  .icon {
+    color: var(--color-text-secondary);
+    transition: var(--animate-colors);
+  }
+
+  &:hover .icon {
+    color: var(--color-text-primary);
+  }
+}

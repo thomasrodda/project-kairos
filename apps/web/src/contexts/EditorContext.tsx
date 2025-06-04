@@ -30,6 +30,7 @@ export interface EditorState {
   pageTitle: string // Editable page title
   blocks: EditorBlock[] // All blocks in the page
   focusedBlockId: string | null // Currently focused block
+  selectedBlockId: string | null // Currently selected block (via drag handle)
   selectedRange?: {
     // Text selection across blocks
     startBlockId: string
@@ -54,6 +55,7 @@ export type EditorAction =
   | { type: 'CHANGE_BLOCK_TYPE'; blockId: string; blockType: BlockType }
   | { type: 'REORDER_BLOCKS'; blockIds: string[] }
   | { type: 'SET_FOCUSED_BLOCK'; blockId: string | null }
+  | { type: 'SET_SELECTED_BLOCK'; blockId: string | null }
   | { type: 'SET_SELECTION'; selection: EditorState['selectedRange'] }
   | { type: 'MARK_SAVED' }
   | { type: 'RESET_EDITOR' }
@@ -76,6 +78,7 @@ const initialState: EditorState = {
   pageTitle: 'New Page',
   blocks: [createInitialBlock()],
   focusedBlockId: null,
+  selectedBlockId: null,
   selectedRange: undefined,
   isDirty: false,
   lastSaved: null,
@@ -94,6 +97,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         pageTitle: action.title,
         blocks: action.blocks.length > 0 ? action.blocks : [createInitialBlock()],
         focusedBlockId: null,
+        selectedBlockId: null,
         selectedRange: undefined,
         isDirty: false,
         lastSaved: new Date(),
@@ -125,6 +129,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         blocks: newBlocks,
         focusedBlockId: block.id,
+        selectedBlockId: null, // Clear selection when adding new block
         isDirty: true,
       }
     }
@@ -160,6 +165,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         blocks: newBlocks,
         focusedBlockId: newFocusedId,
+        selectedBlockId: null, // Clear selection when deleting block
         isDirty: true,
       }
     }
@@ -190,6 +196,14 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
       return {
         ...state,
         focusedBlockId: action.blockId,
+        selectedBlockId: null, // Clear selection when focusing for editing
+      }
+
+    case 'SET_SELECTED_BLOCK':
+      return {
+        ...state,
+        selectedBlockId: action.blockId,
+        focusedBlockId: null, // Clear focus when selecting
       }
 
     case 'SET_SELECTION':

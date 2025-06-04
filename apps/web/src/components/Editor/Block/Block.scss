@@ -3,12 +3,34 @@
 .block {
   position: relative;
 
+  // Show drag handle on hover
+  &:hover .block-drag-handle {
+    opacity: 1;
+  }
+
+  // Selected state for blocks
+  &--selected {
+    .block__content {
+      background-color: color-mix(in srgb, var(--color-primary-500) 10%, transparent);
+      border-radius: var(--radius-4);
+    }
+
+    .block-drag-handle {
+      opacity: 1;
+
+      .icon {
+        color: var(--color-white);
+      }
+    }
+  }
+
   &__content {
     outline: none;
     cursor: text;
     min-height: 1.5em; // Prevent collapse when empty
     white-space: pre-wrap; // Preserve line breaks
     word-break: break-word; // Break long words
+    transition: var(--animate-colors);
 
     // Remove default contentEditable styling
     &:focus {

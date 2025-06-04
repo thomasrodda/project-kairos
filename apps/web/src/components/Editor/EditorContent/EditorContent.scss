@@ -5,6 +5,8 @@
   max-width: 750px; // Comfortable reading width
   margin: 0 auto;
   padding: var(--spacing-32) 0;
+  // Add left padding to accommodate drag handles
+  padding-left: 48px; // Space for drag handles that appear at -40px
 
   &__blocks {
     // Blocks container

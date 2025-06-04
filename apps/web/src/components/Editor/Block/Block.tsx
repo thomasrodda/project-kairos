@@ -2,11 +2,13 @@
 // Individual block component that renders editable content with contentEditable.
 // Handles text input, Enter key for new blocks, and displays placeholder text when empty.
 // Supports different block types (H1, H2, H3, paragraph, bullet) with appropriate styling.
+// Includes a drag handle that appears on hover for block reordering.
 
 import React, { useRef, useEffect, useState } from 'react'
-import { useEditorDispatch, BLOCK_PLACEHOLDERS } from '../../../contexts/EditorContext'
+import { useEditorDispatch, useEditorState, BLOCK_PLACEHOLDERS } from '../../../contexts/EditorContext'
 import type { EditorBlock } from '../../../contexts/EditorContext'
 import { generateId } from '@kairos/utils'
+import { BlockDragHandle } from './BlockDragHandle'
 import './Block.scss'
 
 interface BlockProps {
@@ -16,9 +18,13 @@ interface BlockProps {
 
 export function Block({ block, isFocused }: BlockProps) {
   const dispatch = useEditorDispatch()
+  const editorState = useEditorState()
   // Single RefObject that can point to a <p>, <h1>, <h2>, <h3> or <li>.
   const blockRef = useRef<HTMLHeadingElement | HTMLParagraphElement | HTMLLIElement>(null)
   const [isUpdating, setIsUpdating] = useState(false)
+
+  // Check if this block is selected from centralized state
+  const isSelected = editorState.selectedBlockId === block.id
 
   // Focus the block when isFocused changes to true
   useEffect(() => {
@@ -90,6 +96,17 @@ export function Block({ block, isFocused }: BlockProps) {
 
     selection.deleteFromDocument()
     selection.getRangeAt(0).insertNode(document.createTextNode(text))
+  }
+
+  // Handle drag handle selection
+  const handleBlockSelect = (blockId: string) => {
+    dispatch({ type: 'SET_SELECTED_BLOCK', blockId })
+  }
+
+  // Handle drag start (future drag & drop implementation)
+  const handleDragStart = (blockId: string) => {
+    console.log('Drag started for block:', blockId)
+    // Future: Implement drag & drop logic
   }
 
   // Determine which HTML tag to use
@@ -167,5 +184,13 @@ export function Block({ block, isFocused }: BlockProps) {
     }
   }
 
-  return <div className={`block block--${block.type}`}>{renderBlockContent()}</div>
+  return (
+    <div className={`block block--${block.type} ${isSelected ? 'block--selected' : ''}`}>
+      {/* Drag handle - shows on hover */}
+      <BlockDragHandle blockId={block.id} onDragStart={handleDragStart} onSelect={handleBlockSelect} />
+
+      {/* Block content */}
+      {renderBlockContent()}
+    </div>
+  )
 }
