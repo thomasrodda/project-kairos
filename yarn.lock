@@ -2067,6 +2067,7 @@ __metadata:
     ts-jest: "npm:^29.2.5"
     ts-node: "npm:^10.9.2"
     tsx: "npm:^4.19.4"
+    typescript: "npm:^5.8.3"
     vercel: "npm:^42.1.1"
   languageName: unknown
   linkType: soft
@@ -2145,6 +2146,7 @@ __metadata:
     "@types/react": "npm:^18.3.12"
     "@types/react-dom": "npm:^18.3.1"
     "@vitejs/plugin-react": "npm:^4.5.0"
+    cypress: "npm:^14.4.0"
     firebase: "npm:^10.14.1"
     identity-obj-proxy: "npm:^3.0.0"
     jest: "npm:^29.7.0"
@@ -2156,6 +2158,7 @@ __metadata:
     sass: "npm:^1.81.0"
     ts-jest: "npm:^29.2.5"
     ts-node: "npm:^10.9.2"
+    typescript: "npm:^5.8.3"
     vite: "npm:^6.3.5"
   languageName: unknown
   linkType: soft
@@ -10807,6 +10810,7 @@ __metadata:
     husky: "npm:^9.1.7"
     jest: "npm:^29.7.0"
     lint-staged: "npm:^15.2.10"
+    postcss: "npm:^8.5.3"
     prettier: "npm:^3.3.3"
     typescript: "npm:^5.8.3"
   languageName: unknown
