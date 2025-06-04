@@ -31,6 +31,7 @@ export interface EditorState {
   blocks: EditorBlock[] // All blocks in the page
   focusedBlockId: string | null // Currently focused block
   selectedBlockId: string | null // Currently selected block (via drag handle)
+  isDragging: boolean // Whether we're currently dragging a block
   selectedRange?: {
     // Text selection across blocks
     startBlockId: string
@@ -53,9 +54,10 @@ export type EditorAction =
   | { type: 'UPDATE_BLOCK'; blockId: string; content: string }
   | { type: 'DELETE_BLOCK'; blockId: string }
   | { type: 'CHANGE_BLOCK_TYPE'; blockId: string; blockType: BlockType }
-  | { type: 'REORDER_BLOCKS'; blockIds: string[] }
+  | { type: 'REORDER_BLOCKS'; blocks: EditorBlock[] }
   | { type: 'SET_FOCUSED_BLOCK'; blockId: string | null }
   | { type: 'SET_SELECTED_BLOCK'; blockId: string | null }
+  | { type: 'SET_DRAGGING'; isDragging: boolean }
   | { type: 'SET_SELECTION'; selection: EditorState['selectedRange'] }
   | { type: 'MARK_SAVED' }
   | { type: 'RESET_EDITOR' }
@@ -79,6 +81,7 @@ const initialState: EditorState = {
   blocks: [createInitialBlock()],
   focusedBlockId: null,
   selectedBlockId: null,
+  isDragging: false,
   selectedRange: undefined,
   isDirty: false,
   lastSaved: null,
@@ -181,13 +184,9 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
     }
 
     case 'REORDER_BLOCKS': {
-      // Reorder blocks based on the new order of IDs
-      const blockMap = new Map(state.blocks.map((b) => [b.id, b]))
-      const newBlocks = action.blockIds.map((id) => blockMap.get(id)).filter((block): block is EditorBlock => block !== undefined)
-
       return {
         ...state,
-        blocks: newBlocks,
+        blocks: action.blocks,
         isDirty: true,
       }
     }
@@ -204,6 +203,12 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         selectedBlockId: action.blockId,
         focusedBlockId: null, // Clear focus when selecting
+      }
+
+    case 'SET_DRAGGING':
+      return {
+        ...state,
+        isDragging: action.isDragging,
       }
 
     case 'SET_SELECTION':

@@ -1,0 +1,53 @@
+// apps/web/src/components/Editor/Block/DraggableBlock.scss
+
+.draggable-block {
+  position: relative;
+
+  // Smooth transitions when not actively dragging
+  &:not(.draggable-block--dragging) {
+    transition: transform 200ms ease;
+  }
+
+  // Style when being dragged
+  &--dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+
+    // Add shadow to dragged item
+    .block {
+      box-shadow: var(--shadow-heavy);
+      border-radius: var(--radius-8);
+      background: var(--color-surface);
+    }
+  }
+
+  // Drop indicator line that appears between blocks
+  &__drop-indicator {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-primary-500);
+    border-radius: 2px;
+    opacity: 0;
+    transform: scaleX(0);
+    transition: all 200ms ease;
+    pointer-events: none;
+    z-index: 100;
+  }
+}
+
+// Show drop indicators during sorting
+.editor-content--sorting {
+  .draggable-block__drop-indicator {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+// Cursor changes during drag
+body.is-dragging {
+  cursor: grabbing !important;
+  user-select: none;
+}

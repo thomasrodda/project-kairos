@@ -14,9 +14,10 @@ import './Block.scss'
 interface BlockProps {
   block: EditorBlock
   isFocused: boolean
+  dragHandleProps?: any // Listeners from @dnd-kit
 }
 
-export function Block({ block, isFocused }: BlockProps) {
+export function Block({ block, isFocused, dragHandleProps }: BlockProps) {
   const dispatch = useEditorDispatch()
   const editorState = useEditorState()
   // Single RefObject that can point to a <p>, <h1>, <h2>, <h3> or <li>.
@@ -101,12 +102,6 @@ export function Block({ block, isFocused }: BlockProps) {
   // Handle drag handle selection
   const handleBlockSelect = (blockId: string) => {
     dispatch({ type: 'SET_SELECTED_BLOCK', blockId })
-  }
-
-  // Handle drag start (future drag & drop implementation)
-  const handleDragStart = (blockId: string) => {
-    console.log('Drag started for block:', blockId)
-    // Future: Implement drag & drop logic
   }
 
   // Determine the appropriate placeholder text
@@ -196,7 +191,7 @@ export function Block({ block, isFocused }: BlockProps) {
   return (
     <div className={`block block--${block.type} ${isSelected ? 'block--selected' : ''}`} data-block-id={block.id}>
       {/* Drag handle - shows on hover */}
-      <BlockDragHandle blockId={block.id} onDragStart={handleDragStart} onSelect={handleBlockSelect} />
+      <BlockDragHandle blockId={block.id} onSelect={handleBlockSelect} dragHandleProps={dragHandleProps} />
 
       {/* Block content */}
       {renderBlockContent()}

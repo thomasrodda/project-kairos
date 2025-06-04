@@ -115,6 +115,8 @@ apps
 │   │   │   │   ├── Block.tsx
 │   │   │   │   ├── BlockDragHandle.scss
 │   │   │   │   ├── BlockDragHandle.tsx
+│   │   │   │   ├── DraggableBlock.scss
+│   │   │   │   ├── DraggableBlock.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── EditorContent
 │   │   │   │   ├── EditorContent.scss
