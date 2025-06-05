@@ -6,7 +6,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Project Kairos is a creative writing and worldbuilding web application designed for novelists, writers, and D&D campaign planners. It combines block-based editing with AI-driven tools for consistency checking and writing assistance.
 
-**Current Status**: Development phase - block-based editor with drag-and-drop functionality implemented, working on cross-block text selection and preparing for Firebase integration.
+**Current Status**: Development phase - block-based editor with drag-and-drop functionality implemented, cross-block text selection working, comprehensive testing underway.
+
+## Quick Navigation
+
+- **File Structure**: See `FILE_TREE.md` for complete project file organization
+- **Development Guides**: `AI System Prompt Files/` directory contains all architectural and development guides
+- **Testing Progress**: `AI System Prompt Files/Testing Plan.md` tracks test implementation status
+
+## Key File Locations
+
+### Core Application (`apps/web/`)
+- **Components**: `src/components/` - All React components organized by feature
+  - `Editor/` - Block editor components (Block, PageTitle, EditorContent, ContentEditableContainer)
+  - `Sidebar/` - Navigation sidebar
+  - `Workspace/` - Main layout wrapper
+- **State Management**: `src/contexts/EditorContext.tsx` - Central editor state
+- **Hooks**: `src/hooks/` - Custom React hooks (useCrossBlockSelection, useDismiss)
+- **Tests**: Component tests are colocated with components (e.g., `PageTitle.test.tsx`)
+- **Styles**: `src/styles/` - Global styles and reset
+
+### Packages (`packages/`)
+- **@kairos/ui**: Shared React components and icons
+- **@kairos/utils**: Utilities (ID generation, validation with Zod)
+- **@kairos/types**: TypeScript type definitions
+- **@kairos/design-tokens**: SCSS variables and design system
+- **@kairos/database**: Prisma database layer (planned)
+
+### Documentation (`AI System Prompt Files/`)
+- **Core Docs**: Vision & Scope, User Stories, MVP, Architecture
+- **Implementation Guides**: Component Structure, SCSS Structure, Testing Guide
+- **Feature Guides**: Analytics, Security, Performance Optimization
+- **Testing Plan**: Comprehensive test coverage tracking
 
 ## Technology Stack
 
@@ -69,13 +100,11 @@ yarn test --testNamePattern="renders without crashing"
 The editor uses a unified contentEditable approach with sophisticated state management:
 
 1. **EditorContext** (`src/contexts/EditorContext.tsx`):
-
    - Central state management using useReducer
    - Manages blocks, selection, focus, and cross-block text selection
    - Actions: ADD_BLOCK, UPDATE_BLOCK, DELETE_BLOCK, MOVE_BLOCK, etc.
 
 2. **Component Hierarchy**:
-
    ```
    Editor
    ├── PageTitle
@@ -92,17 +121,7 @@ The editor uses a unified contentEditable approach with sophisticated state mana
    - Multi-block selection (Shift+click, Ctrl/Cmd+click)
    - Cross-block text selection (custom implementation)
    - Placeholder hints for slash commands and AI features
-
-### Monorepo Package Structure
-
-```
-packages/
-├── @kairos/ui         # Shared React components and icons
-├── @kairos/utils      # Utilities (ID generation, validation with Zod)
-├── @kairos/types      # TypeScript type definitions
-├── @kairos/design-tokens # SCSS variables and design system
-└── @kairos/database   # Prisma database layer (planned)
-```
+   - Copy/paste with custom Kairos format support
 
 ### Testing Architecture
 
@@ -110,25 +129,61 @@ packages/
 - **Integration Tests**: API endpoint testing with Supertest
 - **E2E Tests**: User flow testing with Cypress
 - **Mocking**: CSS modules, SVG imports, and @kairos/ui icons
+- **Test Utils**: `apps/web/src/test/utils.tsx` - Helper functions for testing with contexts
 
-## AI System Prompts
+### Recent Development Progress
 
-The `AI System Prompt Files/` directory contains comprehensive development guidance. Key files:
+1. **Completed Features**:
+   - ✅ Block-based editor with contentEditable
+   - ✅ Drag and drop reordering
+   - ✅ Multi-block selection
+   - ✅ Cross-block text selection
+   - ✅ Copy/paste with custom format
+   - ✅ PageTitle component tests (17 tests)
+   - ✅ Block component tests (25 tests)
 
-- `# 1. Vision & Scope.md` - Project goals and target users
-- `# 2. User Stories.md` - Feature requirements from user perspective
-- `# 3. MVP.md` - Core features for initial release
-- `# 5. Architecture.md` - Technical architecture decisions
-- `Component Structure Guide.md` - React component patterns
-- `Scss Structure Guide.md` - SCSS organization and BEM methodology
+2. **In Progress**:
+   - 🔄 Comprehensive test coverage for all components
+   - 🔄 Bug fixes for edge cases
+
+3. **Upcoming**:
+   - 📋 BlockDragHandle component tests
+   - 📋 ContentEditableContainer tests
+   - 📋 EditorContent tests
+   - 📋 Slash command implementation
+   - 📋 Firebase integration
 
 ## Current Development Focus
 
-1. **Bug Fixes**: Resolve cross-block text selection issues
-2. **Slash Commands**: Implement "/" command menu for block types
-3. **Firebase Integration**: Set up authentication and cloud sync
-4. **Database**: Configure PostgreSQL with Prisma
-5. **AI Features**: Integrate writing assistant and consistency checking
+1. **Testing**: Implementing comprehensive tests following Testing Plan
+2. **Bug Fixes**: Resolve any remaining cross-block selection issues
+3. **Slash Commands**: Implement "/" command menu for block types
+4. **Firebase Integration**: Set up authentication and cloud sync
+5. **Database**: Configure PostgreSQL with Prisma
+6. **AI Features**: Integrate writing assistant and consistency checking
+
+## Development Best Practices
+
+### When Making Changes
+1. **Check FILE_TREE.md** to understand file locations
+2. **Read relevant guides** in `AI System Prompt Files/`
+3. **Follow existing patterns** - check similar components/files
+4. **Write tests** - colocate with components, use Testing Guide format
+5. **Update documentation** - keep CLAUDE.md and Testing Plan current
+
+### Testing Guidelines
+- Use checkmark headings format (✅ Core Functionality)
+- Test user behavior, not implementation details
+- Include edge cases and error scenarios
+- Mock external dependencies appropriately
+- Run `yarn test` before committing
+
+### Code Style
+- TypeScript strict mode enforced
+- SCSS with BEM methodology
+- Design tokens for consistency
+- No inline styles unless dynamic
+- Meaningful component and variable names
 
 ## Development Notes
 
@@ -137,3 +192,23 @@ The `AI System Prompt Files/` directory contains comprehensive development guida
 - **SCSS Imports**: Design tokens are auto-imported globally
 - **Type Safety**: Strict TypeScript mode is enabled
 - **Pre-commit**: Husky runs linting and formatting on staged files
+- **Git Workflow**: Work on feature branches, create PRs to main
+
+## Important Commands to Remember
+
+```bash
+# When you need to find files
+cat FILE_TREE.md
+
+# When tests fail due to formatting
+yarn format
+
+# When TypeScript errors occur
+yarn typecheck
+
+# To see what's been done
+cat "AI System Prompt Files/Testing Plan.md"
+
+# To understand a feature
+ls "AI System Prompt Files/"
+```
