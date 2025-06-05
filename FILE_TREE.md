@@ -109,6 +109,7 @@ apps
 │   │   ├── Editor
 │   │   │   ├── Block
 │   │   │   │   ├── Block.scss
+│   │   │   │   ├── Block.test.tsx
 │   │   │   │   ├── Block.tsx
 │   │   │   │   ├── BlockDragHandle.scss
 │   │   │   │   ├── BlockDragHandle.tsx
@@ -117,6 +118,8 @@ apps
 │   │   │   │   └── index.ts
 │   │   │   ├── ContentEditableContainer
 │   │   │   │   ├── ContentEditableContainer.scss
+│   │   │   │   ├── ContentEditableContainer.simple.test.tsx
+│   │   │   │   ├── ContentEditableContainer.test.tsx
 │   │   │   │   ├── ContentEditableContainer.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── EditorContent

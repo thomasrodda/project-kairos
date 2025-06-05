@@ -35,6 +35,45 @@ global.DOMParser = class DOMParser {
   }
 }
 
+// Add ClipboardEvent polyfill for jest-dom
+if (typeof ClipboardEvent === 'undefined') {
+  global.ClipboardEvent = class ClipboardEvent extends Event {
+    clipboardData: DataTransfer
+    constructor(type: string, eventInitDict?: ClipboardEventInit) {
+      super(type, eventInitDict)
+      this.clipboardData = eventInitDict?.clipboardData || new DataTransfer()
+    }
+  } as any
+}
+
+// Add DataTransfer polyfill if needed
+if (typeof DataTransfer === 'undefined') {
+  global.DataTransfer = class DataTransfer {
+    items: any[] = []
+    types: string[] = []
+    files: FileList = [] as any
+
+    getData(format: string): string {
+      return ''
+    }
+
+    setData(format: string, data: string): void {
+      this.types.push(format)
+    }
+
+    clearData(format?: string): void {
+      if (format) {
+        const index = this.types.indexOf(format)
+        if (index > -1) {
+          this.types.splice(index, 1)
+        }
+      } else {
+        this.types = []
+      }
+    }
+  } as any
+}
+
 // Suppress console errors during tests unless explicitly testing error handling
 const originalError = console.error
 const originalWarn = console.warn
@@ -46,6 +85,10 @@ beforeAll(() => {
     }
     // Also suppress SVG-related errors during testing
     if (typeof args[0] === 'string' && args[0].includes('SVG')) {
+      return
+    }
+    // Suppress act() warnings in tests as they can cause flakiness
+    if (typeof args[0] === 'string' && args[0].includes('not wrapped in act')) {
       return
     }
     originalError.call(console, ...args)
@@ -63,3 +106,16 @@ afterAll(() => {
   console.error = originalError
   console.warn = originalWarn
 })
+
+// Add support for InputEvent if not available
+if (typeof InputEvent === 'undefined') {
+  global.InputEvent = class InputEvent extends Event {
+    data: string | null
+    inputType: string
+    constructor(type: string, eventInitDict?: InputEventInit) {
+      super(type, eventInitDict)
+      this.data = eventInitDict?.data || null
+      this.inputType = eventInitDict?.inputType || ''
+    }
+  } as any
+}

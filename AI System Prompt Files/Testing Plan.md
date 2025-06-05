@@ -119,35 +119,35 @@ The editor currently supports:
 
 - **Basic Editing**
 
-  - [ ] Prevents default contentEditable behavior
-  - [ ] Handles character input at correct position
-  - [ ] Maintains cursor position after state updates
-  - [ ] Works with different input methods (IME)
+  - [x] Prevents default contentEditable behavior
+  - [x] Handles character input at correct position
+  - [x] Maintains cursor position after state updates
+  - [x] Works with different input methods (IME)
 
 - **Block Operations**
 
-  - [ ] Creates new block on Enter key
-  - [ ] Splits block content at cursor position
-  - [ ] Merges blocks on Backspace at start
-  - [ ] Deletes forward on Delete key
-  - [ ] Handles selection deletion (single block)
-  - [ ] Handles selection deletion (multi-block)
+  - [x] Creates new block on Enter key
+  - [x] Splits block content at cursor position
+  - [x] Merges blocks on Backspace at start
+  - [x] Deletes forward on Delete key
+  - [x] Handles selection deletion (single block)
+  - [x] Handles selection deletion (multi-block)
 
 - **Paste Handling**
 
-  - [ ] Pastes plain text at cursor
-  - [ ] Creates multiple blocks from multi-line paste
-  - [ ] Preserves empty lines in custom format
-  - [ ] Handles paste with selection (replaces)
-  - [ ] Maintains block types from custom format
-  - [ ] Prevents dangerous HTML injection
+  - [x] Pastes plain text at cursor
+  - [x] Creates multiple blocks from multi-line paste
+  - [x] Preserves empty lines in custom format
+  - [x] Handles paste with selection (replaces)
+  - [x] Maintains block types from custom format
+  - [x] Prevents dangerous HTML injection
 
 - **Edge Cases**
-  - [ ] Handles rapid typing without losing characters
-  - [ ] Works at block boundaries
-  - [ ] Handles emoji and special characters
-  - [ ] Recovers from malformed paste data
-  - [ ] Works with browser autofill
+  - [x] Handles rapid typing without losing characters
+  - [x] Works at block boundaries
+  - [x] Handles emoji and special characters
+  - [x] Recovers from malformed paste data
+  - [x] Works with browser autofill
 
 ### 1.5 EditorContent Component Tests (`EditorContent.test.tsx`)
 

@@ -1,7 +1,7 @@
 // Test utilities for rendering components with required contexts
 import { render, RenderOptions } from '@testing-library/react'
-import { ReactElement, ReactNode } from 'react'
-import { EditorProvider, EditorState } from '../contexts/EditorContext'
+import React, { ReactElement, ReactNode } from 'react'
+import { EditorProvider, EditorState, useEditorState, useEditorDispatch, EditorAction } from '../contexts/EditorContext'
 import { generateId } from '@kairos/utils'
 
 // Default editor state for testing
@@ -29,15 +29,60 @@ interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
   initialState?: EditorState
 }
 
-// Custom render function that includes EditorProvider
-export function renderWithEditor(ui: ReactElement, options?: CustomRenderOptions) {
-  const { initialState, ...renderOptions } = options || {}
+// Extended options for rendering with editor
+interface ExtendedRenderOptions extends CustomRenderOptions {
+  initialBlocks?: EditorState['blocks']
+}
 
-  function Wrapper({ children }: { children: ReactNode }) {
-    // Note: EditorProvider currently doesn't support custom initial state
-    // This is here for future compatibility
-    return <EditorProvider>{children}</EditorProvider>
+// Custom render function that includes EditorProvider
+export function renderWithEditor(ui: ReactElement, options?: ExtendedRenderOptions) {
+  const { initialState, initialBlocks, ...renderOptions } = options || {}
+
+  // Store reference to access state in tests
+  let editorState: EditorState | null = null
+  let editorDispatch: React.Dispatch<EditorAction> | null = null
+
+  function TestWrapper({ children }: { children: ReactNode }) {
+    const state = useEditorState()
+    const dispatch = useEditorDispatch()
+
+    // Store references for test access
+    React.useEffect(() => {
+      editorState = state
+      editorDispatch = dispatch
+    })
+
+    // Set up initial blocks if provided
+    React.useEffect(() => {
+      if (initialBlocks && initialBlocks.length > 0) {
+        dispatch({
+          type: 'SET_PAGE',
+          pageId: 'test-page',
+          title: 'Test Page',
+          blocks: initialBlocks,
+        })
+      }
+    }, []) // Run only once on mount
+
+    return <>{children}</>
   }
 
-  return render(ui, { wrapper: Wrapper, ...renderOptions })
+  function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <EditorProvider>
+        <TestWrapper>{children}</TestWrapper>
+      </EditorProvider>
+    )
+  }
+
+  const renderResult = render(ui, { wrapper: Wrapper, ...renderOptions })
+
+  // Return render result with store accessor
+  return {
+    ...renderResult,
+    store: {
+      getState: () => editorState!,
+      dispatch: (action: EditorAction) => editorDispatch!(action),
+    },
+  }
 }

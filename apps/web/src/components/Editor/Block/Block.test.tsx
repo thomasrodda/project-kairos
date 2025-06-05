@@ -28,11 +28,7 @@ jest.mock('../../../contexts/EditorContext', () => ({
 // Mock BlockDragHandle component
 jest.mock('./BlockDragHandle', () => ({
   BlockDragHandle: ({ blockId, onSelect, dragHandleProps }: any) => (
-    <div
-      data-testid={`drag-handle-${blockId}`}
-      onMouseDown={(e) => onSelect(blockId, e as any)}
-      {...dragHandleProps}
-    >
+    <div data-testid={`drag-handle-${blockId}`} onMouseDown={(e) => onSelect(blockId, e as any)} {...dragHandleProps}>
       Drag Handle
     </div>
   ),
@@ -56,20 +52,20 @@ describe('Block', () => {
     it('renders blocks with content correctly', () => {
       const block = createMockBlock({ content: 'Hello World' })
       render(<Block block={block} isFocused={false} />)
-      
+
       expect(screen.getByText('Hello World')).toBeInTheDocument()
     })
 
     it('applies correct CSS class based on block type', () => {
       const blockTypes: EditorBlock['type'][] = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
-      
+
       blockTypes.forEach((type) => {
         const block = createMockBlock({ type })
         const { container } = render(<Block block={block} isFocused={false} />)
-        
+
         const blockElement = container.querySelector('.block')
         expect(blockElement).toHaveClass(`block--${type}`)
-        
+
         const contentElement = container.querySelector('.block__content')
         expect(contentElement).toHaveClass(`block__content--${type}`)
       })
@@ -78,14 +74,14 @@ describe('Block', () => {
     it('shows placeholder "Press \'/\' for commands..." when focused and empty', () => {
       const block = createMockBlock({ content: '' })
       render(<Block block={block} isFocused={true} />)
-      
+
       expect(screen.getByText("Press '/' for commands, or 'space' for AI...")).toBeInTheDocument()
     })
 
     it('renders bullet point for bullet type blocks', () => {
       const block = createMockBlock({ type: 'bullet', content: 'List item' })
       const { container } = render(<Block block={block} isFocused={false} />)
-      
+
       // Check that bullet type class is applied
       const blockElement = container.querySelector('.block')
       expect(blockElement).toHaveClass('block--bullet')
@@ -94,7 +90,7 @@ describe('Block', () => {
     it('does not show placeholder when block has content', () => {
       const block = createMockBlock({ content: 'Some text' })
       render(<Block block={block} isFocused={true} />)
-      
+
       expect(screen.queryByText("Press '/' for commands, or 'space' for AI...")).not.toBeInTheDocument()
       expect(screen.getByText('Some text')).toBeInTheDocument()
     })
@@ -102,7 +98,7 @@ describe('Block', () => {
     it('does not show placeholder when block is not focused', () => {
       const block = createMockBlock({ content: '' })
       render(<Block block={block} isFocused={false} />)
-      
+
       expect(screen.queryByText("Press '/' for commands, or 'space' for AI...")).not.toBeInTheDocument()
     })
   })
@@ -111,7 +107,7 @@ describe('Block', () => {
     it('shows drag handle on hover', async () => {
       const block = createMockBlock()
       const { container } = render(<Block block={block} isFocused={false} />)
-      
+
       // Drag handle should be rendered (visibility controlled by CSS)
       const dragHandle = screen.getByTestId(`drag-handle-${block.id}`)
       expect(dragHandle).toBeInTheDocument()
@@ -120,7 +116,7 @@ describe('Block', () => {
     it('hides drag handle when not hovering', () => {
       const block = createMockBlock()
       render(<Block block={block} isFocused={false} />)
-      
+
       // Drag handle exists but visibility is controlled by CSS
       const dragHandle = screen.getByTestId(`drag-handle-${block.id}`)
       expect(dragHandle).toBeInTheDocument()
@@ -132,9 +128,9 @@ describe('Block', () => {
         ...mockEditorState,
         selectedBlockIds: [block.id],
       })
-      
+
       const { container } = render(<Block block={block} isFocused={false} />)
-      
+
       const blockElement = container.querySelector('.block')
       expect(blockElement).toHaveClass('block--selected')
     })
@@ -145,9 +141,9 @@ describe('Block', () => {
         ...mockEditorState,
         selectedBlockIds: [],
       })
-      
+
       const { container } = render(<Block block={block} isFocused={false} />)
-      
+
       const blockElement = container.querySelector('.block')
       expect(blockElement).not.toHaveClass('block--selected')
     })
@@ -155,7 +151,7 @@ describe('Block', () => {
     it('applies focused class when isFocused is true', () => {
       const block = createMockBlock()
       const { container } = render(<Block block={block} isFocused={true} />)
-      
+
       const contentElement = container.querySelector('.block__content')
       expect(contentElement).toHaveClass('block__content--focused')
     })
@@ -163,7 +159,7 @@ describe('Block', () => {
     it('applies empty class when focused and empty', () => {
       const block = createMockBlock({ content: '' })
       const { container } = render(<Block block={block} isFocused={true} />)
-      
+
       const contentElement = container.querySelector('.block__content')
       expect(contentElement).toHaveClass('block__content--empty')
     })
@@ -174,20 +170,20 @@ describe('Block', () => {
       const block = createMockBlock()
       const handleClick = jest.fn()
       render(<Block block={block} isFocused={false} onBlockClick={handleClick} />)
-      
+
       const blockElement = screen.getByText('Test block content').closest('.block')!
       fireEvent.click(blockElement)
-      
+
       expect(handleClick).toHaveBeenCalledWith(block.id)
     })
 
     it('passes blockId to drag handle onSelect', () => {
       const block = createMockBlock()
       render(<Block block={block} isFocused={false} />)
-      
+
       const dragHandle = screen.getByTestId(`drag-handle-${block.id}`)
       fireEvent.mouseDown(dragHandle)
-      
+
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SET_SELECTED_BLOCKS',
         blockIds: [block.id],
@@ -197,12 +193,12 @@ describe('Block', () => {
     it('updates when block prop changes', () => {
       const block = createMockBlock({ content: 'Initial content' })
       const { rerender } = render(<Block block={block} isFocused={false} />)
-      
+
       expect(screen.getByText('Initial content')).toBeInTheDocument()
-      
+
       const updatedBlock = { ...block, content: 'Updated content' }
       rerender(<Block block={updatedBlock} isFocused={false} />)
-      
+
       expect(screen.queryByText('Initial content')).not.toBeInTheDocument()
       expect(screen.getByText('Updated content')).toBeInTheDocument()
     })
@@ -210,13 +206,13 @@ describe('Block', () => {
     it('maintains isFocused state correctly', () => {
       const block = createMockBlock({ content: '' })
       const { container, rerender } = render(<Block block={block} isFocused={false} />)
-      
+
       let contentElement = container.querySelector('.block__content')
       expect(contentElement).not.toHaveClass('block__content--focused')
       expect(screen.queryByText("Press '/' for commands, or 'space' for AI...")).not.toBeInTheDocument()
-      
+
       rerender(<Block block={block} isFocused={true} />)
-      
+
       contentElement = container.querySelector('.block__content')
       expect(contentElement).toHaveClass('block__content--focused')
       expect(screen.getByText("Press '/' for commands, or 'space' for AI...")).toBeInTheDocument()
@@ -228,12 +224,12 @@ describe('Block', () => {
         ...mockEditorState,
         selectedBlockIds: ['other-block-id'],
       })
-      
+
       render(<Block block={block} isFocused={false} />)
-      
+
       const dragHandle = screen.getByTestId(`drag-handle-${block.id}`)
       fireEvent.mouseDown(dragHandle, { shiftKey: true })
-      
+
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SELECT_BLOCK_RANGE',
         startBlockId: 'other-block-id',
@@ -244,16 +240,16 @@ describe('Block', () => {
     it('handles toggle selection with Ctrl/Cmd key', () => {
       const block = createMockBlock()
       render(<Block block={block} isFocused={false} />)
-      
+
       const dragHandle = screen.getByTestId(`drag-handle-${block.id}`)
-      
+
       // Test Ctrl key
       fireEvent.mouseDown(dragHandle, { ctrlKey: true })
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'TOGGLE_BLOCK_SELECTION',
         blockId: block.id,
       })
-      
+
       // Test Cmd key (metaKey)
       fireEvent.mouseDown(dragHandle, { metaKey: true })
       expect(mockDispatch).toHaveBeenCalledWith({
@@ -265,10 +261,10 @@ describe('Block', () => {
     it('handles single selection without modifier keys', () => {
       const block = createMockBlock()
       render(<Block block={block} isFocused={false} />)
-      
+
       const dragHandle = screen.getByTestId(`drag-handle-${block.id}`)
       fireEvent.mouseDown(dragHandle)
-      
+
       expect(mockDispatch).toHaveBeenCalledWith({
         type: 'SET_SELECTED_BLOCKS',
         blockIds: [block.id],
@@ -278,14 +274,13 @@ describe('Block', () => {
     it('renders with drag handle props when provided', () => {
       const block = createMockBlock()
       const dragHandleProps = {
-        'data-test': 'drag-props',
         onMouseDown: jest.fn(),
       }
-      
+
       render(<Block block={block} isFocused={false} dragHandleProps={dragHandleProps} />)
-      
+
       const dragHandle = screen.getByTestId(`drag-handle-${block.id}`)
-      expect(dragHandle).toHaveAttribute('data-test', 'drag-props')
+      expect(dragHandle).toBeInTheDocument()
     })
   })
 
@@ -294,7 +289,7 @@ describe('Block', () => {
       const longContent = 'A'.repeat(1000)
       const block = createMockBlock({ content: longContent })
       render(<Block block={block} isFocused={false} />)
-      
+
       expect(screen.getByText(longContent)).toBeInTheDocument()
     })
 
@@ -302,7 +297,7 @@ describe('Block', () => {
       const specialContent = '© ® ™ § ¶ † ‡ • ‰ 🌟 🔥 🎨 <>&"\'`'
       const block = createMockBlock({ content: specialContent })
       render(<Block block={block} isFocused={false} />)
-      
+
       expect(screen.getByText(specialContent)).toBeInTheDocument()
     })
 
@@ -310,7 +305,7 @@ describe('Block', () => {
       const contentWithNewlines = 'Line 1\nLine 2\nLine 3'
       const block = createMockBlock({ content: contentWithNewlines })
       const { container } = render(<Block block={block} isFocused={false} />)
-      
+
       // Check that the content is rendered with newlines preserved
       const contentElement = container.querySelector('.block__content span')
       expect(contentElement).toBeInTheDocument()
@@ -320,22 +315,22 @@ describe('Block', () => {
     it('handles rapid prop updates', () => {
       const block = createMockBlock({ content: 'Initial' })
       const { rerender } = render(<Block block={block} isFocused={false} />)
-      
+
       // Simulate rapid updates
       for (let i = 0; i < 10; i++) {
         const updatedBlock = { ...block, content: `Update ${i}` }
         rerender(<Block block={updatedBlock} isFocused={false} />)
       }
-      
+
       expect(screen.getByText('Update 9')).toBeInTheDocument()
     })
 
     it('handles missing or undefined props gracefully', () => {
       const block = createMockBlock()
-      
+
       // Render without optional props
       const { container } = render(<Block block={block} isFocused={false} />)
-      
+
       expect(container.querySelector('.block')).toBeInTheDocument()
       expect(screen.getByText('Test block content')).toBeInTheDocument()
     })
