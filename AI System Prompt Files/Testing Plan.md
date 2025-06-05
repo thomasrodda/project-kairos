@@ -66,23 +66,23 @@ The editor currently supports:
 
 - **Rendering (Static Types Only)**
 
-  - [ ] Renders blocks with content correctly
-  - [ ] Applies correct CSS class based on block type
-  - [ ] Shows placeholder "Press '/' for commands..." when focused and empty
-  - [ ] Renders bullet point for bullet type blocks
+  - [x] Renders blocks with content correctly
+  - [x] Applies correct CSS class based on block type
+  - [x] Shows placeholder "Press '/' for commands..." when focused and empty
+  - [x] Renders bullet point for bullet type blocks
 
 - **Visual States**
 
-  - [ ] Shows drag handle on hover
-  - [ ] Hides drag handle when not hovering
-  - [ ] Applies selected state styling (blue highlight)
-  - [ ] Shows hover effect on non-selected blocks
+  - [x] Shows drag handle on hover
+  - [x] Hides drag handle when not hovering
+  - [x] Applies selected state styling (blue highlight)
+  - [x] Shows hover effect on non-selected blocks
 
 - **Interactions**
-  - [ ] Calls onBlockClick when clicked
-  - [ ] Passes blockId to drag handle onSelect
-  - [ ] Updates when block prop changes
-  - [ ] Maintains isFocused state correctly
+  - [x] Calls onBlockClick when clicked
+  - [x] Passes blockId to drag handle onSelect
+  - [x] Updates when block prop changes
+  - [x] Maintains isFocused state correctly
 
 ### 1.3 BlockDragHandle Component Tests (`BlockDragHandle.test.tsx`)
 
