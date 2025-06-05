@@ -115,11 +115,42 @@ export function EditorContent() {
       const plainText = getSelectedText()
       const markdown = getSelectedMarkdown()
 
-      // Set both plain text and markdown formats
+      // Create a custom format that preserves block structure
+      const selectedBlockData = (() => {
+        const { startBlockId, endBlockId, startOffset, endOffset } = crossBlockSelection
+        const startIndex = blocks.findIndex((b) => b.id === startBlockId)
+        const endIndex = blocks.findIndex((b) => b.id === endBlockId)
+
+        if (startIndex === -1 || endIndex === -1) return []
+
+        return blocks.slice(startIndex, endIndex + 1).map((block, index) => {
+          let content = block.content
+
+          // Trim content based on selection for first and last blocks
+          if (index === 0 && startIndex === endIndex) {
+            // Single block selection
+            content = block.content.substring(startOffset, endOffset)
+          } else if (index === 0) {
+            // First block of multi-block selection
+            content = block.content.substring(startOffset)
+          } else if (index === endIndex - startIndex) {
+            // Last block of multi-block selection
+            content = block.content.substring(0, endOffset)
+          }
+
+          return {
+            type: block.type,
+            content: content,
+            isEmpty: content === '',
+          }
+        })
+      })()
+
+      // Set both plain text and custom format
       if (e.clipboardData) {
         e.clipboardData.setData('text/plain', plainText)
         e.clipboardData.setData('text/markdown', markdown)
-        e.clipboardData.setData('text/html', markdown) // Some apps prefer HTML
+        e.clipboardData.setData('application/x-kairos-blocks', JSON.stringify(selectedBlockData))
       }
 
       // Prevent default to avoid double copying
@@ -132,7 +163,7 @@ export function EditorContent() {
 
     document.addEventListener('copy', handleCopy)
     return () => document.removeEventListener('copy', handleCopy)
-  }, [crossBlockSelection, getSelectedText, getSelectedMarkdown])
+  }, [crossBlockSelection, getSelectedText, getSelectedMarkdown, blocks])
 
   // Handle clicks in empty space
   const handleEmptySpaceClick = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -346,8 +346,45 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       e.preventDefault()
 
-      const text = e.clipboardData.getData('text/plain')
-      const lines = text.split('\n')
+      // Check for custom Kairos block format first
+      const kairosBlocksData = e.clipboardData.getData('application/x-kairos-blocks')
+      let blocksToInsert: { type: string; content: string }[] = []
+
+      if (kairosBlocksData) {
+        // Use custom format that preserves empty blocks
+        try {
+          blocksToInsert = JSON.parse(kairosBlocksData)
+        } catch (err) {
+          console.error('Failed to parse Kairos blocks data:', err)
+        }
+      }
+
+      // Fall back to plain text if no custom format
+      if (blocksToInsert.length === 0) {
+        const text = e.clipboardData.getData('text/plain')
+        // Split by newlines but filter out empty lines to prevent empty blocks
+        const allLines = text.split('\n')
+        // Keep empty lines only if they're between non-empty lines (preserve intentional spacing)
+        const lines: string[] = []
+        for (let i = 0; i < allLines.length; i++) {
+          const line = allLines[i]
+          const prevLine = i > 0 ? allLines[i - 1] : ''
+          const nextLine = i < allLines.length - 1 ? allLines[i + 1] : ''
+
+          // Keep the line if it's non-empty OR if it's an empty line between two non-empty lines
+          if (line !== '' || (prevLine !== '' && nextLine !== '')) {
+            lines.push(line)
+          }
+        }
+
+        // If all lines were empty, treat as single empty line
+        if (lines.length === 0) {
+          lines.push('')
+        }
+
+        // Convert to block format
+        blocksToInsert = lines.map((line) => ({ type: 'paragraph', content: line }))
+      }
 
       const selection = window.getSelection()
       if (!selection || selection.rangeCount === 0) return
@@ -371,29 +408,29 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
 
       const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
 
-      if (lines.length === 1) {
-        // Single line paste
-        const newContent = block.content.slice(0, offset) + lines[0] + block.content.slice(offset)
+      if (blocksToInsert.length === 1) {
+        // Single block paste
+        const newContent = block.content.slice(0, offset) + blocksToInsert[0].content + block.content.slice(offset)
 
         // Save cursor position after paste
-        savedSelection.current = { blockId, offset: offset + lines[0].length }
+        savedSelection.current = { blockId, offset: offset + blocksToInsert[0].content.length }
 
         dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
       } else {
-        // Multi-line paste
+        // Multi-block paste
         const beforeCursor = block.content.slice(0, offset)
         const afterCursor = block.content.slice(offset)
 
-        // Update first block
-        dispatch({ type: 'UPDATE_BLOCK', blockId, content: beforeCursor + lines[0] })
+        // Update first block with first pasted content
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: beforeCursor + blocksToInsert[0].content })
 
         // Create middle blocks
         let lastBlockId = blockId
-        for (let i = 1; i < lines.length - 1; i++) {
+        for (let i = 1; i < blocksToInsert.length - 1; i++) {
           const newBlock: EditorBlock = {
             id: generateId(),
-            type: 'paragraph',
-            content: lines[i],
+            type: blocksToInsert[i].type as EditorBlock['type'],
+            content: blocksToInsert[i].content,
           }
           dispatch({ type: 'ADD_BLOCK', block: newBlock, afterBlockId: lastBlockId })
           lastBlockId = newBlock.id
@@ -402,11 +439,11 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
         // Create last block with remaining content
         const lastBlock: EditorBlock = {
           id: generateId(),
-          type: 'paragraph',
-          content: lines[lines.length - 1] + afterCursor,
+          type: blocksToInsert[blocksToInsert.length - 1].type as EditorBlock['type'],
+          content: blocksToInsert[blocksToInsert.length - 1].content + afterCursor,
         }
         // Save cursor position for last pasted block
-        savedSelection.current = { blockId: lastBlock.id, offset: lines[lines.length - 1].length }
+        savedSelection.current = { blockId: lastBlock.id, offset: blocksToInsert[blocksToInsert.length - 1].content.length }
 
         dispatch({ type: 'ADD_BLOCK', block: lastBlock, afterBlockId: lastBlockId })
       }
