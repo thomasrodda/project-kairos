@@ -114,6 +114,10 @@ apps
 │   │   │   │   ├── DraggableBlock.scss
 │   │   │   │   ├── DraggableBlock.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── ContentEditableContainer
+│   │   │   │   ├── ContentEditableContainer.scss
+│   │   │   │   ├── ContentEditableContainer.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── EditorContent
 │   │   │   │   ├── EditorContent.scss
 │   │   │   │   ├── EditorContent.tsx

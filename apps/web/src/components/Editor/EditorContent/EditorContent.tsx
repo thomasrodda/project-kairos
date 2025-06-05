@@ -1,8 +1,7 @@
 // apps/web/src/components/Editor/EditorContent/EditorContent.tsx
 // Main content area for the block-based editor. Renders the page title and all blocks.
+// Uses a single contentEditable container to enable cross-block text selection.
 // Manages drag and drop reordering using @dnd-kit for smooth, accessible interactions.
-// Supports cross-block text selection using native browser APIs for a Notion-like experience.
-// Acts as the container for all editing functionality within the Editor layout.
 
 import { useRef, useEffect, useState } from 'react'
 import {
@@ -22,6 +21,7 @@ import { useDismiss, useCrossBlockSelection } from '../../../hooks'
 import { PageTitle } from '../PageTitle'
 import { DraggableBlock } from '../Block/DraggableBlock'
 import { Block } from '../Block'
+import { ContentEditableContainer } from '../ContentEditableContainer'
 import './EditorContent.scss'
 
 export function EditorContent() {
@@ -30,7 +30,6 @@ export function EditorContent() {
   const { pageTitle, blocks, focusedBlockId, selectedBlockIds, crossBlockSelection } = editorState
   const editorRef = useRef<HTMLDivElement>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [isSelecting, setIsSelecting] = useState(false)
 
   // Screen reader announcements for accessibility
   const [announcement, setAnnouncement] = useState<string>('')
@@ -50,43 +49,6 @@ export function EditorContent() {
     },
   })
 
-  // Track mouse down/up for selection
-  useEffect(() => {
-    const handleMouseDown = (e: MouseEvent) => {
-      // Check if we're starting a text selection
-      const target = e.target as HTMLElement
-      if (target.closest('.block__content')) {
-        console.log('Mouse down on block content, starting selection tracking')
-        setIsSelecting(true)
-      }
-    }
-
-    const handleMouseUp = () => {
-      if (isSelecting) {
-        console.log('Mouse up, ending selection tracking')
-        setIsSelecting(false)
-
-        // Force a selection check after a small delay
-        setTimeout(() => {
-          const selection = window.getSelection()
-          if (selection && !selection.isCollapsed) {
-            console.log('Forcing selection check after mouse up')
-            // Trigger the selection change handler manually
-            document.dispatchEvent(new Event('selectionchange'))
-          }
-        }, 10)
-      }
-    }
-
-    document.addEventListener('mousedown', handleMouseDown)
-    document.addEventListener('mouseup', handleMouseUp)
-
-    return () => {
-      document.removeEventListener('mousedown', handleMouseDown)
-      document.removeEventListener('mouseup', handleMouseUp)
-    }
-  }, [isSelecting])
-
   // Configure drag sensors for better UX
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -104,25 +66,6 @@ export function EditorContent() {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Handle text selection shortcuts first
       if (crossBlockSelection) {
-        // Copy selected text
-        if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
-          // Browser handles copy automatically with selection
-          return
-        }
-
-        // Cut selected text
-        if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
-          // Browser handles cut automatically with selection
-          return
-        }
-
-        // Delete selected text
-        if (e.key === 'Delete' || e.key === 'Backspace') {
-          // For now, let the browser handle it
-          // In the future, we might want custom handling for multi-block deletions
-          return
-        }
-
         // Escape clears text selection
         if (e.key === 'Escape') {
           e.preventDefault()
@@ -159,47 +102,9 @@ export function EditorContent() {
       }
     }
 
-    // Handle Select All (Ctrl/Cmd + A)
-    const handleSelectAll = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'a' && !e.shiftKey) {
-        const target = e.target as HTMLElement
-
-        // If we're in a block's content, let the browser handle it
-        if (target.closest('.block__content')) {
-          return
-        }
-
-        // Otherwise, select all content in the editor
-        e.preventDefault()
-
-        if (editorRef.current && blocks.length > 0) {
-          const selection = window.getSelection()
-          if (selection) {
-            const range = document.createRange()
-
-            // Find first and last block content
-            const firstBlockContent = editorRef.current.querySelector(`[data-block-id="${blocks[0].id}"] .block__content`)
-            const lastBlockContent = editorRef.current.querySelector(`[data-block-id="${blocks[blocks.length - 1].id}"] .block__content`)
-
-            if (firstBlockContent && lastBlockContent) {
-              range.setStartBefore(firstBlockContent)
-              range.setEndAfter(lastBlockContent)
-              selection.removeAllRanges()
-              selection.addRange(range)
-            }
-          }
-        }
-      }
-    }
-
     document.addEventListener('keydown', handleKeyDown)
-    document.addEventListener('keydown', handleSelectAll)
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-      document.removeEventListener('keydown', handleSelectAll)
-    }
-  }, [selectedBlockIds, focusedBlockId, crossBlockSelection, dispatch, clearSelection, blocks])
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [selectedBlockIds, focusedBlockId, crossBlockSelection, dispatch, clearSelection])
 
   // Handle copy event for cross-block selection
   useEffect(() => {
@@ -217,6 +122,9 @@ export function EditorContent() {
         e.clipboardData.setData('text/html', markdown) // Some apps prefer HTML
       }
 
+      // Prevent default to avoid double copying
+      e.preventDefault()
+
       // Announce copy for screen readers
       setAnnouncement('Text copied to clipboard')
       setTimeout(() => setAnnouncement(''), 1000)
@@ -226,70 +134,40 @@ export function EditorContent() {
     return () => document.removeEventListener('copy', handleCopy)
   }, [crossBlockSelection, getSelectedText, getSelectedMarkdown])
 
-  // Handle clicks in empty space to focus the nearest block above cursor
+  // Handle clicks in empty space
   const handleEmptySpaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement
 
-    // Check if the click was on a block content element or any interactive element
-    const isOnBlock = target.closest('.block__content') !== null
-    const isOnDragHandle = target.closest('.block-drag-handle') !== null
+    // Check if the click was on specific elements
+    const isOnBlock = target.closest('.block') !== null
     const isOnPageTitle = target.closest('.page-title') !== null
+    const isOnContainer = target.closest('.content-editable-container') !== null
 
-    // Only handle clicks that are NOT on interactive elements
-    if (isOnBlock || isOnDragHandle || isOnPageTitle) {
+    // Only handle clicks on truly empty space
+    if (isOnBlock || isOnPageTitle || isOnContainer) {
       return
     }
 
-    // Clear any text selection
+    // Clear selections
     if (crossBlockSelection) {
       clearSelection()
     }
 
-    // Get cursor position
-    const clickY = e.clientY
-
-    // Find all block elements in the DOM
-    const blockElements = Array.from(editorRef.current?.querySelectorAll('.block[data-block-id]') || []) as HTMLElement[]
-
-    if (blockElements.length === 0) return
-
-    // Find the block that's closest above the cursor position
-    let bestDistance = Infinity
-    let bestBlockId: string | null = null
-
-    blockElements.forEach((blockElement) => {
-      const rect = blockElement.getBoundingClientRect()
-      const blockBottom = rect.bottom
-
-      // Get the block ID from the data attribute
-      const blockId = blockElement.getAttribute('data-block-id')
-      if (!blockId) return
-
-      // Calculate distance from cursor to bottom of block
-      const distance = clickY - blockBottom
-
-      // If click is below this block and it's closer than our current best
-      if (distance > 0 && distance < bestDistance) {
-        bestDistance = distance
-        bestBlockId = blockId
-      }
-    })
-
-    // Determine which block to focus
-    let targetBlockId: string | null = null
-
-    if (bestBlockId) {
-      // If we found a block above the cursor, focus it
-      targetBlockId = bestBlockId
-    } else {
-      // If cursor is above all blocks, focus the first block
-      targetBlockId = blocks[0]?.id || null
+    if (selectedBlockIds.length > 0) {
+      dispatch({ type: 'CLEAR_SELECTION' })
     }
 
-    // Focus the target block
-    if (targetBlockId) {
-      dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: targetBlockId })
+    // Focus the last block if clicking below all content
+    if (blocks.length > 0) {
+      dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: blocks[blocks.length - 1].id })
     }
+  }
+
+  // Handle block click from ContentEditableContainer
+  const handleBlockClick = (blockId: string) => {
+    // This is now handled by the ContentEditableContainer
+    // We just need to ensure focus is set properly
+    dispatch({ type: 'SET_FOCUSED_BLOCK', blockId })
   }
 
   // Dismiss selection when clicking outside editor or pressing escape
@@ -352,10 +230,9 @@ export function EditorContent() {
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div
-        className={`editor-content ${activeId ? 'editor-content--sorting' : ''} ${crossBlockSelection ? 'editor-content--selecting' : ''}`}
+        className={`editor-content ${activeId ? 'editor-content--sorting' : ''}`}
         ref={editorRef}
         onClick={handleEmptySpaceClick}
-        // Accessibility improvements
         role="document"
         aria-label="Document editor"
       >
@@ -364,7 +241,13 @@ export function EditorContent() {
           aria-live="polite"
           aria-atomic="true"
           className="sr-only"
-          style={{ position: 'absolute', left: '-10000px', width: '1px', height: '1px', overflow: 'hidden' }}
+          style={{
+            position: 'absolute',
+            left: '-10000px',
+            width: '1px',
+            height: '1px',
+            overflow: 'hidden',
+          }}
         >
           {announcement}
         </div>
@@ -372,15 +255,17 @@ export function EditorContent() {
         {/* Page title - always visible and editable */}
         <PageTitle title={pageTitle} />
 
-        {/* All blocks in the page */}
+        {/* All blocks in a single contentEditable container */}
         <div className="editor-content__blocks" role="group" aria-label="Document blocks">
-          <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
-            {blocks.map((block, index) => (
-              <div key={block.id} aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
-                <DraggableBlock block={block} isFocused={focusedBlockId === block.id} />
-              </div>
-            ))}
-          </SortableContext>
+          <ContentEditableContainer onBlockClick={handleBlockClick}>
+            <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
+              {blocks.map((block, index) => (
+                <div key={block.id} aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
+                  <DraggableBlock block={block} isFocused={focusedBlockId === block.id} />
+                </div>
+              ))}
+            </SortableContext>
+          </ContentEditableContainer>
         </div>
       </div>
 

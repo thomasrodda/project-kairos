@@ -1,0 +1,32 @@
+// apps/web/src/components/Editor/ContentEditableContainer/ContentEditableContainer.scss
+
+.content-editable-container {
+  outline: none;
+  width: 100%;
+
+  // Ensure text selection works properly
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+
+  // Cursor should be text cursor
+  cursor: text;
+
+  // Prevent contentEditable from adding its own styles
+  &:focus {
+    outline: none;
+  }
+
+  // Make sure all child elements allow text selection
+  * {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  // But drag handles should not be selectable
+  .block-drag-handle {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}

@@ -1,7 +1,6 @@
 // apps/web/src/utils/textSelection.ts
 // Utility functions for handling cross-block text selection in the editor.
-// Provides helpers for finding blocks from DOM nodes, calculating selection boundaries,
-// and determining which blocks are fully or partially selected.
+// Updated to work with the single contentEditable container approach.
 
 import type { EditorBlock } from '../contexts/EditorContext'
 
@@ -10,26 +9,34 @@ import type { EditorBlock } from '../contexts/EditorContext'
  */
 export function findBlockFromNode(node: Node): { element: HTMLElement; id: string } | null {
   let currentNode: Node | null = node
-  console.log('findBlockFromNode called with node:', node)
 
   // Walk up the DOM tree to find the block element
   while (currentNode) {
     if (currentNode.nodeType === Node.ELEMENT_NODE) {
       const element = currentNode as HTMLElement
+
+      // Check for block content element
+      if (element.classList.contains('block__content')) {
+        const blockId = element.getAttribute('data-block-id')
+        if (blockId) {
+          return { element, id: blockId }
+        }
+      }
+
+      // Also check parent block element
       const blockId = element.getAttribute('data-block-id')
-
-      console.log('Checking element:', element, 'blockId:', blockId, 'has block class:', element.classList.contains('block'))
-
       if (blockId && element.classList.contains('block')) {
-        console.log('Found block:', { element, id: blockId })
-        return { element, id: blockId }
+        // Find the content element within
+        const contentEl = element.querySelector('.block__content') as HTMLElement
+        if (contentEl) {
+          return { element: contentEl, id: blockId }
+        }
       }
     }
 
     currentNode = currentNode.parentNode
   }
 
-  console.log('No block found for node')
   return null
 }
 
@@ -100,25 +107,30 @@ export function getRangeText(range: Range): string {
 }
 
 /**
- * Calculate the offset within a specific block's content
+ * Get clean text offsets for a block
  */
-export function getOffsetInBlock(container: Node, offset: number): number {
-  // If the container is a text node, the offset is already correct
+export function getCleanOffsets(blockElement: HTMLElement, container: Node, offset: number): number {
+  // If container is a text node
   if (container.nodeType === Node.TEXT_NODE) {
+    // Find offset within the block
+    let textOffset = 0
+    const walker = document.createTreeWalker(blockElement, NodeFilter.SHOW_TEXT, null)
+
+    let node: Node | null
+    while ((node = walker.nextNode())) {
+      if (node === container) {
+        return textOffset + offset
+      }
+      textOffset += node.textContent?.length || 0
+    }
+  }
+
+  // If container is an element, calculate based on child nodes
+  if (container === blockElement) {
     return offset
   }
 
-  // If the container is an element, we need to calculate the text offset
-  let textOffset = 0
-  const element = container as HTMLElement
-
-  // Walk through child nodes up to the offset index
-  for (let i = 0; i < offset && i < element.childNodes.length; i++) {
-    const child = element.childNodes[i]
-    textOffset += child.textContent?.length || 0
-  }
-
-  return textOffset
+  return offset
 }
 
 /**
@@ -128,100 +140,28 @@ export function isMultiBlockSelection(range: Range): boolean {
   const startBlock = findBlockFromNode(range.startContainer)
   const endBlock = findBlockFromNode(range.endContainer)
 
-  const result = startBlock !== null && endBlock !== null && startBlock.id !== endBlock.id
-  console.log('isMultiBlockSelection:', {
-    startBlock: startBlock?.id,
-    endBlock: endBlock?.id,
-    isMultiBlock: result,
-  })
-
-  return result
+  return startBlock !== null && endBlock !== null && startBlock.id !== endBlock.id
 }
 
 /**
- * Get clean text offsets for a block, accounting for contentEditable quirks
- */
-export function getCleanOffsets(blockElement: HTMLElement, container: Node, offset: number): number {
-  console.log('getCleanOffsets called:', { blockElement, container, offset })
-
-  // Handle the common case where the container is inside the block's content area
-  const blockContent = blockElement.querySelector('.block__content')
-  if (!blockContent) {
-    console.log('No block content found')
-    return offset
-  }
-
-  // If we're directly in the content element
-  if (container === blockContent) {
-    console.log('Container is block content directly')
-    return getOffsetInBlock(container, offset)
-  }
-
-  // If we're in a text node within the content
-  if (container.nodeType === Node.TEXT_NODE && blockContent.contains(container)) {
-    // Find the text offset from the beginning of the block
-    let textOffset = 0
-    const walker = document.createTreeWalker(blockContent, NodeFilter.SHOW_TEXT, null)
-
-    let node: Node | null
-    while ((node = walker.nextNode())) {
-      if (node === container) {
-        console.log('Found text node, returning offset:', textOffset + offset)
-        return textOffset + offset
-      }
-      textOffset += node.textContent?.length || 0
-    }
-  }
-
-  console.log('Fallback, returning original offset:', offset)
-  return offset
-}
-
-/**
- * Create a visual highlight element for selected text
- */
-export function createSelectionHighlight(range: Range, _className: string = 'text-selection-highlight'): HTMLElement[] {
-  const highlights: HTMLElement[] = []
-
-  // This is a placeholder for visual highlighting
-  // In practice, you might use CSS to style the native selection
-  // or create overlay elements for custom highlighting
-
-  return highlights
-}
-
-/**
- * Clear any custom selection highlights
- */
-export function clearSelectionHighlights(container: HTMLElement): void {
-  const highlights = container.querySelectorAll('.text-selection-highlight')
-  highlights.forEach((el) => el.remove())
-}
-
-/**
- * Determine if the selection should be treated as a text selection vs block selection
+ * Determine if the selection should be treated as a text selection
  */
 export function shouldTreatAsTextSelection(range: Range): boolean {
-  console.log('shouldTreatAsTextSelection - range.collapsed:', range.collapsed)
-
   // If the selection is collapsed (no text selected), it's not a text selection
   if (range.collapsed) {
-    console.log('Range is collapsed, returning false')
     return false
   }
 
-  // Check if the selection started from a drag handle or block selection UI
+  // Check if the selection started from a drag handle
   const startElement =
     range.startContainer.nodeType === Node.ELEMENT_NODE ? (range.startContainer as HTMLElement) : range.startContainer.parentElement
 
   const isFromDragHandle = startElement?.closest('.block-drag-handle') !== null
-  console.log('Is from drag handle:', isFromDragHandle)
 
   if (isFromDragHandle) {
     return false
   }
 
   // Otherwise, treat it as a text selection
-  console.log('Treating as text selection')
   return true
 }

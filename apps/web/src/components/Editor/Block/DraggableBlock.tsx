@@ -15,9 +15,9 @@ interface DraggableBlockProps {
 }
 
 export function DraggableBlock({ block, isFocused }: DraggableBlockProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging, isSorting } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
-    disabled: isFocused, // Disable dragging when editing text
+    disabled: false, // Allow dragging even when editing
   })
 
   const style = {
@@ -26,16 +26,8 @@ export function DraggableBlock({ block, isFocused }: DraggableBlockProps) {
   }
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`draggable-block ${isDragging ? 'draggable-block--dragging' : ''} ${isSorting ? 'draggable-block--sorting' : ''}`}
-      {...attributes}
-    >
+    <div ref={setNodeRef} style={style} className={`draggable-block ${isDragging ? 'draggable-block--dragging' : ''}`} {...attributes}>
       <Block block={block} isFocused={isFocused} dragHandleProps={listeners} />
-
-      {/* Drop indicator line - COMMENTED OUT as requested */}
-      {/* <div className="draggable-block__drop-indicator" /> */}
     </div>
   )
 }
