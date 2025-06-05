@@ -39,10 +39,10 @@ AI System Prompt Files
 ├── # Project Plan.md
 ├── Analytics Feature Flags Guide.md
 ├── Backend Api Guide.md
-├── Block-Based Editor Plan.md
 ├── CI CD Guide.md
 ├── Component Structure Guide.md
 ├── Data Model Guide.md
+├── Enhanced Custom Editor Plan.md
 ├── Error Handling Guide.md
 ├── Extensibility & Plugin Architecture Guide.md
 ├── Git & Github Guide.md
