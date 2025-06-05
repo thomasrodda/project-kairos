@@ -1,11 +1,11 @@
 // apps/web/src/components/Editor/ContentEditableContainer/ContentEditableContainer.tsx
 // Single contentEditable container that enables cross-block text selection.
-// Handles all text input, keyboard shortcuts, and editing operations.
-// Synchronizes changes with the editor state while maintaining cursor position.
+// Prevents block merging by intercepting browser editing operations.
+// Maintains block structure while allowing seamless text selection.
 
-import React, { useRef, useEffect, useCallback, useState } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import { useEditorState, useEditorDispatch } from '../../../contexts/EditorContext'
-import type { EditorBlock, BlockType } from '../../../contexts/EditorContext'
+import type { EditorBlock } from '../../../contexts/EditorContext'
 import { generateId } from '@kairos/utils'
 import './ContentEditableContainer.scss'
 
@@ -18,40 +18,164 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
   const editorState = useEditorState()
   const dispatch = useEditorDispatch()
   const containerRef = useRef<HTMLDivElement>(null)
-  const [isComposing, setIsComposing] = useState(false)
-  const lastKnownSelection = useRef<{ blockId: string; offset: number } | null>(null)
+  const isInternalUpdate = useRef(false)
 
-  // Handle input events (typing)
-  const handleInput = useCallback(
-    (e: React.FormEvent<HTMLDivElement>) => {
-      if (isComposing) return
-
-      const container = e.currentTarget
-
-      // Get all block elements
-      const blockElements = Array.from(container.querySelectorAll('[data-block-id]')) as HTMLElement[]
-
-      // Update each block's content
-      blockElements.forEach((blockEl) => {
-        const blockId = blockEl.getAttribute('data-block-id')
-        if (!blockId) return
-
-        const content = blockEl.textContent || ''
-        const currentBlock = editorState.blocks.find((b) => b.id === blockId)
-
-        // Only update if content changed
-        if (currentBlock && currentBlock.content !== content) {
-          dispatch({ type: 'UPDATE_BLOCK', blockId, content })
+  // Utility functions (moved up to be available for all callbacks)
+  const findBlockElement = (node: Node): HTMLElement | null => {
+    let current = node
+    while (current && current !== containerRef.current) {
+      if (current.nodeType === Node.ELEMENT_NODE) {
+        const el = current as HTMLElement
+        if (el.classList.contains('block__content')) {
+          return el
         }
-      })
+      }
+      current = current.parentNode!
+    }
+    return null
+  }
+
+  const getTextOffset = (blockEl: HTMLElement, container: Node, offset: number): number => {
+    if (container === blockEl || container === blockEl.firstChild) {
+      return offset
+    }
+
+    // For nested text nodes, calculate the real offset
+    let textOffset = 0
+    const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null)
+
+    let node
+    while ((node = walker.nextNode())) {
+      if (node === container) {
+        return textOffset + offset
+      }
+      textOffset += node.textContent?.length || 0
+    }
+
+    return offset
+  }
+
+  const setCursorPosition = (blockId: string, offset: number) => {
+    const blockEl = containerRef.current?.querySelector(`[data-block-id="${blockId}"] .block__content`) as HTMLElement
+    if (!blockEl) return
+
+    const textNode = blockEl.firstChild || blockEl
+    const selection = window.getSelection()
+    const range = document.createRange()
+
+    try {
+      range.setStart(textNode, Math.min(offset, textNode.textContent?.length || 0))
+      range.collapse(true)
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+    } catch (e) {
+      console.error('Failed to set cursor position:', e)
+    }
+  }
+
+  // Handle selection deletion
+  const handleDeleteSelection = useCallback(() => {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return
+
+    const range = selection.getRangeAt(0)
+
+    const startBlock = findBlockElement(range.startContainer)
+    const endBlock = findBlockElement(range.endContainer)
+
+    if (!startBlock || !endBlock) return
+
+    const startBlockId = startBlock.getAttribute('data-block-id')
+    const endBlockId = endBlock.getAttribute('data-block-id')
+
+    if (!startBlockId || !endBlockId) return
+
+    const startOffset = getTextOffset(startBlock, range.startContainer, range.startOffset)
+    const endOffset = getTextOffset(endBlock, range.endContainer, range.endOffset)
+
+    if (startBlockId === endBlockId) {
+      // Selection within single block
+      const block = editorState.blocks.find((b) => b.id === startBlockId)
+      if (!block) return
+
+      const newContent = block.content.slice(0, startOffset) + block.content.slice(endOffset)
+      dispatch({ type: 'UPDATE_BLOCK', blockId: startBlockId, content: newContent })
+
+      setTimeout(() => {
+        setCursorPosition(startBlockId, startOffset)
+      }, 0)
+    } else {
+      // Selection across multiple blocks
+      const startIndex = editorState.blocks.findIndex((b) => b.id === startBlockId)
+      const endIndex = editorState.blocks.findIndex((b) => b.id === endBlockId)
+
+      const startBlockContent = editorState.blocks[startIndex].content.slice(0, startOffset)
+      const endBlockContent = editorState.blocks[endIndex].content.slice(endOffset)
+
+      // Merge content
+      const mergedContent = startBlockContent + endBlockContent
+
+      // Update first block
+      dispatch({ type: 'UPDATE_BLOCK', blockId: startBlockId, content: mergedContent })
+
+      // Delete blocks in between and end block
+      const blocksToDelete = editorState.blocks.slice(startIndex + 1, endIndex + 1).map((b) => b.id)
+
+      if (blocksToDelete.length > 0) {
+        dispatch({ type: 'DELETE_BLOCKS', blockIds: blocksToDelete })
+      }
+
+      setTimeout(() => {
+        setCursorPosition(startBlockId, startOffset)
+      }, 0)
+    }
+  }, [dispatch, editorState.blocks])
+
+  // Prevent default contentEditable behavior and handle input manually
+  const handleBeforeInput = useCallback(
+    (e: Event) => {
+      e.preventDefault()
+
+      const inputEvent = e as InputEvent
+      const data = inputEvent.data
+
+      if (!data) return
+
+      const selection = window.getSelection()
+      if (!selection || selection.rangeCount === 0) return
+
+      const range = selection.getRangeAt(0)
+
+      // Find which block we're in
+      const blockEl = findBlockElement(range.startContainer)
+      if (!blockEl) return
+
+      const blockId = blockEl.getAttribute('data-block-id')
+      if (!blockId) return
+
+      const block = editorState.blocks.find((b) => b.id === blockId)
+      if (!block) return
+
+      // Get the text offset within the block
+      const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
+
+      // Insert the typed character at the correct position
+      const newContent = block.content.slice(0, offset) + data + block.content.slice(offset)
+
+      // Update block content
+      dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+
+      // Move cursor forward
+      setTimeout(() => {
+        setCursorPosition(blockId, offset + data.length)
+      }, 0)
     },
-    [dispatch, editorState.blocks, isComposing]
+    [dispatch, editorState.blocks]
   )
 
-  // Handle key down events
+  // Handle Enter key to create new blocks
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      // Handle Enter key
       if (e.key === 'Enter' && !e.shiftKey) {
         e.preventDefault()
 
@@ -59,203 +183,201 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
         if (!selection || selection.rangeCount === 0) return
 
         const range = selection.getRangeAt(0)
-        const container = range.startContainer
+        const blockEl = findBlockElement(range.startContainer)
+        if (!blockEl) return
 
-        // Find the current block
-        let blockElement = container as Node
-        while (blockElement && blockElement !== containerRef.current) {
-          if (blockElement.nodeType === Node.ELEMENT_NODE) {
-            const el = blockElement as HTMLElement
-            const blockId = el.getAttribute('data-block-id')
-            if (blockId) {
-              const block = editorState.blocks.find((b) => b.id === blockId)
-              if (block) {
-                // Create new block
-                const newBlock: EditorBlock = {
-                  id: generateId(),
-                  type: 'paragraph',
-                  content: '',
-                  metadata: {},
-                }
+        const blockId = blockEl.getAttribute('data-block-id')
+        if (!blockId) return
 
-                // Get the offset in the block
-                const blockContent = el.textContent || ''
-                const offset = range.startOffset
+        const block = editorState.blocks.find((b) => b.id === blockId)
+        if (!block) return
 
-                // Split content at cursor position
-                const beforeCursor = blockContent.substring(0, offset)
-                const afterCursor = blockContent.substring(offset)
+        const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
 
-                // Update current block with content before cursor
-                dispatch({ type: 'UPDATE_BLOCK', blockId: block.id, content: beforeCursor })
+        // Split content at cursor
+        const beforeCursor = block.content.substring(0, offset)
+        const afterCursor = block.content.substring(offset)
 
-                // Add new block with content after cursor
-                newBlock.content = afterCursor
-                dispatch({ type: 'ADD_BLOCK', block: newBlock, afterBlockId: block.id })
+        // Update current block
+        dispatch({ type: 'UPDATE_BLOCK', blockId: block.id, content: beforeCursor })
 
-                // Store where we want to put the cursor
-                lastKnownSelection.current = { blockId: newBlock.id, offset: 0 }
-
-                break
-              }
-            }
-          }
-          blockElement = blockElement.parentNode as Node
+        // Create new block
+        const newBlock: EditorBlock = {
+          id: generateId(),
+          type: 'paragraph',
+          content: afterCursor,
         }
+
+        dispatch({ type: 'ADD_BLOCK', block: newBlock, afterBlockId: block.id })
+
+        // Focus new block
+        setTimeout(() => {
+          setCursorPosition(newBlock.id, 0)
+        }, 0)
       }
 
-      // Handle Backspace at beginning of block
+      // Handle Backspace
       if (e.key === 'Backspace') {
         const selection = window.getSelection()
         if (!selection || selection.rangeCount === 0) return
 
         const range = selection.getRangeAt(0)
 
-        // Check if we're at the beginning of a block
-        if (range.startOffset === 0 && range.collapsed) {
-          const container = range.startContainer
+        if (range.collapsed) {
+          // Single cursor, no selection
+          const blockEl = findBlockElement(range.startContainer)
+          if (!blockEl) return
 
-          // Find the current block
-          let blockElement = container as Node
-          while (blockElement && blockElement !== containerRef.current) {
-            if (blockElement.nodeType === Node.ELEMENT_NODE) {
-              const el = blockElement as HTMLElement
-              const blockId = el.getAttribute('data-block-id')
-              if (blockId) {
-                const blockIndex = editorState.blocks.findIndex((b) => b.id === blockId)
+          const blockId = blockEl.getAttribute('data-block-id')
+          if (!blockId) return
 
-                // If this is not the first block, merge with previous
-                if (blockIndex > 0) {
-                  e.preventDefault()
-                  const currentBlock = editorState.blocks[blockIndex]
-                  const previousBlock = editorState.blocks[blockIndex - 1]
+          const block = editorState.blocks.find((b) => b.id === blockId)
+          if (!block) return
 
-                  // Merge content
-                  const mergedContent = previousBlock.content + currentBlock.content
-                  dispatch({ type: 'UPDATE_BLOCK', blockId: previousBlock.id, content: mergedContent })
-                  dispatch({ type: 'DELETE_BLOCK', blockId: currentBlock.id })
+          const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
 
-                  // Store cursor position at merge point
-                  lastKnownSelection.current = {
-                    blockId: previousBlock.id,
-                    offset: previousBlock.content.length,
-                  }
-                }
-                break
-              }
+          if (offset === 0) {
+            // At beginning of block - merge with previous
+            e.preventDefault()
+            const blockIndex = editorState.blocks.findIndex((b) => b.id === blockId)
+
+            if (blockIndex > 0) {
+              const previousBlock = editorState.blocks[blockIndex - 1]
+              const mergedContent = previousBlock.content + block.content
+
+              dispatch({ type: 'UPDATE_BLOCK', blockId: previousBlock.id, content: mergedContent })
+              dispatch({ type: 'DELETE_BLOCK', blockId: block.id })
+
+              setTimeout(() => {
+                setCursorPosition(previousBlock.id, previousBlock.content.length)
+              }, 0)
             }
-            blockElement = blockElement.parentNode as Node
+          } else {
+            // Normal backspace within block
+            e.preventDefault()
+            const newContent = block.content.slice(0, offset - 1) + block.content.slice(offset)
+            dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+
+            setTimeout(() => {
+              setCursorPosition(blockId, offset - 1)
+            }, 0)
           }
+        } else {
+          // Has selection - delete it
+          e.preventDefault()
+          handleDeleteSelection()
+        }
+      }
+
+      // Handle Delete key
+      if (e.key === 'Delete') {
+        const selection = window.getSelection()
+        if (!selection || selection.rangeCount === 0) return
+
+        const range = selection.getRangeAt(0)
+
+        if (!range.collapsed) {
+          e.preventDefault()
+          handleDeleteSelection()
         }
       }
     },
-    [dispatch, editorState.blocks]
+    [dispatch, editorState.blocks, handleDeleteSelection]
   )
 
-  // Handle click events to track which block was clicked
-  const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      const target = e.target as HTMLElement
+  // Handle paste
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>) => {
+      e.preventDefault()
 
-      // Find the clicked block
-      let blockElement = target
-      while (blockElement && blockElement !== containerRef.current) {
-        const blockId = blockElement.getAttribute('data-block-id')
-        if (blockId) {
-          onBlockClick?.(blockId)
-          dispatch({ type: 'SET_FOCUSED_BLOCK', blockId })
-          break
-        }
-        blockElement = blockElement.parentElement as HTMLElement
+      const text = e.clipboardData.getData('text/plain')
+      const lines = text.split('\n')
+
+      const selection = window.getSelection()
+      if (!selection || selection.rangeCount === 0) return
+
+      const range = selection.getRangeAt(0)
+
+      // Delete any selected content first
+      if (!range.collapsed) {
+        handleDeleteSelection()
       }
-    },
-    [dispatch, onBlockClick]
-  )
 
-  // Synchronize block content with DOM after updates
-  useEffect(() => {
-    if (!containerRef.current) return
+      // Get current position
+      const blockEl = findBlockElement(range.startContainer)
+      if (!blockEl) return
 
-    // Get all block elements
-    const blockElements = Array.from(containerRef.current.querySelectorAll('[data-block-id]')) as HTMLElement[]
-
-    blockElements.forEach((blockEl) => {
       const blockId = blockEl.getAttribute('data-block-id')
       if (!blockId) return
 
       const block = editorState.blocks.find((b) => b.id === blockId)
       if (!block) return
 
-      // Only update if content is different
-      const currentContent = blockEl.textContent || ''
-      if (currentContent !== block.content) {
+      const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
+
+      if (lines.length === 1) {
+        // Single line paste
+        const newContent = block.content.slice(0, offset) + lines[0] + block.content.slice(offset)
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+
+        setTimeout(() => {
+          setCursorPosition(blockId, offset + lines[0].length)
+        }, 0)
+      } else {
+        // Multi-line paste
+        const beforeCursor = block.content.slice(0, offset)
+        const afterCursor = block.content.slice(offset)
+
+        // Update first block
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: beforeCursor + lines[0] })
+
+        // Create middle blocks
+        let lastBlockId = blockId
+        for (let i = 1; i < lines.length - 1; i++) {
+          const newBlock: EditorBlock = {
+            id: generateId(),
+            type: 'paragraph',
+            content: lines[i],
+          }
+          dispatch({ type: 'ADD_BLOCK', block: newBlock, afterBlockId: lastBlockId })
+          lastBlockId = newBlock.id
+        }
+
+        // Create last block with remaining content
+        const lastBlock: EditorBlock = {
+          id: generateId(),
+          type: 'paragraph',
+          content: lines[lines.length - 1] + afterCursor,
+        }
+        dispatch({ type: 'ADD_BLOCK', block: lastBlock, afterBlockId: lastBlockId })
+
+        setTimeout(() => {
+          setCursorPosition(lastBlock.id, lines[lines.length - 1].length)
+        }, 0)
+      }
+    },
+    [dispatch, editorState.blocks, handleDeleteSelection]
+  )
+
+  // Update DOM when blocks change
+  useEffect(() => {
+    if (!containerRef.current || isInternalUpdate.current) return
+
+    isInternalUpdate.current = true
+
+    // Update block content in DOM
+    editorState.blocks.forEach((block) => {
+      const blockEl = containerRef.current!.querySelector(`[data-block-id="${block.id}"] .block__content`)
+      if (blockEl && blockEl.textContent !== block.content) {
         blockEl.textContent = block.content
       }
     })
 
-    // Restore cursor position if needed
-    if (lastKnownSelection.current) {
-      const { blockId, offset } = lastKnownSelection.current
-      const blockEl = containerRef.current.querySelector(`[data-block-id="${blockId}"]`) as HTMLElement
-
-      if (blockEl) {
-        const selection = window.getSelection()
-        if (selection) {
-          const range = document.createRange()
-          const textNode = blockEl.firstChild || blockEl
-
-          try {
-            range.setStart(textNode, Math.min(offset, textNode.textContent?.length || 0))
-            range.collapse(true)
-            selection.removeAllRanges()
-            selection.addRange(range)
-          } catch (e) {
-            console.error('Failed to restore cursor position:', e)
-          }
-        }
-      }
-
-      lastKnownSelection.current = null
-    }
+    isInternalUpdate.current = false
   }, [editorState.blocks])
 
-  // Handle composition events for IME input
-  const handleCompositionStart = () => setIsComposing(true)
-  const handleCompositionEnd = () => {
-    setIsComposing(false)
-    // Trigger input handler after composition ends
-    if (containerRef.current) {
-      handleInput({ currentTarget: containerRef.current } as React.FormEvent<HTMLDivElement>)
-    }
-  }
-
-  // Handle paste events
-  const handlePaste = useCallback(
-    (e: React.ClipboardEvent<HTMLDivElement>) => {
-      e.preventDefault()
-
-      const text = e.clipboardData.getData('text/plain')
-      const selection = window.getSelection()
-      if (!selection || selection.rangeCount === 0) return
-
-      const range = selection.getRangeAt(0)
-      range.deleteContents()
-
-      // Insert plain text
-      const textNode = document.createTextNode(text)
-      range.insertNode(textNode)
-
-      // Move cursor to end of inserted text
-      range.setStartAfter(textNode)
-      range.collapse(true)
-      selection.removeAllRanges()
-      selection.addRange(range)
-
-      // Trigger input handler to update state
-      handleInput({ currentTarget: containerRef.current! } as React.FormEvent<HTMLDivElement>)
-    },
-    [handleInput]
-  )
+  // Properly typed event handler for beforeinput
+  const handleBeforeInputTyped = handleBeforeInput as unknown as React.FormEventHandler<HTMLDivElement>
 
   return (
     <div
@@ -263,12 +385,19 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
       className="content-editable-container"
       contentEditable
       suppressContentEditableWarning
-      onInput={handleInput}
+      onBeforeInput={handleBeforeInputTyped}
       onKeyDown={handleKeyDown}
-      onClick={handleClick}
       onPaste={handlePaste}
-      onCompositionStart={handleCompositionStart}
-      onCompositionEnd={handleCompositionEnd}
+      onClick={(e) => {
+        const target = e.target as HTMLElement
+        const blockEl = findBlockElement(target)
+        if (blockEl) {
+          const blockId = blockEl.parentElement?.getAttribute('data-block-id')
+          if (blockId) {
+            onBlockClick?.(blockId)
+          }
+        }
+      }}
       spellCheck
     >
       {children}
