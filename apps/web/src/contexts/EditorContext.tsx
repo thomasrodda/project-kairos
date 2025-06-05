@@ -83,19 +83,45 @@ export type EditorAction =
 // INITIAL STATE
 // =============================================================================
 
-const createInitialBlock = (): EditorBlock => ({
-  id: generateId(),
-  type: 'paragraph',
-  content: '',
-  metadata: {
-    placeholder: 'Start writing...',
+const createInitialBlocks = (): EditorBlock[] => [
+  {
+    id: generateId(),
+    type: 'h1',
+    content: 'Welcome to the Editor',
+    metadata: {
+      placeholder: 'Heading 1',
+    },
   },
-})
+  {
+    id: generateId(),
+    type: 'paragraph',
+    content: 'This is the first paragraph. Try selecting text across multiple blocks.',
+    metadata: {
+      placeholder: 'Start writing...',
+    },
+  },
+  {
+    id: generateId(),
+    type: 'paragraph',
+    content: 'This is the second paragraph. You should be able to select from the first paragraph to here.',
+    metadata: {
+      placeholder: 'Start writing...',
+    },
+  },
+  {
+    id: generateId(),
+    type: 'paragraph',
+    content: 'This is the third paragraph. Cross-block selection should work smoothly.',
+    metadata: {
+      placeholder: 'Start writing...',
+    },
+  },
+]
 
 const initialState: EditorState = {
   pageId: null,
-  pageTitle: 'New Page',
-  blocks: [createInitialBlock()],
+  pageTitle: 'Test Page',
+  blocks: createInitialBlocks(),
   focusedBlockId: null,
   selectedBlockIds: [],
   crossBlockSelection: null,
@@ -116,7 +142,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         pageId: action.pageId,
         pageTitle: action.title,
-        blocks: action.blocks.length > 0 ? action.blocks : [createInitialBlock()],
+        blocks: action.blocks.length > 0 ? action.blocks : createInitialBlocks(),
         focusedBlockId: null,
         selectedBlockIds: [],
         crossBlockSelection: null,
@@ -200,7 +226,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
       const remainingBlocks = state.blocks.filter((b) => !blocksToDelete.has(b.id))
 
       // If we would delete all blocks, keep one empty paragraph
-      const newBlocks = remainingBlocks.length === 0 ? [createInitialBlock()] : remainingBlocks
+      const newBlocks = remainingBlocks.length === 0 ? createInitialBlocks() : remainingBlocks
 
       // Find new focus target
       let newFocusedId = null

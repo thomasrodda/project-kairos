@@ -19,3 +19,28 @@
     min-height: 50vh;
   }
 }
+
+// Temporary styles to help with cross-block selection
+.editor-content {
+  // Ensure text selection is allowed
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+
+  * {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  // Make sure blocks don't interfere with selection
+  .block {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .block__content {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+}

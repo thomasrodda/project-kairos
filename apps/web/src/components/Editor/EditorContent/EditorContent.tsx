@@ -30,6 +30,7 @@ export function EditorContent() {
   const { pageTitle, blocks, focusedBlockId, selectedBlockIds, crossBlockSelection } = editorState
   const editorRef = useRef<HTMLDivElement>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [isSelecting, setIsSelecting] = useState(false)
 
   // Screen reader announcements for accessibility
   const [announcement, setAnnouncement] = useState<string>('')
@@ -48,6 +49,43 @@ export function EditorContent() {
       }
     },
   })
+
+  // Track mouse down/up for selection
+  useEffect(() => {
+    const handleMouseDown = (e: MouseEvent) => {
+      // Check if we're starting a text selection
+      const target = e.target as HTMLElement
+      if (target.closest('.block__content')) {
+        console.log('Mouse down on block content, starting selection tracking')
+        setIsSelecting(true)
+      }
+    }
+
+    const handleMouseUp = () => {
+      if (isSelecting) {
+        console.log('Mouse up, ending selection tracking')
+        setIsSelecting(false)
+
+        // Force a selection check after a small delay
+        setTimeout(() => {
+          const selection = window.getSelection()
+          if (selection && !selection.isCollapsed) {
+            console.log('Forcing selection check after mouse up')
+            // Trigger the selection change handler manually
+            document.dispatchEvent(new Event('selectionchange'))
+          }
+        }, 10)
+      }
+    }
+
+    document.addEventListener('mousedown', handleMouseDown)
+    document.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown)
+      document.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isSelecting])
 
   // Configure drag sensors for better UX
   const sensors = useSensors(

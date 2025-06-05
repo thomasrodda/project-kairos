@@ -10,6 +10,7 @@ import type { EditorBlock } from '../contexts/EditorContext'
  */
 export function findBlockFromNode(node: Node): { element: HTMLElement; id: string } | null {
   let currentNode: Node | null = node
+  console.log('findBlockFromNode called with node:', node)
 
   // Walk up the DOM tree to find the block element
   while (currentNode) {
@@ -17,7 +18,10 @@ export function findBlockFromNode(node: Node): { element: HTMLElement; id: strin
       const element = currentNode as HTMLElement
       const blockId = element.getAttribute('data-block-id')
 
+      console.log('Checking element:', element, 'blockId:', blockId, 'has block class:', element.classList.contains('block'))
+
       if (blockId && element.classList.contains('block')) {
+        console.log('Found block:', { element, id: blockId })
         return { element, id: blockId }
       }
     }
@@ -25,6 +29,7 @@ export function findBlockFromNode(node: Node): { element: HTMLElement; id: strin
     currentNode = currentNode.parentNode
   }
 
+  console.log('No block found for node')
   return null
 }
 
@@ -123,19 +128,32 @@ export function isMultiBlockSelection(range: Range): boolean {
   const startBlock = findBlockFromNode(range.startContainer)
   const endBlock = findBlockFromNode(range.endContainer)
 
-  return startBlock !== null && endBlock !== null && startBlock.id !== endBlock.id
+  const result = startBlock !== null && endBlock !== null && startBlock.id !== endBlock.id
+  console.log('isMultiBlockSelection:', {
+    startBlock: startBlock?.id,
+    endBlock: endBlock?.id,
+    isMultiBlock: result,
+  })
+
+  return result
 }
 
 /**
  * Get clean text offsets for a block, accounting for contentEditable quirks
  */
 export function getCleanOffsets(blockElement: HTMLElement, container: Node, offset: number): number {
+  console.log('getCleanOffsets called:', { blockElement, container, offset })
+
   // Handle the common case where the container is inside the block's content area
   const blockContent = blockElement.querySelector('.block__content')
-  if (!blockContent) return offset
+  if (!blockContent) {
+    console.log('No block content found')
+    return offset
+  }
 
   // If we're directly in the content element
   if (container === blockContent) {
+    console.log('Container is block content directly')
     return getOffsetInBlock(container, offset)
   }
 
@@ -148,12 +166,14 @@ export function getCleanOffsets(blockElement: HTMLElement, container: Node, offs
     let node: Node | null
     while ((node = walker.nextNode())) {
       if (node === container) {
+        console.log('Found text node, returning offset:', textOffset + offset)
         return textOffset + offset
       }
       textOffset += node.textContent?.length || 0
     }
   }
 
+  console.log('Fallback, returning original offset:', offset)
   return offset
 }
 
@@ -182,17 +202,26 @@ export function clearSelectionHighlights(container: HTMLElement): void {
  * Determine if the selection should be treated as a text selection vs block selection
  */
 export function shouldTreatAsTextSelection(range: Range): boolean {
+  console.log('shouldTreatAsTextSelection - range.collapsed:', range.collapsed)
+
   // If the selection is collapsed (no text selected), it's not a text selection
-  if (range.collapsed) return false
+  if (range.collapsed) {
+    console.log('Range is collapsed, returning false')
+    return false
+  }
 
   // Check if the selection started from a drag handle or block selection UI
   const startElement =
     range.startContainer.nodeType === Node.ELEMENT_NODE ? (range.startContainer as HTMLElement) : range.startContainer.parentElement
 
-  if (startElement?.closest('.block-drag-handle')) {
+  const isFromDragHandle = startElement?.closest('.block-drag-handle') !== null
+  console.log('Is from drag handle:', isFromDragHandle)
+
+  if (isFromDragHandle) {
     return false
   }
 
   // Otherwise, treat it as a text selection
+  console.log('Treating as text selection')
   return true
 }

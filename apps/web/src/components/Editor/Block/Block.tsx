@@ -21,7 +21,6 @@ interface BlockProps {
 export function Block({ block, isFocused, dragHandleProps }: BlockProps) {
   const dispatch = useEditorDispatch()
   const editorState = useEditorState()
-  // Single RefObject that can point to a <p>, <h1>, <h2>, <h3> or <li>.
   const blockRef = useRef<HTMLHeadingElement | HTMLParagraphElement | HTMLLIElement>(null)
   const [isUpdating, setIsUpdating] = useState(false)
 
