@@ -32,11 +32,8 @@ AI System Prompt Files
 ├── # 2. User Stories.md
 ├── # 3. MVP.md
 ├── # 5. Architecture.md
-├── # Assistant Guidelines.md
 ├── # Development Plan.md
-├── # Project Framework.md
-├── # Project Overview.md
-├── # Project Plan.md
+├── # Project Management & Development Guide.md
 ├── Analytics Feature Flags Guide.md
 ├── Backend Api Guide.md
 ├── CI CD Guide.md
@@ -49,7 +46,6 @@ AI System Prompt Files
 ├── Inline SVG System Guide.md
 ├── Performance Optimization Guide.md
 ├── Production Deployment Guide.md
-├── Prompting Guide.md
 ├── Scss Structure Guide.md
 ├── Security Guide.md
 └── Testing Guide.md

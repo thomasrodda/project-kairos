@@ -1,67 +1,41 @@
 # SCSS Structure Guide
 
-> This guide explains how we organize, write, and maintain SCSS for styling across all platforms of the app. It supports a clean, scalable, and component-based CSS architecture with a comprehensive design system and theming support.
+> SCSS organization with design token system, semantic color assignments, and cross-platform compatibility using relative units.
 
 ---
 
 ## Overview
 
-We use **SCSS** with a **design token system** instead of Tailwind or external UI libraries. This approach gives us complete control and flexibility while maintaining consistency across web, mobile, and desktop versions through a unified design system.
-
-This guide supports:
-
-- **Design token system** with CSS custom properties
-- **Semantic color assignments** for easy theming
-- **Dark/light/system theme support** (dark as default)
-- **Cross-platform compatibility** using relative units
-- **Modular component styles** with design system integration
-- **Future-proof architecture** for theme switching and customization
+We use **SCSS with design tokens** instead of Tailwind for complete control and flexibility. Supports dark/light themes, cross-platform compatibility, and component-based architecture.
 
 ---
 
 ## Design Token Structure
 
-Design tokens live in `packages/design-tokens/src/` and provide the foundation for all styling:
+Design tokens live in `packages/design-tokens/src/`:
 
 ```
 packages/design-tokens/src/
 ├── colors.scss          # Color palette and semantic assignments
 ├── typography.scss      # Font families, sizes, weights, line heights
-├── spacing.scss         # Margin, padding, and sizing scales
+├── spacing.scss         # Margin, padding, sizing scales
 ├── layout.scss          # Breakpoints, grid systems, z-index
 ├── semantic.scss        # Semantic assignments for theming
-├── themes/              # Theme-specific overrides (future)
-│   ├── dark.scss        # Dark theme variables
-│   ├── light.scss       # Light theme variables
-│   └── system.scss      # System preference detection
+├── animations.scss      # Timing, easing, keyframes
+├── shadows.scss         # Shadow system
 └── index.scss           # Unified export of all tokens
 ```
 
----
-
-## App-Specific SCSS Structure
-
-Located in: `apps/web/src/styles/`
+**App-Specific SCSS Structure** in `apps/web/src/styles/`:
 
 ```
 styles/
 ├── tokens/              # Design token imports
-│   └── index.scss       # Import from @kairos/design-tokens
 ├── base/                # Global resets, base styles
-│   ├── reset.scss       # CSS reset and normalize
-│   ├── typography.scss  # Global typography rules using tokens
-│   └── accessibility.scss # Focus states, screen reader styles
 ├── layout/              # Layout containers and grids
-│   ├── grid.scss        # Grid system using layout tokens
-│   └── containers.scss  # Layout containers and wrappers
 ├── components/          # Optional shared component styles
-│   └── buttons.scss     # Example: global button variants
-├── utilities/           # Utility classes generated from tokens
-│   ├── spacing.scss     # Margin/padding utilities
-│   ├── colors.scss      # Background/text color utilities
-│   └── typography.scss  # Font size/weight utilities
+├── utilities/           # Utility classes from tokens
 ├── themes/              # Theme switching logic
-│   └── theme-switch.scss # CSS for theme transition effects
 └── index.scss           # Global entry point
 ```
 
@@ -69,9 +43,9 @@ styles/
 
 ## Design Token Philosophy
 
-### 1. Raw Tokens vs Semantic Assignments
+### Raw Tokens vs Semantic Assignments
 
-**Raw color palette** (never changes between themes):
+**Raw color palette** (never changes):
 
 ```scss
 :root {
@@ -89,38 +63,26 @@ styles/
   --color-background: var(--color-neutral-900);
   --color-surface: var(--color-neutral-800);
   --color-text-primary: var(--color-neutral-100);
-  --color-border: var(--color-neutral-700);
 }
 
 [data-theme='light'] {
   // Light theme overrides
   --color-background: var(--color-neutral-100);
-  --color-surface: var(--color-white);
   --color-text-primary: var(--color-neutral-900);
-  --color-border: var(--color-neutral-300);
 }
 ```
 
-### 2. Modern Unit Strategy
+### Modern Unit Strategy
 
-- **Use `rem` for all spacing and typography** (accessibility and scalability)
+- **Use `rem` for all spacing and typography** (accessibility/scalability)
 - **Use `px` only for borders and precise details** (1px borders, icons)
-- **Use `%` and `vw/vh` for responsive layouts**
 - **Base font size: 16px = 1rem** (never change this assumption)
-
-### 3. Cross-Platform Consistency
-
-Design tokens work across all platforms:
-
-- **Web**: Direct CSS custom property usage
-- **Mobile**: Token values converted to platform-specific units
-- **Desktop**: Same tokens, potentially different base sizes
 
 ---
 
 ## Component Styling Approach
 
-### 1. Token-First Development
+### Token-First Development
 
 Always use design tokens, never arbitrary values:
 
@@ -137,26 +99,21 @@ Always use design tokens, never arbitrary values:
 .button {
   background-color: #b373fc;
   padding: 12px 16px;
-  font-size: 14px;
-  border-radius: 8px;
 }
 ```
 
-### 2. Component Style Location
+### Component Style Location
 
-Choose based on component scope:
-
-**Option A: Colocated with component** (recommended for specific components)
+**Option A: Colocated** (recommended for specific components)
 
 ```
-components/
-├── Editor/
-│   ├── Editor.tsx
-│   ├── Editor.scss
-│   └── index.ts
+components/Editor/
+├── Editor.tsx
+├── Editor.scss
+└── index.ts
 ```
 
-**Option B: Central component styles** (for shared UI components)
+**Option B: Central** (for shared UI components)
 
 ```
 styles/components/
@@ -165,12 +122,11 @@ styles/components/
 └── modals.scss
 ```
 
-### 3. Naming Convention
+### Naming Convention
 
 Use **BEM methodology** with **design system prefixes**:
 
 ```scss
-// Component block
 .editor-toolbar {
   // Element
   &__button {
@@ -186,9 +142,9 @@ Use **BEM methodology** with **design system prefixes**:
 
 ## Theme System Foundation
 
-### 1. Theme Switching Mechanism (Future Implementation)
+### Theme Switching Mechanism
 
-Themes will be controlled via a `data-theme` attribute on the root element:
+Themes controlled via `data-theme` attribute:
 
 ```html
 <html data-theme="dark">
@@ -202,9 +158,7 @@ Themes will be controlled via a `data-theme` attribute on the root element:
 </html>
 ```
 
-### 2. Theme Transition Effects
-
-Smooth transitions between themes:
+### Theme Transition Effects
 
 ```scss
 * {
@@ -215,69 +169,28 @@ Smooth transitions between themes:
 }
 ```
 
-### 3. System Preference Detection (Future)
-
-```scss
-@media (prefers-color-scheme: light) {
-  [data-theme='system'] {
-    // Apply light theme variables
-  }
-}
-```
-
 ---
 
 ## Import Strategy
 
-### 1. Design Token Import
-
-In your main SCSS file:
+### Design Token Import
 
 ```scss
 // Import design tokens first
 @import '@kairos/design-tokens';
 
-// Then import your app styles
+// Then import app styles
 @import './base/reset';
 @import './base/typography';
-@import './layout/grid';
 ```
 
-### 2. Component-Level Imports
-
-In component SCSS files:
+### Component-Level Imports
 
 ```scss
 // Design tokens are globally available via CSS custom properties
-// No need to import - just use var(--token-name)
-
 .my-component {
   color: var(--color-text-primary);
   padding: var(--spacing-md);
-}
-```
-
----
-
-## Utility Class Generation (Future)
-
-Generate utility classes from design tokens:
-
-```scss
-// Auto-generated from spacing tokens
-.m-sm {
-  margin: var(--spacing-sm);
-}
-.p-lg {
-  padding: var(--spacing-lg);
-}
-
-// Auto-generated from color tokens
-.text-primary {
-  color: var(--color-text-primary);
-}
-.bg-surface {
-  background-color: var(--color-surface);
 }
 ```
 
@@ -287,30 +200,20 @@ Generate utility classes from design tokens:
 
 ### Development
 
-- **Start with tokens**: Always check if a design token exists before creating custom values
-- **Semantic naming**: Use semantic color assignments (`--color-text-primary`) not raw colors (`--color-neutral-100`) in components
-- **Component isolation**: Scope styles to avoid global conflicts
-- **Design system compliance**: Follow token scales instead of arbitrary values
+- **Start with tokens**: Check if a design token exists before creating custom values
+- **Semantic naming**: Use semantic assignments (`--color-text-primary`) not raw colors
+- **Component isolation**: Scope styles to avoid conflicts
 
 ### Performance
 
 - **Minimize custom properties**: Don't create tokens for one-off values
 - **Efficient selectors**: Keep specificity low, avoid deep nesting
-- **Critical CSS**: Inline design tokens and base styles for first paint
 
 ### Maintenance
 
-- **Token documentation**: Document the purpose of semantic assignments
-- **Version control**: Track design token changes carefully
-- **Cross-platform testing**: Verify tokens work across all target platforms
+- **Token documentation**: Document semantic assignment purposes
+- **Cross-platform testing**: Verify tokens work across target platforms
 - **Accessibility**: Ensure sufficient contrast ratios in all themes
-
-### Future Considerations
-
-- **Component variants**: Plan for multiple button styles, form variations
-- **Animation tokens**: Motion duration and easing curves
-- **Platform adaptations**: Different spacing scales for touch vs. desktop
-- **User customization**: Allow users to adjust font sizes, contrast levels
 
 ---
 
@@ -333,6 +236,5 @@ Generate utility classes from design tokens:
 - 🔄 Theme switching implementation
 - 🔄 System preference detection
 - 🔄 User preference persistence
-- 🔄 Advanced animation and motion tokens
 
 This structure ensures scalability, maintainability, and consistency across all platforms while providing a solid foundation for future enhancements.
