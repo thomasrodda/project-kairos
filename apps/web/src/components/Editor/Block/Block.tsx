@@ -59,12 +59,9 @@ export function Block({ block, isFocused, dragHandleProps, onBlockClick }: Block
     const content = block.content || ''
     const placeholder = getPlaceholder()
 
-    // Show placeholder when empty and focused
-    if (content === '' && placeholder) {
-      return <span className="block__placeholder">{placeholder}</span>
-    }
-
-    return content
+    // Always use the same DOM structure to prevent React errors
+    // Use a consistent span element with conditional className
+    return <span className={content === '' && placeholder ? 'block__placeholder' : ''}>{content === '' && placeholder ? placeholder : content}</span>
   }
 
   // Get the appropriate class for the block type
@@ -83,7 +80,7 @@ export function Block({ block, isFocused, dragHandleProps, onBlockClick }: Block
       <BlockDragHandle blockId={block.id} onSelect={handleBlockSelect} dragHandleProps={dragHandleProps} />
 
       {/* Block content - no longer contentEditable */}
-      <div ref={blockRef} className={getBlockClass()} data-block-id={block.id}>
+      <div ref={blockRef} className={getBlockClass()} data-block-id={block.id} suppressContentEditableWarning>
         {renderContent()}
       </div>
     </div>
