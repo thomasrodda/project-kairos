@@ -146,6 +146,7 @@ apps
 │   │   └── EditorContext.tsx
 │   ├── hooks
 │   │   ├── index.ts
+│   │   ├── useCrossBlockSelection.ts
 │   │   └── useDismiss.ts
 │   ├── pages
 │   ├── styles
@@ -155,6 +156,7 @@ apps
 │   ├── test
 │   │   └── setup.ts
 │   ├── utils
+│   │   └── textSelection.ts
 │   ├── App.test.tsx
 │   ├── App.tsx
 │   ├── main.tsx

@@ -24,6 +24,17 @@ export interface EditorBlock {
   }
 }
 
+// Cross-block text selection state
+export interface CrossBlockSelection {
+  startBlockId: string // ID of the block where selection starts
+  startOffset: number // Character offset within start block
+  endBlockId: string // ID of the block where selection ends
+  endOffset: number // Character offset within end block
+  selectedText: string // The actual selected text
+  selectedBlocks: string[] // IDs of fully selected blocks (middle blocks)
+  isCollapsed: boolean // Whether the selection is collapsed (cursor with no selection)
+}
+
 // Global editor state
 export interface EditorState {
   pageId: string | null // Current page being edited
@@ -31,9 +42,10 @@ export interface EditorState {
   blocks: EditorBlock[] // All blocks in the page
   focusedBlockId: string | null // Currently focused block
   selectedBlockIds: string[] // Currently selected blocks (via drag handle)
+  crossBlockSelection: CrossBlockSelection | null // Cross-block text selection
   isDragging: boolean // Whether we're currently dragging a block
   selectedRange?: {
-    // Text selection across blocks
+    // Text selection across blocks (deprecated - using crossBlockSelection instead)
     startBlockId: string
     startOffset: number
     endBlockId: string
@@ -63,6 +75,7 @@ export type EditorAction =
   | { type: 'CLEAR_SELECTION' }
   | { type: 'SET_DRAGGING'; isDragging: boolean }
   | { type: 'SET_SELECTION'; selection: EditorState['selectedRange'] }
+  | { type: 'SET_CROSS_BLOCK_SELECTION'; selection: CrossBlockSelection | null }
   | { type: 'MARK_SAVED' }
   | { type: 'RESET_EDITOR' }
 
@@ -85,6 +98,7 @@ const initialState: EditorState = {
   blocks: [createInitialBlock()],
   focusedBlockId: null,
   selectedBlockIds: [],
+  crossBlockSelection: null,
   isDragging: false,
   selectedRange: undefined,
   isDirty: false,
@@ -104,7 +118,8 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         pageTitle: action.title,
         blocks: action.blocks.length > 0 ? action.blocks : [createInitialBlock()],
         focusedBlockId: null,
-        selectedBlockIds: [], // CHANGED: Clear selection
+        selectedBlockIds: [],
+        crossBlockSelection: null,
         selectedRange: undefined,
         isDirty: false,
         lastSaved: new Date(),
@@ -137,6 +152,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         blocks: newBlocks,
         focusedBlockId: block.id,
         selectedBlockIds: [], // Clear selection when adding new block
+        crossBlockSelection: null, // Clear text selection too
         isDirty: true,
       }
     }
@@ -173,6 +189,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         blocks: newBlocks,
         focusedBlockId: newFocusedId,
         selectedBlockIds: [], // Clear selection when deleting block
+        crossBlockSelection: null, // Clear text selection too
         isDirty: true,
       }
     }
@@ -202,6 +219,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         blocks: newBlocks,
         focusedBlockId: newFocusedId,
         selectedBlockIds: [], // Clear selection after deletion
+        crossBlockSelection: null, // Clear text selection too
         isDirty: true,
       }
     }
@@ -229,6 +247,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         focusedBlockId: action.blockId,
         selectedBlockIds: [], // Clear selection when focusing for editing
+        crossBlockSelection: null, // Clear text selection when focusing a block
       }
 
     case 'SET_SELECTED_BLOCKS':
@@ -236,6 +255,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         selectedBlockIds: action.blockIds,
         focusedBlockId: null, // Clear focus when selecting
+        crossBlockSelection: null, // Clear text selection when selecting blocks
       }
 
     case 'TOGGLE_BLOCK_SELECTION': {
@@ -246,6 +266,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         selectedBlockIds: isSelected ? state.selectedBlockIds.filter((id) => id !== blockId) : [...state.selectedBlockIds, blockId],
         focusedBlockId: null, // Clear focus when selecting
+        crossBlockSelection: null, // Clear text selection
       }
     }
 
@@ -263,6 +284,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
         ...state,
         selectedBlockIds: selectedIds,
         focusedBlockId: null, // Clear focus when selecting range
+        crossBlockSelection: null, // Clear text selection
       }
     }
 
@@ -270,6 +292,7 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
       return {
         ...state,
         selectedBlockIds: [],
+        crossBlockSelection: null, // Also clear text selection
       }
 
     case 'SET_DRAGGING':
@@ -282,6 +305,14 @@ function editorReducer(state: EditorState, action: EditorAction): EditorState {
       return {
         ...state,
         selectedRange: action.selection,
+      }
+
+    case 'SET_CROSS_BLOCK_SELECTION':
+      return {
+        ...state,
+        crossBlockSelection: action.selection,
+        // Clear block selection when text is selected
+        selectedBlockIds: action.selection ? [] : state.selectedBlockIds,
       }
 
     case 'MARK_SAVED':
