@@ -48,7 +48,8 @@ AI System Prompt Files
 ├── Production Deployment Guide.md
 ├── Scss Structure Guide.md
 ├── Security Guide.md
-└── Testing Guide.md
+├── Testing Guide.md
+└── Testing Plan.md
 apps
 ├── api
 │   ├── dev-server.ts
@@ -124,6 +125,7 @@ apps
 │   │   │   │   └── index.ts
 │   │   │   ├── PageTitle
 │   │   │   │   ├── PageTitle.scss
+│   │   │   │   ├── PageTitle.test.tsx
 │   │   │   │   ├── PageTitle.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── Editor.scss
@@ -158,7 +160,8 @@ apps
 │   │   │   └── reset.scss
 │   │   └── index.scss
 │   ├── test
-│   │   └── setup.ts
+│   │   ├── setup.ts
+│   │   └── utils.tsx
 │   ├── utils
 │   │   └── textSelection.ts
 │   ├── App.test.tsx
