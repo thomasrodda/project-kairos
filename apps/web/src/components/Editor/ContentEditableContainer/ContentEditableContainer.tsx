@@ -207,6 +207,11 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
 
       const range = selection.getRangeAt(0)
 
+      // Handle selection deletion first if there's selected text
+      if (!range.collapsed) {
+        handleDeleteSelection()
+      }
+
       // Find which block we're in
       const blockEl = findBlockElement(range.startContainer)
       if (!blockEl) return
@@ -226,10 +231,13 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
       // Save cursor position for after update
       savedSelection.current = { blockId, offset: offset + data.length }
 
+      // Mark that we're doing an internal update
+      isInternalUpdate.current = true
+
       // Update block content
       dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
     },
-    [dispatch, editorState.blocks]
+    [dispatch, editorState.blocks, handleDeleteSelection]
   )
 
   // Handle Enter key to create new blocks
@@ -396,8 +404,13 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
         handleDeleteSelection()
       }
 
+      // Get current position after potential deletion
+      const currentSelection = window.getSelection()
+      if (!currentSelection || currentSelection.rangeCount === 0) return
+      const currentRange = currentSelection.getRangeAt(0)
+
       // Get current position
-      const blockEl = findBlockElement(range.startContainer)
+      const blockEl = findBlockElement(currentRange.startContainer)
       if (!blockEl) return
 
       const blockId = blockEl.getAttribute('data-block-id')
@@ -406,7 +419,7 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
       const block = editorState.blocks.find((b) => b.id === blockId)
       if (!block) return
 
-      const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
+      const offset = getTextOffset(blockEl, currentRange.startContainer, currentRange.startOffset)
 
       if (blocksToInsert.length === 1) {
         // Single block paste
@@ -415,24 +428,33 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
         // Save cursor position after paste
         savedSelection.current = { blockId, offset: offset + blocksToInsert[0].content.length }
 
+        // Mark as internal update
+        isInternalUpdate.current = true
+
         dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
       } else {
         // Multi-block paste
         const beforeCursor = block.content.slice(0, offset)
         const afterCursor = block.content.slice(offset)
 
+        // Mark as internal update for all operations
+        isInternalUpdate.current = true
+
         // Update first block with first pasted content
-        dispatch({ type: 'UPDATE_BLOCK', blockId, content: beforeCursor + blocksToInsert[0].content })
+        const firstNewContent = beforeCursor + blocksToInsert[0].content
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: firstNewContent })
 
         // Create middle blocks
         let lastBlockId = blockId
+        const newBlocks: EditorBlock[] = []
+
         for (let i = 1; i < blocksToInsert.length - 1; i++) {
           const newBlock: EditorBlock = {
             id: generateId(),
             type: blocksToInsert[i].type as EditorBlock['type'],
             content: blocksToInsert[i].content,
           }
-          dispatch({ type: 'ADD_BLOCK', block: newBlock, afterBlockId: lastBlockId })
+          newBlocks.push(newBlock)
           lastBlockId = newBlock.id
         }
 
@@ -442,10 +464,16 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
           type: blocksToInsert[blocksToInsert.length - 1].type as EditorBlock['type'],
           content: blocksToInsert[blocksToInsert.length - 1].content + afterCursor,
         }
+        newBlocks.push(lastBlock)
+
         // Save cursor position for last pasted block
         savedSelection.current = { blockId: lastBlock.id, offset: blocksToInsert[blocksToInsert.length - 1].content.length }
 
-        dispatch({ type: 'ADD_BLOCK', block: lastBlock, afterBlockId: lastBlockId })
+        // Add all new blocks in a batch
+        newBlocks.forEach((block, index) => {
+          const afterId = index === 0 ? blockId : newBlocks[index - 1].id
+          dispatch({ type: 'ADD_BLOCK', block, afterBlockId: afterId })
+        })
       }
     },
     [dispatch, editorState.blocks, handleDeleteSelection]
@@ -453,7 +481,23 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
 
   // Update DOM when blocks change
   useEffect(() => {
-    if (!containerRef.current || isInternalUpdate.current) return
+    if (!containerRef.current) return
+
+    // Update the DOM to reflect the state changes
+    const blocks = containerRef.current.querySelectorAll('.block__content')
+
+    blocks.forEach((blockEl) => {
+      const blockId = blockEl.getAttribute('data-block-id')
+      if (!blockId) return
+
+      const block = editorState.blocks.find((b) => b.id === blockId)
+      if (!block) return
+
+      // Only update if content has changed
+      if (blockEl.textContent !== block.content) {
+        blockEl.textContent = block.content
+      }
+    })
 
     // Restore cursor position after React has updated the DOM
     if (savedSelection.current) {
@@ -462,6 +506,41 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
 
     isInternalUpdate.current = false
   }, [editorState.blocks, restoreCursorPosition])
+
+  // Handle input event as fallback for environments that don't support beforeinput
+  const handleInput = useCallback(
+    (e: React.FormEvent<HTMLDivElement>) => {
+      // Only process if we haven't already handled it via beforeinput
+      if (isInternalUpdate.current) return
+
+      const target = e.target as HTMLElement
+      const blockEl = findBlockElement(target)
+      if (!blockEl) return
+
+      const blockId = blockEl.getAttribute('data-block-id')
+      if (!blockId) return
+
+      const block = editorState.blocks.find((b) => b.id === blockId)
+      if (!block) return
+
+      // Get the new content from the DOM
+      const newContent = blockEl.textContent || ''
+
+      if (newContent !== block.content) {
+        // Save cursor position
+        const selection = window.getSelection()
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0)
+          const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
+          savedSelection.current = { blockId, offset }
+        }
+
+        isInternalUpdate.current = true
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+      }
+    },
+    [dispatch, editorState.blocks]
+  )
 
   // Properly typed event handler for beforeinput
   const handleBeforeInputTyped = handleBeforeInput as unknown as React.FormEventHandler<HTMLDivElement>
@@ -473,6 +552,7 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
       contentEditable
       suppressContentEditableWarning
       onBeforeInput={handleBeforeInputTyped}
+      onInput={handleInput}
       onKeyDown={handleKeyDown}
       onPaste={handlePaste}
       onClick={(e) => {

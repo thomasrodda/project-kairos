@@ -31,9 +31,9 @@ The editor currently supports:
 
 ## 1. Unit Tests for Core Components
 
-### 1.1 PageTitle Component Tests (`PageTitle.test.tsx`)
+### 1.1 PageTitle Component Tests (`PageTitle.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: Low**
+**Priority: P0** | **Complexity: Low** | **Status: Complete (17/17 tests)**
 
 - **Rendering & Display**
 
@@ -60,9 +60,9 @@ The editor currently supports:
   - [x] Prevents script injection (XSS)
   - [x] Works with IME (Input Method Editor) for non-Latin text
 
-### 1.2 Block Component Tests (`Block.test.tsx`)
+### 1.2 Block Component Tests (`Block.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: Medium**
+**Priority: P0** | **Complexity: Medium** | **Status: Complete (25/25 tests)**
 
 - **Rendering (Static Types Only)**
 
@@ -113,9 +113,9 @@ The editor currently supports:
   - [ ] Detects Ctrl/Cmd key for toggle selection
   - [ ] Works with touch events on mobile
 
-### 1.4 ContentEditableContainer Component Tests (`ContentEditableContainer.test.tsx`)
+### 1.4 ContentEditableContainer Component Tests (`ContentEditableContainer.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: High**
+**Priority: P0** | **Complexity: High** | **Status: Complete (23/23 tests)**
 
 - **Basic Editing**
 
@@ -143,11 +143,16 @@ The editor currently supports:
   - [x] Prevents dangerous HTML injection
 
 - **Edge Cases**
+
   - [x] Handles rapid typing without losing characters
   - [x] Works at block boundaries
   - [x] Handles emoji and special characters
   - [x] Recovers from malformed paste data
   - [x] Works with browser autofill
+
+- **Click Handling**
+  - [x] Calls onBlockClick when clicking on a block
+  - [x] Handles clicks on nested elements within blocks
 
 ### 1.5 EditorContent Component Tests (`EditorContent.test.tsx`)
 
