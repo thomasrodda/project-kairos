@@ -641,7 +641,7 @@ describe('ContentEditableContainer', () => {
 
   describe('✅ Click Handling', () => {
     it('calls onBlockClick when clicking on a block', async () => {
-      const { store } = renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Click me' }])
+      renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Click me' }])
 
       const blockContent = screen.getByText('Click me')
       fireEvent.click(blockContent)
@@ -650,7 +650,7 @@ describe('ContentEditableContainer', () => {
     })
 
     it('handles clicks on nested elements within blocks', async () => {
-      const { store } = renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Nested content' }])
+      renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Nested content' }])
 
       const blockContent = screen.getByText('Nested content')
 
