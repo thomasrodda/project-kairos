@@ -61,7 +61,10 @@ apps
 └── web
 ├── cypress
 │   ├── e2e
-│   │   └── app.cy.ts
+│   │   ├── app.cy.ts
+│   │   ├── editor-advanced.cy.ts
+│   │   ├── editor-basic.cy.ts
+│   │   └── editor-selection.cy.ts
 │   ├── support
 │   │   ├── commands.ts
 │   │   ├── components.ts
@@ -133,6 +136,8 @@ apps
 │   │   │   │   ├── PageTitle.test.tsx
 │   │   │   │   ├── PageTitle.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── Editor.performance.simple.test.tsx
+│   │   │   ├── Editor.performance.test.tsx
 │   │   │   ├── Editor.scss
 │   │   │   ├── Editor.tsx
 │   │   │   └── index.ts
