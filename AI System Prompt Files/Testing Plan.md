@@ -292,36 +292,53 @@ The editor currently supports:
 
 ## 3. Utility Function Tests
 
-### 3.1 textSelection Utilities (`textSelection.test.ts`)
+### 3.1 textSelection Utilities (`textSelection.test.ts`) ✅
 
-**Priority: P1** | **Complexity: Medium**
+**Priority: P1** | **Complexity: Medium** | **Status: Complete (36/36 tests)**
 
 - **findBlockFromNode**
 
-  - [ ] Finds block from text node
-  - [ ] Finds block from element node
-  - [ ] Returns null for non-block nodes
-  - [ ] Handles deeply nested nodes
+  - [x] Finds block from text node
+  - [x] Finds block from element node
+  - [x] Returns null for non-block nodes
+  - [x] Handles deeply nested nodes
+  - [x] Finds block from parent block element
+  - [x] Returns null when block content is missing from parent block
 
 - **getBlockIdsBetween**
 
-  - [ ] Returns single block for same start/end
-  - [ ] Returns range for different blocks
-  - [ ] Handles reversed selection
-  - [ ] Returns empty for invalid IDs
+  - [x] Returns single block for same start/end
+  - [x] Returns range for different blocks
+  - [x] Handles reversed selection
+  - [x] Returns empty for invalid IDs
+  - [x] Returns empty when start ID is invalid
+  - [x] Returns empty when end ID is invalid
+  - [x] Handles selection across all blocks
 
 - **categorizeSelectedBlocks**
 
-  - [ ] Identifies fully selected middle blocks
-  - [ ] Identifies partially selected first/last
-  - [ ] Handles single block selection
-  - [ ] Works with empty blocks
+  - [x] Identifies fully selected middle blocks
+  - [x] Identifies partially selected first/last
+  - [x] Handles single block selection
+  - [x] Works with empty blocks
+  - [x] Handles two block selection
+  - [x] Returns empty arrays for invalid block IDs
+  - [x] Handles reversed selection correctly
 
 - **getCleanOffsets**
-  - [ ] Calculates text offset correctly
-  - [ ] Handles element containers
-  - [ ] Handles text node containers
-  - [ ] Works with nested structures
+
+  - [x] Calculates text offset correctly
+  - [x] Handles element containers
+  - [x] Handles text node containers
+  - [x] Works with nested structures
+  - [x] Returns offset for container equal to blockElement
+  - [x] Handles empty text nodes
+  - [x] Returns offset as-is for text node not found in block
+
+- **Additional Functions**
+  - [x] isMultiBlockSelection - detects multi-block selections
+  - [x] shouldTreatAsTextSelection - determines selection type
+  - [x] getRangeText - extracts text from range
 
 ---
 
