@@ -10,3 +10,5 @@ build/
 .turbo/
 coverage/
 **/dist/
+cypress/screenshots/
+cypress/videos/
