@@ -162,6 +162,8 @@ apps
 │   │   ├── useCrossBlockSelection.ts
 │   │   ├── useDismiss.test.ts
 │   │   └── useDismiss.ts
+│   ├── integration
+│   │   └── Editor.integration.test.tsx
 │   ├── pages
 │   ├── styles
 │   │   ├── base
