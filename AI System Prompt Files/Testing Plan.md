@@ -84,34 +84,34 @@ The editor currently supports:
   - [x] Updates when block prop changes
   - [x] Maintains isFocused state correctly
 
-### 1.3 BlockDragHandle Component Tests (`BlockDragHandle.test.tsx`)
+### 1.3 BlockDragHandle Component Tests (`BlockDragHandle.test.tsx`) ✅
 
-**Priority: P1** | **Complexity: Low**
+**Priority: P1** | **Complexity: Low** | **Status: Complete (25/25 tests)**
 
 - **Rendering**
 
-  - [ ] Renders grab icon
-  - [ ] Has correct ARIA attributes
-  - [ ] Shows tooltip on hover
+  - [x] Renders grab icon
+  - [x] Has correct ARIA attributes
+  - [x] Shows tooltip on hover
 
 - **Mouse Interactions**
 
-  - [ ] Calls onSelect with blockId on mousedown
-  - [ ] Passes mouse event for modifier key detection
-  - [ ] Changes cursor to grab on hover
-  - [ ] Changes cursor to grabbing on mousedown
+  - [x] Calls onSelect with blockId on mousedown
+  - [x] Passes mouse event for modifier key detection
+  - [x] Changes cursor to grab on hover
+  - [x] Changes cursor to grabbing on mousedown
 
 - **Keyboard Interactions**
 
-  - [ ] Responds to Enter key
-  - [ ] Responds to Space key
-  - [ ] Prevents default behavior
-  - [ ] Maintains focus state
+  - [x] Responds to Enter key
+  - [x] Responds to Space key
+  - [x] Prevents default behavior
+  - [x] Maintains focus state
 
 - **Multi-Select Support**
-  - [ ] Detects Shift key for range selection
-  - [ ] Detects Ctrl/Cmd key for toggle selection
-  - [ ] Works with touch events on mobile
+  - [x] Detects Shift key for range selection
+  - [x] Detects Ctrl/Cmd key for toggle selection
+  - [x] Works with touch events on mobile
 
 ### 1.4 ContentEditableContainer Component Tests (`ContentEditableContainer.test.tsx`) ✅
 

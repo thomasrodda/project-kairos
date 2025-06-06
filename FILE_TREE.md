@@ -112,6 +112,7 @@ apps
 │   │   │   │   ├── Block.test.tsx
 │   │   │   │   ├── Block.tsx
 │   │   │   │   ├── BlockDragHandle.scss
+│   │   │   │   ├── BlockDragHandle.test.tsx
 │   │   │   │   ├── BlockDragHandle.tsx
 │   │   │   │   ├── DraggableBlock.scss
 │   │   │   │   ├── DraggableBlock.tsx
