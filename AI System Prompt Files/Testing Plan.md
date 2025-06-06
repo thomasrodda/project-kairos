@@ -154,46 +154,80 @@ The editor currently supports:
   - [x] Calls onBlockClick when clicking on a block
   - [x] Handles clicks on nested elements within blocks
 
-### 1.5 EditorContent Component Tests (`EditorContent.test.tsx`)
+### 1.5 EditorContent Component Tests (`EditorContent.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: High**
+**Priority: P0** | **Complexity: High** | **Status: Complete (57/58 tests)**
 
 - **Component Structure**
 
-  - [ ] Renders PageTitle component
-  - [ ] Renders all blocks from state
-  - [ ] Wraps blocks in DndContext
-  - [ ] Includes screen reader announcements
+  - [x] Renders PageTitle component
+  - [x] Renders all blocks from state
+  - [x] Wraps blocks in DndContext
+  - [x] Includes screen reader announcements
+  - [x] Renders ContentEditableContainer with blocks
+  - [x] Renders SortableContext for drag and drop
+  - [x] Applies focused state to focused block
+  - [x] Renders drag overlay when dragging
+  - [x] Adds ARIA labels to blocks
+  - [x] Has proper document role and aria-label
+  - [x] Has proper group role for blocks container
 
 - **Drag and Drop**
 
-  - [ ] Initiates drag on handle drag
-  - [ ] Shows drag overlay during drag
-  - [ ] Updates block order on drop
-  - [ ] Cancels drag on Escape
-  - [ ] Announces drag operations to screen readers
-  - [ ] Clears text selection on drag start
+  - [x] Initiates drag on handle drag
+  - [x] Shows drag overlay during drag
+  - [x] Updates block order on drop
+  - [x] Cancels drag on Escape
+  - [x] Announces drag operations to screen readers
+  - [x] Clears text selection on drag start
+  - [x] Applies sorting class during drag
+  - [x] Handles invalid block IDs during drag
+  - [x] Disables cross-block selection during drag
 
 - **Selection Management**
 
-  - [ ] Clears selection on empty space click
-  - [ ] Clears selection on Escape key
-  - [ ] Maintains focus after operations
-  - [ ] Integrates with useDismiss hook
+  - [x] Clears selection on empty space click
+  - [x] Clears selection on Escape key
+  - [x] Maintains focus after operations
+  - [x] Integrates with useDismiss hook
+  - [x] Clears text selection on empty space click
+  - [x] Focuses last block when clicking below all content
+  - [x] Clears block selection when text is selected
+  - [x] Does not clear selection when clicking on blocks
+  - [x] Does not clear selection when clicking on page title
+  - [x] Does not clear selection when clicking on content editable container
+  - [x] Announces selection cleared to screen readers
+  - [x] Clears text selection on Escape when text is selected
+  - [x] Prioritizes text selection escape over block selection
 
 - **Keyboard Shortcuts**
 
-  - [ ] Delete key removes selected blocks
-  - [ ] Backspace key removes selected blocks
-  - [ ] Prevents deletion of last block
-  - [ ] Escape clears all selections
+  - [x] Delete key removes selected blocks
+  - [x] Backspace key removes selected blocks
+  - [x] Prevents deletion of last block
+  - [x] Escape clears all selections
+  - [x] Ignores shortcuts when block is focused
+  - [x] Ignores shortcuts when text is selected
+  - [x] Announces single block deletion to screen readers
+  - [x] Announces multiple block deletion to screen readers
+  - [x] Prevents default behavior for handled shortcuts
+  - [x] Does not handle shortcuts when no blocks are selected
+  - [x] Cleans up keyboard event listeners on unmount
+  - [x] Handles Escape key for text selection first
 
 - **Copy Operations**
-  - [ ] Copies plain text from selection
-  - [ ] Copies markdown format
-  - [ ] Copies custom Kairos format
-  - [ ] Handles partial block selection
-  - [ ] Handles full block selection
+  - [x] Copies plain text from selection
+  - [x] Copies markdown format
+  - [x] Copies custom Kairos format
+  - [x] Handles partial block selection
+  - [x] Handles full block selection
+  - [x] Handles empty blocks in selection
+  - [x] Does not copy when no text is selected
+  - [x] Announces copy to screen readers
+  - [x] Handles invalid block IDs in selection
+  - [x] Cleans up copy event listener on unmount
+  - [x] Handles single block selection correctly
+  - [x] Preserves block types in custom format
 
 ---
 

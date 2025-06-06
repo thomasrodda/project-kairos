@@ -124,6 +124,7 @@ apps
 │   │   │   │   └── index.ts
 │   │   │   ├── EditorContent
 │   │   │   │   ├── EditorContent.scss
+│   │   │   │   ├── EditorContent.test.tsx
 │   │   │   │   ├── EditorContent.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── PageTitle
