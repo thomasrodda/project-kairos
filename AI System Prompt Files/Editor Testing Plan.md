@@ -115,7 +115,9 @@ The editor currently supports:
 
 ### 1.4 ContentEditableContainer Component Tests (`ContentEditableContainer.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: High** | **Status: Complete (23/23 tests)**
+**Priority: P0** | **Complexity: High** | **Status: Complete (28/28 tests)**
+
+**Note**: Includes 5 additional tests from `ContentEditableContainer.simple.test.tsx`
 
 - **Basic Editing**
 
@@ -442,7 +444,7 @@ The editor currently supports:
 
 ### 6.1 Performance Tests ✅
 
-**Priority: P1** | **Complexity: High** | **Status: Complete**
+**Priority: P1** | **Complexity: High** | **Status: Complete (18/22 tests)**
 
 - **Metrics to Track**
 
@@ -459,10 +461,11 @@ The editor currently supports:
 
 **Implementation Notes:**
 
-- Created `Editor.performance.test.tsx` with comprehensive performance tests
-- Created `Editor.performance.simple.test.tsx` for render time benchmarks
+- Created `Editor.performance.test.tsx` with comprehensive performance tests (7 passing, 4 skipped)
+- Created `Editor.performance.simple.test.tsx` for render time benchmarks (7 passing)
 - Tests measure actual performance metrics and ensure thresholds are met
 - Memory usage tests verify no leaks on unmount
+- **Technical Debt**: 4 tests skipped in `Editor.performance.test.tsx` due to test environment limitations
 
 ### 6.2 Accessibility Tests
 
@@ -600,7 +603,33 @@ The editor currently supports:
 
 ---
 
-## 10. Maintenance Plan
+## 10. Technical Debt
+
+### Skipped Tests
+
+**Editor.performance.test.tsx** - 4 tests currently skipped:
+
+- "should handle rapid typing without losing characters" - ContentEditableContainer prevents default on input events
+- "should update selection in < 50ms" - IndexSizeError issues with selection ranges
+- "should handle complex selection patterns efficiently" - IndexSizeError issues with selection ranges
+- "should handle large copy operations efficiently" - Selection range issues in test environment
+
+**EditorContent.test.tsx** - 1 test currently skipped:
+
+- "announces cancelled drag to screen readers" - Accessibility test for drag cancellation
+
+**Reason**: These tests have implementation challenges:
+
+- The performance tests rely on simulating direct DOM input/selection events which conflict with the ContentEditableContainer's event handling that prevents default
+- The accessibility test requires more sophisticated screen reader simulation
+  Consider:
+- Moving these to a real browser environment (e.g., Playwright)
+- Using Chrome DevTools Protocol for memory profiling
+- Implementing custom performance monitoring utilities
+
+---
+
+## 11. Maintenance Plan
 
 ### Regular Tasks
 

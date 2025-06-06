@@ -39,6 +39,7 @@ AI System Prompt Files
 ├── CI CD Guide.md
 ├── Component Structure Guide.md
 ├── Data Model Guide.md
+├── Editor Testing Plan.md
 ├── Enhanced Custom Editor Plan.md
 ├── Error Handling Guide.md
 ├── Extensibility & Plugin Architecture Guide.md
@@ -48,8 +49,7 @@ AI System Prompt Files
 ├── Production Deployment Guide.md
 ├── Scss Structure Guide.md
 ├── Security Guide.md
-├── Testing Guide.md
-└── Testing Plan.md
+└── Testing Guide.md
 apps
 ├── api
 │   ├── dev-server.ts
