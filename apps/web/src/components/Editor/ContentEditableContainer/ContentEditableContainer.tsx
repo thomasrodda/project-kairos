@@ -3,7 +3,7 @@
 // Prevents block merging by intercepting browser editing operations.
 // Maintains block structure while allowing seamless text selection.
 
-import React, { useRef, useEffect, useCallback, useState } from 'react'
+import React, { useRef, useEffect, useCallback } from 'react'
 import { useEditorState, useEditorDispatch } from '../../../contexts/EditorContext'
 import type { EditorBlock } from '../../../contexts/EditorContext'
 import { generateId } from '@kairos/utils'
@@ -20,7 +20,6 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
   const containerRef = useRef<HTMLDivElement>(null)
   const isInternalUpdate = useRef(false)
   const savedSelection = useRef<{ blockId: string; offset: number } | null>(null)
-  const [isUpdating, setIsUpdating] = useState(false)
 
   // Utility functions (moved up to be available for all callbacks)
   const findBlockElement = (node: Node): HTMLElement | null => {
@@ -167,22 +166,6 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
       }
     }
   }, [dispatch, editorState.blocks])
-
-  // Save current cursor position
-  const saveCursorPosition = useCallback(() => {
-    const selection = window.getSelection()
-    if (!selection || selection.rangeCount === 0) return
-
-    const range = selection.getRangeAt(0)
-    const blockEl = findBlockElement(range.startContainer)
-    if (!blockEl) return
-
-    const blockId = blockEl.getAttribute('data-block-id')
-    if (!blockId) return
-
-    const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
-    savedSelection.current = { blockId, offset }
-  }, [])
 
   // Restore saved cursor position
   const restoreCursorPosition = useCallback(() => {
@@ -445,7 +428,6 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
         dispatch({ type: 'UPDATE_BLOCK', blockId, content: firstNewContent })
 
         // Create middle blocks
-        let lastBlockId = blockId
         const newBlocks: EditorBlock[] = []
 
         for (let i = 1; i < blocksToInsert.length - 1; i++) {
@@ -455,7 +437,6 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
             content: blocksToInsert[i].content,
           }
           newBlocks.push(newBlock)
-          lastBlockId = newBlock.id
         }
 
         // Create last block with remaining content

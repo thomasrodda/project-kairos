@@ -1,4 +1,3 @@
-import React from 'react'
 import { screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { ContentEditableContainer } from './ContentEditableContainer'
 import { renderWithEditor } from '../../../test/utils'
@@ -169,7 +168,7 @@ describe('ContentEditableContainer', () => {
 
   describe('✅ Basic Editing', () => {
     it('prevents default contentEditable behavior', async () => {
-      const { store } = renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Test' }])
+      renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Test' }])
       const container = getContainer()
       const blockEl = container.querySelector('[data-block-id="block-1"] .block__content') as HTMLElement
 
@@ -192,7 +191,7 @@ describe('ContentEditableContainer', () => {
         cancelable: true,
       })
 
-      const preventDefaultSpy = jest.spyOn(event, 'preventDefault')
+      jest.spyOn(event, 'preventDefault')
 
       // Dispatch the event
       await act(async () => {
@@ -642,7 +641,7 @@ describe('ContentEditableContainer', () => {
 
   describe('✅ Click Handling', () => {
     it('calls onBlockClick when clicking on a block', async () => {
-      renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Click me' }])
+      const { store } = renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Click me' }])
 
       const blockContent = screen.getByText('Click me')
       fireEvent.click(blockContent)
@@ -651,7 +650,7 @@ describe('ContentEditableContainer', () => {
     })
 
     it('handles clicks on nested elements within blocks', async () => {
-      renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Nested content' }])
+      const { store } = renderContainer([{ id: 'block-1', type: 'paragraph', content: 'Nested content' }])
 
       const blockContent = screen.getByText('Nested content')
 
