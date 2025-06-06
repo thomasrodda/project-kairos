@@ -344,38 +344,40 @@ The editor currently supports:
 
 ## 4. Integration Tests
 
-### 4.1 EditorContext Reducer Tests (`EditorContext.test.tsx`)
+### 4.1 EditorContext Reducer Tests (`EditorContext.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: Medium**
+**Priority: P0** | **Complexity: Medium** | **Status: Complete (41/41 tests)**
 
 - **State Management**
 
-  - [ ] Initial state is correct
-  - [ ] All actions update state immutably
-  - [ ] Invalid actions don't change state
+  - [x] Initial state is correct
+  - [x] All actions update state immutably
+  - [x] Invalid actions don't change state
 
 - **Action Tests**
 
-  - [ ] SET_PAGE resets editor state
-  - [ ] ADD_BLOCK inserts at correct position
-  - [ ] UPDATE_BLOCK modifies content
-  - [ ] DELETE_BLOCK maintains valid state
-  - [ ] DELETE_BLOCKS handles multiple
-  - [ ] REORDER_BLOCKS updates order
-  - [ ] SET_FOCUSED_BLOCK manages focus
-  - [ ] SET_SELECTED_BLOCKS manages selection
-  - [ ] TOGGLE_BLOCK_SELECTION toggles individual blocks
-  - [ ] SELECT_BLOCK_RANGE selects block range
-  - [ ] CLEAR_SELECTION clears all selections
-  - [ ] SET_DRAGGING updates drag state
-  - [ ] SET_CROSS_BLOCK_SELECTION manages text selection
-  - [ ] CHANGE_BLOCK_TYPE action (not yet used in UI)
+  - [x] SET_PAGE resets editor state
+  - [x] ADD_BLOCK inserts at correct position
+  - [x] UPDATE_BLOCK modifies content
+  - [x] DELETE_BLOCK maintains valid state
+  - [x] DELETE_BLOCKS handles multiple
+  - [x] REORDER_BLOCKS updates order
+  - [x] SET_FOCUSED_BLOCK manages focus
+  - [x] SET_SELECTED_BLOCKS manages selection
+  - [x] TOGGLE_BLOCK_SELECTION toggles individual blocks
+  - [x] SELECT_BLOCK_RANGE selects block range
+  - [x] CLEAR_SELECTION clears all selections
+  - [x] SET_DRAGGING updates drag state
+  - [x] SET_CROSS_BLOCK_SELECTION manages text selection
+  - [x] CHANGE_BLOCK_TYPE action (not yet used in UI)
+  - [x] MARK_SAVED updates save state
+  - [x] RESET_EDITOR returns to initial state
 
 - **Business Rules**
-  - [ ] Can't delete last block
-  - [ ] Focus updates clear selection
-  - [ ] Selection clears on text select
-  - [ ] Dirty flag tracks changes
+  - [x] Can't delete last block
+  - [x] Focus updates clear selection
+  - [x] Selection clears on text select
+  - [x] Dirty flag tracks changes
 
 ### 4.2 Cross-Component Integration Tests
 

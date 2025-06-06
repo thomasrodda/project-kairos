@@ -83,7 +83,7 @@ export type EditorAction =
 // INITIAL STATE
 // =============================================================================
 
-const createInitialBlocks = (): EditorBlock[] => [
+export const createInitialBlocks = (): EditorBlock[] => [
   {
     id: generateId(),
     type: 'h1',
@@ -135,7 +135,7 @@ const initialState: EditorState = {
 // REDUCER
 // =============================================================================
 
-function editorReducer(state: EditorState, action: EditorAction): EditorState {
+export function editorReducer(state: EditorState, action: EditorAction): EditorState {
   switch (action.type) {
     case 'SET_PAGE':
       return {

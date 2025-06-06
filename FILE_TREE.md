@@ -154,6 +154,7 @@ apps
 │   │   ├── Workspace.tsx
 │   │   └── index.ts
 │   ├── contexts
+│   │   ├── EditorContext.test.tsx
 │   │   └── EditorContext.tsx
 │   ├── hooks
 │   │   ├── index.ts
