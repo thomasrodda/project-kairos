@@ -401,49 +401,40 @@ The editor currently supports:
 
 ---
 
-## 5. E2E Tests (Cypress)
+## 5. E2E Tests (Cypress) ✅
 
-### 5.1 Basic Editor Operations (`editor-basic.cy.ts`)
+### 5.1 Basic Editor Operations (`editor-basic.cy.ts`) ✅
 
-**Priority: P0** | **Complexity: Medium**
+**Priority: P0** | **Complexity: Medium** | **Status: Complete**
 
-```typescript
-describe('Editor Basic Operations', () => {
-  it('types text into blocks')
-  it('creates new blocks with Enter key')
-  it('merges blocks with Backspace at start')
-  it('deletes characters with Delete key')
-  it('shows placeholder text when block is empty')
-  it('handles empty document state')
-})
-```
+- [x] Types text into blocks (page title and content blocks)
+- [x] Creates new blocks with Enter key
+- [x] Merges blocks with Backspace at start
+- [x] Deletes characters with Delete key
+- [x] Shows placeholder text when block is empty
+- [x] Handles empty document state
+- [x] Block type preservation and behavior
 
-### 5.2 Selection Scenarios (`editor-selection.cy.ts`)
+### 5.2 Selection Scenarios (`editor-selection.cy.ts`) ✅
 
-**Priority: P0** | **Complexity: High**
+**Priority: P0** | **Complexity: High** | **Status: Complete**
 
-```typescript
-describe('Cross-Block Selection', () => {
-  it('selects text within single block')
-  it('selects text across multiple blocks')
-  it('extends selection with keyboard')
-  it('copies selection in multiple formats')
-  it('clears selection appropriately')
-})
-```
+- [x] Selects text within single block (mouse, keyboard, double-click)
+- [x] Selects text across multiple blocks
+- [x] Extends selection with keyboard (character, word, line)
+- [x] Copies selection in multiple formats
+- [x] Clears selection appropriately (click, Escape, typing)
+- [x] Block selection via drag handles (single, multi, range)
 
-### 5.3 Advanced Operations (`editor-advanced.cy.ts`)
+### 5.3 Advanced Operations (`editor-advanced.cy.ts`) ✅
 
-**Priority: P1** | **Complexity: High**
+**Priority: P1** | **Complexity: High** | **Status: Complete**
 
-```typescript
-describe('Advanced Editor Features', () => {
-  it('handles complex paste scenarios')
-  it('handles drag and drop with multiple blocks')
-  it('maintains performance with 100+ blocks')
-  it('handles rapid typing without losing characters')
-})
-```
+- [x] Handles complex paste scenarios (plain text, multi-line, custom format, HTML stripping)
+- [x] Handles drag and drop with multiple blocks
+- [x] Maintains performance with 100+ blocks
+- [x] Handles rapid typing without losing characters
+- [x] Undo/Redo operations (tests written but skipped - feature not implemented)
 
 ---
 
