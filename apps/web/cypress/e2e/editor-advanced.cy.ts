@@ -46,10 +46,15 @@ describe('Advanced Editor Features', () => {
           })
 
           // Set clipboard data
-          pasteEvent.clipboardData.setData('text/plain', multiLineText)
+          if (pasteEvent.clipboardData) {
+            pasteEvent.clipboardData.setData('text/plain', multiLineText)
+          }
 
           // Dispatch on the focused element
-          win.document.querySelector('.block--paragraph .block__content').dispatchEvent(pasteEvent)
+          const blockContent = win.document.querySelector('.block--paragraph .block__content')
+          if (blockContent) {
+            blockContent.dispatchEvent(pasteEvent)
+          }
         })
 
         // Should create additional blocks
@@ -72,12 +77,17 @@ describe('Advanced Editor Features', () => {
           clipboardData: new DataTransfer(),
         })
 
-        pasteEvent.clipboardData.setData('text/x-kairos-blocks', kairosData)
-        pasteEvent.clipboardData.setData('text/plain', 'Pasted Heading\nPasted paragraph\nPasted bullet point')
+        if (pasteEvent.clipboardData) {
+          pasteEvent.clipboardData.setData('text/x-kairos-blocks', kairosData)
+          pasteEvent.clipboardData.setData('text/plain', 'Pasted Heading\nPasted paragraph\nPasted bullet point')
+        }
 
         // Focus first block and dispatch
         cy.get('.block--paragraph .block__content').first().click()
-        win.document.querySelector('.block--paragraph .block__content').dispatchEvent(pasteEvent)
+        const blockContent = win.document.querySelector('.block--paragraph .block__content')
+        if (blockContent) {
+          blockContent.dispatchEvent(pasteEvent)
+        }
       })
 
       // Verify block types are preserved

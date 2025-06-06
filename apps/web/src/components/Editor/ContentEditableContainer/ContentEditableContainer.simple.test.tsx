@@ -100,7 +100,7 @@ describe('ContentEditableContainer Simple Tests', () => {
     // Create a mock clipboardData
     const mockClipboardData = {
       getData: jest.fn((format: string) => {
-        if (format === 'application/x-kairos-blocks') return ''
+        if (format === 'application/x-kairos-blocks') return '[]' // Return valid JSON
         if (format === 'text/plain') return 'pasted text'
         return ''
       }),
