@@ -233,60 +233,60 @@ The editor currently supports:
 
 ## 2. Hook Tests
 
-### 2.1 useCrossBlockSelection Hook Tests (`useCrossBlockSelection.test.ts`)
+### 2.1 useCrossBlockSelection Hook Tests (`useCrossBlockSelection.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: High**
+**Priority: P0** | **Complexity: High** | **Status: Complete (23/23 tests)**
 
 - **Selection Calculation**
 
-  - [ ] Detects single block selection
-  - [ ] Detects multi-block selection
-  - [ ] Calculates correct start/end offsets
-  - [ ] Identifies fully vs partially selected blocks
-  - [ ] Returns null for collapsed selection
-  - [ ] Returns null for non-text selection
+  - [x] Detects single block selection
+  - [x] Detects multi-block selection
+  - [x] Calculates correct start/end offsets
+  - [x] Identifies fully vs partially selected blocks
+  - [x] Returns null for collapsed selection
+  - [x] Returns null for non-text selection
 
 - **Event Handling**
 
-  - [ ] Updates on selectionchange event
-  - [ ] Updates on mouseup event
-  - [ ] Debounces rapid selection changes
-  - [ ] Handles keyboard selection (Shift+Arrow)
-  - [ ] Cleans up event listeners
+  - [x] Updates on selectionchange event
+  - [x] Updates on mouseup event
+  - [x] Debounces rapid selection changes
+  - [x] Handles keyboard selection (Shift+Arrow)
+  - [x] Cleans up event listeners
 
 - **Text Extraction**
 
-  - [ ] Gets plain text from selection
-  - [ ] Generates markdown from selection
-  - [ ] Handles empty blocks in selection
-  - [ ] Preserves block type formatting
+  - [x] Gets plain text from selection
+  - [x] Generates markdown from selection
+  - [x] Handles empty blocks in selection
+  - [x] Preserves block type formatting
 
 - **State Integration**
-  - [ ] Updates EditorContext
-  - [ ] Clears block selection on text selection
-  - [ ] Disabled during drag operations
-  - [ ] Clears on block deletion
+  - [x] Updates EditorContext
+  - [x] Clears block selection on text selection
+  - [x] Disabled during drag operations
+  - [x] Clears on block deletion
 
-### 2.2 useDismiss Hook Tests (`useDismiss.test.ts`)
+### 2.2 useDismiss Hook Tests (`useDismiss.test.ts`) ✅
 
-**Priority: P1** | **Complexity: Low**
+**Priority: P1** | **Complexity: Low** | **Status: Complete (13/13 tests)**
 
 - **Click Outside**
 
-  - [ ] Triggers on click outside ref
-  - [ ] Ignores clicks inside ref
-  - [ ] Respects excludeRefs array
-  - [ ] Works with nested elements
+  - [x] Triggers on click outside ref
+  - [x] Ignores clicks inside ref
+  - [x] Respects excludeRefs array
+  - [x] Works with nested elements
 
 - **Keyboard**
 
-  - [ ] Triggers on Escape key
-  - [ ] Uses custom onEscape if provided
-  - [ ] Respects enabled option
+  - [x] Triggers on Escape key
+  - [x] Uses custom onEscape if provided
+  - [x] Respects enabled option
 
 - **Cleanup**
-  - [ ] Removes event listeners on unmount
-  - [ ] Updates listeners when deps change
+  - [x] Removes event listeners on unmount
+  - [x] Updates listeners when deps change
 
 ---
 
