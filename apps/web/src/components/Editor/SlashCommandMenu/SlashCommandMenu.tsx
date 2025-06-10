@@ -3,6 +3,7 @@
 // Provides searchable list of block types with keyboard navigation.
 
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { BlockType } from '../../../contexts/EditorContext'
 import { useDismiss } from '../../../hooks/useDismiss'
 import './SlashCommandMenu.scss'
@@ -108,7 +109,7 @@ export function SlashCommandMenu({ onSelect, onClose, position }: SlashCommandMe
     setSelectedIndex(index)
   }
 
-  return (
+  return createPortal(
     <div ref={menuRef} className="slash-command-menu" style={{ top: position.top, left: position.left }}>
       <div className="slash-command-menu__search">
         <input
@@ -139,6 +140,7 @@ export function SlashCommandMenu({ onSelect, onClose, position }: SlashCommandMe
           <div className="slash-command-menu__empty">No matching block types</div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
+    "@types/react-dom": "^19",
     "@typescript-eslint/eslint-plugin": "^8.15.0",
     "@typescript-eslint/parser": "^8.15.0",
     "autoprefixer": "^10.4.21",
@@ -63,5 +64,8 @@
     "node": ">=22.0.0",
     "yarn": ">=4.0.0"
   },
-  "packageManager": "yarn@4.9.2"
+  "packageManager": "yarn@4.9.2",
+  "dependencies": {
+    "react-dom": "^19.1.0"
+  }
 }

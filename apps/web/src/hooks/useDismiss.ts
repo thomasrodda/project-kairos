@@ -43,12 +43,13 @@ export function useDismiss(ref: RefObject<HTMLElement>, { onDismiss, onEscape, e
     }
 
     // Add global event listeners
-    document.addEventListener('mousedown', handleGlobalClick)
+    // Use capture phase to ensure our handler runs first
+    document.addEventListener('mousedown', handleGlobalClick, true)
     document.addEventListener('keydown', handleGlobalKeyDown)
 
     // Cleanup event listeners
     return () => {
-      document.removeEventListener('mousedown', handleGlobalClick)
+      document.removeEventListener('mousedown', handleGlobalClick, true)
       document.removeEventListener('keydown', handleGlobalKeyDown)
     }
   }, [ref, onDismiss, onEscape, enabled, excludeRefs])

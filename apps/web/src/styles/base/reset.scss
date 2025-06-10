@@ -71,6 +71,5 @@ img {
 
 // Focus styles for accessibility
 *:focus-visible {
-  outline: 2px solid var(--color-border-focus);
-  outline-offset: 2px;
+  outline: none;
 }

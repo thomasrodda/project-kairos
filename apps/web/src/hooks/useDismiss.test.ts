@@ -184,12 +184,12 @@ describe('useDismiss', () => {
 
       const { unmount } = renderHook(() => useDismiss(mockRef, { onDismiss: mockOnDismiss }))
 
-      expect(addEventListenerSpy).toHaveBeenCalledWith('mousedown', expect.any(Function))
+      expect(addEventListenerSpy).toHaveBeenCalledWith('mousedown', expect.any(Function), true)
       expect(addEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function))
 
       unmount()
 
-      expect(removeEventListenerSpy).toHaveBeenCalledWith('mousedown', expect.any(Function))
+      expect(removeEventListenerSpy).toHaveBeenCalledWith('mousedown', expect.any(Function), true)
       expect(removeEventListenerSpy).toHaveBeenCalledWith('keydown', expect.any(Function))
 
       addEventListenerSpy.mockRestore()
