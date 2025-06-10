@@ -72,7 +72,7 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
     return offset
   }
 
-  const setCursorPosition = (blockId: string, offset: number) => {
+  const setCursorPosition = useCallback((blockId: string, offset: number) => {
     // Use requestAnimationFrame to ensure DOM is updated before setting cursor
     requestAnimationFrame(() => {
       const blockEl = containerRef.current?.querySelector(`[data-block-id="${blockId}"] .block__content`) as HTMLElement
@@ -116,7 +116,7 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
         console.error('Failed to set cursor position:', e)
       }
     })
-  }
+  }, [])
 
   // Handle selection deletion
   const handleDeleteSelection = useCallback(() => {
@@ -180,7 +180,7 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
     const { blockId, offset } = savedSelection.current
     setCursorPosition(blockId, offset)
     savedSelection.current = null
-  }, [])
+  }, [setCursorPosition])
 
   // Handle slash command selection
   const handleSlashCommandSelect = useCallback(
@@ -213,14 +213,17 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
   const handleSlashMenuClose = useCallback(() => {
     setShowSlashMenu(false)
 
-    // Restore focus to the editor at the position right after the '/'
-    if (slashCommandBlockId && slashCommandStartOffset !== null) {
+    // Only restore focus if we're still within the editor
+    // This prevents focus issues when clicking outside
+    const isEditorFocused = containerRef.current?.contains(document.activeElement)
+
+    if (isEditorFocused && slashCommandBlockId && slashCommandStartOffset !== null) {
       // Position cursor after the '/' character
       setCursorPosition(slashCommandBlockId, slashCommandStartOffset + 1)
     }
 
     setSlashCommandBlockId(null)
-  }, [slashCommandBlockId, slashCommandStartOffset])
+  }, [slashCommandBlockId, slashCommandStartOffset, setCursorPosition])
 
   // Prevent default contentEditable behavior and handle input manually
   const handleBeforeInput = useCallback(
@@ -263,11 +266,10 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
         if (isValidSlashPosition) {
           // Calculate menu position
           const rect = blockEl.getBoundingClientRect()
-          const containerRect = containerRef.current?.getBoundingClientRect() || rect
 
           setSlashMenuPosition({
-            top: rect.bottom - containerRect.top + 4,
-            left: rect.left - containerRect.left,
+            top: rect.top,
+            left: rect.left,
           })
           setSlashCommandBlockId(blockId)
           setSlashCommandStartOffset(offset)

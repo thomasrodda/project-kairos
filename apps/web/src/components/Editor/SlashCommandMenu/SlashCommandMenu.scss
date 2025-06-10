@@ -11,6 +11,7 @@
   min-width: 200px;
   max-width: 300px;
   overflow: hidden;
+  transform: translateY(calc(-100% - 8px)); // Position above with 8px gap
 
   &__search {
     padding: var(--spacing-xs);
