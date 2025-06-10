@@ -2,21 +2,75 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Overview
+## 🚀 Quick Start
+
+### Current Focus
+
+**Testing**: Completing component tests for ContentEditableContainer, EditorContent, and Editor integration
+
+### Prerequisites
+
+- **Node.js**: v22+ required
+- **Yarn**: v4.0+ required (project uses Yarn 4.9.2)
+- **PostgreSQL**: For database (local or cloud)
+- **Git**: v2.25+ recommended
+
+### Essential Commands
+
+```bash
+yarn dev          # Start development servers (web:3000, api:3001)
+yarn test         # Run all tests
+yarn lint         # Fix linting issues
+yarn typecheck    # Check TypeScript types
+```
+
+📋 **Full command reference**: [Quick Commands.md](AI System Prompt Files/Quick Commands.md)
+
+## 📍 Project Overview
 
 Project Kairos is a creative writing and worldbuilding web application designed for novelists, writers, and D&D campaign planners. It combines block-based editing with AI-driven tools for consistency checking and writing assistance.
 
-**Current Status**: Development phase - block-based editor with drag-and-drop functionality implemented, cross-block text selection working, comprehensive testing underway.
+**Current Status**: Block editor with drag-and-drop implemented, cross-block selection working, component testing in progress.
 
-## Quick Navigation
+## 🗺️ Document Navigation
 
-- **File Structure**: See `FILE_TREE.md` for complete project file organization
-- **Development Guides**: `AI System Prompt Files/` directory contains all architectural and development guides
-- **Testing Progress**: `AI System Prompt Files/Testing Plan.md` tracks test implementation status
+### Essential Documents (Check These First)
+
+- **[# 0.INDEX.md](AI System Prompt Files/# 0.INDEX.md)** - Helps you navigate Project Kairos documentation efficiently
+- **[# Current State.md](AI System Prompt Files/# Current State.md)** - What's built, in progress, known issues
+- **[FILE_TREE.md](FILE_TREE.md)** - Complete project structure
+- **[Quick Commands.md](AI System Prompt Files/Quick Commands.md)** - All commands reference
+- **[Troubleshooting Guide.md](AI System Prompt Files/Troubleshooting Guide.md)** - Common fixes
+
+### Core Project Documents
+
+- **[# 1. Vision & Scope.md](AI System Prompt Files/# 1. Vision & Scope.md)** - Product vision, terminology
+- **[# 2. User Stories.md](AI System Prompt Files/# 2. User Stories.md)** - Feature requirements
+- **[# 3. MVP.md](AI System Prompt Files/# 3. MVP.md)** - MVP scope and phases
+- **[# 5. Architecture.md](AI System Prompt Files/# 5. Architecture.md)** - System design
+- **[# Development Plan.md](AI System Prompt Files/# Development Plan.md)** - Feature roadmap
+
+### Implementation Guides
+
+- **[Component Structure Guide.md](AI System Prompt Files/Component Structure Guide.md)** - React patterns
+- **[Testing Guide.md](AI System Prompt Files/Testing Guide.md)** - Test patterns
+- **[Editor Testing Plan.md](AI System Prompt Files/Editor Testing Plan.md)** - Editor test coverage
+- **[Backend Api Guide.md](AI System Prompt Files/Backend Api Guide.md)** - API design
+- **[Data Model Guide.md](AI System Prompt Files/Data Model Guide.md)** - Database schema
+
+### Quick Decision Guide
+
+- **"What should I work on?"** → Check Current State.md
+- **"How do I implement X?"** → Check User Stories + relevant Guide
+- **"Where is X located?"** → Check FILE_TREE.md
+- **"How do I run X?"** → Check Quick Commands.md
+- **"X is broken!"** → Check Troubleshooting Guide.md
+- **"What's the full doc list?"** → See [# 0. INDEX.md](AI System Prompt Files/# 0. INDEX.md)
 
 ## Key File Locations
 
 ### Core Application (`apps/web/`)
+
 - **Components**: `src/components/` - All React components organized by feature
   - `Editor/` - Block editor components (Block, PageTitle, EditorContent, ContentEditableContainer)
   - `Sidebar/` - Navigation sidebar
@@ -27,17 +81,12 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 - **Styles**: `src/styles/` - Global styles and reset
 
 ### Packages (`packages/`)
+
 - **@kairos/ui**: Shared React components and icons
 - **@kairos/utils**: Utilities (ID generation, validation with Zod)
 - **@kairos/types**: TypeScript type definitions
 - **@kairos/design-tokens**: SCSS variables and design system
 - **@kairos/database**: Prisma database layer (planned)
-
-### Documentation (`AI System Prompt Files/`)
-- **Core Docs**: Vision & Scope, User Stories, MVP, Architecture
-- **Implementation Guides**: Component Structure, SCSS Structure, Testing Guide
-- **Feature Guides**: Analytics, Security, Performance Optimization
-- **Testing Plan**: Comprehensive test coverage tracking
 
 ## Technology Stack
 
@@ -49,49 +98,27 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 - **Monorepo**: Yarn Workspaces with 5 packages
 - **Styling**: SCSS with design tokens system
 
-## Development Commands
-
-### Core Development
+## 🚀 First Time Setup
 
 ```bash
-yarn dev          # Start both web (port 3000) and API (port 3001) servers
-yarn build        # Build all packages for production
-yarn test         # Run all tests
-yarn test:watch   # Run tests in watch mode
-yarn test:coverage # Generate coverage report
+# 1. Clone and install
+git clone [repo-url]
+cd project-kairos
+yarn install
+
+# 2. Set up environment
+cp .env.example .env.local
+# Edit .env.local with your database and Firebase credentials
+
+# 3. Initialize database
+yarn db:generate
+yarn db:migrate
+
+# 4. Start development
+yarn dev
 ```
 
-### Code Quality
-
-```bash
-yarn lint         # Run ESLint with auto-fix
-yarn typecheck    # Run TypeScript type checking across all workspaces
-yarn format       # Format code with Prettier
-```
-
-### E2E Testing
-
-```bash
-yarn test:e2e      # Run Cypress tests headlessly
-yarn test:e2e:open # Open Cypress interactive test runner
-```
-
-### Utilities
-
-```bash
-yarn kill-ports    # Kill processes on ports 3000, 3001, 5173
-yarn update-tree   # Update FILE_TREE.md
-```
-
-### Testing Individual Files
-
-```bash
-# Run specific test file
-yarn test apps/web/src/components/Sidebar/Sidebar.test.tsx
-
-# Run tests matching pattern
-yarn test --testNamePattern="renders without crashing"
-```
+📋 **Detailed setup**: [Environment Setup Guide.md](AI System Prompt Files/Environment Setup Guide.md)
 
 ## Architecture Overview
 
@@ -100,11 +127,13 @@ yarn test --testNamePattern="renders without crashing"
 The editor uses a unified contentEditable approach with sophisticated state management:
 
 1. **EditorContext** (`src/contexts/EditorContext.tsx`):
+
    - Central state management using useReducer
    - Manages blocks, selection, focus, and cross-block text selection
    - Actions: ADD_BLOCK, UPDATE_BLOCK, DELETE_BLOCK, MOVE_BLOCK, etc.
 
 2. **Component Hierarchy**:
+
    ```
    Editor
    ├── PageTitle
@@ -131,40 +160,21 @@ The editor uses a unified contentEditable approach with sophisticated state mana
 - **Mocking**: CSS modules, SVG imports, and @kairos/ui icons
 - **Test Utils**: `apps/web/src/test/utils.tsx` - Helper functions for testing with contexts
 
-### Recent Development Progress
+## 🎯 Development Status
 
-1. **Completed Features**:
-   - ✅ Block-based editor with contentEditable
-   - ✅ Drag and drop reordering
-   - ✅ Multi-block selection
-   - ✅ Cross-block text selection
-   - ✅ Copy/paste with custom format
-   - ✅ PageTitle component tests (17 tests)
-   - ✅ Block component tests (25 tests)
+For detailed status, see [# Current State.md](AI System Prompt Files/# Current State.md)
 
-2. **In Progress**:
-   - 🔄 Comprehensive test coverage for all components
-   - 🔄 Bug fixes for edge cases
+**Quick Summary**:
 
-3. **Upcoming**:
-   - 📋 BlockDragHandle component tests
-   - 📋 ContentEditableContainer tests
-   - 📋 EditorContent tests
-   - 📋 Slash command implementation
-   - 📋 Firebase integration
-
-## Current Development Focus
-
-1. **Testing**: Implementing comprehensive tests following Testing Plan
-2. **Bug Fixes**: Resolve any remaining cross-block selection issues
-3. **Slash Commands**: Implement "/" command menu for block types
-4. **Firebase Integration**: Set up authentication and cloud sync
-5. **Database**: Configure PostgreSQL with Prisma
-6. **AI Features**: Integrate writing assistant and consistency checking
+- ✅ Editor foundation complete (drag/drop, selection, copy/paste)
+- ✅ Test coverage: PageTitle (17), Block (25), BlockDragHandle (25)
+- 🔄 In Progress: Component tests for ContentEditableContainer, EditorContent
+- 📋 Next: Slash commands, formatting toolbar, Firebase auth
 
 ## Development Best Practices
 
 ### When Making Changes
+
 1. **Check FILE_TREE.md** to understand file locations
 2. **Read relevant guides** in `AI System Prompt Files/`
 3. **Follow existing patterns** - check similar components/files
@@ -172,6 +182,7 @@ The editor uses a unified contentEditable approach with sophisticated state mana
 5. **Update documentation** - keep CLAUDE.md and Testing Plan current
 
 ### Testing Guidelines
+
 - Use checkmark headings format (✅ Core Functionality)
 - Test user behavior, not implementation details
 - Include edge cases and error scenarios
@@ -179,6 +190,7 @@ The editor uses a unified contentEditable approach with sophisticated state mana
 - Run `yarn test` before committing
 
 ### Code Style
+
 - TypeScript strict mode enforced
 - SCSS with BEM methodology
 - Design tokens for consistency
@@ -194,21 +206,28 @@ The editor uses a unified contentEditable approach with sophisticated state mana
 - **Pre-commit**: Husky runs linting and formatting on staged files
 - **Git Workflow**: Work on feature branches, create PRs to main
 
-## Important Commands to Remember
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+- **Port already in use**: Run `yarn kill-ports`
+- **Tests failing on format**: Run `yarn format`
+- **TypeScript errors**: Run `yarn typecheck` then `yarn db:generate` if needed
+- **Can't find a file**: Check `FILE_TREE.md`
+- **Unsure what to work on**: Check `AI System Prompt Files/# Current State.md`
+
+### Important Paths to Remember
 
 ```bash
-# When you need to find files
+# Current project state
+cat "AI System Prompt Files/# Current State.md"
+
+# Documentation index
+cat "AI System Prompt Files/# 0. INDEX.md"
+
+# File structure
 cat FILE_TREE.md
 
-# When tests fail due to formatting
-yarn format
-
-# When TypeScript errors occur
-yarn typecheck
-
-# To see what's been done
-cat "AI System Prompt Files/Testing Plan.md"
-
-# To understand a feature
-ls "AI System Prompt Files/"
+# Test coverage status
+cat "AI System Prompt Files/Editor Testing Plan.md"
 ```

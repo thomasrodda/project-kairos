@@ -28,10 +28,12 @@
 ├── extensions.json
 └── settings.json
 AI System Prompt Files
+├── # 0. INDEX.md
 ├── # 1. Vision & Scope.md
 ├── # 2. User Stories.md
 ├── # 3. MVP.md
 ├── # 5. Architecture.md
+├── # Current State.md
 ├── # Development Plan.md
 ├── # Project Management & Development Guide.md
 ├── Analytics Feature Flags Guide.md
@@ -41,15 +43,18 @@ AI System Prompt Files
 ├── Data Model Guide.md
 ├── Editor Testing Plan.md
 ├── Enhanced Custom Editor Plan.md
+├── Environment Setup Guide.md
 ├── Error Handling Guide.md
 ├── Extensibility & Plugin Architecture Guide.md
 ├── Git & Github Guide.md
 ├── Inline SVG System Guide.md
 ├── Performance Optimization Guide.md
 ├── Production Deployment Guide.md
+├── Quick Commands.md
 ├── Scss Structure Guide.md
 ├── Security Guide.md
-└── Testing Guide.md
+├── Testing Guide.md
+└── Troubleshooting Guide.md
 apps
 ├── api
 │   ├── dev-server.ts
