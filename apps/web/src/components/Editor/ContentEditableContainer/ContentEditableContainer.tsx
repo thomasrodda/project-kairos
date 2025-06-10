@@ -3,10 +3,11 @@
 // Prevents block merging by intercepting browser editing operations.
 // Maintains block structure while allowing seamless text selection.
 
-import React, { useRef, useEffect, useCallback } from 'react'
+import React, { useRef, useEffect, useCallback, useState } from 'react'
 import { useEditorState, useEditorDispatch } from '../../../contexts/EditorContext'
-import type { EditorBlock } from '../../../contexts/EditorContext'
+import type { EditorBlock, BlockType } from '../../../contexts/EditorContext'
 import { generateId } from '@kairos/utils'
+import { SlashCommandMenu } from '../SlashCommandMenu'
 import './ContentEditableContainer.scss'
 
 interface ContentEditableContainerProps {
@@ -20,6 +21,12 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
   const containerRef = useRef<HTMLDivElement>(null)
   const isInternalUpdate = useRef(false)
   const savedSelection = useRef<{ blockId: string; offset: number } | null>(null)
+
+  // Slash command menu state
+  const [showSlashMenu, setShowSlashMenu] = useState(false)
+  const [slashMenuPosition, setSlashMenuPosition] = useState({ top: 0, left: 0 })
+  const [slashCommandBlockId, setSlashCommandBlockId] = useState<string | null>(null)
+  const [slashCommandStartOffset, setSlashCommandStartOffset] = useState<number>(0)
 
   // Utility functions (moved up to be available for all callbacks)
   const findBlockElement = (node: Node): HTMLElement | null => {
@@ -175,6 +182,46 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
     savedSelection.current = null
   }, [])
 
+  // Handle slash command selection
+  const handleSlashCommandSelect = useCallback(
+    (blockType: BlockType) => {
+      if (!slashCommandBlockId) return
+
+      const block = editorState.blocks.find((b) => b.id === slashCommandBlockId)
+      if (!block) return
+
+      // Remove the slash from the content
+      const newContent = block.content.slice(0, slashCommandStartOffset) + block.content.slice(slashCommandStartOffset + 1)
+
+      // Update block content first
+      dispatch({ type: 'UPDATE_BLOCK', blockId: slashCommandBlockId, content: newContent })
+
+      // Then change block type
+      dispatch({ type: 'CHANGE_BLOCK_TYPE', blockId: slashCommandBlockId, blockType })
+
+      // Save cursor position
+      savedSelection.current = { blockId: slashCommandBlockId, offset: slashCommandStartOffset }
+
+      // Close menu
+      setShowSlashMenu(false)
+      setSlashCommandBlockId(null)
+    },
+    [slashCommandBlockId, slashCommandStartOffset, editorState.blocks, dispatch]
+  )
+
+  // Handle slash command menu close
+  const handleSlashMenuClose = useCallback(() => {
+    setShowSlashMenu(false)
+
+    // Restore focus to the editor at the position right after the '/'
+    if (slashCommandBlockId && slashCommandStartOffset !== null) {
+      // Position cursor after the '/' character
+      setCursorPosition(slashCommandBlockId, slashCommandStartOffset + 1)
+    }
+
+    setSlashCommandBlockId(null)
+  }, [slashCommandBlockId, slashCommandStartOffset])
+
   // Prevent default contentEditable behavior and handle input manually
   const handleBeforeInput = useCallback(
     (e: Event) => {
@@ -208,6 +255,32 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
       // Get the text offset within the block
       const offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
 
+      // Check for slash command trigger
+      if (data === '/') {
+        // Check if this is at the start of a block or after a space
+        const isValidSlashPosition = offset === 0 || (offset > 0 && block.content[offset - 1] === ' ')
+
+        if (isValidSlashPosition) {
+          // Calculate menu position
+          const rect = blockEl.getBoundingClientRect()
+          const containerRect = containerRef.current?.getBoundingClientRect() || rect
+
+          setSlashMenuPosition({
+            top: rect.bottom - containerRect.top + 4,
+            left: rect.left - containerRect.left,
+          })
+          setSlashCommandBlockId(blockId)
+          setSlashCommandStartOffset(offset)
+          setShowSlashMenu(true)
+        }
+      } else if (showSlashMenu) {
+        // Hide slash menu if typing something other than slash
+        // This allows the menu to stay open while the user continues typing
+        // but we might want to implement filtering in the future
+        setShowSlashMenu(false)
+        setSlashCommandBlockId(null)
+      }
+
       // Insert the typed character at the correct position
       const newContent = block.content.slice(0, offset) + data + block.content.slice(offset)
 
@@ -220,7 +293,7 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
       // Update block content
       dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
     },
-    [dispatch, editorState.blocks, handleDeleteSelection]
+    [dispatch, editorState.blocks, handleDeleteSelection, showSlashMenu]
   )
 
   // Handle Enter key to create new blocks
@@ -266,6 +339,12 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
 
       // Handle Backspace
       if (e.key === 'Backspace') {
+        // Hide slash menu if active
+        if (showSlashMenu) {
+          setShowSlashMenu(false)
+          setSlashCommandBlockId(null)
+        }
+
         const selection = window.getSelection()
         if (!selection || selection.rangeCount === 0) return
 
@@ -329,7 +408,7 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
         }
       }
     },
-    [dispatch, editorState.blocks, handleDeleteSelection]
+    [dispatch, editorState.blocks, handleDeleteSelection, showSlashMenu]
   )
 
   // Handle paste
@@ -527,28 +606,31 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
   const handleBeforeInputTyped = handleBeforeInput as unknown as React.FormEventHandler<HTMLDivElement>
 
   return (
-    <div
-      ref={containerRef}
-      className="content-editable-container"
-      contentEditable
-      suppressContentEditableWarning
-      onBeforeInput={handleBeforeInputTyped}
-      onInput={handleInput}
-      onKeyDown={handleKeyDown}
-      onPaste={handlePaste}
-      onClick={(e) => {
-        const target = e.target as HTMLElement
-        const blockEl = findBlockElement(target)
-        if (blockEl) {
-          const blockId = blockEl.parentElement?.getAttribute('data-block-id')
-          if (blockId) {
-            onBlockClick?.(blockId)
+    <>
+      <div
+        ref={containerRef}
+        className="content-editable-container"
+        contentEditable
+        suppressContentEditableWarning
+        onBeforeInput={handleBeforeInputTyped}
+        onInput={handleInput}
+        onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
+        onClick={(e) => {
+          const target = e.target as HTMLElement
+          const blockEl = findBlockElement(target)
+          if (blockEl) {
+            const blockId = blockEl.parentElement?.getAttribute('data-block-id')
+            if (blockId) {
+              onBlockClick?.(blockId)
+            }
           }
-        }
-      }}
-      spellCheck
-    >
-      {children}
-    </div>
+        }}
+        spellCheck
+      >
+        {children}
+      </div>
+      {showSlashMenu && <SlashCommandMenu position={slashMenuPosition} onSelect={handleSlashCommandSelect} onClose={handleSlashMenuClose} />}
+    </>
   )
 }

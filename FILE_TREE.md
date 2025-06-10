@@ -53,6 +53,7 @@ AI System Prompt Files
 ├── Quick Commands.md
 ├── Scss Structure Guide.md
 ├── Security Guide.md
+├── Slash Command Feature Development.md
 ├── Testing Guide.md
 └── Troubleshooting Guide.md
 apps
@@ -128,6 +129,7 @@ apps
 │   │   │   ├── ContentEditableContainer
 │   │   │   │   ├── ContentEditableContainer.scss
 │   │   │   │   ├── ContentEditableContainer.simple.test.tsx
+│   │   │   │   ├── ContentEditableContainer.slashcommand.test.tsx
 │   │   │   │   ├── ContentEditableContainer.test.tsx
 │   │   │   │   ├── ContentEditableContainer.tsx
 │   │   │   │   └── index.ts
@@ -140,6 +142,11 @@ apps
 │   │   │   │   ├── PageTitle.scss
 │   │   │   │   ├── PageTitle.test.tsx
 │   │   │   │   ├── PageTitle.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── SlashCommandMenu
+│   │   │   │   ├── SlashCommandMenu.scss
+│   │   │   │   ├── SlashCommandMenu.test.tsx
+│   │   │   │   ├── SlashCommandMenu.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── Editor.performance.simple.test.tsx
 │   │   │   ├── Editor.performance.test.tsx

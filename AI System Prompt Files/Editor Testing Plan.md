@@ -8,7 +8,7 @@ This document outlines all tests needed for the Project Kairos block-based edito
 
 The editor currently supports:
 
-- Basic block rendering (fixed types: h1, h2, h3, paragraph, bullet)
+- Basic block rendering (types: h1, h2, h3, paragraph, bullet)
 - Typing and editing within blocks
 - Creating new blocks with Enter key
 - Merging blocks with Backspace
@@ -17,8 +17,9 @@ The editor currently supports:
 - Cross-block text selection
 - Copy/paste with custom format support
 - Focus and selection management
+- Slash commands for changing block types
 
-**Not Yet Implemented**: Slash commands, block type changing, formatting toolbar, undo/redo, markdown conversion, AI features
+**Not Yet Implemented**: Formatting toolbar, undo/redo, markdown conversion, AI features
 
 ## Test Priority Levels
 
@@ -115,9 +116,9 @@ The editor currently supports:
 
 ### 1.4 ContentEditableContainer Component Tests (`ContentEditableContainer.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: High** | **Status: Complete (28/28 tests)**
+**Priority: P0** | **Complexity: High** | **Status: Complete (35/35 tests)**
 
-**Note**: Includes 5 additional tests from `ContentEditableContainer.simple.test.tsx`
+**Note**: Includes 5 tests from `ContentEditableContainer.simple.test.tsx` and 7 tests from `ContentEditableContainer.slashcommand.test.tsx`
 
 - **Basic Editing**
 
@@ -153,10 +154,57 @@ The editor currently supports:
   - [x] Works with browser autofill
 
 - **Click Handling**
+
   - [x] Calls onBlockClick when clicking on a block
   - [x] Handles clicks on nested elements within blocks
 
-### 1.5 EditorContent Component Tests (`EditorContent.test.tsx`) ✅
+- **Slash Commands** (`ContentEditableContainer.slashcommand.test.tsx`) ✅
+  - [x] Shows slash menu when typing / at start of block
+  - [x] Shows slash menu when typing / after a space
+  - [x] Does not show menu when typing / in middle of word
+  - [x] Hides menu when typing non-slash character
+  - [x] Hides menu when pressing Backspace
+  - [x] Changes block type when selecting from menu
+  - [x] Removes slash character when converting block type
+
+### 1.5 SlashCommandMenu Component Tests (`SlashCommandMenu.test.tsx`) ✅
+
+**Priority: P0** | **Complexity: Medium** | **Status: Complete (22/22 tests)**
+
+- **Core Functionality**
+
+  - [x] Renders all block type options
+  - [x] Shows shortcuts for block types
+  - [x] Positions the menu correctly
+  - [x] Focuses search input on mount
+
+- **Search Functionality**
+
+  - [x] Filters options based on search query
+  - [x] Filters by block type
+  - [x] Filters by shortcut
+  - [x] Shows empty state when no matches
+  - [x] Resets selected index when filter changes
+
+- **Keyboard Navigation**
+
+  - [x] Navigates down with arrow key
+  - [x] Navigates up with arrow key
+  - [x] Wraps navigation at boundaries
+  - [x] Selects option with Enter key
+  - [x] Closes menu with Escape key
+
+- **Mouse Interaction**
+
+  - [x] Selects option on click
+  - [x] Highlights option on mouse enter
+  - [x] Closes menu on outside click
+
+- **Edge Cases**
+  - [x] Handles selection when no options match filter
+  - [x] Maintains focus on search input during navigation
+
+### 1.6 EditorContent Component Tests (`EditorContent.test.tsx`) ✅
 
 **Priority: P0** | **Complexity: High** | **Status: Complete (57/58 tests)**
 

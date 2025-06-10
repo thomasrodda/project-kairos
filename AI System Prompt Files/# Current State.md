@@ -52,12 +52,18 @@
 - **Editor**: Integration tests for the complete editor
 - **Sidebar & SidebarButton**: Basic component tests
 
+### Slash Commands ✅
+
+- **Slash command menu**: Triggered by typing "/" at start of block or after space
+- **Block type conversion**: Changes block type and removes slash character
+- **Search/filter**: Real-time filtering of block types
+- **Keyboard navigation**: Arrow keys, Enter to select, Escape to close
+- **Auto-dismiss**: Closes when typing non-slash character or clicking outside
+
 ### Known Issues 🐛
 
 - Cross-block selection may have edge cases with rapid selections
 - No undo/redo functionality yet
-- No slash commands implemented
-- Block types are fixed (cannot change type after creation)
 - No formatting toolbar
 - No markdown conversion
 
@@ -71,21 +77,14 @@ Based on Development Plan and current progress:
    - EditorContent tests
    - Integration tests for Editor
 
-2. **Implement Slash Commands** (Next Feature)
-
-   - "/" trigger menu
-   - Block type conversion
-   - Search/filter functionality
-   - Keyboard navigation
-
-3. **Add Formatting Toolbar**
+2. **Add Formatting Toolbar** (Next Feature)
 
    - Text selection detection
    - Floating toolbar
    - Bold, italic, underline
    - Link creation
 
-4. **Live Markdown Support**
+3. **Live Markdown Support**
    - Auto-convert "# " to H1
    - Auto-convert "## " to H2
    - Markdown paste detection
