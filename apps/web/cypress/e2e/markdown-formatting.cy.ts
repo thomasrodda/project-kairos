@@ -9,6 +9,19 @@ describe('Markdown Formatting', () => {
     cy.get('.content-editable-container').should('be.visible')
   })
 
+  it('DEBUG: check basic typing works', () => {
+    cy.get('.block__content').first().click()
+    cy.get('.content-editable-container').type('Hello world')
+    cy.get('.block__content').first().should('contain', 'Hello world')
+
+    // Log the HTML to see what's happening
+    cy.get('.block__content')
+      .first()
+      .then(($el) => {
+        cy.log('Block content HTML:', $el.html())
+      })
+  })
+
   it('converts **text** to bold formatting', () => {
     // Focus on the first block
     cy.get('.block__content').first().click()
@@ -16,14 +29,19 @@ describe('Markdown Formatting', () => {
     // Type markdown for bold
     cy.get('.content-editable-container').type('This is **bold** text')
 
+    // Wait for the content to be updated
+    cy.get('.block__content').first().should('contain', 'This is bold text')
+
     // Check that the text is formatted as bold
     cy.get('.block__content')
       .first()
       .within(() => {
-        cy.get('strong').should('exist').and('contain', 'bold')
-        // Verify markdown symbols are removed
-        cy.get('.block__content').first().should('not.contain', '**')
+        // Wait for the strong element to appear
+        cy.get('strong', { timeout: 10000 }).should('exist').and('contain', 'bold')
       })
+
+    // Verify markdown symbols are removed
+    cy.get('.block__content').first().should('not.contain', '**')
   })
 
   it('converts *text* to italic formatting', () => {
