@@ -71,7 +71,8 @@ apps
 │   │   ├── app.cy.ts
 │   │   ├── editor-advanced.cy.ts
 │   │   ├── editor-basic.cy.ts
-│   │   └── editor-selection.cy.ts
+│   │   ├── editor-selection.cy.ts
+│   │   └── markdown-formatting.cy.ts
 │   ├── support
 │   │   ├── commands.ts
 │   │   ├── components.ts
@@ -128,6 +129,7 @@ apps
 │   │   │   │   ├── DraggableBlock.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── ContentEditableContainer
+│   │   │   │   ├── ContentEditableContainer.markdown.test.tsx
 │   │   │   │   ├── ContentEditableContainer.scss
 │   │   │   │   ├── ContentEditableContainer.simple.test.tsx
 │   │   │   │   ├── ContentEditableContainer.slashcommand.test.tsx
@@ -155,6 +157,7 @@ apps
 │   │   │   │   ├── SlashCommandMenu.test.tsx
 │   │   │   │   ├── SlashCommandMenu.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── DebugFormatting.tsx
 │   │   │   ├── Editor.integration.test.tsx
 │   │   │   ├── Editor.performance.simple.test.tsx
 │   │   │   ├── Editor.performance.test.tsx
@@ -189,7 +192,8 @@ apps
 │   │   ├── useDismiss.test.ts
 │   │   └── useDismiss.ts
 │   ├── integration
-│   │   └── Editor.integration.test.tsx
+│   │   ├── Editor.integration.test.tsx
+│   │   └── markdown-detection.test.tsx
 │   ├── pages
 │   ├── styles
 │   │   ├── base
@@ -199,6 +203,9 @@ apps
 │   │   ├── setup.ts
 │   │   └── utils.tsx
 │   ├── utils
+│   │   ├── formattingRenderer.tsx
+│   │   ├── markdownDetection.test.ts
+│   │   ├── markdownDetection.ts
 │   │   ├── textFormatting.test.ts
 │   │   ├── textFormatting.ts
 │   │   ├── textSelection.test.ts

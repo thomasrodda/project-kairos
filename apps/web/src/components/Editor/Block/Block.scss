@@ -64,7 +64,10 @@
   // =============================================================================
 
   &--h1 .block__content {
-    font: var(--text-heading-xl);
+    font-size: var(--font-size-30);
+    line-height: var(--line-height-tight);
+    font-weight: 700;
+    font-family: 'Inter', system-ui, sans-serif;
     color: var(--color-text-primary);
     margin: var(--spacing-32) 0 var(--spacing-16);
     padding: var(--spacing-4) var(--spacing-8);
@@ -72,7 +75,10 @@
   }
 
   &--h2 .block__content {
-    font: var(--text-heading-lg);
+    font-size: var(--font-size-24);
+    line-height: var(--line-height-tight);
+    font-weight: 700;
+    font-family: 'Inter', system-ui, sans-serif;
     color: var(--color-text-primary);
     margin: var(--spacing-24) 0 var(--spacing-12);
     padding: var(--spacing-4) var(--spacing-8);
@@ -80,7 +86,10 @@
   }
 
   &--h3 .block__content {
-    font: var(--text-heading-md);
+    font-size: var(--font-size-20);
+    line-height: var(--line-height-snug);
+    font-weight: 700;
+    font-family: 'Inter', system-ui, sans-serif;
     color: var(--color-text-primary);
     margin: var(--spacing-20) 0 var(--spacing-8);
     padding: var(--spacing-4) var(--spacing-8);
@@ -88,10 +97,12 @@
   }
 
   &--paragraph .block__content {
-    font: var(--text-body-md);
+    font-size: var(--font-size-16);
+    line-height: var(--line-height-relaxed);
+    font-weight: normal;
+    font-family: 'Inter', system-ui, sans-serif;
     color: var(--color-text-primary);
     margin: var(--spacing-8) 0;
-    line-height: var(--line-height-relaxed);
     padding: var(--spacing-2) var(--spacing-8);
   }
 
@@ -109,10 +120,12 @@
     }
 
     .block__content {
-      font: var(--text-body-md);
+      font-size: var(--font-size-16);
+      line-height: var(--line-height-relaxed);
+      font-weight: normal;
+      font-family: 'Inter', system-ui, sans-serif;
       color: var(--color-text-primary);
       margin: var(--spacing-4) 0;
-      line-height: var(--line-height-relaxed);
       flex: 1;
       padding: var(--spacing-2) var(--spacing-4);
     }
@@ -137,5 +150,44 @@
   &:hover:not(&--selected) .block__content {
     background-color: color-mix(in srgb, var(--color-surface-elevated-1) 50%, transparent);
     border-radius: var(--radius-4);
+  }
+
+  // =============================================================================
+  // FORMATTING STYLES - Applied to inline elements within blocks
+  // =============================================================================
+
+  .block__content {
+    strong {
+      font-weight: 700 !important; // Override block-level font-weight
+    }
+
+    em {
+      font-style: italic !important; // Override any font-style reset
+    }
+
+    del {
+      text-decoration: line-through;
+      opacity: 0.7; // Make strikethrough text slightly faded
+    }
+
+    code {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.875em;
+      padding: 0.125em 0.25em;
+      background-color: var(--color-surface-elevated-1);
+      border-radius: var(--radius-2);
+      color: var(--color-text-primary);
+    }
+
+    a {
+      color: var(--color-primary-500);
+      text-decoration: underline;
+      cursor: pointer;
+
+      &:hover {
+        text-decoration: none;
+        color: var(--color-primary-600);
+      }
+    }
   }
 }

@@ -5,6 +5,7 @@
 
 import React, { createContext, useContext, useReducer, ReactNode } from 'react'
 import { generateId } from '@kairos/utils'
+import { applyFormat } from '../utils/textFormatting'
 
 // =============================================================================
 // TYPE DEFINITIONS
@@ -88,7 +89,7 @@ export type EditorAction =
   | { type: 'SET_DRAGGING'; isDragging: boolean }
   | { type: 'SET_SELECTION'; selection: EditorState['selectedRange'] }
   | { type: 'SET_CROSS_BLOCK_SELECTION'; selection: CrossBlockSelection | null }
-  | { type: 'APPLY_FORMATTING'; blockId: string; start: number; end: number; formatType: FormatType; url?: string }
+  | { type: 'APPLY_FORMATTING'; blockId: string; format: FormatType; range: { start: number; end: number }; url?: string }
   | { type: 'REMOVE_FORMATTING'; blockId: string; start: number; end: number; formatType?: FormatType }
   | { type: 'UPDATE_BLOCK_FORMATTING'; blockId: string; formatting: TextFormat[] }
   | { type: 'MARK_SAVED' }
@@ -209,17 +210,16 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     }
 
     case 'APPLY_FORMATTING': {
-      const { blockId, start, end, formatType, url } = action
+      const { blockId, format, range, url } = action
       const newBlocks = state.blocks.map((block) => {
         if (block.id !== blockId) return block
 
-        const newFormat: TextFormat = { start, end, type: formatType }
-        if (url) newFormat.url = url
+        const currentFormatting = block.formatting || []
+        const updatedFormatting = applyFormat(currentFormatting, range.start, range.end, format, url)
 
-        const formatting = block.formatting || []
         return {
           ...block,
-          formatting: [...formatting, newFormat],
+          formatting: updatedFormatting,
         }
       })
 

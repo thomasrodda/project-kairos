@@ -3,11 +3,12 @@
 // No longer uses individual contentEditable - relies on parent container for editing.
 // Handles block-specific behaviors like placeholders and styling.
 
-import React, { useRef, useEffect } from 'react'
-import { useEditorDispatch, useEditorState, BLOCK_PLACEHOLDERS } from '../../../contexts/EditorContext'
+import React, { useRef } from 'react'
+import { useEditorDispatch, useEditorState } from '../../../contexts/EditorContext'
 import type { EditorBlock } from '../../../contexts/EditorContext'
 import type { SyntheticListenerMap } from '@dnd-kit/core/dist/hooks/utilities'
 import { BlockDragHandle } from './BlockDragHandle'
+import { renderFormattedText } from '../../../utils/formattingRenderer'
 import './Block.scss'
 
 interface BlockProps {
@@ -59,9 +60,18 @@ export function Block({ block, isFocused, dragHandleProps, onBlockClick }: Block
     const content = block.content || ''
     const placeholder = getPlaceholder()
 
-    // Always use the same DOM structure to prevent React errors
-    // Use a consistent span element with conditional className
-    return <span className={content === '' && placeholder ? 'block__placeholder' : ''}>{content === '' && placeholder ? placeholder : content}</span>
+    // Show placeholder if empty
+    if (content === '' && placeholder) {
+      return <span className="block__placeholder">{placeholder}</span>
+    }
+
+    // Render formatted text if block has formatting
+    if (block.formatting && block.formatting.length > 0) {
+      return renderFormattedText({ content, formatting: block.formatting })
+    }
+
+    // Otherwise render plain text
+    return <span>{content}</span>
   }
 
   // Get the appropriate class for the block type

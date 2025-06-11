@@ -8,6 +8,7 @@ import { useEditorState, useEditorDispatch } from '../../../contexts/EditorConte
 import type { EditorBlock, BlockType } from '../../../contexts/EditorContext'
 import { generateId } from '@kairos/utils'
 import { SlashCommandMenu } from '../SlashCommandMenu'
+import { shouldConvertMarkdown, convertMarkdownToFormatting, extractLinkUrl } from '../../../utils/markdownDetection'
 import './ContentEditableContainer.scss'
 
 interface ContentEditableContainerProps {
@@ -74,51 +75,54 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
     return offset
   }
 
-  const setCursorPosition = useCallback((blockId: string, offset: number) => {
-    // Use requestAnimationFrame to ensure DOM is updated before setting cursor
-    requestAnimationFrame(() => {
-      const blockEl = containerRef.current?.querySelector(`[data-block-id="${blockId}"] .block__content`) as HTMLElement
-      if (!blockEl) return
+  const setCursorPosition = useCallback(
+    (blockId: string, offset: number) => {
+      // Use requestAnimationFrame to ensure DOM is updated before setting cursor
+      requestAnimationFrame(() => {
+        const blockEl = containerRef.current?.querySelector(`[data-block-id="${blockId}"] .block__content`) as HTMLElement
+        if (!blockEl) return
 
-      const selection = window.getSelection()
-      if (!selection) return
+        const selection = window.getSelection()
+        if (!selection) return
 
-      try {
-        // Create a tree walker to find the correct text node
-        const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null)
+        try {
+          // Create a tree walker to find the correct text node
+          const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null)
 
-        let currentOffset = 0
-        let targetNode: Node | null = null
-        let targetOffset = 0
+          let currentOffset = 0
+          let targetNode: Node | null = null
+          let targetOffset = 0
 
-        // Find the text node that contains our target offset
-        let node: Node | null
-        while ((node = walker.nextNode())) {
-          const nodeLength = node.textContent?.length || 0
-          if (currentOffset + nodeLength >= offset) {
-            targetNode = node
-            targetOffset = offset - currentOffset
-            break
+          // Find the text node that contains our target offset
+          let node: Node | null
+          while ((node = walker.nextNode())) {
+            const nodeLength = node.textContent?.length || 0
+            if (currentOffset + nodeLength >= offset) {
+              targetNode = node
+              targetOffset = offset - currentOffset
+              break
+            }
+            currentOffset += nodeLength
           }
-          currentOffset += nodeLength
-        }
 
-        // If no text node found, use the block element itself
-        if (!targetNode) {
-          targetNode = blockEl
-          targetOffset = 0
-        }
+          // If no text node found, use the block element itself
+          if (!targetNode) {
+            targetNode = blockEl
+            targetOffset = 0
+          }
 
-        const range = document.createRange()
-        range.setStart(targetNode, Math.min(targetOffset, targetNode.textContent?.length || 0))
-        range.collapse(true)
-        selection.removeAllRanges()
-        selection.addRange(range)
-      } catch (e) {
-        console.error('Failed to set cursor position:', e)
-      }
-    })
-  }, [])
+          const range = document.createRange()
+          range.setStart(targetNode, Math.min(targetOffset, targetNode.textContent?.length || 0))
+          range.collapse(true)
+          selection.removeAllRanges()
+          selection.addRange(range)
+        } catch (e) {
+          console.error('Failed to set cursor position:', e)
+        }
+      })
+    },
+    [containerRef]
+  )
 
   // Handle selection deletion
   const handleDeleteSelection = useCallback(() => {
@@ -290,14 +294,44 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
       // Insert the typed character at the correct position
       const newContent = block.content.slice(0, offset) + data + block.content.slice(offset)
 
-      // Save cursor position for after update
-      savedSelection.current = { blockId, offset: offset + data.length }
+      // Check for markdown pattern completion
+      const markdownPattern = shouldConvertMarkdown(newContent, offset + data.length, data)
 
-      // Mark that we're doing an internal update
-      isInternalUpdate.current = true
+      if (markdownPattern) {
+        // Convert markdown to formatting
+        const { newText, newCursorPosition, format, range } = convertMarkdownToFormatting(newContent, markdownPattern)
 
-      // Update block content
-      dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+        // Extract URL if it's a link
+        const url = format === 'link' ? extractLinkUrl(newContent, markdownPattern.originalStart) : undefined
+
+        // Save cursor position for after update
+        savedSelection.current = { blockId, offset: newCursorPosition }
+
+        // Mark that we're doing an internal update
+        isInternalUpdate.current = true
+
+        // Update block content (removing markdown symbols)
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: newText })
+
+        // Apply formatting to the text range
+        dispatch({
+          type: 'APPLY_FORMATTING',
+          blockId,
+          format,
+          range,
+          url,
+        })
+      } else {
+        // No markdown pattern, proceed normally
+        // Save cursor position for after update
+        savedSelection.current = { blockId, offset: offset + data.length }
+
+        // Mark that we're doing an internal update
+        isInternalUpdate.current = true
+
+        // Update block content
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+      }
     },
     [dispatch, editorState.blocks, handleDeleteSelection, showSlashMenu]
   )
@@ -545,25 +579,9 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
     [dispatch, editorState.blocks, handleDeleteSelection]
   )
 
-  // Update DOM when blocks change
+  // Restore cursor position after state updates
   useEffect(() => {
     if (!containerRef.current) return
-
-    // Update the DOM to reflect the state changes
-    const blocks = containerRef.current.querySelectorAll('.block__content')
-
-    blocks.forEach((blockEl) => {
-      const blockId = blockEl.getAttribute('data-block-id')
-      if (!blockId) return
-
-      const block = editorState.blocks.find((b) => b.id === blockId)
-      if (!block) return
-
-      // Only update if content has changed
-      if (blockEl.textContent !== block.content) {
-        blockEl.textContent = block.content
-      }
-    })
 
     // Restore cursor position after React has updated the DOM
     if (savedSelection.current) {
