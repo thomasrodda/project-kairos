@@ -188,33 +188,72 @@ export function EditorContent() {
       dispatch({ type: 'CLEAR_SELECTION' })
     }
 
-    // Focus the last block if clicking below all content
+    // Find which block is above the click position
     if (blocks.length > 0) {
-      const lastBlockId = blocks[blocks.length - 1].id
-      dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: lastBlockId })
+      const clickY = e.clientY
+      let targetBlockId: string | null = null
 
-      // Place cursor at the end of the last block
-      setTimeout(() => {
-        const lastBlockElement = document.querySelector(`[data-block-id="${lastBlockId}"] .block__content`) as HTMLElement
-        if (lastBlockElement) {
-          const range = document.createRange()
-          const selection = window.getSelection()
+      // Find all block elements and their positions
+      const blockElements = document.querySelectorAll('.block')
 
-          // Find the text node or create one if empty
-          const textNode = lastBlockElement.firstChild || lastBlockElement.appendChild(document.createTextNode(''))
+      for (let i = 0; i < blockElements.length; i++) {
+        const blockEl = blockElements[i] as HTMLElement
+        const rect = blockEl.getBoundingClientRect()
 
-          // Set cursor at the end of the content
-          range.setStart(textNode, textNode.textContent?.length || 0)
-          range.collapse(true)
-
-          selection?.removeAllRanges()
-          selection?.addRange(range)
-
-          // Focus the contentEditable container
-          const container = lastBlockElement.closest('.content-editable-container') as HTMLElement
-          container?.focus()
+        // If click is below this block
+        if (clickY > rect.bottom) {
+          const blockId = blockEl.getAttribute('data-block-id')
+          if (blockId) {
+            targetBlockId = blockId
+          }
+        } else {
+          // We've found a block below the click position, so use the previous block
+          break
         }
-      }, 0)
+      }
+
+      // If no target block found (click is above all blocks), use the first block
+      if (!targetBlockId && blocks.length > 0) {
+        targetBlockId = blocks[0].id
+      }
+
+      // If we found a target block, focus it and place cursor at end
+      if (targetBlockId) {
+        dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: targetBlockId })
+
+        // Place cursor at the end of the target block
+        setTimeout(() => {
+          const blockElement = document.querySelector(`[data-block-id="${targetBlockId}"] .block__content`) as HTMLElement
+          if (blockElement) {
+            const range = document.createRange()
+            const selection = window.getSelection()
+
+            // Find the text node - it might be inside a span
+            let textNode: Node
+            if (blockElement.firstChild?.nodeType === Node.TEXT_NODE) {
+              textNode = blockElement.firstChild
+            } else if (blockElement.firstChild?.firstChild?.nodeType === Node.TEXT_NODE) {
+              // Text is inside a span (for placeholder or regular content)
+              textNode = blockElement.firstChild.firstChild
+            } else {
+              // Create a text node if empty
+              textNode = document.createTextNode('')
+              blockElement.appendChild(textNode)
+            }
+
+            // Set cursor at the end of the content
+            range.setStart(textNode, textNode.textContent?.length || 0)
+            range.collapse(true)
+
+            selection?.removeAllRanges()
+            selection?.addRange(range)
+
+            // Focus the contentEditable container
+            const container = blockElement.closest('.content-editable-container') as HTMLElement
+            container?.focus()
+          }
+        }, 0)
+      }
     }
   }
 

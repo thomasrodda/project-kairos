@@ -17,6 +17,9 @@
     margin-top: var(--spacing-32);
     // Add minimum height to ensure click area below blocks
     min-height: 50vh;
+
+    // Add padding bottom to ensure there's always clickable space below the last block
+    padding-bottom: 30vh;
   }
 }
 

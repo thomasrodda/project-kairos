@@ -31,7 +31,7 @@
 
   &__content {
     outline: none;
-    min-height: 1.5em; // Prevent collapse when empty
+    min-height: calc(var(--line-height-relaxed) * 1em); // Match height of text with line-height
     white-space: pre-wrap; // Preserve line breaks
     word-break: break-word; // Break long words
     transition:
@@ -39,6 +39,7 @@
       border var(--speed-fast) var(--ease-smooth);
     padding: var(--spacing-2) var(--spacing-4);
     margin: var(--spacing-1) 0;
+    box-sizing: content-box; // Ensure padding is added to min-height
 
     // Ensure text selection works
     user-select: text;
@@ -67,6 +68,7 @@
     color: var(--color-text-primary);
     margin: var(--spacing-32) 0 var(--spacing-16);
     padding: var(--spacing-4) var(--spacing-8);
+    min-height: calc(var(--line-height-tight) * 1em); // Match h1 line-height
   }
 
   &--h2 .block__content {
@@ -74,6 +76,7 @@
     color: var(--color-text-primary);
     margin: var(--spacing-24) 0 var(--spacing-12);
     padding: var(--spacing-4) var(--spacing-8);
+    min-height: calc(var(--line-height-tight) * 1em); // Match h2 line-height
   }
 
   &--h3 .block__content {
@@ -81,6 +84,7 @@
     color: var(--color-text-primary);
     margin: var(--spacing-20) 0 var(--spacing-8);
     padding: var(--spacing-4) var(--spacing-8);
+    min-height: calc(var(--line-height-snug) * 1em); // Match h3 line-height
   }
 
   &--paragraph .block__content {
