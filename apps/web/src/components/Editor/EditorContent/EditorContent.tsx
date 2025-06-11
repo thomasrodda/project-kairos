@@ -190,7 +190,31 @@ export function EditorContent() {
 
     // Focus the last block if clicking below all content
     if (blocks.length > 0) {
-      dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: blocks[blocks.length - 1].id })
+      const lastBlockId = blocks[blocks.length - 1].id
+      dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: lastBlockId })
+
+      // Place cursor at the end of the last block
+      setTimeout(() => {
+        const lastBlockElement = document.querySelector(`[data-block-id="${lastBlockId}"] .block__content`) as HTMLElement
+        if (lastBlockElement) {
+          const range = document.createRange()
+          const selection = window.getSelection()
+
+          // Find the text node or create one if empty
+          const textNode = lastBlockElement.firstChild || lastBlockElement.appendChild(document.createTextNode(''))
+
+          // Set cursor at the end of the content
+          range.setStart(textNode, textNode.textContent?.length || 0)
+          range.collapse(true)
+
+          selection?.removeAllRanges()
+          selection?.addRange(range)
+
+          // Focus the contentEditable container
+          const container = lastBlockElement.closest('.content-editable-container') as HTMLElement
+          container?.focus()
+        }
+      }, 0)
     }
   }
 

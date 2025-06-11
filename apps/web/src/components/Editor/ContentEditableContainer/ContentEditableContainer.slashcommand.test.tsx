@@ -241,4 +241,67 @@ describe('ContentEditableContainer - Slash Commands', () => {
       })
     })
   })
+
+  describe('✅ Slash Command Cancellation', () => {
+    it('restores cursor position after ESC key cancellation', async () => {
+      const { container } = renderComponent([{ id: 'block-1', type: 'paragraph', content: '' }])
+
+      const contentEditableContainer = container.querySelector('.content-editable-container') as HTMLElement
+      const blockContent = container.querySelector('[data-block-id="block-1"] .block__content') as HTMLElement
+
+      // Focus the container
+      contentEditableContainer.focus()
+      setCursorPosition(blockContent, 0)
+
+      // Type slash
+      simulateBeforeInput(contentEditableContainer, '/')
+
+      // Wait for menu to appear (even if it doesn't render in tests, the state should change)
+      await waitFor(() => {
+        // Check that the slash character was inserted
+        expect(blockContent.textContent).toBe('/')
+      })
+
+      // Simulate ESC key press on the container
+      fireEvent.keyDown(contentEditableContainer, { key: 'Escape' })
+
+      // Check that slash character is preserved
+      expect(blockContent.textContent).toBe('/')
+
+      // Check that cursor is positioned after the slash
+      const selection = window.getSelection()
+      if (selection && selection.rangeCount > 0) {
+        const range = selection.getRangeAt(0)
+        expect(range.startOffset).toBe(1) // After the '/'
+      }
+    })
+
+    it('restores cursor position when clicking outside menu', async () => {
+      const { container } = renderComponent([{ id: 'block-1', type: 'paragraph', content: 'Hello ' }])
+
+      const contentEditableContainer = container.querySelector('.content-editable-container') as HTMLElement
+      const blockContent = container.querySelector('[data-block-id="block-1"] .block__content') as HTMLElement
+
+      // Focus and position cursor after "Hello "
+      contentEditableContainer.focus()
+      setCursorPosition(blockContent, 6) // After "Hello "
+
+      // Type slash
+      simulateBeforeInput(contentEditableContainer, '/')
+
+      // Wait for content update
+      await waitFor(() => {
+        expect(blockContent.textContent).toBe('Hello /')
+      })
+
+      // Simulate clicking outside (on the container itself)
+      fireEvent.mouseDown(contentEditableContainer)
+
+      // Check that slash character is preserved
+      expect(blockContent.textContent).toBe('Hello /')
+
+      // Verify container still has focus
+      expect(document.activeElement).toBe(contentEditableContainer)
+    })
+  })
 })

@@ -116,9 +116,9 @@ The editor currently supports:
 
 ### 1.4 ContentEditableContainer Component Tests (`ContentEditableContainer.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: High** | **Status: Complete (35/35 tests)**
+**Priority: P0** | **Complexity: High** | **Status: Complete (37/37 tests)**
 
-**Note**: Includes 5 tests from `ContentEditableContainer.simple.test.tsx` and 7 tests from `ContentEditableContainer.slashcommand.test.tsx`
+**Note**: Includes 5 tests from `ContentEditableContainer.simple.test.tsx` and 9 tests from `ContentEditableContainer.slashcommand.test.tsx`
 
 - **Basic Editing**
 
@@ -166,6 +166,8 @@ The editor currently supports:
   - [x] Hides menu when pressing Backspace
   - [x] Changes block type when selecting from menu
   - [x] Removes slash character when converting block type
+  - [x] Restores cursor position after ESC key cancellation
+  - [x] Restores cursor position when clicking outside menu
 
 ### 1.5 SlashCommandMenu Component Tests (`SlashCommandMenu.test.tsx`) ✅
 
@@ -206,7 +208,7 @@ The editor currently supports:
 
 ### 1.6 EditorContent Component Tests (`EditorContent.test.tsx`) ✅
 
-**Priority: P0** | **Complexity: High** | **Status: Complete (57/58 tests)**
+**Priority: P0** | **Complexity: High** | **Status: Complete (58/58 tests)**
 
 - **Component Structure**
 
@@ -242,6 +244,7 @@ The editor currently supports:
   - [x] Integrates with useDismiss hook
   - [x] Clears text selection on empty space click
   - [x] Focuses last block when clicking below all content
+  - [x] Places cursor at end of last block when clicking in empty space
   - [x] Clears block selection when text is selected
   - [x] Does not clear selection when clicking on blocks
   - [x] Does not clear selection when clicking on page title

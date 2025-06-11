@@ -6,15 +6,15 @@
 
 ## 🎯 MVP Feature Implementation List
 
-### Phase 1: Basic UI & Editor Foundation
+### Phase 1: Basic UI & Editor Foundation ✅
 
-- [ ] **App Layout Structure**
+- [x] **App Layout Structure**
 
   - Sidebar and main editor layout
   - Responsive design foundation
   - Basic navigation structure
 
-- [ ] **Custom Block-Based Text Editor**
+- [x] **Custom Block-Based Text Editor**
 
   - Core block component architecture
   - Text input and editing within blocks
@@ -22,34 +22,37 @@
   - Block deletion (Backspace in empty blocks)
   - Block focus and cursor management
 
-- [ ] **Basic Block Types**
+- [x] **Basic Block Types**
   - Paragraph blocks (default)
-  - Heading 1 and Heading 2 blocks
+  - Heading 1, 2, 3 blocks
+  - Bullet list blocks
   - Visual distinction between block types
-  - Block type switching foundation
+  - Block type switching via slash commands
 
 ### Phase 2: Advanced Editor Features
 
-- [ ] **Slash Command Menu**
+- [x] **Slash Command Menu** ✅
 
   - `/` trigger for block type selection
   - Floating menu with search/filter
   - Block type conversion system
   - Keyboard navigation (arrow keys + Enter)
+  - ESC to cancel with cursor restoration
 
-- [ ] **Formatting Toolbar**
+- [ ] **Formatting Toolbar** 🔄
 
   - Text selection detection
   - Floating toolbar positioning
   - Bold, italic, underline formatting
   - Link creation functionality
 
-- [ ] **Block Management**
+- [x] **Block Management** ✅
 
   - Drag handles and reordering
   - Visual drop indicators
   - Multi-block selection
-  - Copy/paste support
+  - Copy/paste support (custom Kairos format)
+  - Click empty space to focus last block
 
 - [ ] **Markdown Support**
   - **Live markdown formatting** (typing `# ` auto-converts to H1, `## ` to H2, etc.)
@@ -170,25 +173,25 @@
 
 ## 🚀 Current Focus: Next Feature to Implement
 
-### **Basic UI Layout & Text Editor Foundation**
+### **Formatting Toolbar**
 
-**Priority**: High - Visual foundation for development and user feedback
+**Priority**: High - Essential for rich text editing
 
-**Why this first**:
+**Why this next**:
 
-- Creates a tangible interface you can see and interact with immediately
-- Allows for visual feedback and design iteration early
-- Establishes the core editing experience without authentication complexity
-- Easier to add Firebase protection to existing components later
+- Users expect basic text formatting capabilities
+- Builds on the existing text selection system
+- Enhances the editor without major architectural changes
+- Completes the core editing experience
 
 **Implementation approach**:
 
-1. **Basic app layout** with sidebar and main editor area
-2. **Simple block component** that handles text input and editing
-3. **Block creation** (Enter key to create new blocks)
-4. **Block deletion** (Backspace in empty blocks)
-5. **Basic block types** (paragraph, heading1, heading2)
-6. **Simple styling** to make it look professional
+1. **Detect text selection** within and across blocks
+2. **Floating toolbar** that appears above selected text
+3. **Basic formatting options**: Bold, Italic, Underline, Link
+4. **Apply formatting** using document.execCommand or custom approach
+5. **Keyboard shortcuts** (Ctrl/Cmd+B, I, U, K)
+6. **Mobile-friendly** touch interactions
 
 **Custom Text Editor Notes**:
 

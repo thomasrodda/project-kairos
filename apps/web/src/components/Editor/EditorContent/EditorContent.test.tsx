@@ -829,6 +829,65 @@ describe('EditorContent', () => {
       expect(state.focusedBlockId).toBe('block3')
     })
 
+    it('places cursor at end of last block when clicking in empty space', async () => {
+      const blocks = [
+        createMockBlock({ id: 'block1', content: 'First block' }),
+        createMockBlock({ id: 'block2', content: 'Second block' }),
+        createMockBlock({ id: 'block3', content: 'Last block content' }),
+      ]
+
+      const { container, store } = renderWithEditor(<EditorContent />)
+
+      act(() => {
+        store.dispatch({
+          type: 'SET_PAGE',
+          pageId: 'test-page',
+          title: 'Test',
+          blocks,
+        })
+      })
+
+      // Mock focus method on contentEditable container
+      const contentEditableContainer = container.querySelector('.content-editable-container') as HTMLElement
+      const mockFocus = jest.fn()
+      if (contentEditableContainer) {
+        contentEditableContainer.focus = mockFocus
+      }
+
+      // Mock window.getSelection
+      const mockRange = {
+        setStart: jest.fn(),
+        collapse: jest.fn(),
+      }
+      const mockSelection = {
+        removeAllRanges: jest.fn(),
+        addRange: jest.fn(),
+        rangeCount: 0,
+      }
+      jest.spyOn(document, 'createRange').mockReturnValue(mockRange as any)
+      jest.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any)
+
+      // Click on empty space
+      const editorContent = screen.getByRole('document')
+      fireEvent.click(editorContent)
+
+      // Wait for async cursor placement
+      await waitFor(() => {
+        // Check that focus was set on the last block
+        const state = store.getState()
+        expect(state.focusedBlockId).toBe('block3')
+
+        // Check that cursor placement methods were called
+        expect(mockRange.setStart).toHaveBeenCalled()
+        expect(mockRange.collapse).toHaveBeenCalledWith(true)
+        expect(mockSelection.removeAllRanges).toHaveBeenCalled()
+        expect(mockSelection.addRange).toHaveBeenCalledWith(mockRange)
+
+        // Check that contentEditable container focus was called
+        expect(mockFocus).toHaveBeenCalled()
+      })
+    })
+
     it('clears block selection when text is selected', () => {
       const blocks = [createMockBlock({ id: 'block1' }), createMockBlock({ id: 'block2' })]
 

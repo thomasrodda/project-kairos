@@ -1,6 +1,6 @@
 # Slash Command Feature Development
 
-> Last Updated: January 10, 2025
+> Last Updated: January 11, 2025
 > This document tracks the development progress of the slash command feature for block type conversion in Project Kairos.
 
 ## 📋 Feature Overview
@@ -14,22 +14,24 @@ The slash command feature allows users to quickly change block types by typing "
 - [x] Created `SlashCommandMenu` component with search and keyboard navigation
 - [x] Integrated slash detection in `ContentEditableContainer`
 - [x] Added block type conversion functionality
-- [x] Implemented menu positioning below the current block
+- [x] Implemented menu positioning above the current block (prevents viewport overflow)
 - [x] Added auto-dismiss when typing non-slash characters
-- [x] Created comprehensive test suites (29 tests total)
-- [x] Updated documentation (Current State.md, Editor Testing Plan.md)
+- [x] Created comprehensive test suites (31 tests total)
+- [x] Added focus restoration when cancelling with ESC
+- [x] Updated documentation (Current State.md, Editor Testing Plan.md, Development Plan.md)
 
 ### Basic Functionality
 
 - [x] Menu appears when typing "/" at start of block
 - [x] Menu appears when typing "/" after a space
 - [x] Menu does NOT appear when typing "/" in middle of word
-- [ ] Search input auto-focuses when menu opens
-- [ ] Real-time filtering by block type name, shortcut, or label
-- [ ] Keyboard navigation (arrow keys, Enter, Escape)
+- [x] Search input auto-focuses when menu opens
+- [x] Real-time filtering by block type name, shortcut, or label
+- [x] Keyboard navigation (arrow keys, Enter, Escape)
 - [x] Mouse interaction (click to select, hover to highlight)
-- [ ] Click outside or Escape to close menu
+- [x] Click outside or Escape to close menu
 - [x] Slash character is removed when block type is changed
+- [x] Cursor position restored after ESC cancellation
 
 ## 🔄 In Progress / Needs Improvement
 

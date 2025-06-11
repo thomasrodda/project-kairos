@@ -213,12 +213,14 @@ export function ContentEditableContainer({ children, onBlockClick }: ContentEdit
   const handleSlashMenuClose = useCallback(() => {
     setShowSlashMenu(false)
 
-    // Only restore focus if we're still within the editor
-    // This prevents focus issues when clicking outside
-    const isEditorFocused = containerRef.current?.contains(document.activeElement)
+    // When slash menu is cancelled, we need to restore focus and cursor position
+    if (slashCommandBlockId && slashCommandStartOffset !== null) {
+      // First, focus the editor container if it's not already focused
+      if (!containerRef.current?.contains(document.activeElement)) {
+        containerRef.current?.focus()
+      }
 
-    if (isEditorFocused && slashCommandBlockId && slashCommandStartOffset !== null) {
-      // Position cursor after the '/' character
+      // Then position cursor after the '/' character
       setCursorPosition(slashCommandBlockId, slashCommandStartOffset + 1)
     }
 
