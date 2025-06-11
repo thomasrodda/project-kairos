@@ -302,10 +302,13 @@ The editor currently supports:
   - [x] Handles containerRef being null
   - [x] Uses editor state for visibility
 
-- **Current Limitations**
-  - Formatting buttons show "Formatting features coming soon!" tooltip
-  - Actual formatting requires architecture changes (plain text → rich text)
-  - UX improvements implemented: only shows after mouse release
+- **Formatting Implementation** ✅
+  - [x] Formatting buttons apply/remove formatting
+  - [x] Active state detection shows applied formats
+  - [x] Selection preserved after formatting
+  - [x] Toolbar stays open during formatting
+  - [x] Link creation/removal with URL prompt
+  - [x] No position flickering during operations
 
 ---
 
@@ -370,7 +373,22 @@ The editor currently supports:
 
 ## 3. Utility Function Tests
 
-### 3.1 textSelection Utilities (`textSelection.test.ts`) ✅
+### 3.1 Text Formatting Utilities (`textFormatting.test.ts`) ✅
+
+**Priority: P0** | **Complexity: High** | **Status: Complete (41/41 tests)**
+
+- **Core Functions**
+  - [x] applyFormat() - Apply formatting with overlap handling (7 tests)
+  - [x] removeFormat() - Remove formatting with splitting (5 tests)
+  - [x] hasFormat() - Check if position has format (3 tests)
+  - [x] getFormatsAtPosition() - Get all formats at position (3 tests)
+  - [x] mergeFormats() - Merge overlapping formats (5 tests)
+  - [x] adjustFormatsAfterEdit() - Update positions after text changes (6 tests)
+  - [x] splitIntoSegments() - Split text for rendering (4 tests)
+  - [x] isRangeFormatted() - Check if range is formatted (4 tests)
+  - [x] toggleFormat() - Toggle format on/off (4 tests)
+
+### 3.2 textSelection Utilities (`textSelection.test.ts`) ✅
 
 **Priority: P1** | **Complexity: Medium** | **Status: Complete (36/36 tests)**
 

@@ -7,8 +7,14 @@ export interface FormattingRendererProps {
   formatting?: TextFormat[]
 }
 
-function renderSegment(segment: TextSegment, index: number): React.ReactElement {
-  const { text, formats } = segment
+// Helper to find the URL for a link format at a specific position
+function findLinkUrl(formatting: TextFormat[], start: number, end: number): string | undefined {
+  const linkFormat = formatting.find((f) => f.type === 'link' && f.start <= start && f.end >= end && f.url)
+  return linkFormat?.url
+}
+
+function renderSegment(segment: TextSegment, index: number, allFormatting: TextFormat[]): React.ReactElement {
+  const { text, formats, start, end } = segment
 
   if (formats.length === 0) {
     return <React.Fragment key={index}>{text}</React.Fragment>
@@ -16,7 +22,7 @@ function renderSegment(segment: TextSegment, index: number): React.ReactElement 
 
   // Sort formats to ensure consistent nesting order
   const sortedFormats = [...formats].sort((a, b) => {
-    const order: FormatType[] = ['link', 'code', 'bold', 'italic', 'strikethrough']
+    const order: FormatType[] = ['link', 'code', 'bold', 'italic', 'underline', 'strikethrough']
     return order.indexOf(a) - order.indexOf(b)
   })
 
@@ -34,6 +40,9 @@ function renderSegment(segment: TextSegment, index: number): React.ReactElement 
       case 'italic':
         element = <em>{element}</em>
         break
+      case 'underline':
+        element = <u>{element}</u>
+        break
       case 'strikethrough':
         element = <del>{element}</del>
         break
@@ -41,11 +50,16 @@ function renderSegment(segment: TextSegment, index: number): React.ReactElement 
         element = <code>{element}</code>
         break
       case 'link': {
-        // Find the link formatting for this segment
-        const linkFormat = segment.formats.find((f) => f === 'link')
-        if (linkFormat) {
-          // For now, we'll need to pass URL data differently
-          // This is a placeholder - we'll need to enhance FormattedText to include URLs
+        // Find the URL for this link
+        const url = findLinkUrl(allFormatting, start, end)
+        if (url) {
+          element = (
+            <a href={url} target="_blank" rel="noopener noreferrer">
+              {element}
+            </a>
+          )
+        } else {
+          // Fallback if no URL found
           element = (
             <a href="#" onClick={(e) => e.preventDefault()}>
               {element}
@@ -67,5 +81,5 @@ export function renderFormattedText({ content, formatting = [] }: FormattingRend
 
   const segments = splitIntoSegments(content, formatting)
 
-  return <React.Fragment>{segments.map((segment, index) => renderSegment(segment, index))}</React.Fragment>
+  return <React.Fragment>{segments.map((segment, index) => renderSegment(segment, index, formatting))}</React.Fragment>
 }

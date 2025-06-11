@@ -13,9 +13,23 @@
 
 ### ⏳ Phase 2: Markdown Detection & Conversion (Pending)
 
-### ⏳ Phase 3: Rendering Formatted Text (Pending)
+### ✅ Phase 3: Rendering Formatted Text (Complete)
 
-### ⏳ Phase 4: Formatting Toolbar Integration (Pending)
+- ✅ Created FormattedText renderer component
+- ✅ Implemented segment splitting for mixed formatting
+- ✅ Added support for all format types (bold, italic, underline, strikethrough, code, link)
+- ✅ Integrated rendering into Block component
+- ✅ Added CSS styles for all formatting types
+
+### ✅ Phase 4: Formatting Toolbar Integration (Complete)
+
+- ✅ Implemented formatting button click handlers with toggle functionality
+- ✅ Added active state detection for formatting buttons
+- ✅ Fixed selection preservation after formatting
+- ✅ Prevented toolbar from closing during formatting operations
+- ✅ Fixed toolbar position flickering/jumping issues
+- ✅ Added link creation/removal with URL prompt
+- ✅ Improved selection restoration logic to handle DOM changes
 
 ### ⏳ Phase 5: Keyboard Shortcuts (Pending)
 

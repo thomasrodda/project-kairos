@@ -44,7 +44,7 @@ If the notification script fails, use: `echo -e "\a"`
 
 ### Current Focus
 
-**Testing**: Completing component tests for ContentEditableContainer, EditorContent, and Editor integration
+**Next Features**: Implementing keyboard shortcuts for formatting (Ctrl+B, etc.) and markdown detection/conversion
 
 ### Prerequisites
 
@@ -68,7 +68,7 @@ yarn typecheck    # Check TypeScript types
 
 Project Kairos is a creative writing and worldbuilding web application designed for novelists, writers, and D&D campaign planners. It combines block-based editing with AI-driven tools for consistency checking and writing assistance.
 
-**Current Status**: Block editor with drag-and-drop implemented, cross-block selection working, component testing in progress.
+**Current Status**: Block editor with drag-and-drop, cross-block selection, slash commands, and text formatting (bold, italic, underline, links) all working. Ready for keyboard shortcuts and markdown conversion.
 
 ## 🗺️ Document Navigation
 
@@ -93,6 +93,7 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 - **[Component Structure Guide.md](AI System Prompt Files/Component Structure Guide.md)** - React patterns
 - **[Testing Guide.md](AI System Prompt Files/Testing Guide.md)** - Test patterns
 - **[Editor Testing Plan.md](AI System Prompt Files/Editor Testing Plan.md)** - Editor test coverage
+- **[Text Formatting Plan.md](AI System Prompt Files/Text Formatting Plan.md)** - Rich text implementation
 - **[Backend Api Guide.md](AI System Prompt Files/Backend Api Guide.md)** - API design
 - **[Data Model Guide.md](AI System Prompt Files/Data Model Guide.md)** - Database schema
 
@@ -110,11 +111,12 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 ### Core Application (`apps/web/`)
 
 - **Components**: `src/components/` - All React components organized by feature
-  - `Editor/` - Block editor components (Block, PageTitle, EditorContent, ContentEditableContainer)
+  - `Editor/` - Block editor components (Block, PageTitle, EditorContent, ContentEditableContainer, FormattingToolbar, SlashCommandMenu)
   - `Sidebar/` - Navigation sidebar
   - `Workspace/` - Main layout wrapper
-- **State Management**: `src/contexts/EditorContext.tsx` - Central editor state
+- **State Management**: `src/contexts/EditorContext.tsx` - Central editor state with formatting support
 - **Hooks**: `src/hooks/` - Custom React hooks (useCrossBlockSelection, useDismiss)
+- **Utilities**: `src/utils/` - Helper functions (textFormatting, textSelection, formattingRenderer)
 - **Tests**: Component tests are colocated with components (e.g., `PageTitle.test.tsx`)
 - **Styles**: `src/styles/` - Global styles and reset
 
@@ -167,17 +169,20 @@ The editor uses a unified contentEditable approach with sophisticated state mana
 1. **EditorContext** (`src/contexts/EditorContext.tsx`):
 
    - Central state management using useReducer
-   - Manages blocks, selection, focus, and cross-block text selection
-   - Actions: ADD_BLOCK, UPDATE_BLOCK, DELETE_BLOCK, MOVE_BLOCK, etc.
+   - Manages blocks, selection, focus, cross-block text selection, and text formatting
+   - Separate formatting layer: plain text content + TextFormat array
+   - Actions: ADD_BLOCK, UPDATE_BLOCK, DELETE_BLOCK, MOVE_BLOCK, APPLY_FORMATTING, etc.
 
 2. **Component Hierarchy**:
 
    ```
    Editor
    ├── PageTitle
+   ├── FormattingToolbar (appears on text selection)
    └── EditorContent (single contentEditable div)
+       ├── SlashCommandMenu (appears on "/" key)
        └── DraggableBlock[] (drag wrapper)
-           └── Block (renders content based on type)
+           └── Block (renders formatted content)
                └── BlockDragHandle (selection/drag UI)
    ```
 
@@ -187,6 +192,8 @@ The editor uses a unified contentEditable approach with sophisticated state mana
    - Drag-and-drop block reordering
    - Multi-block selection (Shift+click, Ctrl/Cmd+click)
    - Cross-block text selection (custom implementation)
+   - Text formatting (bold, italic, underline, links) via toolbar
+   - Slash commands for changing block types
    - Placeholder hints for slash commands and AI features
    - Copy/paste with custom Kairos format support
 
@@ -204,10 +211,10 @@ For detailed status, see [# Current State.md](AI System Prompt Files/# Current S
 
 **Quick Summary**:
 
-- ✅ Editor foundation complete (drag/drop, selection, copy/paste)
-- ✅ Test coverage: PageTitle (17), Block (25), BlockDragHandle (25)
-- 🔄 In Progress: Component tests for ContentEditableContainer, EditorContent
-- 📋 Next: Slash commands, formatting toolbar, Firebase auth
+- ✅ Editor foundation complete (drag/drop, selection, copy/paste, slash commands)
+- ✅ Text formatting complete (bold, italic, underline, links via toolbar or keyboard shortcuts)
+- ✅ Test coverage: 300+ tests passing across all components
+- 📋 Next: Block type markdown detection, Firebase auth
 
 ## Development Best Practices
 
@@ -243,6 +250,21 @@ For detailed status, see [# Current State.md](AI System Prompt Files/# Current S
 - **Type Safety**: Strict TypeScript mode is enabled
 - **Pre-commit**: Husky runs linting and formatting on staged files
 - **Git Workflow**: Work on feature branches, create PRs to main
+
+### Text Formatting Architecture
+
+- **Separate Layer**: Formatting is stored separately from content (plain text + TextFormat array)
+- **Position-based**: TextFormat uses start/end positions in the plain text
+- **Toggle Logic**: Use `toggleFormat()` to apply/remove formatting
+- **Selection Restoration**: Complex logic to restore selection after DOM changes from formatting
+- **No Cross-Block**: Formatting currently only works within single blocks
+
+Key files for formatting:
+
+- `src/utils/textFormatting.ts` - Core formatting utilities
+- `src/utils/formattingRenderer.tsx` - Renders formatted text
+- `src/components/Editor/FormattingToolbar/` - Toolbar component
+- `src/contexts/EditorContext.tsx` - TextFormat types and actions
 
 ## 🛠️ Troubleshooting
 

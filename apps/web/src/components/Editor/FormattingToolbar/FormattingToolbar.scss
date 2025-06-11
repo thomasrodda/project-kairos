@@ -11,6 +11,11 @@
   z-index: 1000;
   transition: opacity 0.15s ease;
 
+  // Disable transitions during formatting to prevent flicker
+  &--formatting {
+    transition: none;
+  }
+
   &__button {
     display: flex;
     align-items: center;
@@ -31,6 +36,16 @@
 
     &:active {
       background-color: var(--color-active);
+    }
+
+    &--active {
+      background-color: var(--color-primary-light);
+      color: var(--color-primary);
+
+      &:hover {
+        background-color: var(--color-primary);
+        color: var(--color-text-on-primary);
+      }
     }
 
     svg {

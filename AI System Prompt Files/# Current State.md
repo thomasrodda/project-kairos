@@ -1,6 +1,6 @@
 # Current State
 
-> Last Updated: January 11, 2025
+> Last Updated: January 11, 2025 (Evening Update)
 > This document tracks the current state of Project Kairos, including what's built, what's in progress, and immediate next steps.
 >
 > **Update this document when:**
@@ -24,6 +24,7 @@
 - **Focus management**: Proper cursor and focus handling
 - **Click empty space**: Clicking below blocks places cursor in last block
 - **Slash commands**: Type "/" to change block types with searchable menu
+- **Text formatting**: Bold, italic, underline, and link formatting via toolbar
 
 ### UI Components ✅
 
@@ -37,6 +38,8 @@
 - **EditorContext**: Centralized state with useReducer
 - **Actions**: ADD_BLOCK, UPDATE_BLOCK, DELETE_BLOCK, MOVE_BLOCK, etc.
 - **Selection tracking**: Both block selection and text selection
+- **Text formatting**: TextFormat types with start/end positions and format types
+- **Formatting actions**: APPLY_FORMATTING, REMOVE_FORMATTING, UPDATE_BLOCK_FORMATTING
 
 ### Testing Infrastructure ✅
 
@@ -53,22 +56,34 @@
   - useCrossBlockSelection (23/23) ✅
   - useDismiss (13/13) ✅
   - textSelection utilities (36/36) ✅
+  - textFormatting utilities (41/41) ✅
+  - FormattingToolbar (7/7) ✅
 - **Performance tests**: Implemented for large document handling
 
 ## 🔄 Currently In Progress
 
-### Formatting Toolbar ✅ (UI Complete, Formatting Not Implemented)
+### Formatting Toolbar ✅ (Fully Implemented)
 
 - **UI Complete**: Toolbar appears after mouse release when text is selected
 - **Position Calculation**: Dynamic positioning above selection with boundary constraints
 - **Buttons Added**: Bold, italic, underline, and link buttons with icons
 - **Tests Written**: Basic component tests passing (7 tests)
-- **UX Improvements**: 
+- **UX Improvements**:
   - Only shows after selection is complete (not during drag)
   - Maintains visibility when selection exists
   - Prevents toolbar from obscuring text during selection
-- **Not Working Yet**: Actual formatting functionality - requires architecture changes
-- **Current Behavior**: Shows "Formatting features coming soon!" tooltip when buttons clicked
+  - Toolbar stays open and selection preserved after formatting
+  - No flickering or position jumping during formatting operations
+- **Formatting Working**:
+  - Toggle formatting on/off with buttons
+  - Active state detection shows which formats are applied
+  - Link creation/removal with URL prompt
+  - Proper selection restoration after DOM changes
+  - CSS styles for all format types
+- **Architecture**: Implemented formatting layer separate from content
+  - Plain text stored in blocks
+  - TextFormat array tracks formatting ranges
+  - FormattedText renderer handles display
 
 ### Component Testing 🔄
 
@@ -80,29 +95,37 @@
 
 - Cross-block selection may have edge cases with rapid selections
 - No undo/redo functionality yet
-- Formatting toolbar shows but cannot apply formatting (plain text only architecture)
-- No markdown conversion
+- No markdown conversion (typing **bold** doesn't auto-format)
 - Slash command tests fail in test environment (feature works in browser)
 - Focus restoration after slash command cancellation needs browser environment
+- Formatting doesn't persist across blocks (cross-block formatting not implemented)
+- No keyboard shortcuts for formatting yet (Ctrl+B, etc.)
 
 ## 📋 Immediate Next Steps
 
 Based on Development Plan and current progress:
 
-1. **Complete Formatting Toolbar** (Architecture Decision Needed)
+1. **Implement Keyboard Shortcuts for Formatting**
 
-   - Option A: Convert to rich text architecture (store HTML in blocks)
-   - Option B: Use markdown-style formatting markers (store as **bold**)
-   - Option C: Implement formatting layer separate from content
-   - Requires significant changes to ContentEditableContainer
+   - Add Ctrl/Cmd+B for bold
+   - Add Ctrl/Cmd+I for italic
+   - Add Ctrl/Cmd+U for underline
+   - Add Ctrl/Cmd+K for links
+   - Hook into existing formatting logic
 
-2. **Complete Remaining Component Tests**
+2. **Implement Markdown Detection & Conversion**
+
+   - Detect patterns like **bold**, _italic_, [link](url)
+   - Auto-convert to formatted text when typing
+   - Hide markdown symbols from display
+
+3. **Complete Remaining Component Tests**
 
    - Editor integration tests
    - Sidebar & SidebarButton tests
    - Workspace tests
 
-3. **Live Markdown Support**
+4. **Live Markdown Support**
    - Auto-convert "# " to H1
    - Auto-convert "## " to H2
    - Markdown paste detection
