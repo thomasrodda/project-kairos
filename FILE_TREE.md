@@ -148,9 +148,11 @@ apps
 │   │   │   │   ├── SlashCommandMenu.test.tsx
 │   │   │   │   ├── SlashCommandMenu.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── Editor.integration.test.tsx
 │   │   │   ├── Editor.performance.simple.test.tsx
 │   │   │   ├── Editor.performance.test.tsx
 │   │   │   ├── Editor.scss
+│   │   │   ├── Editor.test.tsx
 │   │   │   ├── Editor.tsx
 │   │   │   └── index.ts
 │   │   ├── PerformanceTest
@@ -211,6 +213,8 @@ packages
 │   └── tsconfig.json
 ├── design-tokens
 │   ├── src
+│   │   ├── \_root-variables.scss
+│   │   ├── \_root.scss
 │   │   ├── animations.scss
 │   │   ├── colors.scss
 │   │   ├── index.scss

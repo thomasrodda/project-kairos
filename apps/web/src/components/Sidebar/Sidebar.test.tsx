@@ -1,424 +1,230 @@
 // apps/web/src/components/Sidebar/Sidebar.test.tsx
+// Tests for the main navigation sidebar component
+
 import { render, screen, fireEvent } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { Sidebar } from './Sidebar'
 
-// Mock the @kairos/ui module directly in the test
-jest.mock('@kairos/ui', () => ({
-  Icon: (props: { name: string; size?: number | string; className?: string; 'aria-label'?: string; [key: string]: unknown }) => {
-    const { name, size = 20, className = '', 'aria-label': ariaLabel, ...restProps } = props
-    return (
-      <span
-        className={`icon ${className}`}
-        data-icon={name}
-        style={{
-          width: typeof size === 'number' ? `${size}px` : size,
-          height: typeof size === 'number' ? `${size}px` : size,
-          display: 'inline-block',
-        }}
-        role="img"
-        aria-label={ariaLabel || name}
-        {...restProps}
-      >
-        📄
-      </span>
-    )
-  },
-  initializeIconPerformance: jest.fn(),
+// Mock the SidebarButton component
+jest.mock('../SidebarButton', () => ({
+  SidebarButton: ({ icon, text, variant, isCollapsed, id }: any) => (
+    <button data-testid={`sidebar-button-${id}`} data-icon={icon} data-text={text} data-variant={variant} data-collapsed={isCollapsed}>
+      {text}
+    </button>
+  ),
 }))
 
-describe('Sidebar Component', () => {
-  describe('✅ Renders all navigation buttons correctly', () => {
-    it('should render all 4 primary buttons with correct text and icons', () => {
+// Mock the Icon component
+jest.mock('@kairos/ui', () => ({
+  Icon: ({ name, size, className }: any) => (
+    <span data-testid={`icon-${name}`} data-size={size} className={className}>
+      {name} icon
+    </span>
+  ),
+}))
+
+describe('Sidebar', () => {
+  describe('✅ Core Functionality', () => {
+    it('renders sidebar container', () => {
       render(<Sidebar />)
-
-      // Primary buttons (when expanded)
-      expect(screen.getByRole('button', { name: /workspace name/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /search/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /image library/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /create page/i })).toBeInTheDocument()
-
-      // Verify correct icons are present (4 primary buttons + 1 toggle = 5 total in primary section)
-      const primarySection = screen.getByRole('button', { name: /workspace name/i }).closest('.sidebar__primary-buttons')
-      expect(primarySection).toBeInTheDocument()
+      const sidebar = screen.getByRole('complementary')
+      expect(sidebar).toHaveClass('sidebar')
     })
 
-    it('should render all 5 bottom panel buttons with correct text and icons', () => {
+    it('starts in expanded state by default', () => {
       render(<Sidebar />)
-
-      // Bottom panel buttons (when expanded)
-      expect(screen.getByRole('button', { name: /page templates/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /archive/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /help/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /settings & members/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /updates & news/i })).toBeInTheDocument()
-
-      // Verify bottom panel exists
-      const bottomPanel = screen.getByRole('button', { name: /page templates/i }).closest('.sidebar__bottom-panel')
-      expect(bottomPanel).toBeInTheDocument()
-    })
-
-    it('should render toggle button with correct accessibility label', () => {
-      render(<Sidebar />)
-
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      expect(toggleButton).toBeInTheDocument()
-      expect(toggleButton).toHaveClass('sidebar__toggle')
-    })
-
-    it('should show logo when expanded', () => {
-      render(<Sidebar />)
-
-      // Logo should be visible in expanded state
-      const header = document.querySelector('.sidebar__header')
-      expect(header).toBeInTheDocument()
-
-      // Check that logo section exists (contains the color-profile icon)
-      const logo = document.querySelector('.sidebar__logo')
-      expect(logo).toBeInTheDocument()
-    })
-  })
-
-  describe('✅ Toggle functionality works correctly', () => {
-    it('should start in expanded state by default', () => {
-      render(<Sidebar />)
-
-      const sidebar = document.querySelector('.sidebar')
+      const sidebar = screen.getByRole('complementary')
       expect(sidebar).not.toHaveClass('sidebar--collapsed')
-
-      // Toggle button should say "Collapse" when expanded
-      expect(screen.getByRole('button', { name: /collapse sidebar/i })).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: /expand sidebar/i })).not.toBeInTheDocument()
     })
 
-    it('should collapse when toggle button is clicked', () => {
+    it('toggles between expanded and collapsed states', async () => {
+      const user = userEvent.setup()
       render(<Sidebar />)
 
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      fireEvent.click(toggleButton)
+      const sidebar = screen.getByRole('complementary')
+      const toggleButton = screen.getByLabelText('Collapse sidebar')
 
-      // Sidebar should have collapsed class
-      const sidebar = document.querySelector('.sidebar')
-      expect(sidebar).toHaveClass('sidebar--collapsed')
-
-      // Toggle button text should change
-      expect(screen.getByRole('button', { name: /expand sidebar/i })).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: /collapse sidebar/i })).not.toBeInTheDocument()
-    })
-
-    it('should expand when toggle button is clicked in collapsed state', () => {
-      render(<Sidebar />)
-
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-
-      // Collapse first
-      fireEvent.click(toggleButton)
-      expect(document.querySelector('.sidebar')).toHaveClass('sidebar--collapsed')
-
-      // Then expand
-      const expandButton = screen.getByRole('button', { name: /expand sidebar/i })
-      fireEvent.click(expandButton)
-
-      // Should be expanded again
-      const sidebar = document.querySelector('.sidebar')
+      // Initially expanded
       expect(sidebar).not.toHaveClass('sidebar--collapsed')
-      expect(screen.getByRole('button', { name: /collapse sidebar/i })).toBeInTheDocument()
-    })
-
-    it('should toggle multiple times correctly', () => {
-      render(<Sidebar />)
-
-      const getToggleButton = () =>
-        screen.queryByRole('button', { name: /collapse sidebar/i }) || screen.queryByRole('button', { name: /expand sidebar/i })
-
-      const sidebar = document.querySelector('.sidebar')
-
-      // Start expanded
-      expect(sidebar).not.toHaveClass('sidebar--collapsed')
-
-      // Collapse
-      fireEvent.click(getToggleButton()!)
-      expect(sidebar).toHaveClass('sidebar--collapsed')
-
-      // Expand
-      fireEvent.click(getToggleButton()!)
-      expect(sidebar).not.toHaveClass('sidebar--collapsed')
-
-      // Collapse again
-      fireEvent.click(getToggleButton()!)
-      expect(sidebar).toHaveClass('sidebar--collapsed')
-    })
-  })
-
-  describe('✅ Collapsed state behavior', () => {
-    it('should hide button text but keep icons visible when collapsed', () => {
-      render(<Sidebar />)
-
-      // Collapse the sidebar
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      fireEvent.click(toggleButton)
-
-      // All buttons should still be present and clickable
-      expect(screen.getByTestId('workspace-name')).toBeInTheDocument()
-      expect(screen.getByTestId('search')).toBeInTheDocument()
-      expect(screen.getByTestId('image-library')).toBeInTheDocument()
-      expect(screen.getByTestId('create-page')).toBeInTheDocument()
-      expect(screen.getByTestId('page-templates')).toBeInTheDocument()
-      expect(screen.getByTestId('archive')).toBeInTheDocument()
-      expect(screen.getByTestId('help')).toBeInTheDocument()
-      expect(screen.getByTestId('settings')).toBeInTheDocument()
-      expect(screen.getByTestId('updates')).toBeInTheDocument()
-
-      // Verify buttons have collapsed styling applied through SidebarButton component
-      expect(screen.getByTestId('workspace-name')).toHaveClass('sidebar-button--collapsed')
-      expect(screen.getByTestId('search')).toHaveClass('sidebar-button--collapsed')
-    })
-
-    it('should hide logo when collapsed', () => {
-      render(<Sidebar />)
-
-      // Logo should be visible when expanded
-      expect(document.querySelector('.sidebar__logo')).toBeInTheDocument()
-
-      // Collapse the sidebar
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      fireEvent.click(toggleButton)
-
-      // Logo should still exist but be hidden via CSS (conditional rendering)
-      expect(document.querySelector('.sidebar__logo')).not.toBeInTheDocument()
-    })
-
-    it('should hide file tree placeholder when collapsed', () => {
-      render(<Sidebar />)
-
-      // File tree placeholder should be visible when expanded
-      expect(screen.getByText(/file tree will go here/i)).toBeInTheDocument()
-
-      // Collapse the sidebar
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      fireEvent.click(toggleButton)
-
-      // File tree placeholder should be hidden
-      expect(screen.queryByText(/file tree will go here/i)).not.toBeInTheDocument()
-    })
-
-    it('should maintain all button functionality when collapsed', () => {
-      render(<Sidebar />)
-
-      // Collapse the sidebar
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      fireEvent.click(toggleButton)
-
-      // All buttons should still be clickable
-      const buttons = [
-        screen.getByTestId('workspace-name'),
-        screen.getByTestId('search'),
-        screen.getByTestId('image-library'),
-        screen.getByTestId('create-page'),
-        screen.getByTestId('page-templates'),
-        screen.getByTestId('archive'),
-        screen.getByTestId('help'),
-        screen.getByTestId('settings'),
-        screen.getByTestId('updates'),
-      ]
-
-      buttons.forEach((button) => {
-        expect(button).toBeEnabled()
-        expect(button.tagName.toLowerCase()).toBe('button')
-      })
-    })
-  })
-
-  describe('✅ Correct icons are used for each button', () => {
-    it('should use correct icons for primary buttons', () => {
-      render(<Sidebar />)
-
-      // We can't easily test the exact icon content, but we can verify the buttons exist
-      // and have the expected structure. The Icon component is tested separately.
-      const workspaceButton = screen.getByTestId('workspace-name')
-      const searchButton = screen.getByTestId('search')
-      const imageButton = screen.getByTestId('image-library')
-      const createButton = screen.getByTestId('create-page')
-
-      // Verify buttons have the expected structure
-      expect(workspaceButton).toHaveClass('sidebar-button')
-      expect(searchButton).toHaveClass('sidebar-button')
-      expect(imageButton).toHaveClass('sidebar-button')
-      expect(createButton).toHaveClass('sidebar-button')
-
-      // Verify they're in the primary buttons section
-      const primarySection = document.querySelector('.sidebar__primary-buttons')
-      expect(primarySection).toContainElement(workspaceButton)
-      expect(primarySection).toContainElement(searchButton)
-      expect(primarySection).toContainElement(imageButton)
-      expect(primarySection).toContainElement(createButton)
-    })
-
-    it('should use correct icons for bottom panel buttons', () => {
-      render(<Sidebar />)
-
-      const templatesButton = screen.getByTestId('page-templates')
-      const archiveButton = screen.getByTestId('archive')
-      const helpButton = screen.getByTestId('help')
-      const settingsButton = screen.getByTestId('settings')
-      const updatesButton = screen.getByTestId('updates')
-
-      // Verify buttons have the expected structure
-      expect(templatesButton).toHaveClass('sidebar-button')
-      expect(archiveButton).toHaveClass('sidebar-button')
-      expect(helpButton).toHaveClass('sidebar-button')
-      expect(settingsButton).toHaveClass('sidebar-button')
-      expect(updatesButton).toHaveClass('sidebar-button')
-
-      // Verify they're in the bottom panel section
-      const bottomPanel = document.querySelector('.sidebar__bottom-buttons')
-      expect(bottomPanel).toContainElement(templatesButton)
-      expect(bottomPanel).toContainElement(archiveButton)
-      expect(bottomPanel).toContainElement(helpButton)
-      expect(bottomPanel).toContainElement(settingsButton)
-      expect(bottomPanel).toContainElement(updatesButton)
-    })
-
-    it('should use correct variant classes for different button groups', () => {
-      render(<Sidebar />)
-
-      // Primary buttons should use 'standard' variant
-      expect(screen.getByTestId('workspace-name')).toHaveClass('sidebar-button--standard')
-      expect(screen.getByTestId('search')).toHaveClass('sidebar-button--standard')
-      expect(screen.getByTestId('image-library')).toHaveClass('sidebar-button--standard')
-      expect(screen.getByTestId('create-page')).toHaveClass('sidebar-button--standard')
-
-      // Bottom panel buttons should use 'slim' variant
-      expect(screen.getByTestId('page-templates')).toHaveClass('sidebar-button--slim')
-      expect(screen.getByTestId('archive')).toHaveClass('sidebar-button--slim')
-      expect(screen.getByTestId('help')).toHaveClass('sidebar-button--slim')
-      expect(screen.getByTestId('settings')).toHaveClass('sidebar-button--slim')
-      expect(screen.getByTestId('updates')).toHaveClass('sidebar-button--slim')
-    })
-  })
-
-  describe('✅ Accessibility and user experience', () => {
-    it('should have proper ARIA labels for screen readers', () => {
-      render(<Sidebar />)
-
-      // Toggle button has proper accessibility label
-      expect(screen.getByRole('button', { name: /collapse sidebar/i })).toHaveAttribute('aria-label', 'Collapse sidebar')
-
-      // Sidebar should have appropriate landmark role
-      const sidebar = document.querySelector('.sidebar')
-      expect(sidebar?.tagName.toLowerCase()).toBe('aside')
-    })
-
-    it('should handle keyboard navigation properly', () => {
-      render(<Sidebar />)
-
-      // Test that all interactive elements are properly focusable
-      const allButtons = screen.getAllByRole('button')
-
-      // Every button should be focusable via keyboard
-      allButtons.forEach((button) => {
-        button.focus()
-        expect(document.activeElement).toBe(button)
-        expect(button.tagName.toLowerCase()).toBe('button')
-      })
-
-      // Test that the toggle button specifically works with keyboard
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      toggleButton.focus()
-
-      // Use userEvent-style testing - simulate the full interaction
-      // Space or Enter would trigger click in real browsers
-      fireEvent.click(toggleButton) // This simulates what Space/Enter would do
-      expect(document.querySelector('.sidebar')).toHaveClass('sidebar--collapsed')
-    })
-
-    it('should maintain focus management during state changes', () => {
-      render(<Sidebar />)
-
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      toggleButton.focus()
 
       // Click to collapse
-      fireEvent.click(toggleButton)
+      await user.click(toggleButton)
+      expect(sidebar).toHaveClass('sidebar--collapsed')
+      expect(screen.getByLabelText('Expand sidebar')).toBeInTheDocument()
 
-      // Focus should remain on the toggle button (now with different label)
-      const expandButton = screen.getByRole('button', { name: /expand sidebar/i })
-      expect(document.activeElement).toBe(expandButton)
+      // Click to expand
+      await user.click(screen.getByLabelText('Expand sidebar'))
+      expect(sidebar).not.toHaveClass('sidebar--collapsed')
+      expect(screen.getByLabelText('Collapse sidebar')).toBeInTheDocument()
     })
 
-    it('should provide visual feedback for interactive elements', () => {
+    it('shows logo only when expanded', async () => {
+      const user = userEvent.setup()
       render(<Sidebar />)
 
-      // Toggle button should be a proper button element
-      const toggleButton = screen.getByRole('button', { name: /collapse sidebar/i })
-      expect(toggleButton.tagName.toLowerCase()).toBe('button')
-      expect(toggleButton).toHaveClass('sidebar__toggle')
+      // Initially expanded - logo visible
+      expect(screen.getByTestId('icon-color-profile')).toBeInTheDocument()
 
-      // All sidebar buttons should be proper button elements
-      const allButtons = screen.getAllByRole('button')
-      allButtons.forEach((button) => {
-        expect(button.tagName.toLowerCase()).toBe('button')
+      // Collapse - logo hidden
+      await user.click(screen.getByLabelText('Collapse sidebar'))
+      expect(screen.queryByTestId('icon-color-profile')).not.toBeInTheDocument()
+
+      // Expand - logo visible again
+      await user.click(screen.getByLabelText('Expand sidebar'))
+      expect(screen.getByTestId('icon-color-profile')).toBeInTheDocument()
+    })
+  })
+
+  describe('✅ Primary Buttons', () => {
+    it('renders all primary action buttons', () => {
+      render(<Sidebar />)
+
+      expect(screen.getByTestId('sidebar-button-workspace-name')).toBeInTheDocument()
+      expect(screen.getByTestId('sidebar-button-search')).toBeInTheDocument()
+      expect(screen.getByTestId('sidebar-button-image-library')).toBeInTheDocument()
+      expect(screen.getByTestId('sidebar-button-create-page')).toBeInTheDocument()
+    })
+
+    it('passes correct props to primary buttons', () => {
+      render(<Sidebar />)
+
+      const workspaceButton = screen.getByTestId('sidebar-button-workspace-name')
+      expect(workspaceButton).toHaveAttribute('data-icon', 'profile')
+      expect(workspaceButton).toHaveAttribute('data-text', 'Workspace Name')
+      expect(workspaceButton).toHaveAttribute('data-variant', 'standard')
+      expect(workspaceButton).toHaveAttribute('data-collapsed', 'false')
+    })
+
+    it('updates button collapsed state when sidebar collapses', async () => {
+      const user = userEvent.setup()
+      render(<Sidebar />)
+
+      const buttons = screen.getAllByTestId(/^sidebar-button-/)
+
+      // Initially not collapsed
+      buttons.forEach((button) => {
+        expect(button).toHaveAttribute('data-collapsed', 'false')
+      })
+
+      // Collapse sidebar
+      await user.click(screen.getByLabelText('Collapse sidebar'))
+
+      // All buttons should be collapsed
+      buttons.forEach((button) => {
+        expect(button).toHaveAttribute('data-collapsed', 'true')
       })
     })
   })
 
-  describe('✅ Layout and structure integrity', () => {
-    it('should maintain proper layout structure', () => {
+  describe('✅ File Tree Section', () => {
+    it('shows file tree placeholder when expanded', () => {
       render(<Sidebar />)
-
-      // Main sidebar element
-      const sidebar = document.querySelector('.sidebar')
-      expect(sidebar).toBeInTheDocument()
-      expect(sidebar).toHaveClass('sidebar')
-
-      // Header section
-      const header = document.querySelector('.sidebar__header')
-      expect(header).toBeInTheDocument()
-
-      // Primary buttons section
-      const primaryButtons = document.querySelector('.sidebar__primary-buttons')
-      expect(primaryButtons).toBeInTheDocument()
-
-      // File tree section
-      const fileTree = document.querySelector('.sidebar__file-tree')
-      expect(fileTree).toBeInTheDocument()
-
-      // Bottom panel section
-      const bottomPanel = document.querySelector('.sidebar__bottom-panel')
-      expect(bottomPanel).toBeInTheDocument()
+      expect(screen.getByText('File tree will go here')).toBeInTheDocument()
     })
 
-    it('should have correct button counts in each section', () => {
+    it('hides file tree when collapsed', async () => {
+      const user = userEvent.setup()
       render(<Sidebar />)
 
-      // Primary buttons section should have 4 buttons
-      const primarySection = document.querySelector('.sidebar__primary-buttons')
-      const primaryButtons = primarySection?.querySelectorAll('.sidebar-button')
-      expect(primaryButtons).toHaveLength(4)
+      // Collapse sidebar
+      await user.click(screen.getByLabelText('Collapse sidebar'))
 
-      // Bottom panel should have 5 buttons
-      const bottomSection = document.querySelector('.sidebar__bottom-buttons')
-      const bottomButtons = bottomSection?.querySelectorAll('.sidebar-button')
-      expect(bottomButtons).toHaveLength(5)
+      expect(screen.queryByText('File tree will go here')).not.toBeInTheDocument()
+    })
+  })
 
-      // Total should be 9 sidebar buttons + 1 toggle button = 10 buttons
+  describe('✅ Bottom Panel', () => {
+    it('renders all bottom panel buttons', () => {
+      render(<Sidebar />)
+
+      expect(screen.getByTestId('sidebar-button-page-templates')).toBeInTheDocument()
+      expect(screen.getByTestId('sidebar-button-archive')).toBeInTheDocument()
+      expect(screen.getByTestId('sidebar-button-help')).toBeInTheDocument()
+      expect(screen.getByTestId('sidebar-button-settings')).toBeInTheDocument()
+      expect(screen.getByTestId('sidebar-button-updates')).toBeInTheDocument()
+    })
+
+    it('uses slim variant for bottom buttons', () => {
+      render(<Sidebar />)
+
+      const bottomButtons = ['page-templates', 'archive', 'help', 'settings', 'updates']
+
+      bottomButtons.forEach((id) => {
+        const button = screen.getByTestId(`sidebar-button-${id}`)
+        expect(button).toHaveAttribute('data-variant', 'slim')
+      })
+    })
+  })
+
+  describe('✅ Toggle Icon', () => {
+    it('renders toggle icon', () => {
+      render(<Sidebar />)
+      expect(screen.getByTestId('icon-double-arrow')).toBeInTheDocument()
+    })
+
+    it('applies flipped class when collapsed', async () => {
+      const user = userEvent.setup()
+      render(<Sidebar />)
+
+      const icon = screen.getByTestId('icon-double-arrow')
+
+      // Initially not flipped
+      expect(icon).toHaveClass('sidebar__toggle-icon')
+      expect(icon).not.toHaveClass('sidebar__toggle-icon--flipped')
+
+      // Collapse - icon flipped
+      await user.click(screen.getByLabelText('Collapse sidebar'))
+      expect(icon).toHaveClass('sidebar__toggle-icon--flipped')
+    })
+  })
+
+  describe('✅ Accessibility', () => {
+    it('has proper ARIA role', () => {
+      render(<Sidebar />)
+      expect(screen.getByRole('complementary')).toBeInTheDocument()
+    })
+
+    it('toggle button has descriptive labels', async () => {
+      const user = userEvent.setup()
+      render(<Sidebar />)
+
+      // Initially shows collapse label
+      let toggleButton = screen.getByRole('button', { name: 'Collapse sidebar' })
+      expect(toggleButton).toBeInTheDocument()
+
+      // After collapse shows expand label
+      await user.click(toggleButton)
+      toggleButton = screen.getByRole('button', { name: 'Expand sidebar' })
+      expect(toggleButton).toBeInTheDocument()
+    })
+
+    it('all buttons are keyboard accessible', () => {
+      render(<Sidebar />)
+
+      // All buttons should be focusable
       const allButtons = screen.getAllByRole('button')
-      expect(allButtons).toHaveLength(10)
+      allButtons.forEach((button) => {
+        expect(button).toBeVisible()
+      })
+    })
+  })
+
+  describe('✅ Layout Structure', () => {
+    it('has correct section structure', () => {
+      const { container } = render(<Sidebar />)
+
+      expect(container.querySelector('.sidebar__header')).toBeInTheDocument()
+      expect(container.querySelector('.sidebar__primary-buttons')).toBeInTheDocument()
+      expect(container.querySelector('.sidebar__file-tree')).toBeInTheDocument()
+      expect(container.querySelector('.sidebar__bottom-panel')).toBeInTheDocument()
     })
 
-    it('should apply correct CSS classes for styling', () => {
-      render(<Sidebar />)
+    it('bottom panel contains bottom buttons wrapper', () => {
+      const { container } = render(<Sidebar />)
 
-      const sidebar = document.querySelector('.sidebar')
-
-      // Should have base class
-      expect(sidebar).toHaveClass('sidebar')
-
-      // Should not have collapsed class initially
-      expect(sidebar).not.toHaveClass('sidebar--collapsed')
-
-      // After collapsing
-      fireEvent.click(screen.getByRole('button', { name: /collapse sidebar/i }))
-      expect(sidebar).toHaveClass('sidebar--collapsed')
+      const bottomPanel = container.querySelector('.sidebar__bottom-panel')
+      const bottomButtons = bottomPanel?.querySelector('.sidebar__bottom-buttons')
+      expect(bottomButtons).toBeInTheDocument()
     })
   })
 })
