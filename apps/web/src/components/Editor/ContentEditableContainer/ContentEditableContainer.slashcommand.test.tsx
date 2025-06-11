@@ -7,6 +7,7 @@ import { ContentEditableContainer } from './ContentEditableContainer'
 import { renderWithEditor } from '../../../test/utils'
 
 describe('ContentEditableContainer - Slash Commands', () => {
+  // Test basic typing works first - removed this test as the slash commands require different setup
   const renderComponent = (initialBlocks = [{ id: 'block-1', type: 'paragraph' as const, content: 'Test content' }]) => {
     return renderWithEditor(
       <ContentEditableContainer>
@@ -22,18 +23,53 @@ describe('ContentEditableContainer - Slash Commands', () => {
     )
   }
 
-  // Helper to simulate typing in contentEditable
-  const simulateBeforeInput = (container: HTMLElement, data: string) => {
-    const beforeInputEvent = new InputEvent('beforeinput', {
-      bubbles: true,
-      cancelable: true,
+  // Helper to simulate beforeinput event
+  const simulateBeforeInput = (element: HTMLElement, data: string) => {
+    const event = new InputEvent('beforeinput', {
       data,
       inputType: 'insertText',
+      bubbles: true,
+      cancelable: true,
     })
+    element.dispatchEvent(event)
+  }
 
-    act(() => {
-      container.dispatchEvent(beforeInputEvent)
-    })
+  // Helper to simulate typing in contentEditable (similar to the working tests)
+  const simulateTyping = async (container: HTMLElement, blockId: string, text: string, position: number = 0) => {
+    const blockEl = container.querySelector(`[data-block-id="${blockId}"] .block__content`) as HTMLElement
+
+    // Focus the container first
+    container.focus()
+
+    // Set cursor position
+    const range = document.createRange()
+    const textNode = blockEl.firstChild || blockEl
+    range.setStart(textNode, position)
+    range.collapse(true)
+
+    const selection = window.getSelection()!
+    selection.removeAllRanges()
+    selection.addRange(range)
+
+    // Simulate typing character by character
+    for (const char of text) {
+      // Try beforeinput event first
+      const beforeInputEvent = new InputEvent('beforeinput', {
+        data: char,
+        inputType: 'insertText',
+        bubbles: true,
+        cancelable: true,
+      })
+
+      act(() => {
+        container.dispatchEvent(beforeInputEvent)
+      })
+
+      // Small delay between characters
+      await act(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 10))
+      })
+    }
   }
 
   // Helper to set cursor position
@@ -54,7 +90,7 @@ describe('ContentEditableContainer - Slash Commands', () => {
 
   describe('✅ Slash Command Trigger', () => {
     it('shows slash menu when typing / at start of block', async () => {
-      const { container } = renderComponent([{ id: 'block-1', type: 'paragraph', content: '' }])
+      const { container, store } = renderComponent([{ id: 'block-1', type: 'paragraph', content: '' }])
 
       // Wait for the content to be rendered
       await waitFor(() => {
@@ -62,22 +98,45 @@ describe('ContentEditableContainer - Slash Commands', () => {
       })
 
       const contentEditableContainer = container.querySelector('.content-editable-container') as HTMLDivElement
-      const blockContent = container.querySelector('.block__content')!
+      const blockEl = container.querySelector('[data-block-id="block-1"] .block__content') as HTMLElement
 
       // Focus the container
       contentEditableContainer.focus()
 
-      // Add a small delay to ensure focus is processed
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 10))
+      // Create a text node if empty (matching what the working test does)
+      if (!blockEl.firstChild) {
+        blockEl.appendChild(document.createTextNode(''))
+      }
+
+      // Set cursor position
+      const range = document.createRange()
+      const textNode = blockEl.firstChild!
+      range.setStart(textNode, 0)
+      range.collapse(true)
+
+      const selection = window.getSelection()!
+      selection.removeAllRanges()
+      selection.addRange(range)
+
+      // Dispatch beforeinput event
+      const beforeInputEvent = new InputEvent('beforeinput', {
+        data: '/',
+        inputType: 'insertText',
+        bubbles: true,
+        cancelable: true,
       })
 
-      // Set cursor at start of block
-      setCursorPosition(blockContent as HTMLElement, 0)
+      await act(async () => {
+        contentEditableContainer.dispatchEvent(beforeInputEvent)
+      })
 
-      // Simulate typing slash
-      simulateBeforeInput(contentEditableContainer, '/')
+      // Check if the slash character is in the state
+      await waitFor(() => {
+        const updatedBlock = store.getState().blocks.find((b) => b.id === 'block-1')
+        expect(updatedBlock?.content).toBe('/')
+      })
 
+      // Check if the menu appears
       await waitFor(
         () => {
           expect(screen.getByPlaceholderText('Search block types...')).toBeInTheDocument()

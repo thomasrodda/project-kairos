@@ -35,31 +35,15 @@ export function useCrossBlockSelection(options: UseCrossBlockSelectionOptions = 
   // Calculate selection from browser selection
   const calculateSelection = useCallback((): CrossBlockSelection | null => {
     const browserSelection = window.getSelection()
-    console.log('calculateSelection called, browserSelection:', browserSelection)
 
     if (!browserSelection || browserSelection.rangeCount === 0) {
-      console.log('No browser selection or no ranges')
       return null
     }
 
     const range = browserSelection.getRangeAt(0)
 
-    // Log the actual containers to see what's being selected
-    console.log('Range details:', {
-      startContainer: range.startContainer,
-      startContainerText: range.startContainer.textContent?.substring(0, 50),
-      startOffset: range.startOffset,
-      endContainer: range.endContainer,
-      endContainerText: range.endContainer.textContent?.substring(0, 50),
-      endOffset: range.endOffset,
-      collapsed: range.collapsed,
-      commonAncestorContainer: range.commonAncestorContainer,
-      commonAncestorClass: (range.commonAncestorContainer as HTMLElement).className || 'no class',
-    })
-
     // Check if this should be treated as text selection
     if (!shouldTreatAsTextSelection(range)) {
-      console.log('Should not treat as text selection')
       return null
     }
 
@@ -67,22 +51,13 @@ export function useCrossBlockSelection(options: UseCrossBlockSelectionOptions = 
     const startBlock = findBlockFromNode(range.startContainer)
     const endBlock = findBlockFromNode(range.endContainer)
 
-    console.log('Found blocks:', {
-      startBlockId: startBlock?.id,
-      endBlockId: endBlock?.id,
-      isMultiBlock: startBlock?.id !== endBlock?.id,
-    })
-
     if (!startBlock || !endBlock) {
-      console.log('Could not find start or end block')
       return null
     }
 
     // Calculate clean offsets within the blocks
     const startOffset = getCleanOffsets(startBlock.element, range.startContainer, range.startOffset)
     const endOffset = getCleanOffsets(endBlock.element, range.endContainer, range.endOffset)
-
-    console.log('Calculated offsets:', { startOffset, endOffset })
 
     // Get the selected text
     const selectedText = getRangeText(range)
@@ -100,26 +75,17 @@ export function useCrossBlockSelection(options: UseCrossBlockSelectionOptions = 
       isCollapsed: range.collapsed,
     }
 
-    console.log('New selection:', {
-      ...newSelection,
-      isMultiBlock: startBlock.id !== endBlock.id,
-      selectedTextPreview: selectedText.substring(0, 50) + (selectedText.length > 50 ? '...' : ''),
-    })
-
     return newSelection
   }, [blocks])
 
   // Handle selection changes
   const handleSelectionChange = useCallback(() => {
-    console.log('handleSelectionChange called, enabled:', enabled, 'isUpdating:', isUpdatingRef.current)
-
     if (!enabled || isUpdatingRef.current) return
 
     const newSelection = calculateSelection()
 
     // Only update if selection actually changed
     if (JSON.stringify(newSelection) !== JSON.stringify(selection)) {
-      console.log('Selection changed from:', selection, 'to:', newSelection)
       setSelection(newSelection)
       onSelectionChange?.(newSelection)
 
@@ -133,7 +99,6 @@ export function useCrossBlockSelection(options: UseCrossBlockSelectionOptions = 
 
   // Clear selection
   const clearSelection = useCallback(() => {
-    console.log('Clearing selection')
     window.getSelection()?.removeAllRanges()
     setSelection(null)
     dispatch({
@@ -215,11 +180,8 @@ export function useCrossBlockSelection(options: UseCrossBlockSelectionOptions = 
   // Set up event listeners
   useEffect(() => {
     if (!enabled) {
-      console.log('Hook is disabled, not setting up listeners')
       return
     }
-
-    console.log('Setting up selection event listeners')
 
     // Debounced version of handleSelectionChange
     let selectionTimeout: NodeJS.Timeout | null = null
@@ -249,7 +211,6 @@ export function useCrossBlockSelection(options: UseCrossBlockSelectionOptions = 
     document.addEventListener('keyup', handleKeyUp)
 
     return () => {
-      console.log('Cleaning up selection event listeners')
       if (selectionTimeout) {
         clearTimeout(selectionTimeout)
       }

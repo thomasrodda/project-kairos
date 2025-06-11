@@ -22,6 +22,7 @@ import { PageTitle } from '../PageTitle'
 import { DraggableBlock } from '../Block/DraggableBlock'
 import { Block } from '../Block'
 import { ContentEditableContainer } from '../ContentEditableContainer'
+import { FormattingToolbar } from '../FormattingToolbar'
 import './EditorContent.scss'
 
 export function EditorContent() {
@@ -29,6 +30,8 @@ export function EditorContent() {
   const dispatch = useEditorDispatch()
   const { pageTitle, blocks, focusedBlockId, selectedBlockIds, crossBlockSelection } = editorState
   const editorRef = useRef<HTMLDivElement>(null)
+  const contentEditableRef = useRef<HTMLDivElement>(null)
+  const formattingToolbarRef = useRef<HTMLDivElement>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
 
   // Screen reader announcements for accessibility
@@ -273,6 +276,7 @@ export function EditorContent() {
       clearSelection()
     },
     enabled: !!(selectedBlockIds.length > 0 || focusedBlockId || crossBlockSelection),
+    excludeRefs: [formattingToolbarRef], // Don't dismiss when clicking on formatting toolbar
   })
 
   // Handle drag start
@@ -351,7 +355,7 @@ export function EditorContent() {
 
         {/* All blocks in a single contentEditable container */}
         <div className="editor-content__blocks" role="group" aria-label="Document blocks">
-          <ContentEditableContainer onBlockClick={handleBlockClick}>
+          <ContentEditableContainer onBlockClick={handleBlockClick} containerRef={contentEditableRef}>
             <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
               {blocks.map((block, index) => (
                 <div key={block.id} aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
@@ -360,6 +364,8 @@ export function EditorContent() {
               ))}
             </SortableContext>
           </ContentEditableContainer>
+          {/* Formatting toolbar positioned relative to content container */}
+          <FormattingToolbar containerRef={contentEditableRef} toolbarRef={formattingToolbarRef} />
         </div>
       </div>
 

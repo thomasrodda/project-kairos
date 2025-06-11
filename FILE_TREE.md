@@ -138,6 +138,12 @@ apps
 │   │   │   │   ├── EditorContent.test.tsx
 │   │   │   │   ├── EditorContent.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── FormattingToolbar
+│   │   │   │   ├── FormattingToolbar.scss
+│   │   │   │   ├── FormattingToolbar.test.tsx
+│   │   │   │   ├── FormattingToolbar.tsx
+│   │   │   │   ├── debug.md
+│   │   │   │   └── index.ts
 │   │   │   ├── PageTitle
 │   │   │   │   ├── PageTitle.scss
 │   │   │   │   ├── PageTitle.test.tsx

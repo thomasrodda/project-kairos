@@ -57,6 +57,13 @@
 
 ## 🔄 Currently In Progress
 
+### Formatting Toolbar 🔄
+
+- **UI Complete**: Toolbar appears on text selection with position calculation
+- **Buttons Added**: Bold, italic, underline, and link buttons with icons
+- **Tests Written**: Basic component tests passing (7 tests)
+- **Pending**: Rich text support requires architecture changes to support HTML content
+
 ### Component Testing 🔄
 
 - **Editor**: Integration tests for the complete editor component
@@ -67,7 +74,7 @@
 
 - Cross-block selection may have edge cases with rapid selections
 - No undo/redo functionality yet
-- No formatting toolbar
+- Formatting toolbar shows but cannot apply formatting (plain text only architecture)
 - No markdown conversion
 - Slash command tests fail in test environment (feature works in browser)
 - Focus restoration after slash command cancellation needs browser environment
@@ -76,18 +83,18 @@
 
 Based on Development Plan and current progress:
 
-1. **Complete Remaining Component Tests**
+1. **Complete Formatting Toolbar** (Architecture Decision Needed)
+
+   - Option A: Convert to rich text architecture (store HTML in blocks)
+   - Option B: Use markdown-style formatting markers (store as **bold**)
+   - Option C: Implement formatting layer separate from content
+   - Requires significant changes to ContentEditableContainer
+
+2. **Complete Remaining Component Tests**
 
    - Editor integration tests
    - Sidebar & SidebarButton tests
    - Workspace tests
-
-2. **Add Formatting Toolbar** (Next Feature)
-
-   - Text selection detection
-   - Floating toolbar
-   - Bold, italic, underline
-   - Link creation
 
 3. **Live Markdown Support**
    - Auto-convert "# " to H1

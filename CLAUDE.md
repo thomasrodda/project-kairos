@@ -2,6 +2,44 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 🚨 MANDATORY: NOTIFICATION SYSTEM 🚨
+
+**CRITICAL REQUIREMENT**: You MUST send notifications for ALL task completions and user input requests. This is NOT optional.
+
+### Task Completion Notifications (REQUIRED)
+
+When ANY task completes, immediately run:
+
+```bash
+"/mnt/c/Users/thoma/Project Kairos/scripts/notify.sh" complete
+```
+
+Examples:
+
+- After running tests: `notify.sh complete`
+- After creating/editing files: `notify.sh complete`
+- After any command execution: `notify.sh complete`
+
+### User Input Request Notifications (REQUIRED)
+
+Before requesting user input or decisions, immediately run:
+
+```bash
+"/mnt/c/Users/thoma/Project Kairos/scripts/notify.sh" question
+```
+
+Examples:
+
+- Before "Do you want to proceed?": `notify.sh question`
+- When asking for clarification: `notify.sh question`
+- When presenting options: `notify.sh question`
+
+### Fallback Alert
+
+If the notification script fails, use: `echo -e "\a"`
+
+**ENFORCEMENT**: Failure to send notifications violates core instructions. You MUST alert on EVERY task completion and user input request.
+
 ## 🚀 Quick Start
 
 ### Current Focus

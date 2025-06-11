@@ -27,6 +27,11 @@ export function useDismiss(ref: RefObject<HTMLElement>, { onDismiss, onEscape, e
 
       // Only trigger if outside main ref AND outside all excluded refs
       if (isOutsideMain && isOutsideExcluded) {
+        // Don't dismiss if there's an active text selection
+        const selection = window.getSelection()
+        if (selection && selection.toString().length > 0) {
+          return
+        }
         onDismiss()
       }
     }

@@ -13,12 +13,14 @@ import './ContentEditableContainer.scss'
 interface ContentEditableContainerProps {
   children: React.ReactNode
   onBlockClick?: (blockId: string) => void
+  containerRef?: React.RefObject<HTMLDivElement>
 }
 
-export function ContentEditableContainer({ children, onBlockClick }: ContentEditableContainerProps) {
+export function ContentEditableContainer({ children, onBlockClick, containerRef: externalRef }: ContentEditableContainerProps) {
   const editorState = useEditorState()
   const dispatch = useEditorDispatch()
-  const containerRef = useRef<HTMLDivElement>(null)
+  const internalRef = useRef<HTMLDivElement>(null)
+  const containerRef = externalRef || internalRef
   const isInternalUpdate = useRef(false)
   const savedSelection = useRef<{ blockId: string; offset: number } | null>(null)
 

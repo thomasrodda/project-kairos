@@ -20,6 +20,9 @@
 
     // Add padding bottom to ensure there's always clickable space below the last block
     padding-bottom: 30vh;
+
+    // Position relative for toolbar positioning
+    position: relative;
   }
 }
 
