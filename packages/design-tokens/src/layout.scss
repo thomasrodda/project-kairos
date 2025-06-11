@@ -2,125 +2,86 @@
 // =============================================================================
 // PROJECT KAIROS DESIGN SYSTEM - LAYOUT
 // =============================================================================
-
-:root {
-  // =============================================================================
-  // BREAKPOINTS - Mobile-first responsive design
-  // =============================================================================
-
-  // Raw breakpoint values (used in media queries)
-  --breakpoint-xs: 480px; // Extra small devices
-  --breakpoint-sm: 640px; // Small devices
-  --breakpoint-md: 768px; // Tablets
-  --breakpoint-lg: 1024px; // Desktop
-  --breakpoint-xl: 1280px; // Large desktop
-  --breakpoint-2xl: 1536px; // Extra large desktop
-
-  // =============================================================================
-  // CONTAINER WIDTHS - Max widths for content containers
-  // =============================================================================
-
-  --container-xs: 100%; // Full width on mobile
-  --container-sm: 640px; // Small container
-  --container-md: 768px; // Medium container
-  --container-lg: 1024px; // Large container
-  --container-xl: 1280px; // Extra large container
-  --container-prose: 65ch; // Optimal reading width for text
-
-  // Container padding (responsive)
-  --container-padding-mobile: var(--spacing-4); // 16px
-  --container-padding-tablet: var(--spacing-6); // 24px
-  --container-padding-desktop: var(--spacing-8); // 32px
-
-  // =============================================================================
-  // Z-INDEX SCALE - Layering system
-  // =============================================================================
-
-  // Base layers
-  --z-index-negative: -1;
-  --z-index-base: 0;
-  --z-index-above: 1;
-
-  // Component layers
-  --z-index-dropdown: 100;
-  --z-index-sticky: 200;
-  --z-index-fixed: 300;
-  --z-index-backdrop: 400;
-  --z-index-modal: 500;
-  --z-index-popover: 600;
-  --z-index-tooltip: 700;
-  --z-index-notification: 800;
-  --z-index-top: 900;
-  --z-index-max: 9999;
-
-  // Semantic z-index assignments
-  --z-sidebar: var(--z-index-fixed);
-  --z-editor-toolbar: var(--z-index-sticky);
-  --z-slash-menu: var(--z-index-popover);
-  --z-backlinks-panel: var(--z-index-fixed);
-
-  // =============================================================================
-  // GRID SYSTEM - For consistent layouts
-  // =============================================================================
-
-  // Grid columns
-  --grid-columns: 12;
-
-  // Grid gaps (responsive)
-  --grid-gap-sm: var(--spacing-2); // 8px
-  --grid-gap-md: var(--spacing-4); // 16px
-  --grid-gap-lg: var(--spacing-6); // 24px
-  --grid-gap-xl: var(--spacing-8); // 32px
-
-  // =============================================================================
-  // LAYOUT DIMENSIONS - Common sizes
-  // =============================================================================
-
-  // Sidebar
-  --sidebar-width-collapsed: 3.25rem; // Hug
-  --sidebar-width-expanded: 16rem; // 256px
-  --sidebar-width-max: 20rem; // 320px
-
-  // Editor
-  --editor-max-width: 45rem; // 720px - comfortable reading width
-  --editor-padding-mobile: var(--spacing-4); // 16px
-  --editor-padding-desktop: var(--spacing-8); // 32px
-
-  // Toolbar
-  --toolbar-height: 3rem; // 48px
-  --toolbar-floating-offset: var(--spacing-2); // 8px from selection
-
-  // Panels
-  --panel-width-sm: 18rem; // 288px
-  --panel-width-md: 24rem; // 384px
-  --panel-width-lg: 32rem; // 512px
-
-  // =============================================================================
-  // ASPECT RATIOS - For consistent media sizing
-  // =============================================================================
-
-  --aspect-square: 1 / 1;
-  --aspect-video: 16 / 9;
-  --aspect-photo: 4 / 3;
-  --aspect-portrait: 3 / 4;
-  --aspect-wide: 21 / 9;
-}
+// This file exports layout values as Sass variables for use in mixins/functions
+// All CSS custom properties are defined in _root.scss
 
 // =============================================================================
-// RESPONSIVE UTILITIES - CSS custom properties that change with viewport
+// BREAKPOINTS - Mobile-first responsive design
 // =============================================================================
 
-// Tablet and up
-@media (min-width: 768px) {
-  :root {
-    --container-padding: var(--container-padding-tablet);
-    --editor-padding: var(--editor-padding-desktop);
+// Raw breakpoint values (used in media queries)
+$breakpoint-xs: 480px;
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// =============================================================================
+// Z-INDEX SCALE - Layering system
+// =============================================================================
+
+// Base layers
+$z-index-negative: -1;
+$z-index-base: 0;
+$z-index-above: 1;
+
+// Component layers
+$z-index-dropdown: 100;
+$z-index-sticky: 200;
+$z-index-fixed: 300;
+$z-index-backdrop: 400;
+$z-index-modal: 500;
+$z-index-popover: 600;
+$z-index-tooltip: 700;
+$z-index-notification: 800;
+$z-index-top: 900;
+$z-index-max: 9999;
+
+// =============================================================================
+// MEDIA QUERY MIXINS
+// =============================================================================
+
+@mixin breakpoint($size) {
+  @if $size == 'xs' {
+    @media (min-width: $breakpoint-xs) {
+      @content;
+    }
+  } @else if $size == 'sm' {
+    @media (min-width: $breakpoint-sm) {
+      @content;
+    }
+  } @else if $size == 'md' {
+    @media (min-width: $breakpoint-md) {
+      @content;
+    }
+  } @else if $size == 'lg' {
+    @media (min-width: $breakpoint-lg) {
+      @content;
+    }
+  } @else if $size == 'xl' {
+    @media (min-width: $breakpoint-xl) {
+      @content;
+    }
+  } @else if $size == '2xl' {
+    @media (min-width: $breakpoint-2xl) {
+      @content;
+    }
   }
 }
 
-// Desktop and up
-@media (min-width: 1024px) {
-  :root {
-    --container-padding: var(--container-padding-desktop);
+// =============================================================================
+// CONTAINER MIXIN
+// =============================================================================
+
+@mixin container($max-width: null) {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--container-padding);
+  padding-right: var(--container-padding);
+
+  @if $max-width {
+    max-width: $max-width;
   }
 }

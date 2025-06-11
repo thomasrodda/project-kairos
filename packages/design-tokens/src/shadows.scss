@@ -2,53 +2,32 @@
 // =============================================================================
 // PROJECT KAIROS DESIGN SYSTEM - SHADOWS (SIMPLIFIED)
 // =============================================================================
-
-:root {
-  // =============================================================================
-  // BASIC SHADOW SYSTEM - Light, Medium, Heavy
-  // =============================================================================
-
-  // Light shadow - subtle depth (cards at rest, small buttons)
-  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  // Medium shadow - noticeable depth (hover states, floating elements)
-  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-  // Heavy shadow - strong depth (modals, important floating elements)
-  --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.25);
-
-  // =============================================================================
-  // FOCUS SHADOW - For accessibility and interaction feedback
-  // =============================================================================
-
-  --shadow-focus: 0 0 0 3px rgba(179, 115, 252, 0.3); // Primary color glow
-
-  // =============================================================================
-  // COMPONENT ASSIGNMENTS - Easy to change later
-  // =============================================================================
-
-  // Cards and panels
-  --shadow-card: var(--shadow-light);
-  --shadow-card-hover: var(--shadow-medium);
-
-  // Buttons
-  --shadow-button: var(--shadow-light);
-  --shadow-button-hover: var(--shadow-medium);
-
-  // Floating elements
-  --shadow-dropdown: var(--shadow-heavy);
-  --shadow-toolbar: var(--shadow-medium);
-  --shadow-modal: var(--shadow-heavy);
-
-  // Remove any elevation references - just use these simple ones
-}
+// This file exports shadow values as Sass variables for use in mixins/functions
+// All CSS custom properties are defined in _root.scss
 
 // =============================================================================
-// LIGHT THEME - Slightly stronger shadows for better visibility
+// BASIC SHADOW SYSTEM - Light, Medium, Heavy
 // =============================================================================
 
-[data-theme='light'] {
-  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.12);
-  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.18);
-  --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.3);
-}
+// Light shadow - subtle depth (cards at rest, small buttons)
+$shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+// Medium shadow - noticeable depth (hover states, floating elements)
+$shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+// Heavy shadow - strong depth (modals, important floating elements)
+$shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.25);
+
+// =============================================================================
+// FOCUS SHADOW - For accessibility and interaction feedback
+// =============================================================================
+
+$shadow-focus: 0 0 0 3px rgba(179, 115, 252, 0.3); // Primary color glow
+
+// =============================================================================
+// LIGHT THEME SHADOWS - Slightly stronger shadows for better visibility
+// =============================================================================
+
+$shadow-light-theme: 0 2px 4px rgba(0, 0, 0, 0.12);
+$shadow-medium-theme: 0 4px 12px rgba(0, 0, 0, 0.18);
+$shadow-heavy-theme: 0 8px 24px rgba(0, 0, 0, 0.3);

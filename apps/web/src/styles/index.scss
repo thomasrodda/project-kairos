@@ -3,8 +3,8 @@
 // MAIN STYLES ENTRY POINT
 // =============================================================================
 
-// Import design tokens first (this makes all CSS custom properties available)
-@use '@kairos/design-tokens';
+// Design tokens are auto-imported by Vite for all SCSS files
+// No need to import them manually here
 
 // Import base styles
 @use './base/reset';

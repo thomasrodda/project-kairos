@@ -2,15 +2,17 @@
 // =============================================================================
 // PROJECT KAIROS DESIGN SYSTEM - MAIN EXPORT
 // =============================================================================
-// This file imports all design tokens in the correct order
+// This file imports all design tokens through a single consolidated file
+// to prevent duplicate :root declarations
 
-// Import raw tokens first
-@use './colors';
-@use './typography';
-@use './spacing';
-@use './layout.scss';
-@use './shadows.scss';
-@use './animations.scss';
+// Import the consolidated root declarations
+@use './root';
 
-// Import semantic assignments last (they reference the raw tokens)
-@use './semantic';
+// Export mixins and functions (but not :root declarations)
+@forward './colors' hide $colors;
+@forward './typography' hide $font-families, $font-sizes, $font-weights, $line-heights;
+@forward './spacing' hide $spacing;
+@forward './layout.scss';
+@forward './shadows.scss';
+@forward './animations.scss';
+@forward './semantic';

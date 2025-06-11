@@ -32,13 +32,18 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: true,
+    // Optimize CSS delivery
+    cssCodeSplit: true, // Keep code splitting for better caching
+    cssMinify: 'lightningcss', // Use faster CSS minifier
   },
   css: {
     preprocessorOptions: {
       scss: {
         additionalData: `@use "@kairos/design-tokens" as *;`,
+        api: 'modern-compiler', // Use faster Dart Sass API
       },
     },
+    devSourcemap: true, // Enable CSS source maps in dev for easier debugging
   },
   envPrefix: ['VITE_'],
 })

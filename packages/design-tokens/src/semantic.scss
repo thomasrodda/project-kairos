@@ -2,112 +2,32 @@
 // =============================================================================
 // PROJECT KAIROS DESIGN SYSTEM - SEMANTIC ASSIGNMENTS
 // =============================================================================
-// This file assigns raw tokens to semantic meanings that change between themes
+// This file exports semantic assignments as Sass variables for use in mixins/functions
+// All CSS custom properties are defined in _root.scss
 
-:root {
-  // =============================================================================
-  // SEMANTIC COLOR ASSIGNMENTS - Dark Theme (Default)
-  // =============================================================================
+// This file now only contains Sass variables and mixins
+// All CSS custom properties have been moved to _root.scss to prevent duplication
 
-  // Background colors
-  --color-background: var(--color-neutral-900); // Main app background
-  --color-surface: var(--color-neutral-800); // Panel backgrounds
-  --color-surface-elevated-1: var(--color-neutral-750); // Card backgrounds, Sidebar button hover backgrounds
-  --color-surface-elevated-2: var(--color-neutral-700); // Card backgrounds, Sidebar slim button hover backgrounds
-
-  // Text colors
-  --color-text-primary: var(--color-neutral-100); // Main text
-  --color-text-secondary: var(--color-neutral-400); // Secondary text
-  --color-text-muted: var(--color-neutral-500); // Muted/disabled text
-  --color-text-inverse: var(--color-neutral-900); // Text on light backgrounds
-
-  // Button Text colors
-  --color-button-text-default: var(--color-neutral-300); // Dimmed-white text
-  --color-button-text-hover: var(--color-neutral-100); // Bright-white text
-
-  // Border colors
-  --color-border: var(--color-neutral-700); // Default borders
-  --color-border-light: var(--color-neutral-750); // Subtle borders
-  --color-border-focus: var(--color-primary-500); // Focus borders
-
-  // Interactive states
-  --color-interactive: var(--color-primary-500); // Links, buttons
-  --color-interactive-hover: var(--color-primary-400);
-  --color-interactive-active: var(--color-primary-600);
-
-  // Status colors (semantic assignments)
-  --color-status-success: var(--color-success-500);
-  --color-status-warning: var(--color-warning-500);
-  --color-status-error: var(--color-error-500);
-  --color-status-info: var(--color-info-500);
-
-  // =============================================================================
-  // SEMANTIC TYPOGRAPHY ASSIGNMENTS
-  // =============================================================================
-
-  // Body text styles
-  --text-body-sm: var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
-  --text-body-md: var(--font-size-16) / var(--line-height-relaxed) var(--font-family-primary);
-  --text-body-lg: var(--font-size-18) / var(--line-height-relaxed) var(--font-family-primary);
-
-  // Heading styles
-  --text-heading-xs: var(--font-weight-bold) var(--font-size-16) / var(--line-height-snug) var(--font-family-primary);
-  --text-heading-sm: var(--font-weight-bold) var(--font-size-18) / var(--line-height-snug) var(--font-family-primary);
-  --text-heading-md: var(--font-weight-bold) var(--font-size-20) / var(--line-height-snug) var(--font-family-primary);
-  --text-heading-lg: var(--font-weight-bold) var(--font-size-24) / var(--line-height-tight) var(--font-family-primary);
-  --text-heading-xl: var(--font-weight-bold) var(--font-size-30) / var(--line-height-tight) var(--font-family-primary);
-  --text-heading-2xl: var(--font-weight-bold) var(--font-size-36) / var(--line-height-tight) var(--font-family-primary);
-
-  // UI text styles
-  --text-caption: var(--font-size-12) / var(--line-height-normal) var(--font-family-primary);
-  --text-label: var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
-  --text-button: var(--font-size-14) / var(--line-height-tight) var(--font-family-primary);
-  --text-ui-label-md: var(--font-weight-medium) var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
-  --text-ui-label-lg: var(--font-weight-medium) var(--font-size-16) / var(--line-height-normal) var(--font-family-primary);
-
-  // Editor-specific typography
-  --editor-font-paragraph: var(--font-size-16) / var(--line-height-relaxed) var(--font-family-primary);
-  --editor-font-heading-1: var(--font-size-36) / var(--line-height-tight) var(--font-family-secondary);
-  --editor-font-heading-2: var(--font-size-30) / var(--line-height-tight) var(--font-family-secondary);
-
-  // Font weight assignments
-  --font-weight-body: var(--font-weight-regular);
-  --font-weight-emphasis: var(--font-weight-medium);
-  --font-weight-strong: var(--font-weight-semibold);
-  --font-weight-heading: var(--font-weight-bold);
-
-  // =============================================================================
-  // DISABLED & LOADING STATES
-  // =============================================================================
-
-  --color-disabled-background: var(--color-neutral-800);
-  --color-disabled-text: var(--color-neutral-600);
-  --color-disabled-border: var(--color-neutral-750);
-
-  --color-loading-spinner: var(--color-primary-500);
-  --color-skeleton-base: var(--color-neutral-800);
-  --color-skeleton-highlight: var(--color-neutral-750);
+// Mixin for applying text styles
+@mixin text-style($size, $weight: normal, $line-height: normal) {
+  font-size: var(--font-size-#{$size});
+  font-weight: var(--font-weight-#{$weight});
+  line-height: var(--line-height-#{$line-height});
 }
 
-// =============================================================================
-// LIGHT THEME OVERRIDES (Future)
-// =============================================================================
-
-[data-theme='light'] {
-  // Background colors
-  --color-background: var(--color-neutral-100);
-  --color-surface: var(--color-white);
-  --color-surface-hover: var(--color-neutral-200);
-  --color-surface-active: var(--color-neutral-300);
-
-  // Text colors
-  --color-text-primary: var(--color-neutral-900);
-  --color-text-secondary: var(--color-neutral-600);
-  --color-text-muted: var(--color-neutral-500);
-  --color-text-inverse: var(--color-neutral-100);
-
-  // Border colors
-  --color-border: var(--color-neutral-300);
-  --color-border-light: var(--color-neutral-200);
-  // Focus border stays the same
+// Mixin for applying heading styles
+@mixin heading($level) {
+  @if $level == 'xs' {
+    font: var(--text-heading-xs);
+  } @else if $level == 'sm' {
+    font: var(--text-heading-sm);
+  } @else if $level == 'md' {
+    font: var(--text-heading-md);
+  } @else if $level == 'lg' {
+    font: var(--text-heading-lg);
+  } @else if $level == 'xl' {
+    font: var(--text-heading-xl);
+  } @else if $level == '2xl' {
+    font: var(--text-heading-2xl);
+  }
 }

@@ -2,44 +2,23 @@
 // =============================================================================
 // PROJECT KAIROS DESIGN SYSTEM - ANIMATIONS (SIMPLIFIED)
 // =============================================================================
+// This file exports animation values and utilities
+// All CSS custom properties are defined in _root.scss
 
-:root {
-  // =============================================================================
-  // TIMING - How fast things animate
-  // =============================================================================
+// =============================================================================
+// TIMING VALUES - Sass variables for use in mixins
+// =============================================================================
 
-  --speed-fast: 150ms; // Quick interactions (button hover)
-  --speed-normal: 250ms; // Standard transitions (sidebar, menus)
-  --speed-slow: 400ms; // Deliberate animations (page changes)
+$speed-fast: 150ms;
+$speed-normal: 250ms;
+$speed-slow: 400ms;
 
-  // =============================================================================
-  // EASING - How animations feel (industry standard)
-  // =============================================================================
+// =============================================================================
+// EASING VALUES
+// =============================================================================
 
-  --ease-smooth: ease-out; // Natural deceleration (most common)
-  --ease-linear: linear; // Constant speed (loading spinners)
-
-  // =============================================================================
-  // BUILDING BLOCKS - Mix and match these for any animation
-  // =============================================================================
-
-  // Colors (for hover effects, theme switching)
-  --animate-colors:
-    color var(--speed-fast) var(--ease-smooth), background-color var(--speed-fast) var(--ease-smooth),
-    border-color var(--speed-fast) var(--ease-smooth);
-
-  // Size changes (width, height - like sidebar expand/collapse)
-  --animate-size: width var(--speed-normal) var(--ease-smooth);
-
-  // Movement (sliding, repositioning)
-  --animate-transform: transform var(--speed-normal) var(--ease-smooth);
-
-  // Opacity (fade in/out)
-  --animate-opacity: opacity var(--speed-normal) var(--ease-smooth);
-
-  // Everything (when you're not sure what will change)
-  --animate-all: all var(--speed-normal) var(--ease-smooth);
-}
+$ease-smooth: ease-out;
+$ease-linear: linear;
 
 // =============================================================================
 // COMMON KEYFRAME ANIMATIONS - Ready to use
