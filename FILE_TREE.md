@@ -72,6 +72,7 @@ apps
 │   │   ├── editor-advanced.cy.ts
 │   │   ├── editor-basic.cy.ts
 │   │   ├── editor-selection.cy.ts
+│   │   ├── keyboard-shortcuts.cy.ts
 │   │   ├── markdown-formatting-fixed.cy.ts
 │   │   ├── markdown-formatting.cy.ts
 │   │   └── markdown-simple.cy.ts

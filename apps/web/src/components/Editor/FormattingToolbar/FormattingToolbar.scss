@@ -14,6 +14,10 @@
   // Disable transitions during formatting to prevent flicker
   &--formatting {
     transition: none;
+
+    .formatting-toolbar__button {
+      transition: none;
+    }
   }
 
   &__button {
@@ -29,6 +33,7 @@
     cursor: pointer;
     transition: background-color 0.15s ease;
     color: var(--color-text-primary);
+    fill: var(--color-white);
 
     &:hover {
       background-color: var(--color-hover);
@@ -39,17 +44,7 @@
     }
 
     &--active {
-      background-color: var(--color-primary-light);
-      color: var(--color-primary);
-
-      &:hover {
-        background-color: var(--color-primary);
-        color: var(--color-text-on-primary);
-      }
-    }
-
-    svg {
-      fill: currentColor;
+      fill: var(--color-primary);
     }
   }
 

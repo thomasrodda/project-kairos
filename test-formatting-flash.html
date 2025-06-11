@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Formatting Flash Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>Testing Formatting Toolbar Flash Fix</h1>
+    
+    <div class="test-section">
+        <h2>Test Instructions</h2>
+        <div class="result info">
+            <p><strong>Manual Test Steps:</strong></p>
+            <ol>
+                <li>Open the application in the iframe below</li>
+                <li>Type some text in a block</li>
+                <li>Select some text by dragging</li>
+                <li>Press Ctrl+B (or Cmd+B on Mac) to apply bold</li>
+                <li>Watch the formatting toolbar - it should NOT flash purple on all icons</li>
+                <li>Only the Bold button should become active (purple)</li>
+                <li>Try with Ctrl+I and Ctrl+U as well</li>
+            </ol>
+        </div>
+        
+        <div class="result info">
+            <p><strong>Expected Behavior:</strong></p>
+            <ul>
+                <li>When using keyboard shortcuts, only the relevant button should change state</li>
+                <li>Other buttons should remain in their current state (no flash)</li>
+                <li>The toolbar should not flicker or jump</li>
+                <li>When clicking toolbar buttons, behavior should be the same as before</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Application</h2>
+        <iframe src="http://localhost:3002/" title="Project Kairos App"></iframe>
+    </div>
+    
+    <div class="test-section">
+        <h2>Fix Details</h2>
+        <div class="result info">
+            <p><strong>What was fixed:</strong></p>
+            <ul>
+                <li>Added check to prevent active format updates during formatting operations</li>
+                <li>Toolbar now maintains its state while keyboard shortcuts are being processed</li>
+                <li>After formatting completes, the state is updated to reflect the new formatting</li>
+                <li>This prevents the brief flash where all buttons lose their active state</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

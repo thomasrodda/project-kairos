@@ -72,6 +72,57 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
     }
   }, [isMouseDown])
 
+  // Listen for formatting events from keyboard shortcuts
+  useEffect(() => {
+    const handleFormattingStart = (event: Event) => {
+      const customEvent = event as CustomEvent
+      if (customEvent.detail?.isFormatting) {
+        setIsFormatting(true)
+        // Save current position to prevent jumping
+        if (position) {
+          savedPositionRef.current = position
+        }
+      }
+    }
+
+    const handleFormattingEnd = (event: Event) => {
+      const customEvent = event as CustomEvent
+      if (customEvent.detail?.isFormatting === false) {
+        setIsFormatting(false)
+        savedPositionRef.current = null
+
+        // Force immediate update of active formats after formatting ends
+        // This ensures the toolbar reflects the correct state immediately
+        setTimeout(() => {
+          const blockSelection = getBlockRelativeSelection()
+          if (blockSelection) {
+            const block = state.blocks.find((b) => b.id === blockSelection.blockId)
+            if (block && block.formatting) {
+              const newActiveFormats = new Set<FormatType>()
+              const formatTypes: FormatType[] = ['bold', 'italic', 'underline', 'code', 'strikethrough', 'link']
+
+              formatTypes.forEach((formatType) => {
+                if (isRangeFormatted(block.formatting || [], blockSelection.startOffset, blockSelection.endOffset, formatType)) {
+                  newActiveFormats.add(formatType)
+                }
+              })
+
+              setActiveFormats(newActiveFormats)
+            }
+          }
+        }, 0)
+      }
+    }
+
+    window.addEventListener('formatting-start', handleFormattingStart)
+    window.addEventListener('formatting-end', handleFormattingEnd)
+
+    return () => {
+      window.removeEventListener('formatting-start', handleFormattingStart)
+      window.removeEventListener('formatting-end', handleFormattingEnd)
+    }
+  }, [position, state.blocks])
+
   // Handle toolbar visibility based on selection
   useEffect(() => {
     // Only show toolbar if mouse is not down (not actively selecting)
@@ -101,6 +152,12 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
   // Calculate toolbar position
   useEffect(() => {
     if (!isVisible) return
+
+    // Use saved position while formatting to prevent flicker
+    if (isFormatting && savedPositionRef.current) {
+      setPosition(savedPositionRef.current)
+      return
+    }
 
     // Don't recalculate position while formatting to prevent flicker
     if (isFormatting && position) return
@@ -220,6 +277,10 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
   // Update active formats based on selection
   useEffect(() => {
     const updateActiveFormats = () => {
+      // Don't update active formats while formatting is in progress
+      // This prevents the flash of inactive buttons during keyboard shortcuts
+      if (isFormatting) return
+
       if (!hasValidSelection && !state.crossBlockSelection) {
         setActiveFormats(new Set())
         return
@@ -250,7 +311,7 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
     // Also update when selection changes
     const intervalId = setInterval(updateActiveFormats, 100)
     return () => clearInterval(intervalId)
-  }, [hasValidSelection, state.crossBlockSelection, state.blocks])
+  }, [hasValidSelection, state.crossBlockSelection, state.blocks, isFormatting])
 
   // Format selection
   const handleFormat = (formatType: FormatType) => {
