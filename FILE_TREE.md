@@ -55,6 +55,7 @@ AI System Prompt Files
 ├── Security Guide.md
 ├── Slash Command Feature Development.md
 ├── Testing Guide.md
+├── Text Formatting Plan.md
 └── Troubleshooting Guide.md
 apps
 ├── api
@@ -198,6 +199,8 @@ apps
 │   │   ├── setup.ts
 │   │   └── utils.tsx
 │   ├── utils
+│   │   ├── textFormatting.test.ts
+│   │   ├── textFormatting.ts
 │   │   ├── textSelection.test.ts
 │   │   └── textSelection.ts
 │   ├── App.test.tsx

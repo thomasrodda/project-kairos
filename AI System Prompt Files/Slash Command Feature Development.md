@@ -46,7 +46,7 @@ The slash command feature allows users to quickly change block types by typing "
 
 ### Enhanced Functionality
 
-- [ ] Keep menu open while typing to filter options (e.g., "/hea" filters to headings)
+- [x] Keep menu open while typing to filter options (e.g., "/hea" filters to headings)
 - [ ] Add more block types (code block, quote, divider, callout)
 - [ ] Support markdown shortcuts (e.g., "# " converts to H1 without menu)
 - [ ] Add recently used block types at the top

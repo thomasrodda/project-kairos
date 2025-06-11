@@ -13,11 +13,23 @@ import { generateId } from '@kairos/utils'
 // Block types supported by the editor
 export type BlockType = 'h1' | 'h2' | 'h3' | 'paragraph' | 'bullet'
 
+// Text formatting types
+export type FormatType = 'bold' | 'italic' | 'underline' | 'code' | 'strikethrough' | 'link'
+
+// Text formatting data structure
+export interface TextFormat {
+  start: number // Start position in content string
+  end: number // End position in content string
+  type: FormatType // Type of formatting applied
+  url?: string // For links
+}
+
 // Individual block data structure
 export interface EditorBlock {
   id: string // Unique identifier for drag/drop and operations
   type: BlockType // Block type determines rendering and behavior
-  content: string // Plain text content of the block
+  content: string // Plain text content of the block (no markdown symbols)
+  formatting?: TextFormat[] // Rich text annotations
   metadata?: {
     placeholder?: string // Custom placeholder text
     listIndex?: number // For ordered lists (future feature)
@@ -76,6 +88,9 @@ export type EditorAction =
   | { type: 'SET_DRAGGING'; isDragging: boolean }
   | { type: 'SET_SELECTION'; selection: EditorState['selectedRange'] }
   | { type: 'SET_CROSS_BLOCK_SELECTION'; selection: CrossBlockSelection | null }
+  | { type: 'APPLY_FORMATTING'; blockId: string; start: number; end: number; formatType: FormatType; url?: string }
+  | { type: 'REMOVE_FORMATTING'; blockId: string; start: number; end: number; formatType?: FormatType }
+  | { type: 'UPDATE_BLOCK_FORMATTING'; blockId: string; formatting: TextFormat[] }
   | { type: 'MARK_SAVED' }
   | { type: 'RESET_EDITOR' }
 
@@ -185,6 +200,70 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
 
     case 'UPDATE_BLOCK': {
       const newBlocks = state.blocks.map((block) => (block.id === action.blockId ? { ...block, content: action.content } : block))
+
+      return {
+        ...state,
+        blocks: newBlocks,
+        isDirty: true,
+      }
+    }
+
+    case 'APPLY_FORMATTING': {
+      const { blockId, start, end, formatType, url } = action
+      const newBlocks = state.blocks.map((block) => {
+        if (block.id !== blockId) return block
+
+        const newFormat: TextFormat = { start, end, type: formatType }
+        if (url) newFormat.url = url
+
+        const formatting = block.formatting || []
+        return {
+          ...block,
+          formatting: [...formatting, newFormat],
+        }
+      })
+
+      return {
+        ...state,
+        blocks: newBlocks,
+        isDirty: true,
+      }
+    }
+
+    case 'REMOVE_FORMATTING': {
+      const { blockId, start, end, formatType } = action
+      const newBlocks = state.blocks.map((block) => {
+        if (block.id !== blockId || !block.formatting) return block
+
+        const formatting = block.formatting.filter((format) => {
+          // Remove formats that overlap with the specified range
+          const overlaps = format.start < end && format.end > start
+          const matchesType = !formatType || format.type === formatType
+          return !(overlaps && matchesType)
+        })
+
+        return {
+          ...block,
+          formatting: formatting.length > 0 ? formatting : undefined,
+        }
+      })
+
+      return {
+        ...state,
+        blocks: newBlocks,
+        isDirty: true,
+      }
+    }
+
+    case 'UPDATE_BLOCK_FORMATTING': {
+      const { blockId, formatting } = action
+      const newBlocks = state.blocks.map((block) => {
+        if (block.id !== blockId) return block
+        return {
+          ...block,
+          formatting: formatting.length > 0 ? formatting : undefined,
+        }
+      })
 
       return {
         ...state,
