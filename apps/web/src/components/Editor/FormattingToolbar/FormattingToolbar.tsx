@@ -19,6 +19,7 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
   const [position, setPosition] = useState<ToolbarPosition | null>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [hasValidSelection, setHasValidSelection] = useState(false)
+  const [isMouseDown, setIsMouseDown] = useState(false)
   const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Check browser selection directly for immediate feedback
@@ -35,28 +36,41 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
       setHasValidSelection(hasSelection)
     }
 
-    // Check immediately
-    checkSelection()
+    // Track mouse state
+    const handleMouseDown = () => {
+      setIsMouseDown(true)
+    }
+
+    const handleMouseUp = () => {
+      setIsMouseDown(false)
+      // Check selection after mouse release
+      setTimeout(checkSelection, 0)
+    }
 
     // Listen to selection changes
     const handleSelectionChange = () => {
-      checkSelection()
+      // Only check selection if mouse is not down (not actively selecting)
+      if (!isMouseDown) {
+        checkSelection()
+      }
     }
 
-    // Listen to both selectionchange and mouseup events
+    // Listen to mouse and selection events
+    document.addEventListener('mousedown', handleMouseDown)
+    document.addEventListener('mouseup', handleMouseUp)
     document.addEventListener('selectionchange', handleSelectionChange)
-    document.addEventListener('mouseup', handleSelectionChange)
 
     return () => {
+      document.removeEventListener('mousedown', handleMouseDown)
+      document.removeEventListener('mouseup', handleMouseUp)
       document.removeEventListener('selectionchange', handleSelectionChange)
-      document.removeEventListener('mouseup', handleSelectionChange)
     }
-  }, [])
+  }, [isMouseDown])
 
   // Handle toolbar visibility based on selection
   useEffect(() => {
-    // Show toolbar if we have a valid browser selection OR crossBlockSelection
-    const shouldShow = hasValidSelection || (state.crossBlockSelection && !state.crossBlockSelection.isCollapsed)
+    // Only show toolbar if mouse is not down (not actively selecting)
+    const shouldShow = !isMouseDown && (hasValidSelection || (state.crossBlockSelection && !state.crossBlockSelection.isCollapsed))
 
     if (shouldShow) {
       // Clear any pending hide timeout
@@ -77,7 +91,7 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
         clearTimeout(hideTimeoutRef.current)
       }
     }
-  }, [state.crossBlockSelection, hasValidSelection])
+  }, [state.crossBlockSelection, hasValidSelection, isMouseDown])
 
   // Calculate toolbar position
   useEffect(() => {
