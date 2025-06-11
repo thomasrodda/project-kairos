@@ -57,12 +57,18 @@
 
 ## 🔄 Currently In Progress
 
-### Formatting Toolbar 🔄
+### Formatting Toolbar ✅ (UI Complete, Formatting Not Implemented)
 
-- **UI Complete**: Toolbar appears on text selection with position calculation
+- **UI Complete**: Toolbar appears after mouse release when text is selected
+- **Position Calculation**: Dynamic positioning above selection with boundary constraints
 - **Buttons Added**: Bold, italic, underline, and link buttons with icons
 - **Tests Written**: Basic component tests passing (7 tests)
-- **Pending**: Rich text support requires architecture changes to support HTML content
+- **UX Improvements**: 
+  - Only shows after selection is complete (not during drag)
+  - Maintains visibility when selection exists
+  - Prevents toolbar from obscuring text during selection
+- **Not Working Yet**: Actual formatting functionality - requires architecture changes
+- **Current Behavior**: Shows "Formatting features coming soon!" tooltip when buttons clicked
 
 ### Component Testing 🔄
 
@@ -126,13 +132,14 @@ Based on Development Plan and current progress:
 
 ### Test Coverage
 
-- **Core Components**: 305 tests total ✅
+- **Core Components**: 312 tests total ✅
   - PageTitle: 17 tests
   - Block: 25 tests
   - BlockDragHandle: 25 tests
   - ContentEditableContainer: 37 tests
   - SlashCommandMenu: 22 tests
   - EditorContent: 58 tests
+  - FormattingToolbar: 7 tests ✅
   - EditorContext: 41 tests
   - Hooks & Utils: 72 tests
   - Integration: 8 tests

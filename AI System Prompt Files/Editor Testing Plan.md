@@ -282,6 +282,31 @@ The editor currently supports:
   - [x] Handles single block selection correctly
   - [x] Preserves block types in custom format
 
+### 1.7 FormattingToolbar Component Tests (`FormattingToolbar.test.tsx`) ✅
+
+**Priority: P1** | **Complexity: Medium** | **Status: Complete (7/7 tests)**
+
+- **Component Structure**
+
+  - [x] Exports FormattingToolbar component
+  - [x] Accepts containerRef prop
+
+- **Selection State**
+
+  - [x] Does not render when no selection exists
+  - [x] Does not render for collapsed selection
+
+- **Toolbar Features**
+
+  - [x] Includes formatting buttons (bold, italic, underline, link)
+  - [x] Handles containerRef being null
+  - [x] Uses editor state for visibility
+
+- **Current Limitations**
+  - Formatting buttons show "Formatting features coming soon!" tooltip
+  - Actual formatting requires architecture changes (plain text → rich text)
+  - UX improvements implemented: only shows after mouse release
+
 ---
 
 ## 2. Hook Tests
