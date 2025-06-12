@@ -607,7 +607,16 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
       }
 
       // Restore selection after formatting
-      setTimeout(tryRestoreSelection, 50)
+      // For single-block, use a small delay to allow React to update
+      // For multi-block, restore immediately in the next frame
+      if (isSingleBlock) {
+        setTimeout(tryRestoreSelection, 50)
+      } else {
+        // Use requestAnimationFrame for smoother restoration
+        requestAnimationFrame(() => {
+          tryRestoreSelection()
+        })
+      }
     },
     [dispatch, editorState.blocks]
   )
