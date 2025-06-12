@@ -205,7 +205,7 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
     }, 0)
 
     return () => clearTimeout(timeoutId)
-  }, [isVisible, containerRef, state.crossBlockSelection, hasValidSelection, isFormatting, position])
+  }, [isVisible, containerRef, state.crossBlockSelection, hasValidSelection, isFormatting, position, toolbarRef])
 
   // Get selection range relative to block
   const getBlockRelativeSelection = () => {
