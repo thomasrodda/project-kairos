@@ -95,8 +95,8 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
         // This ensures the toolbar reflects the correct state immediately
         setTimeout(() => {
           const blockSelection = getBlockRelativeSelection()
-          if (blockSelection) {
-            const block = state.blocks.find((b) => b.id === blockSelection.blockId)
+          if (blockSelection && blockSelection.isSingleBlock) {
+            const block = state.blocks.find((b) => b.id === blockSelection.startBlockId)
             if (block && block.formatting) {
               const newActiveFormats = new Set<FormatType>()
               const formatTypes: FormatType[] = ['bold', 'italic', 'underline', 'code', 'strikethrough', 'link']
@@ -237,41 +237,32 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
 
     if (!startBlockId || !endBlockId) return null
 
-    // For single block selection
-    if (startBlockId === endBlockId) {
-      // Calculate offsets within the block's text content
-      const blockElement = startBlock
-
-      // Find the block content element
+    // Get the actual text offset by traversing the DOM
+    const getTextOffset = (blockElement: Element, container: Node, offset: number): number => {
       const blockContentElement = blockElement.querySelector('.block__content') || blockElement
+      let textOffset = 0
+      const walker = document.createTreeWalker(blockContentElement, NodeFilter.SHOW_TEXT, null)
 
-      // Get the actual text offset by traversing the DOM
-      const getTextOffset = (container: Node, offset: number): number => {
-        let textOffset = 0
-        const walker = document.createTreeWalker(blockContentElement, NodeFilter.SHOW_TEXT, null)
-
-        let node: Node | null
-        while ((node = walker.nextNode())) {
-          if (node === container) {
-            return textOffset + offset
-          }
-          textOffset += node.textContent?.length || 0
+      let node: Node | null
+      while ((node = walker.nextNode())) {
+        if (node === container) {
+          return textOffset + offset
         }
-        return textOffset
+        textOffset += node.textContent?.length || 0
       }
-
-      const startOffset = getTextOffset(range.startContainer, range.startOffset)
-      const endOffset = getTextOffset(range.endContainer, range.endOffset)
-
-      return {
-        blockId: startBlockId,
-        startOffset,
-        endOffset,
-      }
+      return textOffset
     }
 
-    // For cross-block selection, use the crossBlockSelection state
-    return null
+    const startOffset = getTextOffset(startBlock, range.startContainer, range.startOffset)
+    const endOffset = getTextOffset(endBlock, range.endContainer, range.endOffset)
+
+    return {
+      startBlockId,
+      endBlockId,
+      startOffset,
+      endOffset,
+      isSingleBlock: startBlockId === endBlockId,
+    }
   }
 
   // Update active formats based on selection
@@ -288,15 +279,56 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
 
       const newActiveFormats = new Set<FormatType>()
 
-      // Check single block selection
+      // Check selection
       const blockSelection = getBlockRelativeSelection()
-      if (blockSelection) {
-        const block = state.blocks.find((b) => b.id === blockSelection.blockId)
+      if (blockSelection && blockSelection.isSingleBlock) {
+        // Single block - check formatting
+        const block = state.blocks.find((b) => b.id === blockSelection.startBlockId)
         if (block && block.formatting) {
           const formatTypes: FormatType[] = ['bold', 'italic', 'underline', 'code', 'strikethrough', 'link']
 
           formatTypes.forEach((formatType) => {
             if (isRangeFormatted(block.formatting || [], blockSelection.startOffset, blockSelection.endOffset, formatType)) {
+              newActiveFormats.add(formatType)
+            }
+          })
+        }
+      } else if (blockSelection) {
+        // Multi-block - check if formatting is consistent across selection
+        const startBlockIndex = state.blocks.findIndex((b) => b.id === blockSelection.startBlockId)
+        const endBlockIndex = state.blocks.findIndex((b) => b.id === blockSelection.endBlockId)
+
+        if (startBlockIndex !== -1 && endBlockIndex !== -1) {
+          const formatTypes: FormatType[] = ['bold', 'italic', 'underline', 'code', 'strikethrough', 'link']
+
+          formatTypes.forEach((formatType) => {
+            let isConsistentlyFormatted = true
+
+            for (let i = startBlockIndex; i <= endBlockIndex; i++) {
+              const block = state.blocks[i]
+              if (!block.formatting) {
+                isConsistentlyFormatted = false
+                break
+              }
+
+              let startOffset = 0
+              let endOffset = block.content.length
+
+              if (i === startBlockIndex) {
+                startOffset = blockSelection.startOffset
+              }
+              if (i === endBlockIndex) {
+                endOffset = blockSelection.endOffset
+              }
+
+              // Check if this block's selected portion has the format
+              if (!isRangeFormatted(block.formatting, startOffset, endOffset, formatType)) {
+                isConsistentlyFormatted = false
+                break
+              }
+            }
+
+            if (isConsistentlyFormatted) {
               newActiveFormats.add(formatType)
             }
           })
@@ -317,164 +349,7 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
   const handleFormat = (formatType: FormatType) => {
     const blockSelection = getBlockRelativeSelection()
 
-    if (blockSelection) {
-      const block = state.blocks.find((b) => b.id === blockSelection.blockId)
-      if (!block) return
-
-      // Set formatting flag to prevent toolbar from hiding
-      setIsFormatting(true)
-
-      // Save current position to prevent jumping
-      if (position) {
-        savedPositionRef.current = position
-      }
-
-      // Store the current selection range before any changes
-      const selection = window.getSelection()
-      const selectedText = selection?.toString() || ''
-
-      // Store selection details
-      const { blockId, startOffset, endOffset } = blockSelection
-
-      // Toggle the format
-      const currentFormatting = block.formatting || []
-      const newFormatting = toggleFormat(currentFormatting, startOffset, endOffset, formatType)
-
-      // Update block formatting
-      dispatch({
-        type: 'UPDATE_BLOCK_FORMATTING',
-        blockId: blockId,
-        formatting: newFormatting,
-      })
-
-      // Restore selection after React re-renders
-      const tryRestoreSelection = () => {
-        const blockElement = document.querySelector(`[data-block-id="${blockId}"]`)
-        if (blockElement) {
-          const contentElement = blockElement.querySelector('.block__content') || blockElement
-          const selection = window.getSelection()
-
-          if (selection && contentElement) {
-            const textContent = contentElement.textContent || ''
-
-            // Find the selected text in the new content
-            const searchStart = Math.max(0, startOffset - 10) // Look a bit before the expected position
-            const searchEnd = Math.min(textContent.length, endOffset + 10) // Look a bit after
-            const searchText = textContent.substring(searchStart, searchEnd)
-            const indexInSearch = searchText.indexOf(selectedText)
-
-            if (indexInSearch !== -1) {
-              // Found the text, calculate the actual positions
-              const actualStartOffset = searchStart + indexInSearch
-              const actualEndOffset = actualStartOffset + selectedText.length
-
-              // Now create the selection at the correct position
-              const range = document.createRange()
-              const walker = document.createTreeWalker(contentElement, NodeFilter.SHOW_TEXT, null)
-
-              let currentOffset = 0
-              let startNode = null
-              let startNodeOffset = 0
-              let endNode = null
-              let endNodeOffset = 0
-              let node
-
-              while ((node = walker.nextNode())) {
-                const nodeLength = node.textContent?.length || 0
-                const nodeEndOffset = currentOffset + nodeLength
-
-                if (!startNode && nodeEndOffset > actualStartOffset) {
-                  startNode = node
-                  startNodeOffset = actualStartOffset - currentOffset
-                }
-
-                if (!endNode && nodeEndOffset >= actualEndOffset) {
-                  endNode = node
-                  endNodeOffset = actualEndOffset - currentOffset
-                  break
-                }
-
-                currentOffset = nodeEndOffset
-              }
-
-              if (startNode && endNode) {
-                try {
-                  range.setStart(startNode, startNodeOffset)
-                  range.setEnd(endNode, endNodeOffset)
-                  selection.removeAllRanges()
-                  selection.addRange(range)
-                  setHasValidSelection(true)
-                } catch (e) {
-                  console.error('Failed to restore selection:', e)
-                }
-              }
-            } else {
-              // Fallback: use the original offsets
-              const range = document.createRange()
-              const walker = document.createTreeWalker(contentElement, NodeFilter.SHOW_TEXT, null)
-
-              let currentOffset = 0
-              let startNode = null
-              let startNodeOffset = 0
-              let endNode = null
-              let endNodeOffset = 0
-              let node
-
-              while ((node = walker.nextNode())) {
-                const nodeLength = node.textContent?.length || 0
-                const nodeEndOffset = currentOffset + nodeLength
-
-                if (!startNode && nodeEndOffset > startOffset) {
-                  startNode = node
-                  startNodeOffset = startOffset - currentOffset
-                }
-
-                if (!endNode && nodeEndOffset >= endOffset) {
-                  endNode = node
-                  endNodeOffset = endOffset - currentOffset
-                  break
-                }
-
-                currentOffset = nodeEndOffset
-              }
-
-              if (startNode && endNode) {
-                try {
-                  range.setStart(startNode, startNodeOffset)
-                  range.setEnd(endNode, endNodeOffset)
-                  selection.removeAllRanges()
-                  selection.addRange(range)
-                  setHasValidSelection(true)
-                } catch (e) {
-                  console.error('Failed to restore selection:', e)
-                }
-              }
-            }
-          }
-        }
-
-        // Clear formatting flag and saved position
-        setTimeout(() => {
-          setIsFormatting(false)
-          savedPositionRef.current = null
-        }, 100)
-      }
-
-      // Try to restore selection after a short delay
-      setTimeout(tryRestoreSelection, 50)
-    } else if (state.crossBlockSelection) {
-      // TODO: Implement cross-block formatting
-      console.log('Cross-block formatting not yet implemented')
-    }
-  }
-
-  // Handle link creation
-  const handleLink = () => {
-    const blockSelection = getBlockRelativeSelection()
     if (!blockSelection) return
-
-    const block = state.blocks.find((b) => b.id === blockSelection.blockId)
-    if (!block) return
 
     // Set formatting flag to prevent toolbar from hiding
     setIsFormatting(true)
@@ -484,30 +359,76 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
       savedPositionRef.current = position
     }
 
-    // Store selection details
-    const { blockId, startOffset, endOffset } = blockSelection
-
-    // Check if already has link formatting
-    const currentFormatting = block.formatting || []
-    const hasLink = isRangeFormatted(currentFormatting, startOffset, endOffset, 'link')
-
-    // Store the selected text before any changes
+    // Store the current selection range before any changes
     const selection = window.getSelection()
     const selectedText = selection?.toString() || ''
 
-    const restoreSelection = () => {
-      setTimeout(() => {
-        const blockElement = document.querySelector(`[data-block-id="${blockId}"]`)
+    if (blockSelection.isSingleBlock) {
+      // Single block formatting
+      const block = state.blocks.find((b) => b.id === blockSelection.startBlockId)
+      if (!block) return
+
+      const { startBlockId, startOffset, endOffset } = blockSelection
+
+      // Toggle the format
+      const currentFormatting = block.formatting || []
+      const newFormatting = toggleFormat(currentFormatting, startOffset, endOffset, formatType)
+
+      // Update block formatting
+      dispatch({
+        type: 'UPDATE_BLOCK_FORMATTING',
+        blockId: startBlockId,
+        formatting: newFormatting,
+      })
+    } else {
+      // Multi-block formatting
+      const startBlockIndex = state.blocks.findIndex((b) => b.id === blockSelection.startBlockId)
+      const endBlockIndex = state.blocks.findIndex((b) => b.id === blockSelection.endBlockId)
+
+      if (startBlockIndex === -1 || endBlockIndex === -1) return
+
+      // Apply formatting to each block in the selection
+      for (let i = startBlockIndex; i <= endBlockIndex; i++) {
+        const block = state.blocks[i]
+        const existingFormats = block.formatting || []
+
+        let blockStartOffset = 0
+        let blockEndOffset = block.content.length
+
+        if (i === startBlockIndex) {
+          blockStartOffset = blockSelection.startOffset
+        }
+        if (i === endBlockIndex) {
+          blockEndOffset = blockSelection.endOffset
+        }
+
+        const newFormats = toggleFormat(existingFormats, blockStartOffset, blockEndOffset, formatType)
+
+        dispatch({
+          type: 'UPDATE_BLOCK_FORMATTING',
+          blockId: block.id,
+          formatting: newFormats,
+        })
+      }
+    }
+
+    // Restore selection after React re-renders
+    const tryRestoreSelection = () => {
+      const selection = window.getSelection()
+      if (!selection) return
+
+      if (blockSelection.isSingleBlock) {
+        // Single block selection restoration
+        const blockElement = document.querySelector(`[data-block-id="${blockSelection.startBlockId}"]`)
         if (blockElement) {
           const contentElement = blockElement.querySelector('.block__content') || blockElement
-          const selection = window.getSelection()
 
-          if (selection && contentElement && selectedText) {
+          if (contentElement) {
             const textContent = contentElement.textContent || ''
 
             // Find the selected text in the new content
-            const searchStart = Math.max(0, startOffset - 10)
-            const searchEnd = Math.min(textContent.length, endOffset + 10)
+            const searchStart = Math.max(0, blockSelection.startOffset - 10)
+            const searchEnd = Math.min(textContent.length, blockSelection.endOffset + 10)
             const searchText = textContent.substring(searchStart, searchEnd)
             const indexInSearch = searchText.indexOf(selectedText)
 
@@ -556,8 +477,212 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
                   console.error('Failed to restore selection:', e)
                 }
               }
-            } else {
-              // Fallback: use the original offsets
+            }
+          }
+        }
+      } else {
+        // Multi-block selection restoration
+        try {
+          const startBlockElement = document.querySelector(`[data-block-id="${blockSelection.startBlockId}"]`)
+          const endBlockElement = document.querySelector(`[data-block-id="${blockSelection.endBlockId}"]`)
+
+          if (startBlockElement && endBlockElement) {
+            const startContent = startBlockElement.querySelector('.block__content') || startBlockElement
+            const endContent = endBlockElement.querySelector('.block__content') || endBlockElement
+
+            const range = document.createRange()
+
+            // Set start position
+            const startWalker = document.createTreeWalker(startContent, NodeFilter.SHOW_TEXT, null)
+            let currentOffset = 0
+            let node
+            let startSet = false
+
+            while ((node = startWalker.nextNode())) {
+              const nodeLength = node.textContent?.length || 0
+              const nodeEndOffset = currentOffset + nodeLength
+
+              if (nodeEndOffset > blockSelection.startOffset) {
+                range.setStart(node, blockSelection.startOffset - currentOffset)
+                startSet = true
+                break
+              }
+
+              currentOffset = nodeEndOffset
+            }
+
+            // Set end position
+            const endWalker = document.createTreeWalker(endContent, NodeFilter.SHOW_TEXT, null)
+            currentOffset = 0
+            let endSet = false
+
+            while ((node = endWalker.nextNode())) {
+              const nodeLength = node.textContent?.length || 0
+              const nodeEndOffset = currentOffset + nodeLength
+
+              if (nodeEndOffset >= blockSelection.endOffset) {
+                range.setEnd(node, blockSelection.endOffset - currentOffset)
+                endSet = true
+                break
+              }
+
+              currentOffset = nodeEndOffset
+            }
+
+            if (startSet && endSet) {
+              selection.removeAllRanges()
+              selection.addRange(range)
+              setHasValidSelection(true)
+            }
+          }
+        } catch (e) {
+          console.error('Failed to restore multi-block selection:', e)
+        }
+      }
+
+      // Clear formatting flag and saved position
+      setTimeout(() => {
+        setIsFormatting(false)
+        savedPositionRef.current = null
+      }, 100)
+    }
+
+    // For single-block selections, restore immediately
+    // For multi-block selections, skip restoration to avoid flicker
+    if (blockSelection.isSingleBlock) {
+      setTimeout(tryRestoreSelection, 50)
+    } else {
+      // Just clear the formatting flag for multi-block
+      setTimeout(() => {
+        setIsFormatting(false)
+        savedPositionRef.current = null
+      }, 100)
+    }
+  }
+
+  // Handle link creation
+  const handleLink = () => {
+    const blockSelection = getBlockRelativeSelection()
+    if (!blockSelection) return
+
+    // Set formatting flag to prevent toolbar from hiding
+    setIsFormatting(true)
+
+    // Save current position to prevent jumping
+    if (position) {
+      savedPositionRef.current = position
+    }
+
+    // Store the current selection text before any changes
+    const selection = window.getSelection()
+    const selectedText = selection?.toString() || ''
+
+    // Determine if we need to add or remove link
+    let shouldRemoveLink = false
+    let existingUrl: string | undefined
+
+    if (blockSelection.isSingleBlock) {
+      // Check if single block has link
+      const block = state.blocks.find((b) => b.id === blockSelection.startBlockId)
+      if (block) {
+        const currentFormatting = block.formatting || []
+        shouldRemoveLink = isRangeFormatted(currentFormatting, blockSelection.startOffset, blockSelection.endOffset, 'link')
+
+        // Get existing URL if there is one
+        if (shouldRemoveLink) {
+          const linkFormat = currentFormatting.find(
+            (f) => f.type === 'link' && f.start < blockSelection.endOffset && f.end > blockSelection.startOffset
+          )
+          existingUrl = linkFormat?.url
+        }
+      }
+    } else {
+      // For multi-block, check if the first block has a link at the start position
+      const startBlock = state.blocks.find((b) => b.id === blockSelection.startBlockId)
+      if (startBlock) {
+        const currentFormatting = startBlock.formatting || []
+        const linkFormat = currentFormatting.find(
+          (f) => f.type === 'link' && f.start <= blockSelection.startOffset && f.end > blockSelection.startOffset
+        )
+        shouldRemoveLink = !!linkFormat
+        existingUrl = linkFormat?.url
+      }
+    }
+
+    // Handle link removal or addition
+    const processLink = (url?: string) => {
+      if (blockSelection.isSingleBlock) {
+        // Single block link handling
+        const block = state.blocks.find((b) => b.id === blockSelection.startBlockId)
+        if (!block) return
+
+        const currentFormatting = block.formatting || []
+        const newFormatting = toggleFormat(currentFormatting, blockSelection.startOffset, blockSelection.endOffset, 'link', url)
+
+        dispatch({
+          type: 'UPDATE_BLOCK_FORMATTING',
+          blockId: blockSelection.startBlockId,
+          formatting: newFormatting,
+        })
+      } else {
+        // Multi-block link handling
+        const startBlockIndex = state.blocks.findIndex((b) => b.id === blockSelection.startBlockId)
+        const endBlockIndex = state.blocks.findIndex((b) => b.id === blockSelection.endBlockId)
+
+        if (startBlockIndex === -1 || endBlockIndex === -1) return
+
+        // Apply link formatting to each block in the selection
+        for (let i = startBlockIndex; i <= endBlockIndex; i++) {
+          const block = state.blocks[i]
+          const existingFormats = block.formatting || []
+
+          let blockStartOffset = 0
+          let blockEndOffset = block.content.length
+
+          if (i === startBlockIndex) {
+            blockStartOffset = blockSelection.startOffset
+          }
+          if (i === endBlockIndex) {
+            blockEndOffset = blockSelection.endOffset
+          }
+
+          const newFormats = toggleFormat(existingFormats, blockStartOffset, blockEndOffset, 'link', url)
+
+          dispatch({
+            type: 'UPDATE_BLOCK_FORMATTING',
+            blockId: block.id,
+            formatting: newFormats,
+          })
+        }
+      }
+    }
+
+    // Restore selection after React re-renders
+    const tryRestoreSelection = () => {
+      const selection = window.getSelection()
+      if (!selection) return
+
+      if (blockSelection.isSingleBlock) {
+        // Single block selection restoration
+        const blockElement = document.querySelector(`[data-block-id="${blockSelection.startBlockId}"]`)
+        if (blockElement) {
+          const contentElement = blockElement.querySelector('.block__content') || blockElement
+
+          if (contentElement) {
+            const textContent = contentElement.textContent || ''
+
+            // Find the selected text in the new content
+            const searchStart = Math.max(0, blockSelection.startOffset - 10)
+            const searchEnd = Math.min(textContent.length, blockSelection.endOffset + 10)
+            const searchText = textContent.substring(searchStart, searchEnd)
+            const indexInSearch = searchText.indexOf(selectedText)
+
+            if (indexInSearch !== -1) {
+              // Found the text, calculate the actual positions
+              const actualStartOffset = searchStart + indexInSearch
+              const actualEndOffset = actualStartOffset + selectedText.length
+
+              // Now create the selection at the correct position
               const range = document.createRange()
               const walker = document.createTreeWalker(contentElement, NodeFilter.SHOW_TEXT, null)
 
@@ -572,14 +697,14 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
                 const nodeLength = node.textContent?.length || 0
                 const nodeEndOffset = currentOffset + nodeLength
 
-                if (!startNode && nodeEndOffset > startOffset) {
+                if (!startNode && nodeEndOffset > actualStartOffset) {
                   startNode = node
-                  startNodeOffset = startOffset - currentOffset
+                  startNodeOffset = actualStartOffset - currentOffset
                 }
 
-                if (!endNode && nodeEndOffset >= endOffset) {
+                if (!endNode && nodeEndOffset >= actualEndOffset) {
                   endNode = node
-                  endNodeOffset = endOffset - currentOffset
+                  endNodeOffset = actualEndOffset - currentOffset
                   break
                 }
 
@@ -600,39 +725,83 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
             }
           }
         }
+      } else {
+        // Multi-block selection restoration
+        try {
+          const startBlockElement = document.querySelector(`[data-block-id="${blockSelection.startBlockId}"]`)
+          const endBlockElement = document.querySelector(`[data-block-id="${blockSelection.endBlockId}"]`)
 
-        // Clear formatting flag and saved position
-        setTimeout(() => {
-          setIsFormatting(false)
-          savedPositionRef.current = null
-        }, 100)
-      }, 50)
+          if (startBlockElement && endBlockElement) {
+            const startContent = startBlockElement.querySelector('.block__content') || startBlockElement
+            const endContent = endBlockElement.querySelector('.block__content') || endBlockElement
+
+            const range = document.createRange()
+
+            // Set start position
+            const startWalker = document.createTreeWalker(startContent, NodeFilter.SHOW_TEXT, null)
+            let currentOffset = 0
+            let node
+            let startSet = false
+
+            while ((node = startWalker.nextNode())) {
+              const nodeLength = node.textContent?.length || 0
+              const nodeEndOffset = currentOffset + nodeLength
+
+              if (nodeEndOffset > blockSelection.startOffset) {
+                range.setStart(node, blockSelection.startOffset - currentOffset)
+                startSet = true
+                break
+              }
+
+              currentOffset = nodeEndOffset
+            }
+
+            // Set end position
+            const endWalker = document.createTreeWalker(endContent, NodeFilter.SHOW_TEXT, null)
+            currentOffset = 0
+            let endSet = false
+
+            while ((node = endWalker.nextNode())) {
+              const nodeLength = node.textContent?.length || 0
+              const nodeEndOffset = currentOffset + nodeLength
+
+              if (nodeEndOffset >= blockSelection.endOffset) {
+                range.setEnd(node, blockSelection.endOffset - currentOffset)
+                endSet = true
+                break
+              }
+
+              currentOffset = nodeEndOffset
+            }
+
+            if (startSet && endSet) {
+              selection.removeAllRanges()
+              selection.addRange(range)
+              setHasValidSelection(true)
+            }
+          }
+        } catch (e) {
+          console.error('Failed to restore multi-block selection:', e)
+        }
+      }
+
+      // Clear formatting flag and saved position
+      setTimeout(() => {
+        setIsFormatting(false)
+        savedPositionRef.current = null
+      }, 100)
     }
 
-    if (hasLink) {
+    if (shouldRemoveLink) {
       // Remove link
-      const newFormatting = toggleFormat(currentFormatting, startOffset, endOffset, 'link')
-
-      dispatch({
-        type: 'UPDATE_BLOCK_FORMATTING',
-        blockId: blockId,
-        formatting: newFormatting,
-      })
-
-      restoreSelection()
+      processLink()
+      setTimeout(tryRestoreSelection, 50)
     } else {
-      // Add link
-      const url = prompt('Enter URL:')
+      // Add link - prompt for URL
+      const url = prompt('Enter URL:', existingUrl || '')
       if (url) {
-        const newFormatting = toggleFormat(currentFormatting, startOffset, endOffset, 'link', url)
-
-        dispatch({
-          type: 'UPDATE_BLOCK_FORMATTING',
-          blockId: blockId,
-          formatting: newFormatting,
-        })
-
-        restoreSelection()
+        processLink(url)
+        setTimeout(tryRestoreSelection, 50)
       } else {
         // User cancelled, just clear formatting flag and saved position
         setTimeout(() => {

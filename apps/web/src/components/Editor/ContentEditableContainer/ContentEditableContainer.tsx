@@ -354,14 +354,11 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
       const startBlockId = startBlock.getAttribute('data-block-id')
       const endBlockId = endBlock.getAttribute('data-block-id')
 
-      if (!startBlockId || !endBlockId || startBlockId !== endBlockId) {
-        // Cross-block formatting not supported yet
+      if (!startBlockId || !endBlockId) {
         return
       }
 
-      const block = editorState.blocks.find((b) => b.id === startBlockId)
-      if (!block) return
-
+      // Get offsets for the selection
       const startOffset = getTextOffset(startBlock, range.startContainer, range.startOffset)
       const endOffset = getTextOffset(endBlock, range.endContainer, range.endOffset)
 
@@ -372,104 +369,233 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
       const formattingEvent = new CustomEvent('formatting-start', { detail: { isFormatting: true } })
       window.dispatchEvent(formattingEvent)
 
-      // Handle link format specially
-      if (format === 'link') {
-        const existingFormats = block.formatting || []
-        const isLink = existingFormats.some((f) => f.type === 'link' && f.start <= startOffset && f.end >= endOffset)
+      // Check if this is a single block or multi-block selection
+      const isSingleBlock = startBlockId === endBlockId
 
-        if (isLink) {
-          // Remove link
-          const newFormats = toggleFormat(existingFormats, startOffset, endOffset, 'link')
-          dispatch({
-            type: 'UPDATE_BLOCK_FORMATTING',
-            blockId: startBlockId,
-            formatting: newFormats,
-          })
-        } else {
-          // Show prompt for URL
-          const url = window.prompt('Enter URL:')
-          if (url) {
-            const newFormats = toggleFormat(existingFormats, startOffset, endOffset, 'link', url)
+      if (isSingleBlock) {
+        // Single block formatting - existing logic
+        const block = editorState.blocks.find((b) => b.id === startBlockId)
+        if (!block) return
+
+        // Handle link format specially
+        if (format === 'link') {
+          const existingFormats = block.formatting || []
+          const isLink = existingFormats.some((f) => f.type === 'link' && f.start <= startOffset && f.end >= endOffset)
+
+          if (isLink) {
+            // Remove link
+            const newFormats = toggleFormat(existingFormats, startOffset, endOffset, 'link')
             dispatch({
               type: 'UPDATE_BLOCK_FORMATTING',
               blockId: startBlockId,
               formatting: newFormats,
             })
+          } else {
+            // Show prompt for URL
+            const url = window.prompt('Enter URL:')
+            if (url) {
+              const newFormats = toggleFormat(existingFormats, startOffset, endOffset, 'link', url)
+              dispatch({
+                type: 'UPDATE_BLOCK_FORMATTING',
+                blockId: startBlockId,
+                formatting: newFormats,
+              })
+            }
           }
+        } else {
+          // Regular format toggle (bold, italic, underline)
+          const existingFormats = block.formatting || []
+          const newFormats = toggleFormat(existingFormats, startOffset, endOffset, format)
+
+          dispatch({
+            type: 'UPDATE_BLOCK_FORMATTING',
+            blockId: startBlockId,
+            formatting: newFormats,
+          })
         }
       } else {
-        // Regular format toggle (bold, italic, underline)
-        const existingFormats = block.formatting || []
-        const newFormats = toggleFormat(existingFormats, startOffset, endOffset, format)
+        // Multi-block formatting
+        const startBlockIndex = editorState.blocks.findIndex((b) => b.id === startBlockId)
+        const endBlockIndex = editorState.blocks.findIndex((b) => b.id === endBlockId)
 
-        dispatch({
-          type: 'UPDATE_BLOCK_FORMATTING',
-          blockId: startBlockId,
-          formatting: newFormats,
-        })
+        if (startBlockIndex === -1 || endBlockIndex === -1) return
+
+        // Handle link format for multi-block
+        if (format === 'link') {
+          const url = window.prompt('Enter URL:')
+          if (!url) return
+
+          // Apply link formatting to each block in the selection
+          for (let i = startBlockIndex; i <= endBlockIndex; i++) {
+            const block = editorState.blocks[i]
+            const existingFormats = block.formatting || []
+
+            let blockStartOffset = 0
+            let blockEndOffset = block.content.length
+
+            if (i === startBlockIndex) {
+              blockStartOffset = startOffset
+            }
+            if (i === endBlockIndex) {
+              blockEndOffset = endOffset
+            }
+
+            const newFormats = toggleFormat(existingFormats, blockStartOffset, blockEndOffset, 'link', url)
+            dispatch({
+              type: 'UPDATE_BLOCK_FORMATTING',
+              blockId: block.id,
+              formatting: newFormats,
+            })
+          }
+        } else {
+          // Regular format toggle for multi-block
+          for (let i = startBlockIndex; i <= endBlockIndex; i++) {
+            const block = editorState.blocks[i]
+            const existingFormats = block.formatting || []
+
+            let blockStartOffset = 0
+            let blockEndOffset = block.content.length
+
+            if (i === startBlockIndex) {
+              blockStartOffset = startOffset
+            }
+            if (i === endBlockIndex) {
+              blockEndOffset = endOffset
+            }
+
+            const newFormats = toggleFormat(existingFormats, blockStartOffset, blockEndOffset, format)
+            dispatch({
+              type: 'UPDATE_BLOCK_FORMATTING',
+              blockId: block.id,
+              formatting: newFormats,
+            })
+          }
+        }
       }
 
-      // Restore selection after formatting using the same logic as FormattingToolbar
+      // Restore selection after formatting
       const tryRestoreSelection = () => {
-        const blockElement = document.querySelector(`[data-block-id="${startBlockId}"]`)
-        if (blockElement) {
-          const contentElement = blockElement.querySelector('.block__content') || blockElement
-          const selection = window.getSelection()
+        const selection = window.getSelection()
+        if (!selection) return
 
-          if (selection && contentElement && selectedText) {
-            const textContent = contentElement.textContent || ''
+        if (isSingleBlock) {
+          // Single block selection restoration
+          const blockElement = document.querySelector(`[data-block-id="${startBlockId}"]`)
+          if (blockElement) {
+            const contentElement = blockElement.querySelector('.block__content') || blockElement
 
-            // Find the selected text in the new content
-            const searchStart = Math.max(0, startOffset - 10) // Look a bit before the expected position
-            const searchEnd = Math.min(textContent.length, endOffset + 10) // Look a bit after
-            const searchText = textContent.substring(searchStart, searchEnd)
-            const indexInSearch = searchText.indexOf(selectedText)
+            if (contentElement && selectedText) {
+              const textContent = contentElement.textContent || ''
 
-            if (indexInSearch !== -1) {
-              // Found the text, calculate the actual positions
-              const actualStartOffset = searchStart + indexInSearch
-              const actualEndOffset = actualStartOffset + selectedText.length
+              // Find the selected text in the new content
+              const searchStart = Math.max(0, startOffset - 10) // Look a bit before the expected position
+              const searchEnd = Math.min(textContent.length, endOffset + 10) // Look a bit after
+              const searchText = textContent.substring(searchStart, searchEnd)
+              const indexInSearch = searchText.indexOf(selectedText)
 
-              // Now create the selection at the correct position
+              if (indexInSearch !== -1) {
+                // Found the text, calculate the actual positions
+                const actualStartOffset = searchStart + indexInSearch
+                const actualEndOffset = actualStartOffset + selectedText.length
+
+                // Now create the selection at the correct position
+                const range = document.createRange()
+                const walker = document.createTreeWalker(contentElement, NodeFilter.SHOW_TEXT, null)
+
+                let currentOffset = 0
+                let startNode = null
+                let startNodeOffset = 0
+                let endNode = null
+                let endNodeOffset = 0
+                let node
+
+                while ((node = walker.nextNode())) {
+                  const nodeLength = node.textContent?.length || 0
+                  const nodeEndOffset = currentOffset + nodeLength
+
+                  if (!startNode && nodeEndOffset > actualStartOffset) {
+                    startNode = node
+                    startNodeOffset = actualStartOffset - currentOffset
+                  }
+
+                  if (!endNode && nodeEndOffset >= actualEndOffset) {
+                    endNode = node
+                    endNodeOffset = actualEndOffset - currentOffset
+                    break
+                  }
+
+                  currentOffset = nodeEndOffset
+                }
+
+                if (startNode && endNode) {
+                  try {
+                    range.setStart(startNode, startNodeOffset)
+                    range.setEnd(endNode, endNodeOffset)
+                    selection.removeAllRanges()
+                    selection.addRange(range)
+                  } catch (e) {
+                    console.error('Failed to restore selection:', e)
+                  }
+                }
+              }
+            }
+          }
+        } else {
+          // Multi-block selection restoration
+          try {
+            const startBlockElement = document.querySelector(`[data-block-id="${startBlockId}"]`)
+            const endBlockElement = document.querySelector(`[data-block-id="${endBlockId}"]`)
+
+            if (startBlockElement && endBlockElement) {
+              const startContent = startBlockElement.querySelector('.block__content') || startBlockElement
+              const endContent = endBlockElement.querySelector('.block__content') || endBlockElement
+
               const range = document.createRange()
-              const walker = document.createTreeWalker(contentElement, NodeFilter.SHOW_TEXT, null)
 
+              // Set start position
+              const startWalker = document.createTreeWalker(startContent, NodeFilter.SHOW_TEXT, null)
               let currentOffset = 0
-              let startNode = null
-              let startNodeOffset = 0
-              let endNode = null
-              let endNodeOffset = 0
               let node
+              let startSet = false
 
-              while ((node = walker.nextNode())) {
+              while ((node = startWalker.nextNode())) {
                 const nodeLength = node.textContent?.length || 0
                 const nodeEndOffset = currentOffset + nodeLength
 
-                if (!startNode && nodeEndOffset > actualStartOffset) {
-                  startNode = node
-                  startNodeOffset = actualStartOffset - currentOffset
-                }
-
-                if (!endNode && nodeEndOffset >= actualEndOffset) {
-                  endNode = node
-                  endNodeOffset = actualEndOffset - currentOffset
+                if (nodeEndOffset > startOffset) {
+                  range.setStart(node, startOffset - currentOffset)
+                  startSet = true
                   break
                 }
 
                 currentOffset = nodeEndOffset
               }
 
-              if (startNode && endNode) {
-                try {
-                  range.setStart(startNode, startNodeOffset)
-                  range.setEnd(endNode, endNodeOffset)
-                  selection.removeAllRanges()
-                  selection.addRange(range)
-                } catch (e) {
-                  console.error('Failed to restore selection:', e)
+              // Set end position
+              const endWalker = document.createTreeWalker(endContent, NodeFilter.SHOW_TEXT, null)
+              currentOffset = 0
+              let endSet = false
+
+              while ((node = endWalker.nextNode())) {
+                const nodeLength = node.textContent?.length || 0
+                const nodeEndOffset = currentOffset + nodeLength
+
+                if (nodeEndOffset >= endOffset) {
+                  range.setEnd(node, endOffset - currentOffset)
+                  endSet = true
+                  break
                 }
+
+                currentOffset = nodeEndOffset
+              }
+
+              if (startSet && endSet) {
+                selection.removeAllRanges()
+                selection.addRange(range)
               }
             }
+          } catch (e) {
+            console.error('Failed to restore multi-block selection:', e)
           }
         }
 
@@ -480,8 +606,17 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         }, 100)
       }
 
-      // Try to restore selection after a short delay
-      setTimeout(tryRestoreSelection, 50)
+      // For single-block selections, restore immediately
+      // For multi-block selections, skip restoration to avoid flicker
+      if (isSingleBlock) {
+        setTimeout(tryRestoreSelection, 50)
+      } else {
+        // Just clear the formatting flag for multi-block
+        setTimeout(() => {
+          const formattingEndEvent = new CustomEvent('formatting-end', { detail: { isFormatting: false } })
+          window.dispatchEvent(formattingEndEvent)
+        }, 100)
+      }
     },
     [dispatch, editorState.blocks]
   )
