@@ -547,17 +547,8 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
       }, 100)
     }
 
-    // For single-block selections, restore immediately
-    // For multi-block selections, skip restoration to avoid flicker
-    if (blockSelection.isSingleBlock) {
-      setTimeout(tryRestoreSelection, 50)
-    } else {
-      // Just clear the formatting flag for multi-block
-      setTimeout(() => {
-        setIsFormatting(false)
-        savedPositionRef.current = null
-      }, 100)
-    }
+    // Restore selection after formatting
+    setTimeout(tryRestoreSelection, 50)
   }
 
   // Handle link creation

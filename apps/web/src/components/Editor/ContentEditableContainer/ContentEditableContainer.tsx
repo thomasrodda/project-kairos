@@ -606,17 +606,8 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         }, 100)
       }
 
-      // For single-block selections, restore immediately
-      // For multi-block selections, skip restoration to avoid flicker
-      if (isSingleBlock) {
-        setTimeout(tryRestoreSelection, 50)
-      } else {
-        // Just clear the formatting flag for multi-block
-        setTimeout(() => {
-          const formattingEndEvent = new CustomEvent('formatting-end', { detail: { isFormatting: false } })
-          window.dispatchEvent(formattingEndEvent)
-        }, 100)
-      }
+      // Restore selection after formatting
+      setTimeout(tryRestoreSelection, 50)
     },
     [dispatch, editorState.blocks]
   )
