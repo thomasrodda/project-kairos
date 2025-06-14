@@ -54,6 +54,8 @@ AI System Prompt Files
 ├── Scss Structure Guide.md
 ├── Security Guide.md
 ├── Slash Command Feature Development.md
+├── Test Evaluation Guide.md
+├── Test Review Checklist.md
 ├── Testing Guide.md
 ├── Text Formatting Plan.md
 └── Troubleshooting Guide.md

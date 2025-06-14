@@ -92,6 +92,8 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 
 - **[Component Structure Guide.md](AI System Prompt Files/Component Structure Guide.md)** - React patterns
 - **[Testing Guide.md](AI System Prompt Files/Testing Guide.md)** - Test patterns
+- **[Test Evaluation Guide.md](AI System Prompt Files/Test Evaluation Guide.md)** - Test quality guidelines
+- **[Test Review Checklist.md](AI System Prompt Files/Test Review Checklist.md)** - Test inventory & tracking
 - **[Editor Testing Plan.md](AI System Prompt Files/Editor Testing Plan.md)** - Editor test coverage
 - **[Text Formatting Plan.md](AI System Prompt Files/Text Formatting Plan.md)** - Rich text implementation
 - **[Backend Api Guide.md](AI System Prompt Files/Backend Api Guide.md)** - API design
@@ -233,6 +235,8 @@ For detailed status, see [# Current State.md](AI System Prompt Files/# Current S
 - Include edge cases and error scenarios
 - Mock external dependencies appropriately
 - Run `yarn test` before committing
+- **Review test quality** using Test Evaluation Guide.md
+- **Track test reviews** with Test Review Checklist.md
 
 ### Code Style
 

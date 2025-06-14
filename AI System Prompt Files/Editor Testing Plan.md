@@ -4,6 +4,8 @@
 
 This document outlines all tests needed for the Project Kairos block-based editor. Tests are organized by priority and include complexity estimates.
 
+> **Note**: For test quality evaluation, see [Test Evaluation Guide.md](./Test Evaluation Guide.md) and track review progress in [Test Review Checklist.md](./Test Review Checklist.md).
+
 ## Currently Implemented Features
 
 The editor currently supports:

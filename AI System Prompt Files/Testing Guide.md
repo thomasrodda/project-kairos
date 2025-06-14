@@ -209,3 +209,11 @@ describe('Component Name', () => {
 ```
 
 This approach ensures reliable, user-friendly, and maintainable code with clear feedback about what's working.
+
+---
+
+## Related Documentation
+
+- **[Test Evaluation Guide.md](./Test Evaluation Guide.md)** - Detailed guidelines for evaluating test quality
+- **[Test Review Checklist.md](./Test Review Checklist.md)** - Complete inventory of all tests in the project
+- **[Editor Testing Plan.md](./Editor Testing Plan.md)** - Comprehensive test coverage for the editor
