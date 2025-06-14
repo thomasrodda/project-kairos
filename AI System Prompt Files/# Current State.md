@@ -1,6 +1,6 @@
 # Current State
 
-> Last Updated: January 11, 2025 (Evening Update)
+> Last Updated: January 14, 2025
 > This document tracks the current state of Project Kairos, including what's built, what's in progress, and immediate next steps.
 >
 > **Update this document when:**
@@ -25,6 +25,9 @@
 - **Click empty space**: Clicking below blocks places cursor in last block
 - **Slash commands**: Type "/" to change block types with searchable menu
 - **Text formatting**: Bold, italic, underline, and link formatting via toolbar
+- **Cross-block formatting**: Format text spanning multiple blocks
+- **Keyboard shortcuts**: Ctrl/Cmd+B/I/U/K for formatting
+- **Markdown conversion**: Auto-converts **bold**, _italic_, etc. to formatted text
 
 ### UI Components ✅
 
@@ -95,29 +98,30 @@
 
 - Cross-block selection may have edge cases with rapid selections
 - No undo/redo functionality yet
-- No markdown conversion (typing **bold** doesn't auto-format)
+- ~~No markdown conversion~~ **Markdown conversion working** ✅ (typing **bold** auto-formats to bold)
 - Slash command tests fail in test environment (feature works in browser)
 - Focus restoration after slash command cancellation needs browser environment
-- Formatting doesn't persist across blocks (cross-block formatting not implemented)
-- No keyboard shortcuts for formatting yet (Ctrl+B, etc.)
+- ~~Formatting doesn't persist across blocks~~ **Cross-block formatting working** ✅
+- ~~No keyboard shortcuts for formatting~~ **Keyboard shortcuts implemented** ✅ (Ctrl/Cmd+B/I/U/K all working)
 
 ## 📋 Immediate Next Steps
 
 Based on Development Plan and current progress:
 
-1. **Implement Keyboard Shortcuts for Formatting**
+1. **✅ Keyboard Shortcuts for Formatting (Complete)**
 
-   - Add Ctrl/Cmd+B for bold
-   - Add Ctrl/Cmd+I for italic
-   - Add Ctrl/Cmd+U for underline
-   - Add Ctrl/Cmd+K for links
-   - Hook into existing formatting logic
+   - ✅ Ctrl/Cmd+B for bold
+   - ✅ Ctrl/Cmd+I for italic
+   - ✅ Ctrl/Cmd+U for underline
+   - ✅ Ctrl/Cmd+K for links
+   - ✅ Integrated with existing formatting logic
 
-2. **Implement Markdown Detection & Conversion**
+2. **✅ Markdown Detection & Conversion (Complete)**
 
-   - Detect patterns like **bold**, _italic_, [link](url)
-   - Auto-convert to formatted text when typing
-   - Hide markdown symbols from display
+   - ✅ Detects patterns like **bold**, _italic_, ~~strikethrough~~, `code`, [link](url)
+   - ✅ Auto-converts to formatted text when typing
+   - ✅ Hides markdown symbols from display
+   - ✅ Maintains cursor position after conversion
 
 3. **Complete Remaining Component Tests**
 
@@ -125,9 +129,10 @@ Based on Development Plan and current progress:
    - Sidebar & SidebarButton tests
    - Workspace tests
 
-4. **Live Markdown Support**
-   - Auto-convert "# " to H1
-   - Auto-convert "## " to H2
+4. **Block-Level Markdown Support**
+   - Auto-convert "# " to H1 block type
+   - Auto-convert "## " to H2 block type
+   - Auto-convert "- " to bullet list
    - Markdown paste detection
 
 ## 🚧 Not Yet Implemented
@@ -144,7 +149,6 @@ Based on Development Plan and current progress:
 
 ### Editor Features Pending
 
-- Formatting toolbar
 - Undo/redo system
 - Markdown import/export
 - Image/media blocks

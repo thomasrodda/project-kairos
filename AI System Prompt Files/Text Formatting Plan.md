@@ -11,7 +11,13 @@
 - ✅ Created comprehensive text formatting utilities with 41 passing tests
 - ✅ Implemented all core formatting functions with edge case handling
 
-### ⏳ Phase 2: Markdown Detection & Conversion (Pending)
+### ✅ Phase 2: Markdown Detection & Conversion (Complete)
+
+- ✅ Created markdown detection utilities with pattern matching
+- ✅ Implemented live markdown conversion in ContentEditableContainer
+- ✅ Added support for bold, italic, strikethrough, code, and link patterns
+- ✅ Cursor position preserved after conversion
+- ✅ E2E tests for all markdown patterns
 
 ### ✅ Phase 3: Rendering Formatted Text (Complete)
 
@@ -31,9 +37,21 @@
 - ✅ Added link creation/removal with URL prompt
 - ✅ Improved selection restoration logic to handle DOM changes
 
-### ⏳ Phase 5: Keyboard Shortcuts (Pending)
+### ✅ Phase 5: Keyboard Shortcuts (Complete)
 
-### ⏳ Phase 6: Cross-Block Formatting (Pending)
+- ✅ Implemented keyboard shortcuts in ContentEditableContainer
+- ✅ Added Ctrl/Cmd+B for bold, Ctrl/Cmd+I for italic
+- ✅ Added Ctrl/Cmd+U for underline, Ctrl/Cmd+K for links
+- ✅ Shortcuts work with FormattingToolbar active states
+- ✅ Full E2E test coverage for all shortcuts
+
+### ✅ Phase 6: Cross-Block Formatting (Complete)
+
+- ✅ Implemented cross-block text selection with formatting support
+- ✅ Formatting applies correctly across multiple selected blocks
+- ✅ Proper handling of partial selections in first/last blocks
+- ✅ Selection restoration works after cross-block formatting
+- ✅ Integrated with toolbar and keyboard shortcuts
 
 ---
 
@@ -157,11 +175,11 @@ export function adjustFormatsAfterEdit(formats: FormatRange[], editStart: number
 // ✅ toggleFormat() - Toggle formatting on/off for a range
 ```
 
-### Phase 2: Markdown Detection & Conversion
+### Phase 2: Markdown Detection & Conversion ✅
 
-#### 2.1 Create Markdown Detection System
+#### 2.1 Create Markdown Detection System ✅
 
-**New File: `apps/web/src/utils/markdownDetection.ts`**
+**File: `apps/web/src/utils/markdownDetection.ts`** (Implemented)
 
 ```typescript
 interface MarkdownPattern {
@@ -206,29 +224,23 @@ const MARKDOWN_PATTERNS: MarkdownPattern[] = [
   },
 ]
 
-export function detectAndConvertMarkdown(
-  text: string,
-  cursorPosition: number
-): {
-  newText: string
-  newFormats: FormatRange[]
-  newCursorPosition: number
-} | null {
-  // Detect markdown patterns and convert to formatting
-}
+// Core functions implemented:
+export function shouldConvertMarkdown(text: string, cursorPos: number): MarkdownMatch | null
+export function convertMarkdownToFormatting(text: string, match: MarkdownMatch): MarkdownConversion
+export function getMarkdownPattern(text: string, cursorPos: number): { pattern: MarkdownPattern; match: RegExpMatchArray } | null
 ```
 
-#### 2.2 Integrate Live Detection
+#### 2.2 Integrate Live Detection ✅
 
-**Update: `apps/web/src/components/Editor/ContentEditableContainer/ContentEditableContainer.tsx`**
+**Updated: `apps/web/src/components/Editor/ContentEditableContainer/ContentEditableContainer.tsx`**
 
-Add markdown detection to the input handler:
+Implemented in `handleBeforeInput` (lines 298-325):
 
-- Monitor text changes
-- Detect completed markdown patterns
-- Convert markdown to formatting
-- Update block content and formatting
-- Maintain cursor position
+- ✅ Monitors text changes on every character input
+- ✅ Detects completed markdown patterns (e.g., closing `**`)
+- ✅ Converts markdown to formatting and removes symbols
+- ✅ Updates block content and formatting via EditorContext
+- ✅ Maintains cursor position using selection restoration
 
 ### Phase 3: Rendering Formatted Text
 
@@ -329,66 +341,45 @@ Show active formats in toolbar:
 - Highlight active format buttons
 - Support toggle behavior
 
-### Phase 5: Keyboard Shortcuts
+### Phase 5: Keyboard Shortcuts ✅
 
-#### 5.1 Implement Shortcut Handler
+#### 5.1 Implement Shortcut Handler ✅
 
-**New Hook: `apps/web/src/hooks/useFormatShortcuts.ts`**
+**Implemented in: `apps/web/src/components/Editor/ContentEditableContainer/ContentEditableContainer.tsx`**
 
-```typescript
-export function useFormatShortcuts() {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const isMod = e.ctrlKey || e.metaKey
+Keyboard shortcuts are implemented directly in the `handleKeyDown` function (lines 625-647):
 
-      if (!isMod) return
+- ✅ Ctrl/Cmd+B: Bold formatting
+- ✅ Ctrl/Cmd+I: Italic formatting
+- ✅ Ctrl/Cmd+U: Underline formatting
+- ✅ Ctrl/Cmd+K: Link formatting with URL prompt
+- ✅ Cross-platform support (Ctrl for Windows/Linux, Cmd for Mac)
+- ✅ Integrates with the same `handleFormatShortcut()` used by toolbar
 
-      switch (e.key) {
-        case 'b':
-          e.preventDefault()
-          applyFormat('bold')
-          break
-        case 'i':
-          e.preventDefault()
-          applyFormat('italic')
-          break
-        case 'u':
-          e.preventDefault()
-          applyFormat('underline')
-          break
-        // ... other shortcuts
-      }
-    }
+### Phase 6: Cross-Block Formatting ✅
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [])
-}
-```
+#### 6.1 Enhance Cross-Block Selection ✅
 
-### Phase 6: Cross-Block Formatting
+**Updated: `apps/web/src/hooks/useCrossBlockSelection.ts`**
 
-#### 6.1 Enhance Cross-Block Selection
+Formatting support implemented:
 
-**Update: `apps/web/src/hooks/useCrossBlockSelection.ts`**
+- ✅ Tracks formatting across multiple blocks via selection state
+- ✅ Applies formatting to partial block selections correctly
+- ✅ Handles format boundaries at block edges
+- ✅ Works seamlessly with FormattingToolbar
 
-Add formatting support:
+#### 6.2 Multi-Block Format Operations ✅
 
-- Track formatting across multiple blocks
-- Apply formatting to partial block selections
-- Handle format boundaries at block edges
+**Implemented in: `apps/web/src/components/Editor/ContentEditableContainer/ContentEditableContainer.tsx`**
 
-#### 6.2 Multi-Block Format Operations
+The `handleFormatShortcut` function handles cross-block formatting:
 
-**New Utility: `apps/web/src/utils/crossBlockFormatting.ts`**
-
-```typescript
-export function applyFormatAcrossBlocks(blocks: EditorBlock[], selection: CrossBlockSelection, formatType: FormatType): EditorBlock[] {
-  // Apply formatting across multiple blocks
-  // Handle partial selections in first/last blocks
-  // Apply to full content of middle blocks
-}
-```
+- ✅ Applies formatting across multiple selected blocks
+- ✅ Handles partial selections in first/last blocks
+- ✅ Applies to full content of middle blocks
+- ✅ Maintains selection after formatting
+- ✅ Works with both toolbar buttons and keyboard shortcuts
 
 ---
 

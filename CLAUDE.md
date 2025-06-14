@@ -44,7 +44,7 @@ If the notification script fails, use: `echo -e "\a"`
 
 ### Current Focus
 
-**Next Features**: Implementing keyboard shortcuts for formatting (Ctrl+B, etc.) and markdown detection/conversion
+**Next Features**: Block-level markdown conversion (# for H1, ## for H2, - for bullets) and Firebase authentication
 
 ### Prerequisites
 
@@ -68,7 +68,7 @@ yarn typecheck    # Check TypeScript types
 
 Project Kairos is a creative writing and worldbuilding web application designed for novelists, writers, and D&D campaign planners. It combines block-based editing with AI-driven tools for consistency checking and writing assistance.
 
-**Current Status**: Block editor with drag-and-drop, cross-block selection, slash commands, and text formatting (bold, italic, underline, links) all working. Ready for keyboard shortcuts and markdown conversion.
+**Current Status**: Block editor fully functional with drag-and-drop, cross-block selection, slash commands, text formatting (bold, italic, underline, links), keyboard shortcuts (Ctrl/Cmd+B/I/U/K), and markdown auto-conversion. Ready for block-level markdown and auth.
 
 ## 🗺️ Document Navigation
 
