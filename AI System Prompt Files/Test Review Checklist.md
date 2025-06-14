@@ -43,11 +43,11 @@
 
 ### Editor Sub-Components
 
-- [ ] **Block.test.tsx** - Individual block component
+- [✅] **Block.test.tsx** - Individual block component
 
   - Location: `apps/web/src/components/Editor/Block/Block.test.tsx`
-  - Score: \_/20
-  - Notes:
+  - Score: 20/20 (Behavior: 5/5, Bugs: 5/5, Coverage: 5/5, Maintainability: 5/5)
+  - Notes: REVISED - Now uses prescriptive testing that defines expected behavior rather than matching current implementation. Tests revealed real bugs: XSS vulnerability with javascript: URLs, missing validation for block types and formatting, no developer warnings. Tests now fail appropriately when functionality is incorrect, following the principle "write tests to find bugs, not to pass".
 
 - [ ] **BlockDragHandle.test.tsx** - Block drag functionality
 
@@ -233,13 +233,13 @@
 
 **Review Progress**:
 
-- Not reviewed: 30
+- Not reviewed: 29
 - In review: 0
-- Good quality (✅): 2
+- Good quality (✅): 3
 - Needs improvement (⚠️): 0
 - Poor quality (❌): 0
 
-**Average Quality Score**: 17.5/20
+**Average Quality Score**: 18.7/20
 
 ---
 
