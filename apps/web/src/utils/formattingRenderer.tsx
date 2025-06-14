@@ -52,20 +52,37 @@ function renderSegment(segment: TextSegment, index: number, allFormatting: TextF
       case 'link': {
         // Find the URL for this link
         const url = findLinkUrl(allFormatting, start, end)
-        if (url) {
-          element = (
-            <a href={url} target="_blank" rel="noopener noreferrer">
-              {element}
-            </a>
-          )
-        } else {
-          // Fallback if no URL found
-          element = (
-            <a href="#" onClick={(e) => e.preventDefault()}>
-              {element}
-            </a>
-          )
+
+        // Sanitize URL to prevent XSS
+        const sanitizeUrl = (url: string | undefined): string => {
+          if (!url) return '#'
+
+          // Block javascript: and data: URLs
+          const lowercaseUrl = url.toLowerCase().trim()
+          if (lowercaseUrl.startsWith('javascript:') || lowercaseUrl.startsWith('data:')) {
+            return '#'
+          }
+
+          // Allow http, https, and relative URLs
+          if (
+            lowercaseUrl.startsWith('http://') ||
+            lowercaseUrl.startsWith('https://') ||
+            lowercaseUrl.startsWith('/') ||
+            lowercaseUrl.startsWith('#')
+          ) {
+            return url
+          }
+
+          // For other cases, prepend https://
+          return `https://${url}`
         }
+
+        const safeUrl = sanitizeUrl(url)
+        element = (
+          <a href={safeUrl} target="_blank" rel="noopener noreferrer">
+            {element}
+          </a>
+        )
         break
       }
     }

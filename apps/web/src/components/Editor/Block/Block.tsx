@@ -49,10 +49,59 @@ export function Block({ block, isFocused, dragHandleProps, onBlockClick }: Block
 
   // Determine the appropriate placeholder text
   const getPlaceholder = () => {
-    if (isFocused && block.content === '') {
+    if (isFocused && (!block.content || block.content === '')) {
       return "Press '/' for commands, or 'space' for AI..."
     }
     return ''
+  }
+
+  // Validate and filter formatting
+  const validateFormatting = () => {
+    if (!block.formatting || block.formatting.length === 0) {
+      return []
+    }
+
+    const content = block.content || ''
+    const contentLength = content.length
+
+    // Filter out invalid formatting
+    const validFormatting = block.formatting
+      .filter((format) => {
+        // Check bounds
+        if (format.start < 0 || format.end < 0 || format.start >= format.end) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error(`Invalid formatting range: start=${format.start}, end=${format.end}`)
+          }
+          return false
+        }
+
+        // Check if format extends beyond content
+        if (format.start >= contentLength) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error(`Invalid formatting: start position ${format.start} is beyond content length ${contentLength}`)
+          }
+          return false
+        }
+
+        // Validate link URLs
+        if (format.type === 'link' && (!format.url || format.url === '')) {
+          if (process.env.NODE_ENV === 'development') {
+            console.error(`Invalid formatting: link format missing URL`)
+          }
+          return false
+        }
+
+        return true
+      })
+      .map((format) => {
+        // Clamp end position to content length
+        if (format.end > contentLength) {
+          return { ...format, end: contentLength }
+        }
+        return format
+      })
+
+    return validFormatting
   }
 
   // Render the appropriate block type
@@ -65,9 +114,10 @@ export function Block({ block, isFocused, dragHandleProps, onBlockClick }: Block
       return <span className="block__placeholder">{placeholder}</span>
     }
 
-    // Render formatted text if block has formatting
-    if (block.formatting && block.formatting.length > 0) {
-      return renderFormattedText({ content, formatting: block.formatting })
+    // Validate and render formatted text if block has formatting
+    const validFormatting = validateFormatting()
+    if (validFormatting.length > 0) {
+      return renderFormattedText({ content, formatting: validFormatting })
     }
 
     // Otherwise render plain text
@@ -76,16 +126,28 @@ export function Block({ block, isFocused, dragHandleProps, onBlockClick }: Block
 
   // Get the appropriate class for the block type
   const getBlockClass = () => {
+    // Validate block type
+    const validTypes = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
+    const blockType = validTypes.includes(block.type) ? block.type : 'paragraph'
+
+    if (process.env.NODE_ENV === 'development' && !validTypes.includes(block.type)) {
+      console.error(`Invalid block type: ${block.type}. Falling back to paragraph.`)
+    }
+
     const baseClass = 'block__content'
-    const typeClass = `block__content--${block.type}`
+    const typeClass = `block__content--${blockType}`
     const focusedClass = isFocused ? 'block__content--focused' : ''
-    const emptyClass = isFocused && block.content === '' ? 'block__content--empty' : ''
+    const emptyClass = isFocused && (!block.content || block.content === '') ? 'block__content--empty' : ''
 
     return `${baseClass} ${typeClass} ${focusedClass} ${emptyClass}`.trim()
   }
 
+  // Validate block type for outer div class
+  const validTypes = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
+  const blockType = validTypes.includes(block.type) ? block.type : 'paragraph'
+
   return (
-    <div className={`block block--${block.type} ${isSelected ? 'block--selected' : ''}`} data-block-id={block.id} onClick={handleClick}>
+    <div className={`block block--${blockType} ${isSelected ? 'block--selected' : ''}`} data-block-id={block.id} onClick={handleClick}>
       {/* Drag handle - shows on hover */}
       <BlockDragHandle blockId={block.id} onSelect={handleBlockSelect} dragHandleProps={dragHandleProps} />
 

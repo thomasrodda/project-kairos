@@ -162,8 +162,10 @@ describe('Block', () => {
       expect(overlap).toBeInTheDocument()
       expect(overlap).toHaveTextContent('bold')
 
-      // Verify complete structure
-      expect(container.textContent).toBe('Start bold&italic end')
+      // Verify complete structure in content area
+      const contentArea = container.querySelector('.block__content')
+      expect(contentArea).toBeInTheDocument()
+      expect(contentArea?.textContent).toBe('Start bold&italic end')
     })
 
     it('should highlight selected blocks for user feedback', () => {

@@ -25,6 +25,8 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
   const containerRef = externalRef || internalRef
   const isInternalUpdate = useRef(false)
   const savedSelection = useRef<{ blockId: string; offset: number } | null>(null)
+  const pendingUpdate = useRef<{ blockId: string; content: string } | null>(null)
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Slash command menu state
   const [showSlashMenu, setShowSlashMenu] = useState(false)
@@ -78,49 +80,50 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
   const setCursorPosition = useCallback(
     (blockId: string, offset: number) => {
-      // Use requestAnimationFrame to ensure DOM is updated before setting cursor
-      requestAnimationFrame(() => {
-        const blockEl = containerRef.current?.querySelector(`[data-block-id="${blockId}"] .block__content`) as HTMLElement
-        if (!blockEl) return
+      // Skip if we don't have a valid container
+      if (!containerRef.current) return
 
-        const selection = window.getSelection()
-        if (!selection) return
+      // Immediate execution without requestAnimationFrame for better responsiveness
+      const blockEl = containerRef.current.querySelector(`[data-block-id="${blockId}"] .block__content`) as HTMLElement
+      if (!blockEl) return
 
-        try {
-          // Create a tree walker to find the correct text node
-          const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null)
+      const selection = window.getSelection()
+      if (!selection) return
 
-          let currentOffset = 0
-          let targetNode: Node | null = null
-          let targetOffset = 0
+      try {
+        // Create a tree walker to find the correct text node
+        const walker = document.createTreeWalker(blockEl, NodeFilter.SHOW_TEXT, null)
 
-          // Find the text node that contains our target offset
-          let node: Node | null
-          while ((node = walker.nextNode())) {
-            const nodeLength = node.textContent?.length || 0
-            if (currentOffset + nodeLength >= offset) {
-              targetNode = node
-              targetOffset = offset - currentOffset
-              break
-            }
-            currentOffset += nodeLength
+        let currentOffset = 0
+        let targetNode: Node | null = null
+        let targetOffset = 0
+
+        // Find the text node that contains our target offset
+        let node: Node | null
+        while ((node = walker.nextNode())) {
+          const nodeLength = node.textContent?.length || 0
+          if (currentOffset + nodeLength >= offset) {
+            targetNode = node
+            targetOffset = offset - currentOffset
+            break
           }
-
-          // If no text node found, use the block element itself
-          if (!targetNode) {
-            targetNode = blockEl
-            targetOffset = 0
-          }
-
-          const range = document.createRange()
-          range.setStart(targetNode, Math.min(targetOffset, targetNode.textContent?.length || 0))
-          range.collapse(true)
-          selection.removeAllRanges()
-          selection.addRange(range)
-        } catch (e) {
-          console.error('Failed to set cursor position:', e)
+          currentOffset += nodeLength
         }
-      })
+
+        // If no text node found, use the block element itself
+        if (!targetNode) {
+          targetNode = blockEl
+          targetOffset = 0
+        }
+
+        const range = document.createRange()
+        range.setStart(targetNode, Math.min(targetOffset, targetNode.textContent?.length || 0))
+        range.collapse(true)
+        selection.removeAllRanges()
+        selection.addRange(range)
+      } catch (e) {
+        console.error('Failed to set cursor position:', e)
+      }
     },
     [containerRef]
   )
@@ -154,6 +157,9 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
       // Save cursor position for after update
       savedSelection.current = { blockId: startBlockId, offset: startOffset }
 
+      // Mark as internal update
+      isInternalUpdate.current = true
+
       dispatch({ type: 'UPDATE_BLOCK', blockId: startBlockId, content: newContent })
     } else {
       // Selection across multiple blocks
@@ -168,6 +174,9 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
       // Save cursor position for after update
       savedSelection.current = { blockId: startBlockId, offset: startOffset }
+
+      // Mark as internal update
+      isInternalUpdate.current = true
 
       // Update first block
       dispatch({ type: 'UPDATE_BLOCK', blockId: startBlockId, content: mergedContent })
@@ -185,8 +194,12 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
   const restoreCursorPosition = useCallback(() => {
     if (!savedSelection.current) return
     const { blockId, offset } = savedSelection.current
-    setCursorPosition(blockId, offset)
+
+    // Clear saved selection first to prevent double restoration
     savedSelection.current = null
+
+    // Set cursor position
+    setCursorPosition(blockId, offset)
   }, [setCursorPosition])
 
   // Handle slash command selection
@@ -199,6 +212,9 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
       // Remove the slash from the content
       const newContent = block.content.slice(0, slashCommandStartOffset) + block.content.slice(slashCommandStartOffset + 1)
+
+      // Mark as internal update
+      isInternalUpdate.current = true
 
       // Update block content first
       dispatch({ type: 'UPDATE_BLOCK', blockId: slashCommandBlockId, content: newContent })
@@ -330,8 +346,22 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         // Mark that we're doing an internal update
         isInternalUpdate.current = true
 
-        // Update block content
+        // For rapid typing, batch updates
+        if (updateTimeoutRef.current) {
+          clearTimeout(updateTimeoutRef.current)
+        }
+
+        // Store pending update
+        pendingUpdate.current = { blockId, content: newContent }
+
+        // Dispatch immediately for responsiveness
         dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+
+        // Clear pending update after a short delay
+        updateTimeoutRef.current = setTimeout(() => {
+          pendingUpdate.current = null
+          updateTimeoutRef.current = null
+        }, 50)
       }
     },
     [dispatch, editorState.blocks, handleDeleteSelection, showSlashMenu]
@@ -668,6 +698,9 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         const beforeCursor = block.content.substring(0, offset)
         const afterCursor = block.content.substring(offset)
 
+        // Mark as internal update
+        isInternalUpdate.current = true
+
         // Update current block
         dispatch({ type: 'UPDATE_BLOCK', blockId: block.id, content: beforeCursor })
 
@@ -722,6 +755,9 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
               // Save cursor position for merged block
               savedSelection.current = { blockId: previousBlock.id, offset: previousBlock.content.length }
 
+              // Mark as internal update so cursor restoration works
+              isInternalUpdate.current = true
+
               dispatch({ type: 'UPDATE_BLOCK', blockId: previousBlock.id, content: mergedContent })
               dispatch({ type: 'DELETE_BLOCK', blockId: block.id })
             }
@@ -732,6 +768,9 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
             // Save cursor position after backspace
             savedSelection.current = { blockId, offset: offset - 1 }
+
+            // Mark as internal update so cursor restoration works
+            isInternalUpdate.current = true
 
             dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
           }
@@ -897,9 +936,12 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
   useEffect(() => {
     if (!containerRef.current) return
 
-    // Restore cursor position after React has updated the DOM
-    if (savedSelection.current) {
-      restoreCursorPosition()
+    // Only restore if this was an internal update and we have a saved position
+    if (isInternalUpdate.current && savedSelection.current) {
+      // Use microtask to ensure DOM is updated
+      queueMicrotask(() => {
+        restoreCursorPosition()
+      })
     }
 
     isInternalUpdate.current = false
@@ -939,6 +981,15 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
     },
     [dispatch, editorState.blocks]
   )
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current)
+      }
+    }
+  }, [])
 
   // Properly typed event handler for beforeinput
   const handleBeforeInputTyped = handleBeforeInput as unknown as React.FormEventHandler<HTMLDivElement>

@@ -23,7 +23,6 @@
 │   ├── pre-rebase
 │   └── prepare-commit-msg
 ├── pre-commit
-├── pre-commit.bak
 └── pre-push
 .vscode
 ├── extensions.json
