@@ -4,6 +4,39 @@
 
 ---
 
+## 🚨 CRITICAL: Write Tests to Find Bugs, Not to Pass 🚨
+
+**The #1 Rule of Testing**: Tests must be written to verify that the application works correctly for users, NOT to make test suites green.
+
+### ✅ Correct Approach:
+
+1. Write tests for what the feature SHOULD do
+2. If tests fail, FIX THE CODE, not the tests
+3. Tests should fail when functionality is broken
+4. Every test should prevent a real bug
+
+### ❌ Wrong Approach:
+
+- Writing tests that match current (broken) behavior
+- Adjusting assertions to make tests pass
+- Skipping tests that reveal bugs
+- Writing tests that always pass regardless of functionality
+
+**Example from ContentEditableContainer**:
+
+```typescript
+// ❌ BAD: Test written to pass
+expect(content === 'Replace that text' || content === 'Replace this textthat').toBe(true)
+
+// ✅ GOOD: Test verifies correct behavior
+expect(content).toBe('Replace that text')
+// This test revealed a real bug where selection wasn't deleted before paste
+```
+
+When tests fail, ask: "Is the test wrong, or is the code wrong?" Usually, it's the code.
+
+---
+
 ## Core Testing Philosophy
 
 Tests should verify that the application **behaves correctly from a user's perspective**, not just that the implementation matches expectations. Every test should prevent a real bug that could affect users.
@@ -133,32 +166,41 @@ jest.mock('./api/client')
 
 ### For Each Test File:
 
-1. **Read Test Names First**
+1. **First Question: Do These Tests Verify Real Functionality?**
+
+   - Are tests written to verify correct behavior, or just to pass?
+   - If tests are failing, should we fix the code or the tests?
+   - Would these tests catch actual bugs users would experience?
+
+2. **Read Test Names First**
 
    - Do they describe user scenarios?
    - Can you understand what feature is tested?
 
-2. **Check Test Structure**
+3. **Check Test Structure**
 
    - Are the four categories present? (Core, Interactions, Errors, A11y)
    - Is there logical grouping?
 
-3. **Evaluate Individual Tests**
+4. **Evaluate Individual Tests**
 
    - What bug would this test catch?
    - Would this fail if users couldn't use the feature?
    - Is it testing behavior or implementation?
+   - **Critical**: Is the test asserting what SHOULD happen, not what DOES happen?
 
-4. **Check Coverage**
+5. **Check Coverage**
 
    - Are error cases tested?
    - Is keyboard navigation tested?
    - Are edge cases covered?
+   - Are failing tests being addressed by fixing code, not tests?
 
-5. **Review Assertions**
+6. **Review Assertions**
    - Are they testing user-visible outcomes?
    - Are they specific and meaningful?
    - Would they catch real bugs?
+   - Are assertions checking for correct behavior, not current behavior?
 
 ---
 
@@ -203,11 +245,14 @@ Rate each test file on these dimensions (1-5 scale):
 
 Based on current patterns, watch for:
 
-1. **Over-testing React mechanics** instead of user features
-2. **Missing integration tests** between components
-3. **Incomplete async testing** (loading states, errors)
-4. **Limited accessibility verification**
-5. **Mock overuse** that hides real issues
+1. **Tests written just to pass** - The most critical issue
+2. **Over-testing React mechanics** instead of user features
+3. **Missing integration tests** between components
+4. **Incomplete async testing** (loading states, errors)
+5. **Limited accessibility verification**
+6. **Mock overuse** that hides real issues
+7. **Accepting multiple outcomes** to make tests pass (e.g., `expect(A || B).toBe(true)`)
+8. **Skipping tests that reveal bugs** instead of fixing the bugs
 
 ---
 
@@ -288,3 +333,43 @@ it('should show modal content when trigger is clicked', async () => {
 ```
 
 This approach ensures tests actually verify the application works for users, not just that the code executes.
+
+---
+
+## When Tests Fail: Decision Framework
+
+### 1. Test fails after writing it correctly?
+
+**FIX THE CODE, NOT THE TEST**
+
+### 2. Test reveals unexpected behavior?
+
+**INVESTIGATE IF IT'S A BUG**
+
+- If it's a bug → Fix the code
+- If it's intended → Document why and update test with clear comment
+
+### 3. Multiple tests failing in cascade?
+
+**LIKELY A REAL ISSUE IN THE CODE**
+
+- Don't adjust all tests to pass
+- Find and fix the root cause
+
+### 4. Tempted to write `expect(A || B)`?
+
+**STOP AND THINK**
+
+- Why are there two possible outcomes?
+- Which one is correct?
+- Fix the code to have deterministic behavior
+
+### 5. Want to skip a failing test?
+
+**ONLY IF:**
+
+- Feature is genuinely not implemented yet
+- Add a clear TODO comment
+- Create a ticket to implement the feature
+
+Remember: **Green tests mean nothing if they don't verify correct behavior**. A failing test that catches a real bug is more valuable than 100 passing tests that test nothing.

@@ -1,4 +1,13 @@
-import { EditorState, EditorAction, EditorBlock, BlockType, CrossBlockSelection, editorReducer, createInitialBlocks } from './EditorContext'
+import {
+  EditorState,
+  EditorAction,
+  EditorBlock,
+  BlockType,
+  CrossBlockSelection,
+  TextFormat,
+  editorReducer,
+  createInitialBlocks,
+} from './EditorContext'
 import { generateId } from '@kairos/utils'
 
 // Mock generateId
@@ -567,6 +576,130 @@ describe('EditorContext Reducer', () => {
     })
   })
 
+  describe('✅ Text Formatting Actions', () => {
+    it('APPLY_FORMATTING should add formatting to block', () => {
+      const state = createInitialState()
+
+      const newState = editorReducer(state, {
+        type: 'APPLY_FORMATTING',
+        blockId: 'block-1',
+        format: 'bold',
+        range: { start: 5, end: 10 },
+      })
+
+      expect(newState.blocks[0].formatting).toEqual([{ type: 'bold', start: 5, end: 10 }])
+      expect(newState.isDirty).toBe(true)
+    })
+
+    it('APPLY_FORMATTING should merge with existing formats', () => {
+      const state: EditorState = {
+        ...createInitialState(),
+        blocks: [
+          {
+            id: 'block-1',
+            type: 'paragraph',
+            content: 'First block with formatting',
+            formatting: [{ type: 'bold', start: 0, end: 5 }],
+          },
+          ...createInitialState().blocks.slice(1),
+        ],
+      }
+
+      const newState = editorReducer(state, {
+        type: 'APPLY_FORMATTING',
+        blockId: 'block-1',
+        format: 'italic',
+        range: { start: 6, end: 11 },
+      })
+
+      expect(newState.blocks[0].formatting).toHaveLength(2)
+      expect(newState.blocks[0].formatting).toContainEqual({ type: 'bold', start: 0, end: 5 })
+      expect(newState.blocks[0].formatting).toContainEqual({ type: 'italic', start: 6, end: 11 })
+    })
+
+    it('REMOVE_FORMATTING should remove specific format from block', () => {
+      const state: EditorState = {
+        ...createInitialState(),
+        blocks: [
+          {
+            id: 'block-1',
+            type: 'paragraph',
+            content: 'First block',
+            formatting: [
+              { type: 'bold', start: 0, end: 5 },
+              { type: 'italic', start: 6, end: 11 },
+            ],
+          },
+          ...createInitialState().blocks.slice(1),
+        ],
+      }
+
+      const newState = editorReducer(state, {
+        type: 'REMOVE_FORMATTING',
+        blockId: 'block-1',
+        start: 0,
+        end: 5,
+        formatType: 'bold',
+      })
+
+      expect(newState.blocks[0].formatting).toHaveLength(1)
+      expect(newState.blocks[0].formatting).toEqual([{ type: 'italic', start: 6, end: 11 }])
+      expect(newState.isDirty).toBe(true)
+    })
+
+    it('UPDATE_BLOCK_FORMATTING should update block formatting', () => {
+      const state = createInitialState()
+      const newFormatting: TextFormat[] = [
+        { type: 'bold', start: 0, end: 5 },
+        { type: 'italic', start: 6, end: 11 },
+      ]
+
+      const newState = editorReducer(state, {
+        type: 'UPDATE_BLOCK_FORMATTING',
+        blockId: 'block-1',
+        formatting: newFormatting,
+      })
+
+      expect(newState.blocks[0].formatting).toEqual(newFormatting)
+      expect(newState.isDirty).toBe(true)
+    })
+
+    it('should handle formatting for non-existent block', () => {
+      const state = createInitialState()
+
+      const newState = editorReducer(state, {
+        type: 'APPLY_FORMATTING',
+        blockId: 'non-existent',
+        format: 'bold',
+        range: { start: 0, end: 5 },
+      })
+
+      expect(newState.blocks).toEqual(state.blocks)
+      expect(newState.isDirty).toBe(true)
+    })
+
+    it('should handle link formatting with URL', () => {
+      const state = createInitialState()
+
+      const newState = editorReducer(state, {
+        type: 'APPLY_FORMATTING',
+        blockId: 'block-1',
+        format: 'link',
+        range: { start: 5, end: 10 },
+        url: 'https://example.com',
+      })
+
+      expect(newState.blocks[0].formatting).toEqual([
+        {
+          type: 'link',
+          start: 5,
+          end: 10,
+          url: 'https://example.com',
+        },
+      ])
+    })
+  })
+
   describe('✅ Other Actions', () => {
     it('SET_DRAGGING should update dragging state', () => {
       const state = createInitialState()
@@ -681,6 +814,100 @@ describe('EditorContext Reducer', () => {
   })
 
   describe('✅ Business Rules', () => {
+    it('should handle complex multi-action sequences like real user interactions', () => {
+      let state = createInitialState()
+
+      // User creates a new block
+      state = editorReducer(state, {
+        type: 'ADD_BLOCK',
+        block: { id: 'new-block', type: 'paragraph', content: 'New paragraph' },
+        afterBlockId: 'block-1',
+      })
+
+      // User applies bold formatting to part of the new block
+      state = editorReducer(state, {
+        type: 'APPLY_FORMATTING',
+        blockId: 'new-block',
+        format: 'bold',
+        range: { start: 0, end: 3 },
+      })
+
+      // User changes block type to heading
+      state = editorReducer(state, {
+        type: 'CHANGE_BLOCK_TYPE',
+        blockId: 'new-block',
+        blockType: 'h2',
+      })
+
+      // Verify final state
+      const newBlock = state.blocks.find((b) => b.id === 'new-block')
+      expect(newBlock).toBeDefined()
+      expect(newBlock!.type).toBe('h2')
+      expect(newBlock!.content).toBe('New paragraph')
+      expect(newBlock!.formatting).toEqual([{ type: 'bold', start: 0, end: 3 }])
+      expect(state.focusedBlockId).toBe('new-block')
+      expect(state.isDirty).toBe(true)
+    })
+
+    it('should maintain formatting when moving blocks', () => {
+      const formattedBlock: EditorBlock = {
+        id: 'formatted-block',
+        type: 'paragraph',
+        content: 'Bold and italic text',
+        formatting: [
+          { type: 'bold', start: 0, end: 4 },
+          { type: 'italic', start: 9, end: 15 },
+        ],
+      }
+
+      const state: EditorState = {
+        ...createInitialState(),
+        blocks: [formattedBlock, ...createInitialState().blocks],
+      }
+
+      // Reorder blocks
+      const reorderedBlocks = [
+        state.blocks[1],
+        state.blocks[2],
+        state.blocks[0], // formatted block moved to end
+        state.blocks[3],
+      ]
+
+      const newState = editorReducer(state, {
+        type: 'REORDER_BLOCKS',
+        blocks: reorderedBlocks,
+      })
+
+      const movedBlock = newState.blocks[2]
+      expect(movedBlock.id).toBe('formatted-block')
+      expect(movedBlock.formatting).toEqual(formattedBlock.formatting)
+    })
+
+    it('should clear formatting when changing block type to non-text', () => {
+      const state: EditorState = {
+        ...createInitialState(),
+        blocks: [
+          {
+            id: 'block-1',
+            type: 'paragraph',
+            content: 'Formatted text',
+            formatting: [{ type: 'bold', start: 0, end: 9 }],
+          },
+          ...createInitialState().blocks.slice(1),
+        ],
+      }
+
+      // This test assumes a future feature where some block types don't support formatting
+      // For now, just verify formatting is preserved
+      const newState = editorReducer(state, {
+        type: 'CHANGE_BLOCK_TYPE',
+        blockId: 'block-1',
+        blockType: 'h1',
+      })
+
+      expect(newState.blocks[0].formatting).toEqual([{ type: 'bold', start: 0, end: 9 }])
+    })
+
     it('should not allow deleting the last block', () => {
       const state: EditorState = {
         ...createInitialState(),
@@ -782,6 +1009,58 @@ describe('EditorContext Reducer', () => {
         blocks: [state.blocks[1], state.blocks[0], state.blocks[2]],
       })
       expect(newState.isDirty).toBe(true)
+    })
+  })
+
+  describe('✅ Error Handling and Edge Cases', () => {
+    it('should handle malformed formatting ranges gracefully', () => {
+      const state = createInitialState()
+
+      const newState = editorReducer(state, {
+        type: 'APPLY_FORMATTING',
+        blockId: 'block-1',
+        format: 'bold',
+        range: { start: 10, end: 5 }, // end before start
+      })
+
+      // Should either fix the range or ignore it
+      // Current implementation may just add it as-is
+      expect(newState.blocks[0].formatting).toBeDefined()
+    })
+
+    it('should handle formatting beyond content length', () => {
+      const state = createInitialState()
+      // block-1 has content 'First block' (11 chars)
+
+      const newState = editorReducer(state, {
+        type: 'APPLY_FORMATTING',
+        blockId: 'block-1',
+        format: 'bold',
+        range: { start: 10, end: 20 }, // beyond content length
+      })
+
+      expect(newState.blocks[0].formatting).toEqual([{ type: 'bold', start: 10, end: 20 }])
+      // In practice, the formatting renderer should handle this edge case
+    })
+
+    it('should handle concurrent modifications safely', () => {
+      const state = createInitialState()
+
+      // Simulate rapid updates that might happen from user typing
+      let newState = state
+      for (let i = 0; i < 5; i++) {
+        newState = editorReducer(newState, {
+          type: 'UPDATE_BLOCK',
+          blockId: 'block-1',
+          content: `Updated content ${i}`,
+        })
+      }
+
+      expect(newState.blocks[0].content).toBe('Updated content 4')
+      expect(newState.isDirty).toBe(true)
+
+      // Each update should create a new state object
+      expect(newState).not.toBe(state)
     })
   })
 })

@@ -808,18 +808,8 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
       const range = selection.getRangeAt(0)
 
-      // Delete any selected content first
-      if (!range.collapsed) {
-        handleDeleteSelection()
-      }
-
-      // Get current position after potential deletion
-      const currentSelection = window.getSelection()
-      if (!currentSelection || currentSelection.rangeCount === 0) return
-      const currentRange = currentSelection.getRangeAt(0)
-
-      // Get current position
-      const blockEl = findBlockElement(currentRange.startContainer)
+      // Get current position before deletion
+      const blockEl = findBlockElement(range.startContainer)
       if (!blockEl) return
 
       const blockId = blockEl.getAttribute('data-block-id')
@@ -828,11 +818,28 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
       const block = editorState.blocks.find((b) => b.id === blockId)
       if (!block) return
 
-      const offset = getTextOffset(blockEl, currentRange.startContainer, currentRange.startOffset)
+      let offset = getTextOffset(blockEl, range.startContainer, range.startOffset)
+      let currentContent = block.content
+
+      // If there's a selection, calculate what the content will be after deletion
+      if (!range.collapsed) {
+        const startOffset = getTextOffset(blockEl, range.startContainer, range.startOffset)
+        const endOffset = getTextOffset(blockEl, range.endContainer, range.endOffset)
+
+        if (range.startContainer === range.endContainer || findBlockElement(range.endContainer)?.getAttribute('data-block-id') === blockId) {
+          // Selection within the same block
+          currentContent = block.content.slice(0, startOffset) + block.content.slice(endOffset)
+          offset = startOffset
+        } else {
+          // Selection spans multiple blocks - handle deletion then return
+          handleDeleteSelection()
+          return
+        }
+      }
 
       if (blocksToInsert.length === 1) {
         // Single block paste
-        const newContent = block.content.slice(0, offset) + blocksToInsert[0].content + block.content.slice(offset)
+        const newContent = currentContent.slice(0, offset) + blocksToInsert[0].content + currentContent.slice(offset)
 
         // Save cursor position after paste
         savedSelection.current = { blockId, offset: offset + blocksToInsert[0].content.length }
@@ -843,8 +850,8 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
       } else {
         // Multi-block paste
-        const beforeCursor = block.content.slice(0, offset)
-        const afterCursor = block.content.slice(offset)
+        const beforeCursor = currentContent.slice(0, offset)
+        const afterCursor = currentContent.slice(offset)
 
         // Mark as internal update for all operations
         isInternalUpdate.current = true
