@@ -208,6 +208,12 @@ jest.mock('./api/client')
 
 Rate each test file on these dimensions (1-5 scale):
 
+### Test Distribution (1-5)
+
+- 5: Follows 70/20/10 pyramid (mostly unit tests)
+- 3: Reasonable distribution but heavy on integration
+- 1: Inverted pyramid (mostly E2E tests)
+
 ### Behavior Focus (1-5)
 
 - 5: All tests verify user-visible behavior
@@ -234,10 +240,11 @@ Rate each test file on these dimensions (1-5 scale):
 
 ### Overall Quality
 
-- 17-20: Excellent - Truly tests functionality
-- 13-16: Good - Mostly effective with minor issues
-- 9-12: Fair - Needs improvement in key areas
-- 4-8: Poor - Tests for the sake of testing
+- 21-25: Excellent - Truly tests functionality
+- 17-20: Good - Mostly effective with minor issues
+- 13-16: Fair - Needs improvement in key areas
+- 9-12: Poor - Tests for the sake of testing
+- 5-8: Critical - Fundamental issues with approach
 
 ---
 
@@ -278,6 +285,75 @@ Based on current patterns, watch for:
 - Regular test review sessions
 - Document test patterns and examples
 - Create custom testing utilities
+
+---
+
+## Test Effectiveness Metrics
+
+### Tracking Test Quality Over Time
+
+#### Bug Detection Rate
+
+```
+Bug Detection Rate = (Bugs caught by tests / Total bugs found) × 100
+```
+
+Target: > 80% of bugs should be caught by automated tests
+
+#### Test Stability Score
+
+```
+Test Stability = (Consistent passes / Total runs) × 100
+```
+
+Target: > 95% (flaky tests indicate poor quality)
+
+#### Time to Feedback
+
+- Unit tests: < 1 minute for full suite
+- Integration tests: < 5 minutes
+- E2E tests: < 15 minutes
+- Total CI pipeline: < 20 minutes
+
+#### Coverage Metrics (Use Wisely)
+
+**Remember**: Coverage is a tool, not a goal
+
+- **Statement Coverage**: Minimum 70% for critical paths
+- **Branch Coverage**: Focus on complex conditionals
+- **Path Coverage**: Important for state machines
+
+**Red Flags in Coverage**:
+
+- 100% coverage with failing features
+- High coverage from trivial tests
+- Coverage without assertion quality
+
+### Risk-Based Coverage Targets
+
+| Component Type | Coverage Target | Rationale                      |
+| -------------- | --------------- | ------------------------------ |
+| Editor Core    | 90%+            | High risk, data loss potential |
+| Auth/Security  | 95%+            | Critical for user trust        |
+| UI Components  | 60%+            | Lower risk, mostly visual      |
+| Utilities      | 80%+            | Reused everywhere              |
+| Config Files   | 0%              | No logic to test               |
+
+### Test Performance Benchmarks
+
+```typescript
+// Add to test files to track performance
+describe('Performance', () => {
+  it('should complete operations within performance budget', () => {
+    const start = performance.now()
+
+    // Your test operations
+
+    const end = performance.now()
+    expect(end - start).toBeLessThan(50) // 50ms budget
+  })
+})
+```
 
 ---
 
@@ -336,6 +412,41 @@ This approach ensures tests actually verify the application works for users, not
 
 ---
 
+## Test Maintenance Guidelines
+
+### When to Refactor Tests
+
+1. **Test takes > 1 second**: Profile and optimize
+2. **Test fails intermittently**: Fix flakiness immediately
+3. **Test is hard to understand**: Refactor for clarity
+4. **Multiple tests do similar setup**: Extract helpers
+5. **Test doesn't catch bugs**: Rewrite with better assertions
+
+### Test Lifecycle
+
+```mermaid
+graph LR
+    A[Write Test] --> B{Catches Bugs?}
+    B -->|Yes| C[Maintain]
+    B -->|No| D[Refactor/Delete]
+    C --> E{Still Valuable?}
+    E -->|Yes| C
+    E -->|No| D
+```
+
+### Deprecating Tests
+
+It's OK to delete tests when:
+
+- Feature is removed
+- Test duplicates better tests
+- Cost exceeds value (very slow, very brittle)
+- Technology changes make it obsolete
+
+Always document why a test was removed in the commit message.
+
+---
+
 ## When Tests Fail: Decision Framework
 
 ### 1. Test fails after writing it correctly?
@@ -373,3 +484,47 @@ This approach ensures tests actually verify the application works for users, not
 - Create a ticket to implement the feature
 
 Remember: **Green tests mean nothing if they don't verify correct behavior**. A failing test that catches a real bug is more valuable than 100 passing tests that test nothing.
+
+---
+
+## Continuous Improvement Process
+
+### Monthly Test Review
+
+1. **Analyze Failures**
+
+   - Which tests caught real bugs?
+   - Which tests failed due to valid changes?
+   - What bugs escaped to production?
+
+2. **Update Test Strategy**
+
+   - Add tests for escaped bugs
+   - Remove/refactor brittle tests
+   - Adjust coverage targets based on risk
+
+3. **Performance Review**
+   - Measure test suite execution time
+   - Identify and optimize slow tests
+   - Ensure feedback loop stays fast
+
+### Test Quality Dashboard
+
+Track these metrics monthly:
+
+```
+┌─────────────────────────────────────┐
+│ Test Quality Dashboard - Month X     │
+├─────────────────────────────────────┤
+│ Bug Detection Rate:    85% ↑        │
+│ Test Stability:        97% →        │
+│ Suite Runtime:         1m 45s ↓     │
+│ Flaky Tests:          2 ↓           │
+│ Coverage (Risk-Based): 82% ↑        │
+│ Tests Added:          45            │
+│ Tests Removed:        12            │
+│ Bugs Escaped:         3             │
+└─────────────────────────────────────┘
+```
+
+The goal is continuous improvement, not perfection.
