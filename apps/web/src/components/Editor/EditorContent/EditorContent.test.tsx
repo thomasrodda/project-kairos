@@ -43,8 +43,10 @@ jest.mock('@dnd-kit/core', () => {
   const actual = jest.requireActual('@dnd-kit/core')
 
   // Create a more realistic DndContext that still allows testing
-  const DndContext = ({ children, onDragStart, onDragEnd, sensors, collisionDetection }: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const DndContext = ({ children, onDragStart, onDragEnd }: any) => {
     // Store callbacks globally for testing
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(global as any).__dndCallbacks = { onDragStart, onDragEnd }
     return React.createElement('div', { 'data-testid': 'dnd-context' }, children)
   }
@@ -54,7 +56,7 @@ jest.mock('@dnd-kit/core', () => {
     DndContext,
     DragOverlay: ({ children }: { children: React.ReactNode }) => React.createElement('div', { 'data-testid': 'drag-overlay' }, children),
     useSensor: jest.fn(() => ({ id: 'test-sensor' })),
-    useSensors: jest.fn((sensors) => sensors || []),
+    useSensors: jest.fn((...args) => args[0] || []),
     PointerSensor: jest.fn(),
     KeyboardSensor: jest.fn(),
     closestCenter: jest.fn(),
@@ -76,10 +78,11 @@ jest.mock('@dnd-kit/sortable', () => {
         result.splice(to, 0, removed)
         return result
       }),
-    SortableContext: ({ children, items, strategy }: any) => React.createElement('div', { 'data-testid': 'sortable-context' }, children),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    SortableContext: ({ children }: any) => React.createElement('div', { 'data-testid': 'sortable-context' }, children),
     sortableKeyboardCoordinates: jest.fn(),
     verticalListSortingStrategy: jest.fn(),
-    useSortable: jest.fn((options) => ({
+    useSortable: jest.fn(() => ({
       attributes: {},
       listeners: {},
       setNodeRef: jest.fn(),
@@ -110,7 +113,7 @@ describe('EditorContent', () => {
     }
 
     const event = new ClipboardEvent('copy', {
-      clipboardData: mockClipboardData as any,
+      clipboardData: mockClipboardData as unknown as DataTransfer,
       cancelable: true,
     })
 
@@ -263,11 +266,12 @@ describe('EditorContent', () => {
       })
 
       // Trigger drag start through the DndContext
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
 
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
@@ -331,11 +335,12 @@ describe('EditorContent', () => {
         })
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
 
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
@@ -357,6 +362,7 @@ describe('EditorContent', () => {
         })
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
 
       // Should not show overlay initially
@@ -366,7 +372,7 @@ describe('EditorContent', () => {
       // Start dragging
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
@@ -396,20 +402,21 @@ describe('EditorContent', () => {
         })
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
 
       // Start dragging block1
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
       // Drop block1 after block3
       act(() => {
         dndCallbacks.onDragEnd({
-          active: { id: 'block1' } as any,
-          over: { id: 'block3' } as any,
+          active: { id: 'block1' },
+          over: { id: 'block3' },
         } as DragEndEvent)
       })
 
@@ -432,19 +439,20 @@ describe('EditorContent', () => {
         })
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
 
       // Start dragging
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
       // Cancel drag (no over target)
       act(() => {
         dndCallbacks.onDragEnd({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
           over: null,
         } as DragEndEvent)
       })
@@ -467,13 +475,14 @@ describe('EditorContent', () => {
         })
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
       const srElement = screen.getByLabelText('Document editor').querySelector('[aria-live="polite"]') as HTMLElement
 
       // Start drag
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
@@ -482,8 +491,8 @@ describe('EditorContent', () => {
       // Complete drag
       act(() => {
         dndCallbacks.onDragEnd({
-          active: { id: 'block1' } as any,
-          over: { id: 'block2' } as any,
+          active: { id: 'block1' },
+          over: { id: 'block2' },
         } as DragEndEvent)
       })
 
@@ -517,16 +526,20 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 5,
-          } as any,
+            selectedText: 'Test ',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
 
       // Start drag
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
@@ -553,6 +566,7 @@ describe('EditorContent', () => {
         })
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
       const editorContent = screen.getByRole('document')
 
@@ -563,7 +577,7 @@ describe('EditorContent', () => {
       // Start dragging
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
@@ -572,7 +586,7 @@ describe('EditorContent', () => {
       // End dragging
       act(() => {
         dndCallbacks.onDragEnd({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
           over: null,
         } as DragEndEvent)
       })
@@ -594,19 +608,20 @@ describe('EditorContent', () => {
         })
       })
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
 
       // Try to drag non-existent block
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'invalid-block' } as any,
+          active: { id: 'invalid-block' },
         } as DragStartEvent)
       })
 
       act(() => {
         dndCallbacks.onDragEnd({
-          active: { id: 'invalid-block' } as any,
-          over: { id: 'block1' } as any,
+          active: { id: 'invalid-block' },
+          over: { id: 'block1' },
         } as DragEndEvent)
       })
 
@@ -644,12 +659,13 @@ describe('EditorContent', () => {
 
       expect(hookEnabled).toBe(true)
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dndCallbacks = (global as any).__dndCallbacks
 
       // Start drag
       act(() => {
         dndCallbacks.onDragStart({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
         } as DragStartEvent)
       })
 
@@ -659,7 +675,7 @@ describe('EditorContent', () => {
       // End drag
       act(() => {
         dndCallbacks.onDragEnd({
-          active: { id: 'block1' } as any,
+          active: { id: 'block1' },
           over: null,
         } as DragEndEvent)
       })
@@ -752,6 +768,7 @@ describe('EditorContent', () => {
       const { useDismiss } = jest.requireMock('../../../hooks') as { useDismiss: jest.Mock }
       useDismiss.mockImplementation((_ref: React.RefObject<HTMLElement>, { onDismiss }: { onDismiss: () => void }) => {
         // Store the callback for testing
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(global as any).__dismissCallback = onDismiss
       })
 
@@ -773,6 +790,7 @@ describe('EditorContent', () => {
       })
 
       // Trigger dismiss callback
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const dismissCallback = (global as any).__dismissCallback
       act(() => {
         dismissCallback()
@@ -811,7 +829,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 5,
-          } as any,
+            selectedText: 'Test ',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -861,7 +882,7 @@ describe('EditorContent', () => {
         createMockBlock({ id: 'block3', content: 'Last block content' }),
       ]
 
-      const { container, store } = renderWithEditor(<EditorContent />)
+      const { store } = renderWithEditor(<EditorContent />)
 
       act(() => {
         store.dispatch({
@@ -889,8 +910,8 @@ describe('EditorContent', () => {
         addRange: jest.fn(),
         rangeCount: 0,
       }
-      jest.spyOn(document, 'createRange').mockReturnValue(mockRange as any)
-      jest.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any)
+      jest.spyOn(document, 'createRange').mockReturnValue(mockRange as unknown as Range)
+      jest.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as Selection)
 
       // Get position below all blocks
       const editorContent = screen.getByRole('document')
@@ -928,8 +949,10 @@ describe('EditorContent', () => {
       const { store } = renderWithEditor(<EditorContent />)
 
       // Mock the onSelectionChange callback
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let selectionChangeCallback: ((selection: any) => void) | undefined
       const { useCrossBlockSelection } = jest.requireMock('../../../hooks') as { useCrossBlockSelection: jest.Mock }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       useCrossBlockSelection.mockImplementation(({ onSelectionChange }: { onSelectionChange?: (selection: any) => void }) => {
         selectionChangeCallback = onSelectionChange
         return {
@@ -1099,7 +1122,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 5,
-          } as any,
+            selectedText: 'Test ',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1133,7 +1159,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 5,
-          } as any,
+            selectedText: 'Test ',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1307,7 +1336,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 5,
-          } as any,
+            selectedText: 'Test ',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1446,7 +1478,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 5,
-          } as any,
+            selectedText: 'Test ',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1482,7 +1517,10 @@ describe('EditorContent', () => {
             endBlockId: 'block2',
             startOffset: 0,
             endOffset: 12,
-          } as any,
+            selectedText: 'Test content',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1520,7 +1558,10 @@ describe('EditorContent', () => {
             endBlockId: 'block2',
             startOffset: 0,
             endOffset: 9,
-          } as any,
+            selectedText: 'Heading\nParagraph',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1553,7 +1594,10 @@ describe('EditorContent', () => {
             endBlockId: 'block2',
             startOffset: 0,
             endOffset: 4,
-          } as any,
+            selectedText: 'Test',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1564,8 +1608,8 @@ describe('EditorContent', () => {
       expect(mockClipboardData.setData).toHaveBeenCalledWith('application/x-kairos-blocks', expect.any(String))
       const kairosData = JSON.parse(mockClipboardData.setData.mock.calls.find((call) => call[0] === 'application/x-kairos-blocks')?.[1] || '[]')
       expect(kairosData).toEqual([
-        { type: 'h2', content: 'Header', isEmpty: false } as any,
-        { type: 'bullet', content: 'Item', isEmpty: false } as any,
+        { type: 'h2', content: 'Header', isEmpty: false },
+        { type: 'bullet', content: 'Item', isEmpty: false },
       ])
     })
 
@@ -1590,7 +1634,10 @@ describe('EditorContent', () => {
             endBlockId: 'block2',
             startOffset: 2,
             endOffset: 10,
-          } as any,
+            selectedText: 'st contentMid block',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1601,8 +1648,8 @@ describe('EditorContent', () => {
       expect(mockClipboardData.setData).toHaveBeenCalledWith('application/x-kairos-blocks', expect.any(String))
       const kairosData = JSON.parse(mockClipboardData.setData.mock.calls.find((call) => call[0] === 'application/x-kairos-blocks')?.[1] || '[]')
       expect(kairosData).toEqual([
-        { type: 'paragraph', content: 'llo World', isEmpty: false } as any,
-        { type: 'paragraph', content: 'Goodbye Wo', isEmpty: false } as any,
+        { type: 'paragraph', content: 'llo World', isEmpty: false },
+        { type: 'paragraph', content: 'Goodbye Wo', isEmpty: false },
       ])
     })
 
@@ -1627,7 +1674,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 10,
-          } as any,
+            selectedText: 'Test conte',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1665,7 +1715,10 @@ describe('EditorContent', () => {
             endBlockId: 'block3',
             startOffset: 0,
             endOffset: 5,
-          } as any,
+            selectedText: 'Test content\nMid block\nThird',
+            selectedBlocks: ['block2'],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1676,9 +1729,9 @@ describe('EditorContent', () => {
       expect(mockClipboardData.setData).toHaveBeenCalledWith('application/x-kairos-blocks', expect.any(String))
       const kairosData = JSON.parse(mockClipboardData.setData.mock.calls.find((call) => call[0] === 'application/x-kairos-blocks')?.[1] || '[]')
       expect(kairosData).toEqual([
-        { type: 'paragraph', content: 'First', isEmpty: false } as any,
-        { type: 'paragraph', content: '', isEmpty: true } as any,
-        { type: 'paragraph', content: 'Third', isEmpty: false } as any,
+        { type: 'paragraph', content: 'First', isEmpty: false },
+        { type: 'paragraph', content: '', isEmpty: true },
+        { type: 'paragraph', content: 'Third', isEmpty: false },
       ])
     })
 
@@ -1725,7 +1778,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 4,
-          } as any,
+            selectedText: 'Test',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1759,7 +1815,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 0,
             endOffset: 4,
-          } as any,
+            selectedText: 'Test',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1803,7 +1862,10 @@ describe('EditorContent', () => {
             endBlockId: 'block1',
             startOffset: 2,
             endOffset: 8,
-          } as any,
+            selectedText: 'ext is',
+            selectedBlocks: [],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1839,7 +1901,10 @@ describe('EditorContent', () => {
             endBlockId: 'block3',
             startOffset: 0,
             endOffset: 4,
-          } as any,
+            selectedText: 'Test content\nSecond block\nThir',
+            selectedBlocks: ['block2'],
+            isCollapsed: false,
+          },
         })
       })
 
@@ -1849,7 +1914,7 @@ describe('EditorContent', () => {
 
       expect(mockClipboardData.setData).toHaveBeenCalledWith('application/x-kairos-blocks', expect.any(String))
       const kairosData = JSON.parse(mockClipboardData.setData.mock.calls.find((call) => call[0] === 'application/x-kairos-blocks')?.[1] || '[]')
-      expect(kairosData.map((b: any) => b.type)).toEqual(['h1', 'h2', 'bullet'])
+      expect(kairosData.map((b: { type: string }) => b.type)).toEqual(['h1', 'h2', 'bullet'])
     })
   })
 })
