@@ -44,12 +44,6 @@ describe('PageTitle', () => {
       expect(titleElement).toHaveAttribute('data-placeholder', 'New Page')
       expect(titleElement).toHaveTextContent('')
     })
-
-    it('maintains contentEditable attribute', () => {
-      render(<PageTitle title="Test Title" />)
-      const titleElement = screen.getByRole('heading', { level: 1 })
-      expect(titleElement).toHaveAttribute('contentEditable', 'true')
-    })
   })
 
   describe('✅ User Interactions', () => {

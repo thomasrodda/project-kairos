@@ -132,7 +132,7 @@ export function parseSvgContent(svgContent: string, iconName: IconName): SVGElem
 }
 
 /**
- * Clean SVG element for inline use
+ * Clean SVG element for inline use with security sanitization
  */
 function cleanSvgElement(svgElement: SVGElement): SVGElement {
   const cleaned = svgElement.cloneNode(true) as SVGElement
@@ -150,7 +150,98 @@ function cleanSvgElement(svgElement: SVGElement): SVGElement {
     cleaned.setAttribute('viewBox', '0 0 24 24')
   }
 
+  // Security: Remove dangerous elements and attributes
+  sanitizeSvgElement(cleaned)
+
   return cleaned
+}
+
+/**
+ * Sanitize SVG element to prevent XSS attacks
+ */
+function sanitizeSvgElement(element: Element): void {
+  // Dangerous elements that should be removed
+  const dangerousElements = ['script', 'iframe', 'object', 'embed', 'link', 'style', 'meta']
+
+  // Dangerous attributes that can execute code
+  const dangerousAttributes = [
+    'onload',
+    'onerror',
+    'onclick',
+    'onmouseover',
+    'onmouseout',
+    'onmousemove',
+    'onmouseenter',
+    'onmouseleave',
+    'onfocus',
+    'onblur',
+    'onchange',
+    'onsubmit',
+    'onkeydown',
+    'onkeyup',
+    'onkeypress',
+    'onresize',
+    'onscroll',
+    'oninput',
+    'href',
+    'xlink:href',
+    'from',
+    'to',
+    'values',
+  ]
+
+  // Remove dangerous elements
+  dangerousElements.forEach((tagName) => {
+    const elements = element.getElementsByTagName(tagName)
+    while (elements.length > 0) {
+      elements[0].remove()
+    }
+  })
+
+  // Recursively clean all elements
+  const allElements = element.getElementsByTagName('*')
+  for (let i = allElements.length - 1; i >= 0; i--) {
+    const el = allElements[i]
+
+    // Remove event handler attributes
+    Array.from(el.attributes).forEach((attr) => {
+      if (dangerousAttributes.includes(attr.name.toLowerCase()) || attr.name.toLowerCase().startsWith('on')) {
+        el.removeAttribute(attr.name)
+      }
+
+      // Check for javascript: URLs in any attribute
+      if (attr.value && attr.value.toLowerCase().includes('javascript:')) {
+        el.removeAttribute(attr.name)
+      }
+    })
+
+    // Remove external references in use elements
+    if (el.tagName.toLowerCase() === 'use') {
+      const href = el.getAttribute('href') || el.getAttribute('xlink:href')
+      if (href && (href.startsWith('http') || href.startsWith('//') || href.includes('../'))) {
+        el.remove()
+      }
+    }
+
+    // Remove foreignObject elements (can contain HTML)
+    if (el.tagName.toLowerCase() === 'foreignobject') {
+      el.remove()
+    }
+  }
+
+  // Remove any text content that looks like a script
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null)
+
+  const nodesToRemove: Text[] = []
+  let node
+  while ((node = walker.nextNode())) {
+    const text = node as Text
+    if (text.textContent && text.textContent.includes('<script')) {
+      nodesToRemove.push(text)
+    }
+  }
+
+  nodesToRemove.forEach((node) => node.remove())
 }
 
 /**
@@ -165,6 +256,9 @@ export function svgElementToProps(svgElement: SVGElement): Record<string, unknow
 
     if (propName === 'class') {
       propName = 'className'
+    } else if (propName.startsWith('aria-') || propName.startsWith('data-')) {
+      // ARIA and data attributes should keep their hyphens in React
+      propName = attr.name
     } else if (propName.includes('-')) {
       propName = propName.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())
     }

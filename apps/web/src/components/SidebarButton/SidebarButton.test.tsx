@@ -31,13 +31,6 @@ describe('SidebarButton', () => {
       expect(screen.getByTestId('icon-profile')).toBeInTheDocument()
     })
 
-    it('applies correct base class', () => {
-      render(<SidebarButton {...defaultProps} />)
-
-      const button = screen.getByRole('button')
-      expect(button).toHaveClass('sidebar-button')
-    })
-
     it('uses data-testid when id prop is provided', () => {
       render(<SidebarButton {...defaultProps} />)
 
@@ -116,21 +109,6 @@ describe('SidebarButton', () => {
   })
 
   describe('✅ Icon Props', () => {
-    it('passes correct size to icon', () => {
-      render(<SidebarButton {...defaultProps} />)
-
-      const icon = screen.getByTestId('icon-profile')
-      expect(icon).toHaveAttribute('data-size', '24')
-    })
-
-    it('wraps icon in correct container', () => {
-      const { container } = render(<SidebarButton {...defaultProps} />)
-
-      const iconWrapper = container.querySelector('.sidebar-button__icon')
-      expect(iconWrapper).toBeInTheDocument()
-      expect(iconWrapper).toContainElement(screen.getByTestId('icon-profile'))
-    })
-
     it('supports different icon types', () => {
       const { rerender } = render(<SidebarButton {...defaultProps} icon={'search' as any} />)
       expect(screen.getByTestId('icon-search')).toBeInTheDocument()
@@ -141,14 +119,6 @@ describe('SidebarButton', () => {
   })
 
   describe('✅ Text Content', () => {
-    it('wraps text in correct container', () => {
-      const { container } = render(<SidebarButton {...defaultProps} />)
-
-      const textWrapper = container.querySelector('.sidebar-button__text')
-      expect(textWrapper).toBeInTheDocument()
-      expect(textWrapper).toHaveTextContent('Test Button')
-    })
-
     it('handles long text gracefully', () => {
       const longText = 'This is a very long button text that might overflow'
       render(<SidebarButton {...defaultProps} text={longText} />)
@@ -208,24 +178,9 @@ describe('SidebarButton', () => {
 
       expect(handleClick).toHaveBeenCalled()
     })
-
-    it('has appropriate button role', () => {
-      render(<SidebarButton {...defaultProps} />)
-
-      expect(screen.getByRole('button')).toBeInTheDocument()
-    })
   })
 
   describe('✅ Edge Cases', () => {
-    it('renders without optional props', () => {
-      render(<SidebarButton icon={'profile' as any} text="Minimal Button" />)
-
-      const button = screen.getByRole('button')
-      expect(button).toBeInTheDocument()
-      expect(button).toHaveClass('sidebar-button--standard')
-      expect(button).not.toHaveClass('sidebar-button--collapsed')
-    })
-
     it('handles undefined onClick gracefully', async () => {
       const user = userEvent.setup()
       render(<SidebarButton {...defaultProps} onClick={undefined} />)

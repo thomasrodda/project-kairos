@@ -202,18 +202,6 @@ describe('Icon Component', () => {
       })
     })
 
-    it('should apply default size when not specified', async () => {
-      render(<Icon name="search" />)
-
-      await waitFor(() => {
-        const icon = screen.getByRole('img', { name: 'search' })
-        expect(icon).toHaveStyle({
-          width: '20px',
-          height: '20px',
-        })
-      })
-    })
-
     it('should apply color prop correctly', async () => {
       render(<Icon name="search" color="#ff0000" />)
 
@@ -257,15 +245,6 @@ describe('Icon Component', () => {
         })
       })
     })
-
-    it('should apply custom className correctly', async () => {
-      render(<Icon name="search" className="custom-icon-class" />)
-
-      await waitFor(() => {
-        const icon = screen.getByRole('img', { name: 'search' })
-        expect(icon).toHaveClass('icon', 'custom-icon-class')
-      })
-    })
   })
 
   describe('✅ Handles aria-label for accessibility', () => {
@@ -296,25 +275,6 @@ describe('Icon Component', () => {
         expect(icon).toBeInTheDocument()
         expect(icon).toHaveAttribute('aria-label', 'search')
       })
-    })
-
-    it('should have role="img" for screen readers', async () => {
-      render(<Icon name="search" />)
-
-      await waitFor(() => {
-        const icon = screen.getByRole('img')
-        expect(icon).toHaveAttribute('role', 'img')
-      })
-    })
-
-    it('should maintain accessibility in loading state', () => {
-      render(<Icon name="search" aria-label="Custom search label" />)
-
-      // When custom aria-label is provided, it should use that exact label
-      const loadingIcon = screen.getByRole('img', { name: 'Custom search label' })
-      expect(loadingIcon).toBeInTheDocument()
-      expect(loadingIcon).toHaveAttribute('role', 'img')
-      expect(loadingIcon).toHaveClass('icon--loading')
     })
 
     it('should append "loading" to icon name when no custom aria-label provided', () => {

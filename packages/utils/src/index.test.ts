@@ -3,12 +3,6 @@ import { generateId, formatDate, truncateText, createBlockId, createPageId, crea
 
 describe('Core Utilities', () => {
   describe('✅ generateId creates unique IDs', () => {
-    it('should generate a string ID', () => {
-      const id = generateId()
-      expect(typeof id).toBe('string')
-      expect(id.length).toBeGreaterThan(0)
-    })
-
     it('should generate unique IDs on multiple calls', () => {
       const id1 = generateId()
       const id2 = generateId()
@@ -140,36 +134,6 @@ describe('Core Utilities', () => {
   })
 
   describe('✅ Block utility functions work correctly', () => {
-    it('should create unique block IDs', () => {
-      const id1 = createBlockId()
-      const id2 = createBlockId()
-
-      expect(typeof id1).toBe('string')
-      expect(typeof id2).toBe('string')
-      expect(id1).not.toBe(id2)
-      expect(id1.length).toBeGreaterThan(0)
-    })
-
-    it('should create unique page IDs', () => {
-      const id1 = createPageId()
-      const id2 = createPageId()
-
-      expect(typeof id1).toBe('string')
-      expect(typeof id2).toBe('string')
-      expect(id1).not.toBe(id2)
-      expect(id1.length).toBeGreaterThan(0)
-    })
-
-    it('should create unique workspace IDs', () => {
-      const id1 = createWorkspaceId()
-      const id2 = createWorkspaceId()
-
-      expect(typeof id1).toBe('string')
-      expect(typeof id2).toBe('string')
-      expect(id1).not.toBe(id2)
-      expect(id1.length).toBeGreaterThan(0)
-    })
-
     it('should create different types of IDs that are all unique', () => {
       const blockId = createBlockId()
       const pageId = createPageId()

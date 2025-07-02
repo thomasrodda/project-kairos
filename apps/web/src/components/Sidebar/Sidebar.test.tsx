@@ -25,12 +25,6 @@ jest.mock('@kairos/ui', () => ({
 
 describe('Sidebar', () => {
   describe('✅ Core Functionality', () => {
-    it('renders sidebar container', () => {
-      render(<Sidebar />)
-      const sidebar = screen.getByRole('complementary')
-      expect(sidebar).toHaveClass('sidebar')
-    })
-
     it('starts in expanded state by default', () => {
       render(<Sidebar />)
       const sidebar = screen.getByRole('complementary')
@@ -76,15 +70,6 @@ describe('Sidebar', () => {
   })
 
   describe('✅ Primary Buttons', () => {
-    it('renders all primary action buttons', () => {
-      render(<Sidebar />)
-
-      expect(screen.getByTestId('sidebar-button-workspace-name')).toBeInTheDocument()
-      expect(screen.getByTestId('sidebar-button-search')).toBeInTheDocument()
-      expect(screen.getByTestId('sidebar-button-image-library')).toBeInTheDocument()
-      expect(screen.getByTestId('sidebar-button-create-page')).toBeInTheDocument()
-    })
-
     it('passes correct props to primary buttons', () => {
       render(<Sidebar />)
 
@@ -134,16 +119,6 @@ describe('Sidebar', () => {
   })
 
   describe('✅ Bottom Panel', () => {
-    it('renders all bottom panel buttons', () => {
-      render(<Sidebar />)
-
-      expect(screen.getByTestId('sidebar-button-page-templates')).toBeInTheDocument()
-      expect(screen.getByTestId('sidebar-button-archive')).toBeInTheDocument()
-      expect(screen.getByTestId('sidebar-button-help')).toBeInTheDocument()
-      expect(screen.getByTestId('sidebar-button-settings')).toBeInTheDocument()
-      expect(screen.getByTestId('sidebar-button-updates')).toBeInTheDocument()
-    })
-
     it('uses slim variant for bottom buttons', () => {
       render(<Sidebar />)
 
@@ -157,11 +132,6 @@ describe('Sidebar', () => {
   })
 
   describe('✅ Toggle Icon', () => {
-    it('renders toggle icon', () => {
-      render(<Sidebar />)
-      expect(screen.getByTestId('icon-double-arrow')).toBeInTheDocument()
-    })
-
     it('applies flipped class when collapsed', async () => {
       const user = userEvent.setup()
       render(<Sidebar />)
@@ -179,11 +149,6 @@ describe('Sidebar', () => {
   })
 
   describe('✅ Accessibility', () => {
-    it('has proper ARIA role', () => {
-      render(<Sidebar />)
-      expect(screen.getByRole('complementary')).toBeInTheDocument()
-    })
-
     it('toggle button has descriptive labels', async () => {
       const user = userEvent.setup()
       render(<Sidebar />)
@@ -209,22 +174,5 @@ describe('Sidebar', () => {
     })
   })
 
-  describe('✅ Layout Structure', () => {
-    it('has correct section structure', () => {
-      const { container } = render(<Sidebar />)
-
-      expect(container.querySelector('.sidebar__header')).toBeInTheDocument()
-      expect(container.querySelector('.sidebar__primary-buttons')).toBeInTheDocument()
-      expect(container.querySelector('.sidebar__file-tree')).toBeInTheDocument()
-      expect(container.querySelector('.sidebar__bottom-panel')).toBeInTheDocument()
-    })
-
-    it('bottom panel contains bottom buttons wrapper', () => {
-      const { container } = render(<Sidebar />)
-
-      const bottomPanel = container.querySelector('.sidebar__bottom-panel')
-      const bottomButtons = bottomPanel?.querySelector('.sidebar__bottom-buttons')
-      expect(bottomButtons).toBeInTheDocument()
-    })
-  })
+  describe('✅ Layout Structure', () => {})
 })

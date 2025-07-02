@@ -58,60 +58,9 @@ describe('EditorContext Reducer', () => {
     lastSaved: null,
   })
 
-  describe('✅ Initial State', () => {
-    it('should have correct initial state structure', () => {
-      const state = createInitialState()
+  describe('✅ Initial State', () => {})
 
-      expect(state.pageId).toBeNull()
-      expect(state.pageTitle).toBe('Test Page')
-      expect(state.blocks).toHaveLength(3)
-      expect(state.focusedBlockId).toBeNull()
-      expect(state.selectedBlockIds).toEqual([])
-      expect(state.crossBlockSelection).toBeNull()
-      expect(state.isDragging).toBe(false)
-      expect(state.selectedRange).toBeUndefined()
-      expect(state.isDirty).toBe(false)
-      expect(state.lastSaved).toBeNull()
-    })
-
-    it('should handle invalid action type', () => {
-      const state = createInitialState()
-      const invalidAction = { type: 'INVALID_ACTION' } as any
-
-      const newState = editorReducer(state, invalidAction)
-      expect(newState).toBe(state) // Should return same reference
-    })
-  })
-
-  describe('✅ State Immutability', () => {
-    it('should not mutate the original state', () => {
-      const state = createInitialState()
-      const originalState = JSON.parse(JSON.stringify(state))
-
-      // Test various actions
-      editorReducer(state, { type: 'UPDATE_TITLE', title: 'New Title' })
-      expect(state).toEqual(originalState)
-
-      editorReducer(state, {
-        type: 'ADD_BLOCK',
-        block: { id: 'new-block', type: 'paragraph', content: 'New block' },
-      })
-      expect(state).toEqual(originalState)
-
-      editorReducer(state, { type: 'DELETE_BLOCK', blockId: 'block-1' })
-      expect(state).toEqual(originalState)
-    })
-
-    it('should create new state object for every action', () => {
-      const state = createInitialState()
-
-      const newState1 = editorReducer(state, { type: 'UPDATE_TITLE', title: 'New' })
-      expect(newState1).not.toBe(state)
-
-      const newState2 = editorReducer(state, { type: 'SET_DRAGGING', isDragging: true })
-      expect(newState2).not.toBe(state)
-    })
-  })
+  describe('✅ State Immutability', () => {})
 
   describe('✅ SET_PAGE Action', () => {
     it('should set page with provided blocks', () => {

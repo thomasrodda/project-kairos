@@ -206,6 +206,8 @@ apps
 │   │   │   └── reset.scss
 │   │   └── index.scss
 │   ├── test
+│   │   ├── mocks
+│   │   │   └── dnd-kit.tsx
 │   │   ├── setup.ts
 │   │   └── utils.tsx
 │   ├── utils
@@ -216,7 +218,6 @@ apps
 │   │   ├── textFormatting.ts
 │   │   ├── textSelection.test.ts
 │   │   └── textSelection.ts
-│   ├── App.test.tsx
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── vite-env.d.ts

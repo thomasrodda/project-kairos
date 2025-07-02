@@ -12,12 +12,12 @@
 // Props: None (self-contained component)
 // State: isExpanded (boolean) - controls sidebar collapse/expand
 
-import { useState } from 'react'
+import { useState, forwardRef } from 'react'
 import { SidebarButton } from '../SidebarButton'
 import { Icon } from '@kairos/ui'
 import './Sidebar.scss'
 
-export function Sidebar() {
+export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
   // Component state - manages sidebar collapse/expand
 
   const [isExpanded, setIsExpanded] = useState(true)
@@ -51,7 +51,7 @@ export function Sidebar() {
   // Render component
 
   return (
-    <aside className={`sidebar ${isExpanded ? '' : 'sidebar--collapsed'}`}>
+    <aside ref={ref} className={`sidebar ${isExpanded ? '' : 'sidebar--collapsed'}`} tabIndex={-1} aria-label="Navigation sidebar">
       {/* Header section - Logo and collapse/expand toggle */}
       <div className="sidebar__header">
         {/* Logo - only visible when expanded */}
@@ -93,4 +93,6 @@ export function Sidebar() {
       </div>
     </aside>
   )
-}
+})
+
+Sidebar.displayName = 'Sidebar'

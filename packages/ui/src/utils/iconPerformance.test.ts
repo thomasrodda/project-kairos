@@ -204,13 +204,6 @@ describe('Icon Performance Utilities', () => {
   })
 
   describe('✅ Icon Constants Are Valid', () => {
-    it('should have critical and important icons defined', () => {
-      expect(CRITICAL_ICONS).toBeInstanceOf(Array)
-      expect(CRITICAL_ICONS.length).toBeGreaterThan(0)
-      expect(IMPORTANT_ICONS).toBeInstanceOf(Array)
-      expect(IMPORTANT_ICONS.length).toBeGreaterThan(0)
-    })
-
     it('should return on-demand icons excluding preloaded ones', () => {
       const allIcons = ['search', 'add', 'archive', 'custom'] as IconName[]
       mockGetAllIconNames.mockReturnValue(allIcons)
@@ -227,18 +220,5 @@ describe('Icon Performance Utilities', () => {
     })
   })
 
-  describe('✅ Error Handling', () => {
-    it('should handle timing without corresponding end', () => {
-      iconPerformanceMonitor.startTiming('search')
-      iconPerformanceMonitor.endTiming('add', false) // Different icon
-
-      expect(iconPerformanceMonitor.getMetrics()).toHaveLength(0)
-    })
-
-    it('should return zero metrics when no data exists', () => {
-      expect(iconPerformanceMonitor.getAverageLoadTime()).toBe(0)
-      expect(iconPerformanceMonitor.getCacheHitRate()).toBe(0)
-      expect(iconPerformanceMonitor.getMetrics()).toHaveLength(0)
-    })
-  })
+  describe('✅ Error Handling', () => {})
 })

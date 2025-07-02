@@ -3,15 +3,18 @@
 // Provides the layout wrapper for the EditorContent where all blocks are rendered.
 // In the future, this may also contain toolbars or other editor UI elements.
 
+import { forwardRef } from 'react'
 import { EditorContent } from './EditorContent'
 import './Editor.scss'
 
-export function Editor() {
+export const Editor = forwardRef<HTMLElement>((props, ref) => {
   return (
-    <main className="editor">
+    <main ref={ref} className="editor" tabIndex={-1}>
       <div className="editor__content">
         <EditorContent />
       </div>
     </main>
   )
-}
+})
+
+Editor.displayName = 'Editor'

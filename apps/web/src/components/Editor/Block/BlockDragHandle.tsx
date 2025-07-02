@@ -45,6 +45,7 @@ export function BlockDragHandle({ blockId, onSelect, dragHandleProps }: BlockDra
       tabIndex={0}
       aria-label="Drag to reorder block, or click to select. Use Shift+click to select multiple blocks."
       title="Drag to reorder • Click to select • Shift+click for multi-select"
+      data-testid={`drag-handle-${blockId}`}
     >
       <Icon name="grab" size={16} />
     </div>
