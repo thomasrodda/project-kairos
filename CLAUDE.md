@@ -231,6 +231,8 @@ For detailed status, see [# Current State.md](AI System Prompt Files/# Current S
 ### Testing Guidelines
 
 - Use checkmark headings format (✅ Core Functionality)
+- Write tests so that they correctly test the app, and not just so they pass
+- Write tests using modern 2025 best practices
 - Test user behavior, not implementation details
 - Include edge cases and error scenarios
 - Mock external dependencies appropriately

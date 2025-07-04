@@ -1,6 +1,6 @@
 # Current State
 
-> Last Updated: January 14, 2025
+> Last Updated: January 16, 2025
 > This document tracks the current state of Project Kairos, including what's built, what's in progress, and immediate next steps.
 >
 > **Update this document when:**
@@ -51,48 +51,44 @@
 - **Test coverage**:
   - PageTitle (17/17) ✅
   - Block (25/25) ✅
-  - BlockDragHandle (25/25) ✅
+  - BlockDragHandle (25/25) ✅ - Rewritten to test real behavior
   - ContentEditableContainer (37/37) ✅
   - SlashCommandMenu (22/22) ✅
-  - EditorContent (58/58) ✅
+  - EditorContent (56/56) ✅ - @dnd-kit mocks removed
   - EditorContext (41/41) ✅
-  - useCrossBlockSelection (23/23) ✅
+  - useCrossBlockSelection (18/18) ✅ - Complete rewrite with real Selection API
   - useDismiss (13/13) ✅
   - textSelection utilities (36/36) ✅
   - textFormatting utilities (41/41) ✅
   - FormattingToolbar (7/7) ✅
+  - SidebarButton (19/19) ✅ - CSS tests replaced with behavior tests
+  - Workspace (14/21 passing) - Mocks and CSS tests removed
+  - Editor (10/10) ✅ - All skipped tests enabled
+  - Editor.performance (11/11) ✅ - All tests now verify functionality
 - **Performance tests**: Implemented for large document handling
+- **Test quality**: Average score improved to 19.1/20 (from 15.4/20)
 
 ## 🔄 Currently In Progress
 
-### Formatting Toolbar ✅ (Fully Implemented)
+### Test Quality Improvements 🔄 (Major Progress)
 
-- **UI Complete**: Toolbar appears after mouse release when text is selected
-- **Position Calculation**: Dynamic positioning above selection with boundary constraints
-- **Buttons Added**: Bold, italic, underline, and link buttons with icons
-- **Tests Written**: Basic component tests passing (7 tests)
-- **UX Improvements**:
-  - Only shows after selection is complete (not during drag)
-  - Maintains visibility when selection exists
-  - Prevents toolbar from obscuring text during selection
-  - Toolbar stays open and selection preserved after formatting
-  - No flickering or position jumping during formatting operations
-- **Formatting Working**:
-  - Toggle formatting on/off with buttons
-  - Active state detection shows which formats are applied
-  - Link creation/removal with URL prompt
-  - Proper selection restoration after DOM changes
-  - CSS styles for all format types
-- **Architecture**: Implemented formatting layer separate from content
-  - Plain text stored in blocks
-  - TextFormat array tracks formatting ranges
-  - FormattedText renderer handles display
+- **Completed Today (2025-07-04)**:
+  - ✅ SidebarButton.test.tsx - Removed CSS class tests, focus on behavior
+  - ✅ Workspace.test.tsx - Removed mocks and CSS property tests
+  - ✅ EditorContent.test.tsx - Removed @dnd-kit mocks, uses real components
+  - ✅ Updated Testing Todo List and Test Review Checklist documentation
+- **Test Quality Metrics**:
+  - 29 test files rated "Good" or "Excellent"
+  - Only 2 files still need improvement
+  - Average quality score: 19.1/20
+  - Eliminated common anti-patterns: CSS testing, over-mocking, implementation details
 
-### Component Testing 🔄
+### Next Priority: Block-Level Markdown
 
-- **Editor**: Integration tests for the complete editor component
-- **Sidebar & SidebarButton**: Basic component tests
-- **Workspace**: Layout and interaction tests
+- Auto-convert "# " to H1 block type
+- Auto-convert "## " to H2 block type
+- Auto-convert "- " to bullet list
+- Markdown paste detection
 
 ### Known Issues 🐛
 
@@ -123,13 +119,7 @@ Based on Development Plan and current progress:
    - ✅ Hides markdown symbols from display
    - ✅ Maintains cursor position after conversion
 
-3. **Complete Remaining Component Tests**
-
-   - Editor integration tests
-   - Sidebar & SidebarButton tests
-   - Workspace tests
-
-4. **Block-Level Markdown Support**
+3. **Block-Level Markdown Support** (Next Priority)
    - Auto-convert "# " to H1 block type
    - Auto-convert "## " to H2 block type
    - Auto-convert "- " to bullet list
@@ -159,18 +149,22 @@ Based on Development Plan and current progress:
 
 ### Test Coverage
 
-- **Core Components**: 312 tests total ✅
+- **Core Components**: 350+ tests total ✅
   - PageTitle: 17 tests
   - Block: 25 tests
-  - BlockDragHandle: 25 tests
+  - BlockDragHandle: 25 tests (rewritten)
   - ContentEditableContainer: 37 tests
   - SlashCommandMenu: 22 tests
-  - EditorContent: 58 tests
-  - FormattingToolbar: 7 tests ✅
+  - EditorContent: 56 tests (@dnd-kit mocks removed)
+  - FormattingToolbar: 7 tests
   - EditorContext: 41 tests
-  - Hooks & Utils: 72 tests
+  - Hooks & Utils: 67 tests (useCrossBlockSelection rewritten)
   - Integration: 8 tests
-- **Remaining**: Editor, Sidebar, Workspace
+  - SidebarButton: 19 tests (CSS tests removed)
+  - Workspace: 21 tests (14 passing, mocks removed)
+  - Editor: 10 tests (skipped tests enabled)
+  - Performance: 11 tests (functionality verified)
+- **Test Quality**: Most tests now follow best practices
 
 ### Performance Benchmarks
 
@@ -180,13 +174,14 @@ Based on Development Plan and current progress:
 
 ## 🎯 Current Development Branch
 
-- **Active branch**: `Editor`
+- **Active branch**: `tests`
 - **Base branch**: `main`
 - **Recent commits**:
-  - feat: improve slash command menu focus and cancellation behavior
-  - feat: position slash command menu above the triggering block
-  - feat: fix click-in-empty-space to place cursor in last block
-  - test: add tests for slash command cancellation and cursor placement
+  - test: complete testing improvements for critical priority tests
+  - fix: resolve TypeScript errors in EditorContent tests
+  - fix: resolve TypeScript, ESLint errors and improve test stability
+  - docs: enhance testing documentation with modern best practices
+  - fix: resolve cursor jumping and backspace merge issues in editor
 
 ## 🔧 Environment Status
 
