@@ -1,6 +1,7 @@
 import { auth } from './firebase-admin'
 import { prisma } from '@kairos/database'
 import type { DecodedIdToken } from 'firebase-admin/auth'
+import { AuthenticationError, AppError, ErrorCode } from '../utils/errors'
 
 export class AuthService {
   /**
@@ -12,7 +13,7 @@ export class AuthService {
       return decodedToken
     } catch (error) {
       console.error('Error verifying token:', error)
-      throw new Error('Invalid authentication token')
+      throw new AuthenticationError('Invalid authentication token')
     }
   }
 
@@ -44,7 +45,7 @@ export class AuthService {
       return user
     } catch (error) {
       console.error('Error syncing user:', error)
-      throw new Error('Failed to sync user')
+      throw new AppError('Failed to sync user', ErrorCode.INTERNAL_ERROR, 500)
     }
   }
 

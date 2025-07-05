@@ -65,17 +65,46 @@ AI System Prompt Files
 apps
 ├── api
 │   ├── src
+│   │   ├── **tests**
+│   │   │   └── app.integration.test.ts
+│   │   ├── config
+│   │   │   └── security.config.ts
+│   │   ├── examples
+│   │   │   └── usage-example.ts
 │   │   ├── middleware
-│   │   │   └── auth.middleware.ts
+│   │   │   ├── auth.middleware.ts
+│   │   │   ├── errorHandler.ts
+│   │   │   ├── index.ts
+│   │   │   ├── requestLogger.ts
+│   │   │   └── security.ts
 │   │   ├── routes
+│   │   │   ├── **tests**
+│   │   │   │   ├── auth.test.ts
+│   │   │   │   ├── health.test.ts
+│   │   │   │   └── workspace.test.ts
 │   │   │   ├── auth.routes.ts
+│   │   │   ├── blocks.ts
+│   │   │   ├── pages.ts
 │   │   │   └── workspace.routes.ts
 │   │   ├── services
 │   │   │   ├── auth.service.ts
-│   │   │   └── firebase-admin.ts
+│   │   │   ├── blockService.ts
+│   │   │   ├── firebase-admin.ts
+│   │   │   └── pageService.ts
+│   │   ├── test
+│   │   │   ├── factories.ts
+│   │   │   ├── helpers.ts
+│   │   │   ├── setup.ts
+│   │   │   └── test-app.ts
 │   │   ├── types
 │   │   │   └── express.d.ts
+│   │   ├── utils
+│   │   │   ├── README.md
+│   │   │   ├── apiResponse.ts
+│   │   │   ├── errors.ts
+│   │   │   └── index.ts
 │   │   └── app.ts
+│   ├── SECURITY.md
 │   ├── dev-server.ts
 │   ├── hello.test.ts
 │   ├── hello.ts

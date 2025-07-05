@@ -7,6 +7,10 @@ declare global {
       user?: User
       decodedToken?: DecodedIdToken
     }
+
+    interface Locals {
+      requestId: string
+    }
   }
 }
 
