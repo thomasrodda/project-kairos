@@ -277,8 +277,6 @@ describe('EditorContent', () => {
     // with e2e tests using Cypress.
 
     it('renders drag and drop context structure', () => {
-      const blocks = [createMockBlock({ id: 'block1' })]
-
       renderWithEditor(<EditorContent />)
 
       // Real @dnd-kit components are rendered

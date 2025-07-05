@@ -84,10 +84,7 @@
   }
 
   // Focus indicators for keyboard navigation
-  *:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: -2px;
-  }
+  // Removed global focus outline that was causing purple borders on all elements
 
   // Responsive behavior
   @media (max-width: 768px) {
