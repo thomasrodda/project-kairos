@@ -64,6 +64,18 @@ AI System Prompt Files
 └── Troubleshooting Guide.md
 apps
 ├── api
+│   ├── src
+│   │   ├── middleware
+│   │   │   └── auth.middleware.ts
+│   │   ├── routes
+│   │   │   ├── auth.routes.ts
+│   │   │   └── workspace.routes.ts
+│   │   ├── services
+│   │   │   ├── auth.service.ts
+│   │   │   └── firebase-admin.ts
+│   │   ├── types
+│   │   │   └── express.d.ts
+│   │   └── app.ts
 │   ├── dev-server.ts
 │   ├── hello.test.ts
 │   ├── hello.ts
@@ -321,4 +333,8 @@ packages
 ├── package.json
 └── tsconfig.json
 prisma
+├── migrations
+│   ├── 20250705162218_init
+│   │   └── migration.sql
+│   └── migration_lock.toml
 └── schema.prisma

@@ -1,19 +1,12 @@
-import express from 'express'
-import cors from 'cors'
 import { createServer } from 'http'
-import hello from './hello'
+import { createApp } from './src/app'
+import dotenv from 'dotenv'
 
-const app = express()
+// Load environment variables
+dotenv.config({ path: '../../.env' })
+
+const app = createApp()
 const PORT = 3001
-
-app.use(cors())
-app.use(express.json())
-
-// Mount the hello function
-app.all('/api/hello', (req, res) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  hello(req as any, res as any)
-})
 
 const server = createServer(app)
 
