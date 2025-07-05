@@ -20,7 +20,7 @@ const updateWorkspaceSchema = z.object({
  * GET /api/workspaces
  * Get all workspaces for the authenticated user
  */
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, async (req, res): Promise<void> => {
   try {
     const workspaces = await prisma.workspace.findMany({
       where: { userId: req.user!.id },
@@ -33,9 +33,11 @@ router.get('/', requireAuth, async (req, res) => {
     })
 
     res.json({ workspaces })
+    return
   } catch (error) {
     console.error('Get workspaces error:', error)
     res.status(500).json({ error: 'Failed to fetch workspaces' })
+    return
   }
 })
 
@@ -43,7 +45,7 @@ router.get('/', requireAuth, async (req, res) => {
  * GET /api/workspaces/:id
  * Get a specific workspace
  */
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, async (req, res): Promise<void> => {
   try {
     const workspace = await prisma.workspace.findFirst({
       where: {
@@ -64,13 +66,16 @@ router.get('/:id', requireAuth, async (req, res) => {
     })
 
     if (!workspace) {
-      return res.status(404).json({ error: 'Workspace not found' })
+      res.status(404).json({ error: 'Workspace not found' })
+      return
     }
 
     res.json({ workspace })
+    return
   } catch (error) {
     console.error('Get workspace error:', error)
     res.status(500).json({ error: 'Failed to fetch workspace' })
+    return
   }
 })
 
@@ -78,7 +83,7 @@ router.get('/:id', requireAuth, async (req, res) => {
  * POST /api/workspaces
  * Create a new workspace
  */
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, async (req, res): Promise<void> => {
   try {
     const validatedData = createWorkspaceSchema.parse(req.body)
 
@@ -90,12 +95,15 @@ router.post('/', requireAuth, async (req, res) => {
     })
 
     res.status(201).json({ workspace })
+    return
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: 'Invalid input', details: error.errors })
+      res.status(400).json({ error: 'Invalid input', details: error.errors })
+      return
     }
     console.error('Create workspace error:', error)
     res.status(500).json({ error: 'Failed to create workspace' })
+    return
   }
 })
 
@@ -103,7 +111,7 @@ router.post('/', requireAuth, async (req, res) => {
  * PUT /api/workspaces/:id
  * Update a workspace
  */
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, async (req, res): Promise<void> => {
   try {
     const validatedData = updateWorkspaceSchema.parse(req.body)
 
@@ -116,7 +124,8 @@ router.put('/:id', requireAuth, async (req, res) => {
     })
 
     if (!existing) {
-      return res.status(404).json({ error: 'Workspace not found' })
+      res.status(404).json({ error: 'Workspace not found' })
+      return
     }
 
     const workspace = await prisma.workspace.update({
@@ -128,12 +137,15 @@ router.put('/:id', requireAuth, async (req, res) => {
     })
 
     res.json({ workspace })
+    return
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ error: 'Invalid input', details: error.errors })
+      res.status(400).json({ error: 'Invalid input', details: error.errors })
+      return
     }
     console.error('Update workspace error:', error)
     res.status(500).json({ error: 'Failed to update workspace' })
+    return
   }
 })
 
@@ -141,7 +153,7 @@ router.put('/:id', requireAuth, async (req, res) => {
  * DELETE /api/workspaces/:id
  * Delete a workspace and all its contents
  */
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res): Promise<void> => {
   try {
     // Check ownership
     const workspace = await prisma.workspace.findFirst({
@@ -152,7 +164,8 @@ router.delete('/:id', requireAuth, async (req, res) => {
     })
 
     if (!workspace) {
-      return res.status(404).json({ error: 'Workspace not found' })
+      res.status(404).json({ error: 'Workspace not found' })
+      return
     }
 
     // Delete workspace (cascades to pages and blocks)
@@ -161,9 +174,11 @@ router.delete('/:id', requireAuth, async (req, res) => {
     })
 
     res.status(204).send()
+    return
   } catch (error) {
     console.error('Delete workspace error:', error)
     res.status(500).json({ error: 'Failed to delete workspace' })
+    return
   }
 })
 

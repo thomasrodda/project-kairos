@@ -8,7 +8,7 @@ const router = Router()
  * POST /api/auth/verify
  * Verify a Firebase ID token
  */
-router.post('/verify', async (req, res) => {
+router.post('/verify', async (req, res): Promise<void> => {
   try {
     const authHeader = req.headers.authorization
 
@@ -25,8 +25,10 @@ router.post('/verify', async (req, res) => {
       uid: decodedToken.uid,
       email: decodedToken.email,
     })
+    return
   } catch (_error) {
     res.status(401).json({ valid: false, error: 'Invalid token' })
+    return
   }
 })
 
@@ -34,14 +36,16 @@ router.post('/verify', async (req, res) => {
  * POST /api/auth/sync-user
  * Sync a Firebase user to the database
  */
-router.post('/sync-user', requireAuth, async (req, res) => {
+router.post('/sync-user', requireAuth, async (req, res): Promise<void> => {
   try {
     // Use the authenticated user's UID
     const user = await AuthService.syncUser(req.user!.id)
     res.json({ user })
+    return
   } catch (error) {
     console.error('Sync user error:', error)
     res.status(500).json({ error: 'Failed to sync user' })
+    return
   }
 })
 
@@ -49,8 +53,9 @@ router.post('/sync-user', requireAuth, async (req, res) => {
  * GET /api/auth/me
  * Get current authenticated user
  */
-router.get('/me', requireAuth, async (req, res) => {
+router.get('/me', requireAuth, async (req, res): Promise<void> => {
   res.json({ user: req.user })
+  return
 })
 
 export default router

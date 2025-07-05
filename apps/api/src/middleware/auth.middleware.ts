@@ -4,12 +4,13 @@ import { AuthService } from '../services/auth.service'
 /**
  * Middleware to verify Firebase authentication
  */
-export async function requireAuth(req: Request, res: Response, next: NextFunction) {
+export async function requireAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const authHeader = req.headers.authorization
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' })
+      res.status(401).json({ error: 'Missing or invalid authorization header' })
+      return
     }
 
     const idToken = authHeader.split('Bearer ')[1]
@@ -27,14 +28,15 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     next()
   } catch (error) {
     console.error('Auth middleware error:', error)
-    return res.status(401).json({ error: 'Unauthorized' })
+    res.status(401).json({ error: 'Unauthorized' })
+    return
   }
 }
 
 /**
  * Optional auth middleware - doesn't fail if no token
  */
-export async function optionalAuth(req: Request, res: Response, next: NextFunction) {
+export async function optionalAuth(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const authHeader = req.headers.authorization
 
