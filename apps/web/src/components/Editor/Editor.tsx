@@ -5,6 +5,7 @@
 
 import { forwardRef } from 'react'
 import { EditorContent } from './EditorContent'
+import { SyncStatus } from './SyncStatus'
 import './Editor.scss'
 
 export const Editor = forwardRef<HTMLElement>((props, ref) => {
@@ -13,6 +14,7 @@ export const Editor = forwardRef<HTMLElement>((props, ref) => {
       <div className="editor__content">
         <EditorContent />
       </div>
+      <SyncStatus />
     </main>
   )
 })

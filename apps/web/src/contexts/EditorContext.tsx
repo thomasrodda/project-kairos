@@ -92,6 +92,7 @@ export type EditorAction =
   | { type: 'APPLY_FORMATTING'; blockId: string; format: FormatType; range: { start: number; end: number }; url?: string }
   | { type: 'REMOVE_FORMATTING'; blockId: string; start: number; end: number; formatType?: FormatType }
   | { type: 'UPDATE_BLOCK_FORMATTING'; blockId: string; formatting: TextFormat[] }
+  | { type: 'REPLACE_BLOCK'; oldBlockId: string; newBlock: EditorBlock }
   | { type: 'MARK_SAVED' }
   | { type: 'RESET_EDITOR' }
 
@@ -419,6 +420,24 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         // Clear block selection when text is selected
         selectedBlockIds: action.selection ? [] : state.selectedBlockIds,
       }
+
+    case 'REPLACE_BLOCK': {
+      const { oldBlockId, newBlock } = action
+      const newBlocks = state.blocks.map((block) => (block.id === oldBlockId ? newBlock : block))
+
+      // Update focused block if it was the replaced block
+      const newFocusedId = state.focusedBlockId === oldBlockId ? newBlock.id : state.focusedBlockId
+
+      // Update selected blocks if the old block was selected
+      const newSelectedIds = state.selectedBlockIds.map((id) => (id === oldBlockId ? newBlock.id : id))
+
+      return {
+        ...state,
+        blocks: newBlocks,
+        focusedBlockId: newFocusedId,
+        selectedBlockIds: newSelectedIds,
+      }
+    }
 
     case 'MARK_SAVED':
       return {

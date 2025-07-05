@@ -1,0 +1,67 @@
+@use '@kairos/design-tokens/styles' as *;
+
+.syncStatus {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  transition: all 200ms ease;
+  position: fixed;
+  bottom: var(--spacing-md);
+  right: var(--spacing-md);
+  background: var(--color-background);
+  box-shadow: var(--shadow-sm);
+  z-index: 1000;
+}
+
+.indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: background-color 200ms ease;
+}
+
+.text {
+  color: var(--color-text-secondary);
+}
+
+.saved {
+  .indicator {
+    background-color: var(--color-success);
+  }
+}
+
+.saving {
+  .indicator {
+    background-color: var(--color-warning);
+    animation: pulse 1s ease-in-out infinite;
+  }
+}
+
+.error {
+  .indicator {
+    background-color: var(--color-error);
+  }
+
+  .text {
+    color: var(--color-error);
+  }
+}
+
+.offline {
+  .indicator {
+    background-color: var(--color-text-tertiary);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

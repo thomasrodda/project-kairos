@@ -191,6 +191,14 @@ apps
 │   │   │   │   ├── EditorContent.test.tsx
 │   │   │   │   ├── EditorContent.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── EditorError
+│   │   │   │   ├── EditorError.module.scss
+│   │   │   │   ├── EditorError.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── EditorLoading
+│   │   │   │   ├── EditorLoading.module.scss
+│   │   │   │   ├── EditorLoading.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── FormattingToolbar
 │   │   │   │   ├── FormattingToolbar.scss
 │   │   │   │   ├── FormattingToolbar.test.tsx
@@ -207,6 +215,10 @@ apps
 │   │   │   │   ├── SlashCommandMenu.test.tsx
 │   │   │   │   ├── SlashCommandMenu.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── SyncStatus
+│   │   │   │   ├── SyncStatus.module.scss
+│   │   │   │   ├── SyncStatus.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── DebugFormatting.tsx
 │   │   │   ├── Editor.integration.test.tsx
 │   │   │   ├── Editor.performance.simple.test.tsx
@@ -214,6 +226,7 @@ apps
 │   │   │   ├── Editor.scss
 │   │   │   ├── Editor.test.tsx
 │   │   │   ├── Editor.tsx
+│   │   │   ├── EditorWithSync.tsx
 │   │   │   └── index.ts
 │   │   ├── PerformanceTest
 │   │   │   └── PerformanceTest.tsx
@@ -234,11 +247,15 @@ apps
 │   │   └── index.ts
 │   ├── contexts
 │   │   ├── EditorContext.test.tsx
-│   │   └── EditorContext.tsx
+│   │   ├── EditorContext.tsx
+│   │   └── EditorProvider.tsx
 │   ├── hooks
 │   │   ├── index.ts
+│   │   ├── useAuth.ts
+│   │   ├── useAutoSave.ts
 │   │   ├── useCrossBlockSelection.test.tsx
 │   │   ├── useCrossBlockSelection.ts
+│   │   ├── useDebounce.ts
 │   │   ├── useDismiss.test.ts
 │   │   └── useDismiss.ts
 │   ├── integration
@@ -255,6 +272,10 @@ apps
 │   │   ├── setup.ts
 │   │   └── utils.tsx
 │   ├── utils
+│   │   ├── api
+│   │   │   ├── client.ts
+│   │   │   └── types.ts
+│   │   ├── firebase.ts
 │   │   ├── formattingRenderer.tsx
 │   │   ├── markdownDetection.test.ts
 │   │   ├── markdownDetection.ts
@@ -262,8 +283,10 @@ apps
 │   │   ├── textFormatting.ts
 │   │   ├── textSelection.test.ts
 │   │   └── textSelection.ts
+│   ├── App.dev.tsx
 │   ├── App.tsx
 │   ├── main.tsx
+│   ├── test-api-connection.ts
 │   └── vite-env.d.ts
 ├── .eslintrc.json
 ├── index.html

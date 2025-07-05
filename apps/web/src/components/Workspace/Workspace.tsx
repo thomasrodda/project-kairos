@@ -14,7 +14,7 @@
 
 import { Component, ReactNode, useEffect, useRef } from 'react'
 import { Sidebar } from '../Sidebar'
-import { Editor } from '../Editor'
+import { EditorWithSync } from '../Editor/EditorWithSync'
 import './Workspace.scss'
 
 // Error boundary for individual panels
@@ -83,7 +83,6 @@ function ErrorFallback({ error, retry, component }: { error: Error; retry: () =>
 export function Workspace() {
   const workspaceRef = useRef<HTMLDivElement>(null)
   const sidebarRef = useRef<HTMLElement>(null)
-  const editorRef = useRef<HTMLElement>(null)
 
   // Handle keyboard shortcuts for panel switching
   useEffect(() => {
@@ -126,7 +125,7 @@ export function Workspace() {
           </main>
         )}
       >
-        <Editor ref={editorRef} aria-label="Document editor" />
+        <EditorWithSync />
       </ErrorBoundary>
     </div>
   )
