@@ -1,15 +1,14 @@
-// packages/design-tokens/src/layout.scss
+// packages/design-tokens/src/_helpers.scss
 // =============================================================================
-// PROJECT KAIROS DESIGN SYSTEM - LAYOUT
+// SASS HELPERS - Mixins, Functions, and Variables
 // =============================================================================
-// This file exports layout values as Sass variables for use in mixins/functions
-// All CSS custom properties are defined in _root.scss
+// This file contains ONLY Sass helpers that can be used in component styles
+// No CSS output is generated from this file
+// All :root CSS declarations are in _root.scss
 
 // =============================================================================
-// BREAKPOINTS - Mobile-first responsive design
+// BREAKPOINT VALUES (for use in mixins)
 // =============================================================================
-
-// Raw breakpoint values (used in media queries)
 $breakpoint-xs: 480px;
 $breakpoint-sm: 640px;
 $breakpoint-md: 768px;
@@ -18,15 +17,11 @@ $breakpoint-xl: 1280px;
 $breakpoint-2xl: 1536px;
 
 // =============================================================================
-// Z-INDEX SCALE - Layering system
+// Z-INDEX VALUES (for use in calculations)
 // =============================================================================
-
-// Base layers
 $z-index-negative: -1;
 $z-index-base: 0;
 $z-index-above: 1;
-
-// Component layers
 $z-index-dropdown: 100;
 $z-index-sticky: 200;
 $z-index-fixed: 300;
@@ -39,9 +34,8 @@ $z-index-top: 900;
 $z-index-max: 9999;
 
 // =============================================================================
-// MEDIA QUERY MIXINS
+// RESPONSIVE BREAKPOINT MIXIN
 // =============================================================================
-
 @mixin breakpoint($size) {
   @if $size == 'xs' {
     @media (min-width: $breakpoint-xs) {
@@ -73,7 +67,6 @@ $z-index-max: 9999;
 // =============================================================================
 // CONTAINER MIXIN
 // =============================================================================
-
 @mixin container($max-width: null) {
   width: 100%;
   margin-left: auto;
@@ -83,5 +76,30 @@ $z-index-max: 9999;
 
   @if $max-width {
     max-width: $max-width;
+  }
+}
+
+// =============================================================================
+// TEXT STYLE MIXINS
+// =============================================================================
+@mixin text-style($size, $weight: normal, $line-height: normal) {
+  font-size: var(--font-size-#{$size});
+  font-weight: var(--font-weight-#{$weight});
+  line-height: var(--line-height-#{$line-height});
+}
+
+@mixin heading($level) {
+  @if $level == 'xs' {
+    font: var(--text-heading-xs);
+  } @else if $level == 'sm' {
+    font: var(--text-heading-sm);
+  } @else if $level == 'md' {
+    font: var(--text-heading-md);
+  } @else if $level == 'lg' {
+    font: var(--text-heading-lg);
+  } @else if $level == 'xl' {
+    font: var(--text-heading-xl);
+  } @else if $level == '2xl' {
+    font: var(--text-heading-2xl);
   }
 }

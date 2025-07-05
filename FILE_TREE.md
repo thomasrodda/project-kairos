@@ -237,16 +237,21 @@ packages
 │   └── tsconfig.json
 ├── design-tokens
 │   ├── src
-│   │   ├── \_root-variables.scss
+│   │   ├── \_animations.scss
+│   │   ├── \_colors.scss
+│   │   ├── \_helpers.scss
+│   │   ├── \_layout.scss
+│   │   ├── \_responsive.scss
 │   │   ├── \_root.scss
-│   │   ├── animations.scss
-│   │   ├── colors.scss
+│   │   ├── \_semantic-colors.scss
+│   │   ├── \_semantic-typography.scss
+│   │   ├── \_shadows.scss
+│   │   ├── \_spacing.scss
+│   │   ├── \_theme-overrides.scss
+│   │   ├── \_typography.scss
 │   │   ├── index.scss
-│   │   ├── layout.scss
-│   │   ├── semantic.scss
-│   │   ├── shadows.scss
-│   │   ├── spacing.scss
-│   │   └── typography.scss
+│   │   └── root-declarations.scss
+│   ├── README.md
 │   └── package.json
 ├── types
 │   ├── src

@@ -1,0 +1,48 @@
+// packages/design-tokens/src/_semantic-typography.scss
+// =============================================================================
+// SEMANTIC TYPOGRAPHY ASSIGNMENTS
+// =============================================================================
+// This file contains semantic typography assignments that reference base typography tokens
+
+:root {
+  // =============================================================================
+  // BODY TEXT STYLES
+  // =============================================================================
+  --text-body-sm: var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
+  --text-body-md: var(--font-size-16) / var(--line-height-relaxed) var(--font-family-primary);
+  --text-body-lg: var(--font-size-18) / var(--line-height-relaxed) var(--font-family-primary);
+
+  // =============================================================================
+  // HEADING STYLES
+  // =============================================================================
+  --text-heading-xs: var(--font-weight-bold) var(--font-size-16) / var(--line-height-snug) var(--font-family-primary);
+  --text-heading-sm: var(--font-weight-bold) var(--font-size-18) / var(--line-height-snug) var(--font-family-primary);
+  --text-heading-md: var(--font-weight-bold) var(--font-size-20) / var(--line-height-snug) var(--font-family-primary);
+  --text-heading-lg: var(--font-weight-bold) var(--font-size-24) / var(--line-height-tight) var(--font-family-primary);
+  --text-heading-xl: var(--font-weight-bold) var(--font-size-30) / var(--line-height-tight) var(--font-family-primary);
+  --text-heading-2xl: var(--font-weight-bold) var(--font-size-36) / var(--line-height-tight) var(--font-family-primary);
+
+  // =============================================================================
+  // UI TEXT STYLES
+  // =============================================================================
+  --text-caption: var(--font-size-12) / var(--line-height-normal) var(--font-family-primary);
+  --text-label: var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
+  --text-button: var(--font-size-14) / var(--line-height-tight) var(--font-family-primary);
+  --text-ui-label-md: var(--font-weight-medium) var(--font-size-14) / var(--line-height-normal) var(--font-family-primary);
+  --text-ui-label-lg: var(--font-weight-medium) var(--font-size-16) / var(--line-height-normal) var(--font-family-primary);
+
+  // =============================================================================
+  // EDITOR-SPECIFIC TYPOGRAPHY
+  // =============================================================================
+  --editor-font-paragraph: var(--font-size-16) / var(--line-height-relaxed) var(--font-family-primary);
+  --editor-font-heading-1: var(--font-size-36) / var(--line-height-tight) var(--font-family-secondary);
+  --editor-font-heading-2: var(--font-size-30) / var(--line-height-tight) var(--font-family-secondary);
+
+  // =============================================================================
+  // FONT WEIGHT ASSIGNMENTS
+  // =============================================================================
+  --font-weight-body: var(--font-weight-regular);
+  --font-weight-emphasis: var(--font-weight-medium);
+  --font-weight-strong: var(--font-weight-semibold);
+  --font-weight-heading: var(--font-weight-bold);
+}

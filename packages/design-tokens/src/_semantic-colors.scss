@@ -1,0 +1,69 @@
+// packages/design-tokens/src/_semantic-colors.scss
+// =============================================================================
+// SEMANTIC COLOR ASSIGNMENTS
+// =============================================================================
+// This file contains semantic color assignments that reference base color tokens
+
+:root {
+  // =============================================================================
+  // BACKGROUND COLORS - Default/Dark Theme
+  // =============================================================================
+  --color-background: var(--color-neutral-900);
+  --color-surface: var(--color-neutral-800);
+  --color-surface-elevated-1: var(--color-neutral-750);
+  --color-surface-elevated-2: var(--color-neutral-700);
+  --color-surface-hover: var(--color-gray-50); // Legacy
+  --color-hover: var(--color-neutral-750);
+  --color-active: var(--color-neutral-700);
+
+  // =============================================================================
+  // TEXT COLORS
+  // =============================================================================
+  --color-text-primary: var(--color-neutral-100);
+  --color-text-secondary: var(--color-neutral-400);
+  --color-text-muted: var(--color-neutral-500);
+  --color-text-inverse: var(--color-neutral-900);
+  --color-text-tertiary: var(--color-gray-500); // Legacy
+  --color-text-placeholder: var(--color-gray-400); // Legacy
+
+  // Button Text colors
+  --color-button-text-default: var(--color-neutral-300);
+  --color-button-text-hover: var(--color-neutral-100);
+
+  // =============================================================================
+  // BORDER COLORS
+  // =============================================================================
+  --color-border: var(--color-neutral-700);
+  --color-border-light: var(--color-neutral-750);
+  --color-border-focus: var(--color-primary-500);
+  --color-border-hover: var(--color-gray-300); // Legacy
+
+  // =============================================================================
+  // INTERACTIVE STATES
+  // =============================================================================
+  --color-interactive: var(--color-primary-500);
+  --color-interactive-hover: var(--color-primary-400);
+  --color-interactive-active: var(--color-primary-600);
+
+  // Legacy primary colors
+  --color-primary: var(--color-primary-500);
+  --color-primary-hover: var(--color-primary-600);
+
+  // =============================================================================
+  // STATUS COLORS (semantic assignments)
+  // =============================================================================
+  --color-status-success: var(--color-success-500);
+  --color-status-warning: var(--color-warning-500);
+  --color-status-error: var(--color-error-500);
+  --color-status-info: var(--color-info-500);
+
+  // =============================================================================
+  // DISABLED & LOADING STATES
+  // =============================================================================
+  --color-disabled-background: var(--color-neutral-800);
+  --color-disabled-text: var(--color-neutral-600);
+  --color-disabled-border: var(--color-neutral-750);
+  --color-loading-spinner: var(--color-primary-500);
+  --color-skeleton-base: var(--color-neutral-800);
+  --color-skeleton-highlight: var(--color-neutral-750);
+}

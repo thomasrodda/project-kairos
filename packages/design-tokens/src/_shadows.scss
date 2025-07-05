@@ -1,0 +1,33 @@
+// packages/design-tokens/src/_shadows.scss
+// =============================================================================
+// SHADOW TOKENS
+// =============================================================================
+// This file contains all shadow-related custom properties
+
+:root {
+  // =============================================================================
+  // BASIC SHADOW SYSTEM
+  // =============================================================================
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-heavy: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --shadow-focus: 0 0 0 3px rgba(179, 115, 252, 0.3);
+
+  // =============================================================================
+  // COMPONENT ASSIGNMENTS
+  // =============================================================================
+  --shadow-card: var(--shadow-light);
+  --shadow-card-hover: var(--shadow-medium);
+  --shadow-button: var(--shadow-light);
+  --shadow-button-hover: var(--shadow-medium);
+  --shadow-dropdown: var(--shadow-heavy);
+  --shadow-toolbar: var(--shadow-medium);
+  --shadow-modal: var(--shadow-heavy);
+
+  // =============================================================================
+  // LEGACY SHADOW ALIASES
+  // =============================================================================
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+}

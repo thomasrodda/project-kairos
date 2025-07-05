@@ -1,0 +1,84 @@
+// packages/design-tokens/src/_typography.scss
+// =============================================================================
+// TYPOGRAPHY TOKENS
+// =============================================================================
+// This file contains all typography-related custom properties
+
+:root {
+  // =============================================================================
+  // FONT FAMILIES
+  // =============================================================================
+  --font-family-primary: 'Inter', system-ui, sans-serif;
+  --font-family-secondary: 'Inter', system-ui, sans-serif;
+  --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+
+  // =============================================================================
+  // FONT WEIGHTS
+  // =============================================================================
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  // Legacy aliases
+  --font-weight-normal: 400;
+
+  // =============================================================================
+  // FONT SIZES
+  // =============================================================================
+  --font-size-base: 1rem;
+  --font-size-10: 0.625rem;
+  --font-size-11: 0.6875rem;
+  --font-size-12: 0.75rem;
+  --font-size-13: 0.8125rem;
+  --font-size-14: 0.875rem;
+  --font-size-15: 0.9375rem;
+  --font-size-16: 1rem;
+  --font-size-17: 1.0625rem;
+  --font-size-18: 1.125rem;
+  --font-size-20: 1.25rem;
+  --font-size-22: 1.375rem;
+  --font-size-24: 1.5rem;
+  --font-size-26: 1.625rem;
+  --font-size-28: 1.75rem;
+  --font-size-30: 1.875rem;
+  --font-size-32: 2rem;
+  --font-size-36: 2.25rem;
+  --font-size-40: 2.5rem;
+  --font-size-44: 2.75rem;
+  --font-size-48: 3rem;
+  --font-size-52: 3.25rem;
+  --font-size-56: 3.5rem;
+  --font-size-60: 3.75rem;
+  --font-size-64: 4rem;
+  --font-size-72: 4.5rem;
+
+  // Legacy font size aliases
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 2rem;
+
+  // =============================================================================
+  // LINE HEIGHTS
+  // =============================================================================
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.45;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  // =============================================================================
+  // LETTER SPACING
+  // =============================================================================
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+}

@@ -14,7 +14,7 @@ export default defineConfig({
       '@kairos/ui': resolve(__dirname, '../../packages/ui/src'),
       '@kairos/utils': resolve(__dirname, '../../packages/utils/src'),
       '@kairos/types': resolve(__dirname, '../../packages/types/src'),
-      '@kairos/design-tokens': resolve(__dirname, '../../packages/design-tokens/src/index.scss'),
+      '@kairos/design-tokens': resolve(__dirname, '../../packages/design-tokens/src/index.scss'), // Sass helpers only
     },
   },
   server: {
@@ -39,6 +39,8 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
+        // Only import Sass helpers (mixins/functions) - NO CSS output
+        // The :root CSS declarations are imported once in src/styles/index.scss
         additionalData: `@use "@kairos/design-tokens" as *;`,
         api: 'modern-compiler', // Use faster Dart Sass API
       },

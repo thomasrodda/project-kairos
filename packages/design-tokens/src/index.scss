@@ -1,18 +1,10 @@
 // packages/design-tokens/src/index.scss
 // =============================================================================
-// PROJECT KAIROS DESIGN SYSTEM - MAIN EXPORT
+// PROJECT KAIROS DESIGN SYSTEM - SASS HELPERS EXPORT
 // =============================================================================
-// This file imports all design tokens through a single consolidated file
-// to prevent duplicate :root declarations
+// This file exports ONLY Sass helpers (mixins, functions, variables)
+// NO CSS output is generated from this file
+// For :root CSS declarations, import 'root.scss' once in your app
 
-// Import the consolidated root declarations
-@use './root';
-
-// Export mixins and functions (but not :root declarations)
-@forward './colors' hide $colors;
-@forward './typography' hide $font-families, $font-sizes, $font-weights, $line-heights;
-@forward './spacing' hide $spacing;
-@forward './layout.scss';
-@forward './shadows.scss';
-@forward './animations.scss';
-@forward './semantic';
+// Export all Sass helpers
+@forward './helpers';

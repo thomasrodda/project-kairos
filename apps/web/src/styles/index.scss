@@ -3,8 +3,9 @@
 // MAIN STYLES ENTRY POINT
 // =============================================================================
 
-// Design tokens are auto-imported by Vite for all SCSS files
-// No need to import them manually here
+// Import CSS root declarations ONCE for the entire app
+// This prevents duplication in every component
+@use '../../../../packages/design-tokens/src/root-declarations';
 
 // Import base styles
 @use './base/reset';

@@ -1,0 +1,9 @@
+// packages/design-tokens/src/root.scss
+// =============================================================================
+// CSS ROOT DECLARATIONS ONLY
+// =============================================================================
+// This file is meant to be imported ONCE globally in your app
+// It contains all CSS custom properties (:root declarations)
+// Import this in your main stylesheet or app entry point
+
+@use './_root' as *;

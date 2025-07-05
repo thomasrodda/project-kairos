@@ -1,0 +1,52 @@
+// packages/design-tokens/src/_responsive.scss
+// =============================================================================
+// RESPONSIVE OVERRIDES
+// =============================================================================
+// This file contains responsive overrides for different screen sizes
+
+// =============================================================================
+// MOBILE (default is already set in base files)
+// =============================================================================
+
+// =============================================================================
+// TABLET AND LARGER SCREENS
+// =============================================================================
+
+// Slightly larger base font
+@media (min-width: 768px) {
+  :root {
+    --font-size-base: var(--font-size-17); // 17px
+  }
+}
+
+// Desktop screens - comfortable reading sizes
+@media (min-width: 1024px) {
+  :root {
+    --font-size-base: var(--font-size-18); // 18px
+  }
+}
+
+// Container padding and editor padding
+@media (min-width: 768px) {
+  :root {
+    --container-padding: var(--container-padding-tablet);
+    --editor-padding: var(--editor-padding-desktop);
+  }
+}
+
+// Desktop and up - container padding
+@media (min-width: 1024px) {
+  :root {
+    --container-padding: var(--container-padding-desktop);
+  }
+}
+
+// =============================================================================
+// MOBILE LAYOUT ADJUSTMENTS
+// =============================================================================
+@media (max-width: 768px) {
+  :root {
+    --workspace-padding: 1rem;
+    --sidebar-width: 0;
+  }
+}

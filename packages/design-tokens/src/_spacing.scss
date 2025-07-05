@@ -1,0 +1,74 @@
+// packages/design-tokens/src/_spacing.scss
+// =============================================================================
+// SPACING TOKENS
+// =============================================================================
+// This file contains all spacing-related custom properties
+
+:root {
+  // =============================================================================
+  // BASE SPACING SCALE
+  // =============================================================================
+  --spacing-0: 0;
+  --spacing-1: 0.0625rem;
+  --spacing-2: 0.125rem;
+  --spacing-4: 0.25rem;
+  --spacing-8: 0.5rem;
+  --spacing-12: 0.75rem;
+  --spacing-16: 1rem;
+  --spacing-20: 1.25rem;
+  --spacing-24: 1.5rem;
+  --spacing-32: 2rem;
+  --spacing-40: 2.5rem;
+  --spacing-48: 3rem;
+  --spacing-64: 4rem;
+  --spacing-80: 5rem;
+  --spacing-96: 6rem;
+  --spacing-128: 8rem;
+
+  // Legacy spacing aliases (different scale)
+  --spacing-3: 0.75rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-10: 2.5rem;
+
+  // =============================================================================
+  // COMPONENT-SPECIFIC SPACING
+  // =============================================================================
+  --spacing-button-sm: var(--spacing-2) var(--spacing-3);
+  --spacing-button-md: var(--spacing-3) var(--spacing-4);
+  --spacing-button-lg: var(--spacing-4) var(--spacing-6);
+  --spacing-input-padding: var(--spacing-3) var(--spacing-4);
+  --spacing-form-gap: var(--spacing-4);
+  --spacing-container-padding: var(--spacing-4);
+  --spacing-section-gap: var(--spacing-8);
+  --spacing-content-gap: var(--spacing-6);
+
+  // =============================================================================
+  // BORDER RADIUS
+  // =============================================================================
+  --radius-none: 0;
+  --radius-4: 0.25rem;
+  --radius-8: 0.5rem;
+  --radius-12: 0.75rem;
+  --radius-16: 1rem;
+  --radius-20: 1.25rem;
+  --radius-40: 2.5rem;
+  --radius-60: 3.75rem;
+  --radius-80: 5rem;
+  --radius-full: 9999px;
+
+  // Legacy border radius aliases
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.375rem;
+  --border-radius-lg: 0.5rem;
+
+  // =============================================================================
+  // EDITOR-SPECIFIC SPACING
+  // =============================================================================
+  --block-padding-y: 0.125rem;
+  --block-padding-x: 0;
+  --block-margin-y: 0.25rem;
+
+  // Legacy
+  --workspace-padding: 2rem;
+}
