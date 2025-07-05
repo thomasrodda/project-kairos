@@ -38,6 +38,7 @@ AI System Prompt Files
 ├── # Project Management & Development Guide.md
 ├── Analytics Feature Flags Guide.md
 ├── Backend Api Guide.md
+├── Backend Implementation Plan.md
 ├── CI CD Guide.md
 ├── Component Structure Guide.md
 ├── Data Model Guide.md
