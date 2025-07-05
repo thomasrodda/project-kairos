@@ -1,276 +1,398 @@
 # Backend Implementation Plan
 
-> A comprehensive plan for implementing the Project Kairos backend API, authentication, and data persistence layer.
-
----
-
 ## Overview
 
-This document outlines the step-by-step plan for building out the backend infrastructure for Project Kairos. The backend will handle user authentication, data persistence, and business logic for the creative writing application.
+This plan implements a Notion-inspired backend architecture for Project Kairos, prioritizing performance, scalability, and future extensibility while keeping initial complexity manageable.
 
-## Architecture Summary
+## Core Architecture Decisions
 
-- **API Framework**: Express + Vercel Serverless Functions
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: Firebase Auth with JWT tokens
-- **Deployment**: Vercel (serverless)
-- **Real-time**: WebSockets or Server-Sent Events (Phase 2)
+### 1. Block Storage Strategy
+
+- **Individual block records** (not JSON documents)
+- Each block is a separate database row
+- Enables granular updates, lazy loading, and future collaboration
+- Trade-off: More complex queries for better performance
+
+### 2. Multi-Tenancy
+
+- Build with user isolation from the start
+- All tables include user_id for data separation
+- Collaboration features can be added later via workspace_members table
+- No additional complexity for single-user experience
+
+### 3. Auto-Save Strategy
+
+- **Debounced saves**: 1 second after user stops typing
+- **Immediate saves**: On block blur or navigation
+- **Optimistic updates**: Update UI immediately, sync in background
+- **Conflict detection**: Version numbers on each block
+
+### 4. Version History
+
+- **Hybrid approach**: Snapshots + individual changes
+- Full page snapshots every 100 edits or 24 hours
+- Individual block changes stored between snapshots
+- 30-day retention for free users (configurable)
+
+## Database Schema
+
+```sql
+-- Users (synced from Firebase Auth)
+CREATE TABLE users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  firebase_uid VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  display_name VARCHAR(255),
+  photo_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Workspaces
+CREATE TABLE workspaces (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Pages (hierarchical structure)
+CREATE TABLE pages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
+  parent_id UUID REFERENCES pages(id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  icon VARCHAR(50), -- emoji icon
+  position DECIMAL(10, 5) NOT NULL, -- for ordering
+  is_folder BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Blocks (individual content units)
+CREATE TABLE blocks (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_id UUID REFERENCES pages(id) ON DELETE CASCADE,
+  type VARCHAR(50) NOT NULL, -- paragraph, h1, h2, h3, bullet
+  content TEXT, -- plain text content
+  formatting JSONB DEFAULT '[]', -- array of {start, end, type, data}
+  position DECIMAL(10, 5) NOT NULL, -- for ordering
+  version INTEGER DEFAULT 1, -- for optimistic locking
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes for performance
+CREATE INDEX idx_workspaces_user ON workspaces(user_id);
+CREATE INDEX idx_pages_workspace ON pages(workspace_id);
+CREATE INDEX idx_pages_parent ON pages(parent_id);
+CREATE INDEX idx_blocks_page_position ON blocks(page_id, position);
+CREATE INDEX idx_blocks_updated ON blocks(updated_at);
+
+-- Version History Tables
+CREATE TABLE page_snapshots (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  page_id UUID REFERENCES pages(id) ON DELETE CASCADE,
+  snapshot_data JSONB NOT NULL, -- compressed blocks data
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE block_changes (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  block_id UUID REFERENCES blocks(id) ON DELETE CASCADE,
+  operation VARCHAR(20) NOT NULL, -- create, update, delete
+  old_content TEXT,
+  new_content TEXT,
+  old_formatting JSONB,
+  new_formatting JSONB,
+  changed_by UUID REFERENCES users(id),
+  changed_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Future: Collaboration
+-- CREATE TABLE workspace_members (
+--   workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
+--   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+--   role VARCHAR(20) NOT NULL, -- owner, editor, viewer
+--   PRIMARY KEY (workspace_id, user_id)
+-- );
+```
+
+## API Endpoints
+
+### Authentication
+
+```typescript
+POST / api / auth / verify // Verify Firebase token
+POST / api / auth / sync - user // Create/update user from Firebase
+```
+
+### Workspaces
+
+```typescript
+GET    /api/workspaces           // List user's workspaces
+POST   /api/workspaces           // Create workspace
+GET    /api/workspaces/:id       // Get workspace details
+PUT    /api/workspaces/:id       // Update workspace
+DELETE /api/workspaces/:id       // Delete workspace
+```
+
+### Pages
+
+```typescript
+GET    /api/workspaces/:id/pages // Get page tree for workspace
+POST   /api/pages                // Create page
+GET    /api/pages/:id            // Get page with metadata
+PUT    /api/pages/:id            // Update page metadata
+DELETE /api/pages/:id            // Delete page and blocks
+PUT    /api/pages/:id/move       // Move page in hierarchy
+```
+
+### Blocks
+
+```typescript
+GET    /api/pages/:id/blocks     // Get blocks (with pagination)
+POST   /api/blocks                // Create single block
+PUT    /api/blocks/:id            // Update single block
+DELETE /api/blocks/:id            // Delete single block
+POST   /api/blocks/batch          // Batch operations
+PUT    /api/blocks/reorder        // Reorder blocks
+```
+
+### Version History
+
+```typescript
+GET    /api/pages/:id/history     // Get version history
+GET    /api/pages/:id/snapshot/:version // Get specific version
+POST   /api/pages/:id/restore/:version  // Restore version
+```
 
 ## Implementation Phases
 
-### Phase 1: Core Infrastructure (Week 1)
+### Phase 1: Core Foundation (Weeks 1-3)
 
-#### 1.1 Firebase Authentication Setup
+1. **Database Setup**
 
-- [ ] Initialize Firebase Admin SDK in `apps/api/lib/firebase-admin.ts`
-- [ ] Create auth middleware for token verification
-- [ ] Add user creation/sync endpoint
-- [ ] Test auth flow with Postman
+   - Set up PostgreSQL with Prisma ORM
+   - Create all tables and indexes
+   - Seed with test data
 
-**Key Files:**
+2. **Authentication**
 
-```
-apps/api/
-├── lib/
-│   ├── firebase-admin.ts    # Admin SDK initialization
-│   └── auth-middleware.ts   # JWT verification
-└── auth/
-    ├── verify.ts           # Token verification endpoint
-    └── sync-user.ts        # Create/update user in DB
-```
+   - Firebase Admin SDK integration
+   - Token verification middleware
+   - User sync endpoint
 
-#### 1.2 Database Connection
+3. **Basic CRUD**
+   - Workspace operations
+   - Page operations
+   - Block operations (single)
 
-- [ ] Set up Prisma client singleton in `apps/api/lib/prisma.ts`
-- [ ] Create database utilities (error handling, common queries)
-- [ ] Test connection with health check endpoint
-- [ ] Set up migration workflow
+### Phase 2: Real-time Sync (Weeks 4-5)
 
-**Key Files:**
+1. **Auto-save Implementation**
 
-```
-apps/api/
-├── lib/
-│   ├── prisma.ts          # Prisma client instance
-│   └── db-utils.ts        # Common DB utilities
-└── health.ts              # Health check endpoint
-```
+   - Debounced save logic
+   - Optimistic locking
+   - Conflict detection
 
-#### 1.3 Error Handling & Logging
+2. **Batch Operations**
 
-- [ ] Create centralized error handler
-- [ ] Set up logging service (console for now, structured later)
-- [ ] Add request validation utilities
-- [ ] Create standard API response format
+   - Bulk block updates
+   - Efficient reordering
+   - Paste operation support
 
-### Phase 2: CRUD Endpoints (Week 2-3)
+3. **Performance Optimization**
+   - Query optimization
+   - Connection pooling
+   - Response caching
 
-#### 2.1 Workspace Management
+### Phase 3: Advanced Features (Weeks 6-7)
 
-- [ ] POST `/api/workspaces` - Create workspace
-- [ ] GET `/api/workspaces` - List user workspaces
-- [ ] GET `/api/workspaces/:id` - Get workspace details
-- [ ] PUT `/api/workspaces/:id` - Update workspace
-- [ ] DELETE `/api/workspaces/:id` - Delete workspace
+1. **Version History**
 
-#### 2.2 Page Management
+   - Snapshot system
+   - Change tracking
+   - History UI endpoints
 
-- [ ] POST `/api/pages` - Create page
-- [ ] GET `/api/pages/:id` - Get page with blocks
-- [ ] PUT `/api/pages/:id` - Update page metadata
-- [ ] DELETE `/api/pages/:id` - Delete page
-- [ ] PUT `/api/pages/:id/move` - Move page in hierarchy
-- [ ] GET `/api/workspaces/:id/pages` - Get page tree
+2. **Search & Export**
 
-#### 2.3 Block Operations
+   - Full-text search
+   - Markdown export
+   - Import functionality
 
-- [ ] GET `/api/pages/:pageId/blocks` - Get all blocks
-- [ ] POST `/api/blocks` - Create block
-- [ ] PUT `/api/blocks/:id` - Update block content
-- [ ] DELETE `/api/blocks/:id` - Delete block
-- [ ] PUT `/api/blocks/reorder` - Bulk reorder blocks
-- [ ] PUT `/api/blocks/bulk-update` - Bulk update (for paste)
+3. **Real-time Updates**
+   - WebSocket setup
+   - Change notifications
+   - Multi-tab sync
 
-### Phase 3: Advanced Features (Week 4)
+### Phase 4: Scale & Polish (Week 8+)
 
-#### 3.1 Real-time Sync
+1. **Performance**
 
-- [ ] Add WebSocket support or SSE
-- [ ] Implement autosave endpoint with debouncing
-- [ ] Add conflict resolution for concurrent edits
-- [ ] Create presence indicators (who's editing)
+   - Redis caching
+   - Database read replicas
+   - CDN for static assets
 
-#### 3.2 Search & Export
+2. **Monitoring**
 
-- [ ] GET `/api/search` - Full-text search across workspace
-- [ ] GET `/api/export/:pageId` - Export page as markdown
-- [ ] POST `/api/import` - Import markdown to blocks
+   - Error tracking (Sentry)
+   - Performance monitoring
+   - Usage analytics
 
-### Phase 4: Performance & Security (Week 5)
+3. **Security**
+   - Rate limiting
+   - Input validation
+   - Security headers
 
-#### 4.1 Performance
+## Technical Implementation Details
 
-- [ ] Add Redis caching layer
-- [ ] Implement pagination for large datasets
-- [ ] Add database indexing
-- [ ] Optimize N+1 queries
-
-#### 4.2 Security
-
-- [ ] Rate limiting per user
-- [ ] Input sanitization
-- [ ] SQL injection prevention (Prisma handles most)
-- [ ] CORS configuration for production
-
-## API Endpoint Structure
-
-### Authentication Required Headers
-
-```
-Authorization: Bearer <firebase-id-token>
-Content-Type: application/json
-```
-
-### Standard Response Format
+### Block Formatting Structure
 
 ```typescript
-// Success
-{
-  "success": true,
-  "data": { ... }
+interface TextFormat {
+  start: number
+  end: number
+  type: 'bold' | 'italic' | 'underline' | 'link'
+  data?: { url: string } // for links
 }
 
-// Error
-{
-  "success": false,
-  "error": {
-    "code": "ERROR_CODE",
-    "message": "Human readable message"
-  }
+interface Block {
+  id: string
+  type: BlockType
+  content: string
+  formatting: TextFormat[]
+  position: number
+  version: number
 }
 ```
 
-### Example Endpoint Implementation
+### Auto-save Implementation
 
 ```typescript
-// apps/api/pages/[id].ts
-import { VercelRequest, VercelResponse } from '@vercel/node'
-import { prisma } from '../lib/prisma'
-import { verifyAuth } from '../lib/auth-middleware'
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+// Frontend
+const saveBlock = debounce(async (blockId: string, content: string, formatting: TextFormat[]) => {
   try {
-    // Verify authentication
-    const userId = await verifyAuth(req)
-    if (!userId) {
-      return res.status(401).json({
-        success: false,
-        error: { code: 'UNAUTHORIZED', message: 'Invalid token' },
-      })
-    }
+    const response = await api.updateBlock(blockId, {
+      content,
+      formatting,
+      version: currentVersion,
+    })
 
-    const { id } = req.query
-
-    // Route based on method
-    switch (req.method) {
-      case 'GET':
-        const page = await prisma.page.findFirst({
-          where: { id: String(id), workspace: { userId } },
-          include: { blocks: { orderBy: { order: 'asc' } } },
-        })
-
-        if (!page) {
-          return res.status(404).json({
-            success: false,
-            error: { code: 'NOT_FOUND', message: 'Page not found' },
-          })
-        }
-
-        return res.json({ success: true, data: page })
-
-      case 'PUT':
-        // Update logic
-        break
-
-      case 'DELETE':
-        // Delete logic
-        break
-
-      default:
-        res.setHeader('Allow', ['GET', 'PUT', 'DELETE'])
-        return res.status(405).end(`Method ${req.method} Not Allowed`)
+    if (response.version !== currentVersion + 1) {
+      // Handle conflict
+      await resolveConflict(blockId)
     }
   } catch (error) {
-    console.error('Page endpoint error:', error)
-    return res.status(500).json({
+    // Queue for retry
+    offlineQueue.add({ blockId, content, formatting })
+  }
+}, 1000)
+
+// Backend
+app.put('/api/blocks/:id', async (req, res) => {
+  const { content, formatting, version } = req.body
+
+  // Optimistic locking
+  const updated = await prisma.block.updateMany({
+    where: {
+      id: req.params.id,
+      version: version,
+    },
+    data: {
+      content,
+      formatting,
+      version: { increment: 1 },
+      updatedAt: new Date(),
+    },
+  })
+
+  if (updated.count === 0) {
+    return res.status(409).json({
       success: false,
-      error: { code: 'INTERNAL_ERROR', message: 'Something went wrong' },
+      error: { code: 'VERSION_CONFLICT' },
     })
   }
+
+  // Track change for version history
+  await trackBlockChange(req.params.id, 'update', oldContent, content)
+
+  res.json({ success: true, version: version + 1 })
+})
+```
+
+### Position Management for Ordering
+
+```typescript
+// Generate position between two blocks
+function generatePosition(before: number | null, after: number | null): number {
+  if (!before) return after ? after / 2 : 1
+  if (!after) return before + 1
+  return (before + after) / 2
+}
+
+// Rebalance positions if they get too close
+async function rebalancePositions(pageId: string) {
+  const blocks = await prisma.block.findMany({
+    where: { pageId },
+    orderBy: { position: 'asc' },
+  })
+
+  const updates = blocks.map((block, index) => ({
+    where: { id: block.id },
+    data: { position: (index + 1) * 1000 },
+  }))
+
+  await prisma.$transaction(updates.map((update) => prisma.block.update(update)))
 }
 ```
 
-## Testing Strategy
+## Monitoring & Observability
 
-### Unit Tests
+### Key Metrics
 
-- Test auth middleware with mock tokens
-- Test database utilities with test database
-- Test individual endpoint logic
+- API response times (p50, p95, p99)
+- Block save success rate
+- Active users per hour
+- Storage usage per user
+- Error rates by endpoint
 
-### Integration Tests
+### Logging Strategy
 
-- Full API flow tests with real database
-- Authentication flow testing
-- Error handling scenarios
-
-### E2E Tests
-
-- Frontend to backend data flow
-- Real-time sync testing
-- Performance under load
-
-## Development Workflow
-
-1. **Start with Auth**: Get Firebase working first
-2. **Build One Complete Flow**: e.g., create workspace → create page → add blocks
-3. **Test as You Go**: Write tests for each endpoint
-4. **Document APIs**: Update this plan with actual implementations
-5. **Frontend Integration**: Connect one feature at a time
-
-## Environment Variables Required
-
-```env
-# Database
-DATABASE_URL="postgresql://..."
-
-# Firebase Admin
-FIREBASE_PROJECT_ID="..."
-FIREBASE_PRIVATE_KEY="..."
-FIREBASE_CLIENT_EMAIL="..."
-
-# API
-API_URL="http://localhost:3001"
-
-# Optional
-REDIS_URL="..."
-LOG_LEVEL="debug"
+```typescript
+// Structured logging
+logger.info('Block updated', {
+  blockId,
+  userId,
+  pageId,
+  duration: Date.now() - startTime,
+  version,
+})
 ```
 
-## Success Criteria
+## Security Considerations
 
-- [ ] User can sign in with Google
-- [ ] User can create/read/update/delete workspaces
-- [ ] User can manage pages with full CRUD
-- [ ] Blocks save and load correctly
-- [ ] Changes persist across sessions
-- [ ] API responds within 200ms for most operations
-- [ ] All endpoints have error handling
-- [ ] Frontend seamlessly integrates with backend
+1. **Authentication**: All endpoints require valid Firebase token
+2. **Authorization**: Users can only access their own data
+3. **Rate Limiting**: 100 requests per minute per user
+4. **Input Validation**: Zod schemas for all inputs
+5. **SQL Injection**: Prevented by Prisma parameterized queries
+6. **XSS Prevention**: Content sanitization on output
 
-## Notes
+## Cost Optimization
 
-- Start simple, iterate based on frontend needs
-- Prioritize data integrity over performance initially
-- Keep endpoints focused and RESTful
-- Document any deviations from this plan
+1. **Database**: Use connection pooling, optimize queries
+2. **Storage**: Compress old snapshots, purge old history
+3. **Compute**: Cache frequently accessed data
+4. **Bandwidth**: Paginate large responses
+
+## Future Considerations
+
+1. **Collaboration**: Workspace sharing, real-time cursors
+2. **AI Features**: Vector embeddings for content
+3. **Mobile Sync**: Offline-first architecture
+4. **Enterprise**: SSO, audit logs, compliance
+
+This implementation plan provides a solid foundation that matches Notion's architecture while being practical to implement for a single developer.

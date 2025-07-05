@@ -49,6 +49,7 @@ AI System Prompt Files
 ├── Extensibility & Plugin Architecture Guide.md
 ├── Git & Github Guide.md
 ├── Inline SVG System Guide.md
+├── Markdown Export Import Guide.md
 ├── Performance Optimization Guide.md
 ├── Production Deployment Guide.md
 ├── Quick Commands.md
