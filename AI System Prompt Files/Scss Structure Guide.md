@@ -6,7 +6,7 @@
 
 ## Overview
 
-We use **SCSS with design tokens** instead of Tailwind for complete control and flexibility. Supports dark/light themes, cross-platform compatibility, and component-based architecture.
+We use **SCSS with design tokens** for complete control and flexibility. The system supports dark/light themes through CSS custom properties and provides a clear separation between Sass helpers (mixins, functions) and CSS declarations.
 
 ---
 
@@ -16,28 +16,60 @@ Design tokens live in `packages/design-tokens/src/`:
 
 ```
 packages/design-tokens/src/
-├── colors.scss          # Color palette and semantic assignments
-├── typography.scss      # Font families, sizes, weights, line heights
-├── spacing.scss         # Margin, padding, sizing scales
-├── layout.scss          # Breakpoints, grid systems, z-index
-├── semantic.scss        # Semantic assignments for theming
-├── animations.scss      # Timing, easing, keyframes
-├── shadows.scss         # Shadow system
-└── index.scss           # Unified export of all tokens
+├── _colors.scss              # Core color palette
+├── _typography.scss          # Font families, sizes, weights, line heights
+├── _spacing.scss             # Margin, padding, sizing scales
+├── _layout.scss              # Breakpoints, containers, z-index
+├── _shadows.scss             # Shadow definitions
+├── _animations.scss          # Timing and easing functions
+├── _semantic-colors.scss     # Semantic color assignments
+├── _semantic-typography.scss # Typography style combinations
+├── _theme-overrides.scss     # Dark/light theme overrides
+├── _responsive.scss          # Responsive breakpoint overrides
+├── _helpers.scss             # Sass mixins and functions
+├── _root.scss                # Consolidates all token files
+├── index.scss                # Exports Sass helpers only
+└── root-declarations.scss    # Exports CSS custom properties
 ```
+
+**Key Files:**
+
+- `index.scss` - Import for Sass helpers (mixins, functions, variables) - NO CSS output
+- `root-declarations.scss` - Import ONCE globally for all CSS custom properties
 
 **App-Specific SCSS Structure** in `apps/web/src/styles/`:
 
 ```
 styles/
-├── tokens/              # Design token imports
 ├── base/                # Global resets, base styles
-├── layout/              # Layout containers and grids
-├── components/          # Optional shared component styles
-├── utilities/           # Utility classes from tokens
-├── themes/              # Theme switching logic
-└── index.scss           # Global entry point
+│   └── reset.scss       # CSS reset
+└── index.scss           # Global entry point (imports root-declarations)
 ```
+
+---
+
+## Key Architecture Decision: Separation of Concerns
+
+The design token system maintains a **strict separation** between:
+
+1. **CSS Custom Properties** (runtime values)
+
+   - Defined in `_*.scss` files
+   - Consolidated in `_root.scss`
+   - Exported via `root-declarations.scss`
+   - Imported ONCE globally in the app
+
+2. **Sass Helpers** (compile-time utilities)
+   - Mixins, functions, and Sass variables
+   - Defined in `_helpers.scss`
+   - Exported via `index.scss`
+   - Imported only where needed
+
+This separation prevents:
+
+- Duplicate CSS output from multiple imports
+- Confusion between runtime vs compile-time values
+- Performance issues from redundant declarations
 
 ---
 
@@ -104,7 +136,7 @@ Always use design tokens, never arbitrary values:
 
 ### Component Style Location
 
-**Option A: Colocated** (recommended for specific components)
+**Colocated Pattern** (current implementation):
 
 ```
 components/Editor/
@@ -113,14 +145,7 @@ components/Editor/
 └── index.ts
 ```
 
-**Option B: Central** (for shared UI components)
-
-```
-styles/components/
-├── buttons.scss
-├── forms.scss
-└── modals.scss
-```
+All component styles are colocated with their components for better maintainability and clear ownership.
 
 ### Naming Convention
 
@@ -173,24 +198,47 @@ Themes controlled via `data-theme` attribute:
 
 ## Import Strategy
 
-### Design Token Import
+### Two-Part System
+
+The design token system uses a **two-part import strategy**:
+
+1. **CSS Custom Properties** (imported ONCE globally):
 
 ```scss
-// Import design tokens first
-@import '@kairos/design-tokens';
-
-// Then import app styles
-@import './base/reset';
-@import './base/typography';
+// In apps/web/src/styles/index.scss
+@use '../../../../packages/design-tokens/src/root-declarations';
 ```
 
-### Component-Level Imports
+2. **Sass Helpers** (imported as needed in components):
 
 ```scss
-// Design tokens are globally available via CSS custom properties
+// In component files that need mixins/functions
+@use '@kairos/design-tokens' as tokens;
+
+.my-component {
+  @include tokens.breakpoint('md') {
+    padding: var(--spacing-lg);
+  }
+}
+```
+
+### Component-Level Usage
+
+```scss
+// CSS custom properties are globally available (no import needed)
 .my-component {
   color: var(--color-text-primary);
   padding: var(--spacing-md);
+  font: var(--text-body-md);
+}
+
+// For Sass helpers, import the design-tokens package
+@use '@kairos/design-tokens' as tokens;
+
+.responsive-component {
+  @include tokens.breakpoint('lg') {
+    max-width: 1200px;
+  }
 }
 ```
 
@@ -217,24 +265,24 @@ Themes controlled via `data-theme` attribute:
 
 ---
 
-## Implementation Phases
+## Current Implementation Status
 
-### Phase 1: Foundation (Current)
+### Completed ✅
 
-- ✅ Color palette and semantic assignments
-- 🔄 Typography, spacing, and layout tokens
-- 🔄 Base styles and CSS reset
+- **Design Token System**: Full token library with colors, typography, spacing, layout, shadows, and animations
+- **Semantic Assignments**: Separate semantic color and typography files for themeable values
+- **Theme Support**: Dark/light theme overrides via `data-theme` attribute
+- **Responsive System**: Breakpoint mixins and responsive overrides
+- **Sass Helpers**: Comprehensive mixins and functions for common patterns
+- **CSS Reset**: Modern reset stylesheet in place
+- **Component Integration**: All components use CSS custom properties
 
-### Phase 2: Integration
+### Architecture Highlights
 
-- 🔄 Component styles using design tokens
-- 🔄 Utility class generation
-- 🔄 Cross-platform compatibility testing
+- **Clear Separation**: Sass helpers (`index.scss`) vs CSS declarations (`root-declarations.scss`)
+- **Global Availability**: CSS custom properties available everywhere after single import
+- **Component Isolation**: Each component has its own SCSS file colocated with the component
+- **Performance Optimized**: Single global import prevents duplication
+- **Type Safety**: Using CSS custom properties with consistent naming conventions
 
-### Phase 3: Advanced Features
-
-- 🔄 Theme switching implementation
-- 🔄 System preference detection
-- 🔄 User preference persistence
-
-This structure ensures scalability, maintainability, and consistency across all platforms while providing a solid foundation for future enhancements.
+This structure provides a scalable, maintainable foundation that supports theming, responsive design, and component-based architecture while maintaining excellent developer experience.
