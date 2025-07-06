@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { Workspace } from './components/Workspace'
 import { PerformanceTest } from './components/PerformanceTest/PerformanceTest'
-import { EditorProvider } from './contexts/EditorContext'
+import { EnhancedEditorProvider } from './contexts/EditorProvider'
 import { initializeIconPerformance } from '@kairos/ui'
 
 function App() {
@@ -17,11 +17,11 @@ function App() {
   }, [])
 
   return (
-    <EditorProvider>
+    <EnhancedEditorProvider>
       <Workspace />
       {/* Show performance monitoring in development */}
       {process.env.NODE_ENV === 'development' && <PerformanceTest />}
-    </EditorProvider>
+    </EnhancedEditorProvider>
   )
 }
 

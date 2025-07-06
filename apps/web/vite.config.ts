@@ -25,6 +25,10 @@ export default defineConfig({
       usePolling: true, // Essential for WSL file watching
       interval: 100, // Check for changes every 100ms
     },
+    hmr: {
+      port: 3000, // Use the same port as the server
+      host: 'localhost', // Use localhost for HMR WebSocket
+    },
     fs: {
       allow: ['..', '../..'], // Allow accessing parent directories
     },

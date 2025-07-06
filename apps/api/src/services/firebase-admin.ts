@@ -1,7 +1,13 @@
 import * as admin from 'firebase-admin'
 
-// Initialize Firebase Admin SDK
-if (!admin.apps.length) {
+// Lazy initialization - only initialize when first accessed
+let isInitialized = false
+
+function initializeAdmin() {
+  if (isInitialized || admin.apps.length > 0) {
+    return
+  }
+
   const projectId = process.env.FIREBASE_PROJECT_ID
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
@@ -21,9 +27,25 @@ if (!admin.apps.length) {
       privateKey,
     }),
   })
+
+  isInitialized = true
 }
 
-export const auth = admin.auth()
-export const firestore = admin.firestore()
+// Export getters that initialize on first access
+export const auth = new Proxy({} as admin.auth.Auth, {
+  get(target, prop, receiver) {
+    initializeAdmin()
+    const authInstance = admin.auth()
+    return Reflect.get(authInstance, prop, authInstance)
+  },
+})
+
+export const firestore = new Proxy({} as admin.firestore.Firestore, {
+  get(target, prop, receiver) {
+    initializeAdmin()
+    const firestoreInstance = admin.firestore()
+    return Reflect.get(firestoreInstance, prop, firestoreInstance)
+  },
+})
 
 export default admin

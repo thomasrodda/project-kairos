@@ -288,6 +288,8 @@ apps
 │   ├── main.tsx
 │   ├── test-api-connection.ts
 │   └── vite-env.d.ts
+├── .env -> ../../.env
+├── .env.local -> ../../.env.local
 ├── .eslintrc.json
 ├── index.html
 ├── jest.config.js
