@@ -4,11 +4,12 @@ import { z } from 'zod'
 import { NotFoundError, ValidationError } from '../utils/errors'
 import { pageService } from './pageService'
 import { blockService } from './blockService'
+import { phase3Config } from '../config/phase3.config'
 
 // Validation schemas
 export const exportOptionsSchema = z.object({
-  includeMetadata: z.boolean().default(false),
-  includeSubpages: z.boolean().default(true),
+  includeMetadata: z.boolean().default(phase3Config.export.markdownOptions.includeMetadata),
+  includeSubpages: z.boolean().default(phase3Config.export.markdownOptions.includeSubpages),
   format: z.enum(['markdown', 'json']).default('markdown'),
 })
 
@@ -34,7 +35,7 @@ export class ExportService {
   /**
    * Export a page and optionally its subpages to markdown
    */
-  async exportPageToMarkdown(pageId: string, userId: string, options: z.infer<typeof exportOptionsSchema>): Promise<string> {
+  async exportPageToMarkdown(pageId: string, userId: string, options: z.infer<typeof exportOptionsSchema>, depth: number = 0): Promise<string> {
     // Verify user has access to the page
     const hasAccess = await pageService.verifyPageAccess(pageId, userId)
     if (!hasAccess) {
@@ -72,8 +73,8 @@ Updated: ${page.updatedAt.toISOString()}
     // Convert blocks to markdown
     markdown += this.blocksToMarkdown(page.blocks)
 
-    // Export subpages if requested
-    if (options.includeSubpages) {
+    // Export subpages if requested and within recursion depth limit
+    if (options.includeSubpages && depth < phase3Config.export.maxRecursionDepth) {
       const subpages = await prisma.page.findMany({
         where: {
           parentId: pageId,
@@ -86,7 +87,7 @@ Updated: ${page.updatedAt.toISOString()}
 
       for (const subpage of subpages) {
         markdown += '\n---\n\n'
-        const subpageMarkdown = await this.exportPageToMarkdown(subpage.id, userId, { ...options, includeSubpages: true })
+        const subpageMarkdown = await this.exportPageToMarkdown(subpage.id, userId, { ...options, includeSubpages: true }, depth + 1)
         // Increase heading level for subpages
         markdown += subpageMarkdown.replace(/^#/gm, '##')
       }
@@ -98,7 +99,7 @@ Updated: ${page.updatedAt.toISOString()}
   /**
    * Export a page to JSON format
    */
-  async exportPageToJson(pageId: string, userId: string, options: z.infer<typeof exportOptionsSchema>): Promise<ExportedPage> {
+  async exportPageToJson(pageId: string, userId: string, options: z.infer<typeof exportOptionsSchema>, depth: number = 0): Promise<ExportedPage> {
     // Verify user has access to the page
     const hasAccess = await pageService.verifyPageAccess(pageId, userId)
     if (!hasAccess) {
@@ -133,8 +134,8 @@ Updated: ${page.updatedAt.toISOString()}
       }
     }
 
-    // Export subpages if requested
-    if (options.includeSubpages) {
+    // Export subpages if requested and within recursion depth limit
+    if (options.includeSubpages && depth < phase3Config.export.maxRecursionDepth) {
       const subpages = await prisma.page.findMany({
         where: {
           parentId: pageId,
@@ -148,7 +149,7 @@ Updated: ${page.updatedAt.toISOString()}
       if (subpages.length > 0) {
         exportedPage.children = []
         for (const subpage of subpages) {
-          const exportedSubpage = await this.exportPageToJson(subpage.id, userId, options)
+          const exportedSubpage = await this.exportPageToJson(subpage.id, userId, options, depth + 1)
           exportedPage.children.push(exportedSubpage)
         }
       }
@@ -162,6 +163,15 @@ Updated: ${page.updatedAt.toISOString()}
    */
   async importMarkdown(userId: string, data: z.infer<typeof importMarkdownSchema>): Promise<{ pageId: string; blocksCreated: number }> {
     const { pageId, markdown, replaceExisting } = data
+
+    // Check markdown size limit
+    const markdownSizeMB = Buffer.byteLength(markdown, 'utf8') / (1024 * 1024)
+    if (markdownSizeMB > phase3Config.export.maxExportSizeMB) {
+      throw new ValidationError('Markdown too large', {
+        field: 'markdown',
+        reason: `Markdown size ${markdownSizeMB.toFixed(2)}MB exceeds limit of ${phase3Config.export.maxExportSizeMB}MB`,
+      })
+    }
 
     // Verify user has access to the page
     const hasAccess = await pageService.verifyPageAccess(pageId, userId)

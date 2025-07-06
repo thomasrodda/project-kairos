@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { errorResponse } from '../utils/apiResponse'
-import { AppError, isOperationalError, toAppError, ErrorCode } from '../utils/errors'
+import { AppError, isOperationalError, toAppError, ErrorCode, ValidationError } from '../utils/errors'
 import { logger } from './requestLogger'
+import { ZodError } from 'zod'
 
 /**
  * Global error handler middleware
@@ -15,7 +16,18 @@ export function errorHandler(err: Error, req: Request, res: Response, next: Next
   const requestId = res.locals.requestId || (req.headers['x-request-id'] as string)
 
   // Convert to AppError if needed
-  const appError = toAppError(err)
+  let appError: AppError
+
+  // Handle Zod validation errors
+  if (err instanceof ZodError) {
+    const details = err.errors.map((e) => ({
+      field: e.path.join('.'),
+      reason: e.message,
+    }))
+    appError = new ValidationError('Validation failed', details)
+  } else {
+    appError = toAppError(err)
+  }
 
   // Log error details
   logger.error(requestId, appError.message, err, {

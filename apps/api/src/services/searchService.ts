@@ -1,14 +1,20 @@
 import { prisma, Prisma } from '@kairos/database'
 import { z } from 'zod'
 import { ValidationError } from '../utils/errors'
+import { phase3Config } from '../config/phase3.config'
 
 // Validation schemas
 export const searchQuerySchema = z.object({
-  query: z.string().min(1).max(200),
+  query: z.string().min(1).max(phase3Config.search.queryMaxLength),
   workspaceId: z.string().optional(),
   pageId: z.string().optional(),
   blockTypes: z.array(z.string()).optional(),
-  limit: z.number().int().min(1).max(100).default(20),
+  limit: z
+    .number()
+    .int()
+    .min(phase3Config.search.resultLimit.min)
+    .max(phase3Config.search.resultLimit.max)
+    .default(phase3Config.search.resultLimit.default),
   offset: z.number().int().min(0).default(0),
 })
 
@@ -198,7 +204,7 @@ export class SearchService {
   /**
    * Search suggestions based on partial query
    */
-  async searchSuggestions(userId: string, query: string, limit: number = 5): Promise<string[]> {
+  async searchSuggestions(userId: string, query: string, limit: number = phase3Config.search.suggestionLimit): Promise<string[]> {
     if (query.length < 2) {
       return []
     }
@@ -235,12 +241,12 @@ export class SearchService {
 
     // Truncate to show context around matches
     const firstMatch = highlighted.indexOf('**')
-    if (firstMatch > 50) {
-      const start = Math.max(0, firstMatch - 50)
+    if (firstMatch > phase3Config.search.contextPreview) {
+      const start = Math.max(0, firstMatch - phase3Config.search.contextPreview)
       highlighted = '...' + highlighted.substring(start)
     }
-    if (highlighted.length > 200) {
-      highlighted = highlighted.substring(0, 200) + '...'
+    if (highlighted.length > phase3Config.search.contextLength) {
+      highlighted = highlighted.substring(0, phase3Config.search.contextLength) + '...'
     }
 
     return highlighted

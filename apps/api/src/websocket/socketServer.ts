@@ -2,6 +2,7 @@ import { Server as HttpServer } from 'http'
 import { Server as SocketIOServer, Socket } from 'socket.io'
 import { requireSocketAuth } from '../middleware/socketAuth'
 import { syncService } from '../services/syncService'
+import { phase3Config } from '../config/phase3.config'
 
 export interface AuthenticatedSocket extends Socket {
   userId?: string
@@ -11,12 +12,12 @@ export interface AuthenticatedSocket extends Socket {
 export function createSocketServer(httpServer: HttpServer): SocketIOServer {
   const io = new SocketIOServer(httpServer, {
     cors: {
-      origin: process.env.VITE_API_URL || 'http://localhost:3000',
+      origin: phase3Config.websocket.cors.origins,
       credentials: true,
     },
     // Connection options
-    pingTimeout: 60000,
-    pingInterval: 25000,
+    pingTimeout: phase3Config.websocket.connection.pingTimeout,
+    pingInterval: phase3Config.websocket.connection.pingInterval,
   })
 
   // Apply authentication middleware

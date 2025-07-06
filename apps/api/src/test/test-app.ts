@@ -2,6 +2,9 @@ import express, { Express } from 'express'
 import cors from 'cors'
 import authRoutes from '../routes/auth.routes'
 import workspaceRoutes from '../routes/workspace.routes'
+import syncRoutes from '../routes/sync.routes'
+import { checkRedisHealth } from '../config/redis'
+import { errorHandler } from '../middleware/errorHandler'
 
 // Create a simplified app for testing without problematic middleware
 export function createTestApp(): Express {
@@ -24,24 +27,22 @@ export function createTestApp(): Express {
   })
 
   // Health check
-  app.get('/api/health', (req, res) => {
+  app.get('/api/health', async (req, res) => {
+    const redisHealth = await checkRedisHealth()
     res.json({
       status: 'ok',
       timestamp: new Date().toISOString(),
+      redis: redisHealth,
     })
   })
 
   // Routes
   app.use('/api/auth', authRoutes)
   app.use('/api/workspaces', workspaceRoutes)
+  app.use('/api/sync', syncRoutes)
 
   // Error handling
-  app.use((err: any, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    console.error('Error:', err)
-    res.status(err.status || 500).json({
-      error: err.message || 'Internal server error',
-    })
-  })
+  app.use(errorHandler)
 
   return app
 }

@@ -1,0 +1,63 @@
+import Redis from 'ioredis'
+
+// Redis configuration
+const redisConfig = {
+  host: process.env.REDIS_HOST || 'localhost',
+  port: parseInt(process.env.REDIS_PORT || '6379', 10),
+  password: process.env.REDIS_PASSWORD,
+  db: parseInt(process.env.REDIS_DB || '0', 10),
+  retryStrategy: (times: number) => {
+    // Reconnect after
+    const delay = Math.min(times * 50, 2000)
+    return delay
+  },
+  maxRetriesPerRequest: 3,
+  enableReadyCheck: true,
+  enableOfflineQueue: true,
+}
+
+// Create Redis client
+export const redis = new Redis(redisConfig)
+
+// Handle Redis connection events
+redis.on('connect', () => {
+  console.log('Redis connected successfully')
+})
+
+redis.on('error', (err) => {
+  console.error('Redis connection error:', err)
+})
+
+redis.on('ready', () => {
+  console.log('Redis ready to accept commands')
+})
+
+redis.on('close', () => {
+  console.log('Redis connection closed')
+})
+
+redis.on('reconnecting', (delay: number) => {
+  console.log(`Redis reconnecting in ${delay}ms`)
+})
+
+/**
+ * Check Redis connection health
+ */
+export async function checkRedisHealth(): Promise<{ connected: boolean; error?: string }> {
+  try {
+    const result = await redis.ping()
+    return { connected: result === 'PONG' }
+  } catch (error) {
+    return {
+      connected: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
+  }
+}
+
+/**
+ * Gracefully close Redis connection
+ */
+export async function closeRedis(): Promise<void> {
+  await redis.quit()
+}

@@ -64,10 +64,15 @@ AI System Prompt Files
 └── Troubleshooting Guide.md
 apps
 ├── api
+│   ├── docs
+│   │   ├── phase3-configuration.md
+│   │   └── redis-setup.md
 │   ├── src
 │   │   ├── **tests**
 │   │   │   └── app.integration.test.ts
 │   │   ├── config
+│   │   │   ├── phase3.config.ts
+│   │   │   ├── redis.ts
 │   │   │   └── security.config.ts
 │   │   ├── examples
 │   │   │   └── usage-example.ts
@@ -81,7 +86,11 @@ apps
 │   │   ├── routes
 │   │   │   ├── **tests**
 │   │   │   │   ├── auth.test.ts
+│   │   │   │   ├── export.routes.test.ts
 │   │   │   │   ├── health.test.ts
+│   │   │   │   ├── history.routes.test.ts
+│   │   │   │   ├── search.routes.test.ts
+│   │   │   │   ├── sync.routes.test.ts
 │   │   │   │   └── workspace.test.ts
 │   │   │   ├── auth.routes.ts
 │   │   │   ├── blocks.ts
@@ -93,7 +102,11 @@ apps
 │   │   │   └── workspace.routes.ts
 │   │   ├── services
 │   │   │   ├── **tests**
-│   │   │   │   └── blockService.test.ts
+│   │   │   │   ├── blockService.test.ts
+│   │   │   │   ├── exportService.test.ts
+│   │   │   │   ├── historyService.test.ts
+│   │   │   │   ├── searchService.test.ts
+│   │   │   │   └── syncService.test.ts
 │   │   │   ├── auth.service.ts
 │   │   │   ├── blockService.ts
 │   │   │   ├── exportService.ts
@@ -105,6 +118,7 @@ apps
 │   │   ├── test
 │   │   │   ├── factories.ts
 │   │   │   ├── helpers.ts
+│   │   │   ├── redisMock.ts
 │   │   │   ├── setup.ts
 │   │   │   └── test-app.ts
 │   │   ├── types
@@ -115,6 +129,8 @@ apps
 │   │   │   ├── errors.ts
 │   │   │   └── index.ts
 │   │   ├── websocket
+│   │   │   ├── **tests**
+│   │   │   │   └── socketServer.test.ts
 │   │   │   └── socketServer.ts
 │   │   └── app.ts
 │   ├── SECURITY.md

@@ -1,14 +1,25 @@
 import { PrismaClient } from '@kairos/database'
 import { mockDeep, mockReset, DeepMockProxy } from 'jest-mock-extended'
 import { DecodedIdToken } from 'firebase-admin/auth'
+import { RedisMock } from './redisMock'
 
 // Create a mock Prisma client
 export const prismaMock = mockDeep<PrismaClient>() as unknown as DeepMockProxy<PrismaClient>
+
+// Create a mock Redis client
+export const redisMock = new RedisMock()
 
 // Mock the database module
 jest.mock('@kairos/database', () => ({
   prisma: prismaMock,
   Prisma: jest.requireActual('@kairos/database').Prisma,
+}))
+
+// Mock Redis
+jest.mock('../config/redis', () => ({
+  redis: redisMock,
+  checkRedisHealth: jest.fn().mockResolvedValue({ connected: true }),
+  closeRedis: jest.fn().mockResolvedValue(undefined),
 }))
 
 // Mock Firebase Admin
@@ -22,6 +33,7 @@ jest.mock('../services/firebase-admin', () => ({
 // Reset mocks before each test
 beforeEach(() => {
   mockReset(prismaMock)
+  redisMock.clear()
   jest.clearAllMocks()
 })
 

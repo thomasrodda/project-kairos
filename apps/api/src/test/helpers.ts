@@ -48,10 +48,13 @@ export function expectErrorResponse(response: request.Response, statusCode: numb
   expect(response.body).toHaveProperty('error')
 
   if (errorMessage) {
+    // Handle both simple string errors and error objects with message property
+    const actualError = typeof response.body.error === 'string' ? response.body.error : response.body.error.message
+
     if (typeof errorMessage === 'string') {
-      expect(response.body.error).toBe(errorMessage)
+      expect(actualError).toBe(errorMessage)
     } else {
-      expect(response.body.error).toMatch(errorMessage)
+      expect(actualError).toMatch(errorMessage)
     }
   }
 }

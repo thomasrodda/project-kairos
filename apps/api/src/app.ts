@@ -21,6 +21,7 @@ import {
 } from './middleware/security'
 import { errorHandler, notFoundHandler } from './middleware/errorHandler'
 import { successResponse } from './utils/apiResponse'
+import { checkRedisHealth } from './config/redis'
 
 export function createApp(): Express {
   const app = express()
@@ -58,11 +59,14 @@ export function createApp(): Express {
   app.use(generalRateLimiter)
 
   // Health check (exempt from auth rate limiting)
-  app.get('/api/health', (_req, res) => {
+  app.get('/api/health', async (_req, res) => {
+    const redisHealth = await checkRedisHealth()
+
     successResponse(res, {
       status: 'ok',
       version: process.env.npm_package_version || '1.0.0',
       environment: process.env.NODE_ENV || 'development',
+      redis: redisHealth,
     })
   })
 

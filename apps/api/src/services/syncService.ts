@@ -1,4 +1,6 @@
 import { prisma } from '@kairos/database'
+import { redis } from '../config/redis'
+import { phase3Config } from '../config/phase3.config'
 
 interface ActiveEdit {
   userId: string
@@ -14,10 +16,22 @@ interface PageUser {
 }
 
 export class SyncService {
-  // In-memory storage for active edits and page users
-  // In production, consider using Redis for scalability
-  private activeEdits: Map<string, ActiveEdit> = new Map()
-  private pageUsers: Map<string, Map<string, PageUser>> = new Map()
+  // Redis key prefixes
+  private readonly ACTIVE_EDITS_PREFIX = 'active_edits:'
+  private readonly PAGE_USERS_PREFIX = 'page_users:'
+  private readonly EDIT_TTL = phase3Config.sync.activeEditTTL // TTL for active edits from config
+
+  /**
+   * Handle Redis errors gracefully
+   */
+  private async handleRedisError<T>(operation: () => Promise<T>, fallback: T): Promise<T> {
+    try {
+      return await operation()
+    } catch (error) {
+      console.error('Redis operation failed:', error)
+      return fallback
+    }
+  }
 
   /**
    * Verify user has access to a workspace
@@ -51,41 +65,75 @@ export class SyncService {
    * Track active edit on a block
    */
   async trackActiveEdit(blockId: string, userId: string): Promise<void> {
-    this.activeEdits.set(blockId, {
-      userId,
-      blockId,
-      timestamp: new Date(),
-    })
+    await this.handleRedisError(async () => {
+      const key = `${this.ACTIVE_EDITS_PREFIX}${blockId}`
+      const edit: ActiveEdit = {
+        userId,
+        blockId,
+        timestamp: new Date(),
+      }
 
-    // Clean up stale edits (older than 30 seconds)
-    this.cleanupStaleEdits()
+      // Set with TTL to auto-expire stale edits
+      await redis.setex(key, this.EDIT_TTL, JSON.stringify(edit))
+    }, undefined)
   }
 
   /**
    * Check if a block is being edited by another user
    */
-  isBlockBeingEdited(blockId: string, userId: string): boolean {
-    const edit = this.activeEdits.get(blockId)
-    return !!edit && edit.userId !== userId
+  async isBlockBeingEdited(blockId: string, userId: string): Promise<boolean> {
+    return await this.handleRedisError(async () => {
+      const key = `${this.ACTIVE_EDITS_PREFIX}${blockId}`
+      const editData = await redis.get(key)
+
+      if (!editData) return false
+
+      const edit: ActiveEdit = JSON.parse(editData)
+      return edit.userId !== userId
+    }, false)
   }
 
   /**
    * Get user editing a block
    */
-  getBlockEditor(blockId: string): string | null {
-    const edit = this.activeEdits.get(blockId)
-    return edit?.userId || null
+  async getBlockEditor(blockId: string): Promise<string | null> {
+    return await this.handleRedisError(async () => {
+      const key = `${this.ACTIVE_EDITS_PREFIX}${blockId}`
+      const editData = await redis.get(key)
+
+      if (!editData) return null
+
+      const edit: ActiveEdit = JSON.parse(editData)
+      return edit.userId
+    }, null)
   }
 
   /**
    * Clear active edits for a user
    */
   async clearUserActiveEdits(userId: string): Promise<void> {
-    for (const [blockId, edit] of this.activeEdits.entries()) {
-      if (edit.userId === userId) {
-        this.activeEdits.delete(blockId)
+    await this.handleRedisError(async () => {
+      // Get all active edit keys
+      const pattern = `${this.ACTIVE_EDITS_PREFIX}*`
+      const keys = await redis.keys(pattern)
+
+      if (keys.length === 0) return
+
+      // Check each key and delete if it belongs to the user
+      const pipeline = redis.pipeline()
+
+      for (const key of keys) {
+        const editData = await redis.get(key)
+        if (editData) {
+          const edit: ActiveEdit = JSON.parse(editData)
+          if (edit.userId === userId) {
+            pipeline.del(key)
+          }
+        }
       }
-    }
+
+      await pipeline.exec()
+    }, undefined)
   }
 
   /**
@@ -104,59 +152,66 @@ export class SyncService {
 
     if (!user) return
 
-    // Initialize page users map if needed
-    if (!this.pageUsers.has(pageId)) {
-      this.pageUsers.set(pageId, new Map())
-    }
+    await this.handleRedisError(async () => {
+      // Add user to page in Redis
+      const key = `${this.PAGE_USERS_PREFIX}${pageId}`
+      const pageUser: PageUser = {
+        userId: user.id,
+        displayName: user.displayName || undefined,
+        email: user.email,
+        joinedAt: new Date(),
+      }
 
-    // Add user to page
-    const pageUsersMap = this.pageUsers.get(pageId)!
-    pageUsersMap.set(userId, {
-      userId: user.id,
-      displayName: user.displayName || undefined,
-      email: user.email,
-      joinedAt: new Date(),
-    })
+      await redis.hset(key, userId, JSON.stringify(pageUser))
+    }, undefined)
   }
 
   /**
    * Remove user from a page
    */
-  removeUserFromPage(pageId: string, userId: string): void {
-    const pageUsersMap = this.pageUsers.get(pageId)
-    if (pageUsersMap) {
-      pageUsersMap.delete(userId)
+  async removeUserFromPage(pageId: string, userId: string): Promise<void> {
+    await this.handleRedisError(async () => {
+      const key = `${this.PAGE_USERS_PREFIX}${pageId}`
+      await redis.hdel(key, userId)
 
-      // Clean up empty maps
-      if (pageUsersMap.size === 0) {
-        this.pageUsers.delete(pageId)
+      // Clean up empty hashes
+      const remaining = await redis.hlen(key)
+      if (remaining === 0) {
+        await redis.del(key)
       }
-    }
+    }, undefined)
   }
 
   /**
    * Get all users in a page
    */
   async getPageUsers(pageId: string): Promise<PageUser[]> {
-    const pageUsersMap = this.pageUsers.get(pageId)
-    if (!pageUsersMap) {
-      return []
-    }
-    return Array.from(pageUsersMap.values())
+    return await this.handleRedisError(async () => {
+      const key = `${this.PAGE_USERS_PREFIX}${pageId}`
+      const usersData = await redis.hgetall(key)
+
+      if (!usersData || Object.keys(usersData).length === 0) {
+        return []
+      }
+
+      return Object.values(usersData).map((userData) => {
+        const user = JSON.parse(userData)
+        // Convert joinedAt string back to Date
+        return {
+          ...user,
+          joinedAt: new Date(user.joinedAt),
+        }
+      })
+    }, [])
   }
 
   /**
    * Clean up stale edits
+   * Note: With Redis TTL, this is no longer needed as Redis automatically expires keys
    */
-  private cleanupStaleEdits(): void {
-    const now = new Date()
-    const staleThreshold = 30 * 1000 // 30 seconds
-
-    for (const [blockId, edit] of this.activeEdits.entries()) {
-      if (now.getTime() - edit.timestamp.getTime() > staleThreshold) {
-        this.activeEdits.delete(blockId)
-      }
-    }
+  private async cleanupStaleEdits(): Promise<void> {
+    // This method is kept for compatibility but is now a no-op
+    // Redis handles expiration automatically with TTL
   }
 
   /**
@@ -188,10 +243,14 @@ export class SyncService {
 
     // Check active users in each page
     for (const pageId of pageIds) {
-      const pageUsersMap = this.pageUsers.get(pageId)
-      if (pageUsersMap && pageUsersMap.size > 0) {
+      const usersData = await this.handleRedisError(async () => {
+        const key = `${this.PAGE_USERS_PREFIX}${pageId}`
+        return await redis.hgetall(key)
+      }, {})
+
+      if (usersData && Object.keys(usersData).length > 0) {
         activePages.push(pageId)
-        for (const userId of pageUsersMap.keys()) {
+        for (const userId of Object.keys(usersData)) {
           activeUsersSet.add(userId)
         }
       }
@@ -256,7 +315,11 @@ export class SyncService {
     }
 
     // Version mismatch - potential conflict
-    const activeEdit = this.activeEdits.get(blockId)
+    const activeEdit = await this.handleRedisError(async () => {
+      const key = `${this.ACTIVE_EDITS_PREFIX}${blockId}`
+      const editData = await redis.get(key)
+      return editData ? JSON.parse(editData) : null
+    }, null)
 
     return {
       resolved: false,

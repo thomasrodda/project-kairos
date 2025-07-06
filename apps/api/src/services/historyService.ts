@@ -3,10 +3,16 @@ import { NotFoundError } from '../utils/errors'
 import { z } from 'zod'
 import { pageService } from './pageService'
 import { blockService } from './blockService'
+import { phase3Config } from '../config/phase3.config'
 
 // Validation schemas
 export const historyQuerySchema = z.object({
-  limit: z.number().int().min(1).max(100).default(50),
+  limit: z
+    .number()
+    .int()
+    .min(phase3Config.history.queryLimit.min)
+    .max(phase3Config.history.queryLimit.max)
+    .default(phase3Config.history.queryLimit.default),
   offset: z.number().int().min(0).default(0),
   startDate: z.string().datetime().optional(),
   endDate: z.string().datetime().optional(),
@@ -16,10 +22,8 @@ export const restoreSnapshotSchema = z.object({
   snapshotId: z.string(),
 })
 
-// Constants
-const SNAPSHOT_THRESHOLD = 100 // Create snapshot every 100 changes
-const SNAPSHOT_INTERVAL_HOURS = 24 // Create snapshot every 24 hours
-const RETENTION_DAYS = 30 // Keep history for 30 days (free tier)
+// Get constants from config
+const { snapshotThreshold, snapshotIntervalHours, retentionDays } = phase3Config.history
 
 export class HistoryService {
   /**
@@ -328,7 +332,7 @@ export class HistoryService {
 
     // Check time since last snapshot
     const hoursSinceLastSnapshot = (Date.now() - latestSnapshot.createdAt.getTime()) / (1000 * 60 * 60)
-    if (hoursSinceLastSnapshot >= SNAPSHOT_INTERVAL_HOURS) {
+    if (hoursSinceLastSnapshot >= snapshotIntervalHours) {
       return true
     }
 
@@ -340,7 +344,7 @@ export class HistoryService {
       },
     })
 
-    return changeCount >= SNAPSHOT_THRESHOLD
+    return changeCount >= snapshotThreshold
   }
 
   /**
@@ -348,7 +352,7 @@ export class HistoryService {
    */
   async cleanupOldHistory(userId: string): Promise<{ deletedSnapshots: number; deletedChanges: number }> {
     const retentionDate = new Date()
-    retentionDate.setDate(retentionDate.getDate() - RETENTION_DAYS)
+    retentionDate.setDate(retentionDate.getDate() - retentionDays)
 
     // Delete old snapshots
     const deletedSnapshots = await prisma.pageSnapshot.deleteMany({
