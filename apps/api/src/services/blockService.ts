@@ -2,6 +2,7 @@ import { prisma, Block, Prisma, BlockChange } from '@kairos/database'
 import { BlockType } from '@prisma/client'
 import { z } from 'zod'
 import { NotFoundError, ValidationError, ConflictError } from '../utils/errors'
+import { historyService } from './historyService'
 
 // Validation schemas
 export const createBlockSchema = z.object({
@@ -64,6 +65,21 @@ export class BlockService {
         changedBy: userId,
       },
     })
+  }
+
+  /**
+   * Check and create snapshot if needed after block changes
+   */
+  private async checkAndCreateSnapshot(pageId: string, userId: string): Promise<void> {
+    try {
+      const shouldCreate = await historyService.shouldCreateSnapshot(pageId)
+      if (shouldCreate) {
+        await historyService.createSnapshot(pageId, userId)
+      }
+    } catch (error) {
+      // Log error but don't fail the operation
+      console.error('Failed to check/create snapshot:', error)
+    }
   }
 
   /**
@@ -156,6 +172,9 @@ export class BlockService {
 
     // Track the creation
     await this.trackBlockChange(newBlock.id, 'create', userId, null, newBlock.content, null, newBlock.metadata)
+
+    // Check if snapshot should be created
+    await this.checkAndCreateSnapshot(pageId, userId)
 
     return newBlock
   }
@@ -256,6 +275,9 @@ export class BlockService {
     // Track the update with old and new values
     await this.trackBlockChange(blockId, 'update', userId, currentBlock.content, updatedBlock.content, currentBlock.metadata, updatedBlock.metadata)
 
+    // Check if snapshot should be created
+    await this.checkAndCreateSnapshot(pageId, userId)
+
     return updatedBlock
   }
 
@@ -295,6 +317,9 @@ export class BlockService {
         order: { decrement: 1 },
       },
     })
+
+    // Check if snapshot should be created
+    await this.checkAndCreateSnapshot(pageId, userId)
   }
 
   /**
@@ -438,6 +463,9 @@ export class BlockService {
         }
       })
     )
+
+    // Check if snapshot should be created after batch updates
+    await this.checkAndCreateSnapshot(pageId, userId)
 
     return updatedBlocks
   }

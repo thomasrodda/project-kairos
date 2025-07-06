@@ -76,7 +76,8 @@ apps
 │   │   │   ├── errorHandler.ts
 │   │   │   ├── index.ts
 │   │   │   ├── requestLogger.ts
-│   │   │   └── security.ts
+│   │   │   ├── security.ts
+│   │   │   └── socketAuth.ts
 │   │   ├── routes
 │   │   │   ├── **tests**
 │   │   │   │   ├── auth.test.ts
@@ -84,15 +85,23 @@ apps
 │   │   │   │   └── workspace.test.ts
 │   │   │   ├── auth.routes.ts
 │   │   │   ├── blocks.ts
+│   │   │   ├── export.routes.ts
+│   │   │   ├── history.routes.ts
 │   │   │   ├── pages.ts
+│   │   │   ├── search.routes.ts
+│   │   │   ├── sync.routes.ts
 │   │   │   └── workspace.routes.ts
 │   │   ├── services
 │   │   │   ├── **tests**
 │   │   │   │   └── blockService.test.ts
 │   │   │   ├── auth.service.ts
 │   │   │   ├── blockService.ts
+│   │   │   ├── exportService.ts
 │   │   │   ├── firebase-admin.ts
-│   │   │   └── pageService.ts
+│   │   │   ├── historyService.ts
+│   │   │   ├── pageService.ts
+│   │   │   ├── searchService.ts
+│   │   │   └── syncService.ts
 │   │   ├── test
 │   │   │   ├── factories.ts
 │   │   │   ├── helpers.ts
@@ -105,6 +114,8 @@ apps
 │   │   │   ├── apiResponse.ts
 │   │   │   ├── errors.ts
 │   │   │   └── index.ts
+│   │   ├── websocket
+│   │   │   └── socketServer.ts
 │   │   └── app.ts
 │   ├── SECURITY.md
 │   ├── dev-server.ts

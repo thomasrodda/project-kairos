@@ -4,6 +4,10 @@ import authRoutes from './routes/auth.routes'
 import workspaceRoutes from './routes/workspace.routes'
 import pageRoutes from './routes/pages'
 import blockRoutes from './routes/blocks'
+import historyRoutes from './routes/history.routes'
+import searchRoutes from './routes/search.routes'
+import exportRoutes from './routes/export.routes'
+import syncRoutes from './routes/sync.routes'
 import {
   requestIdMiddleware,
   generalRateLimiter,
@@ -67,6 +71,10 @@ export function createApp(): Express {
   app.use('/api/workspaces', workspaceRoutes)
   app.use('/api/pages', pageRoutes)
   app.use('/api/blocks', blockRoutes)
+  app.use('/api/history', historyRoutes)
+  app.use('/api/search', searchRoutes)
+  app.use('/api/export', exportRoutes)
+  app.use('/api/sync', syncRoutes)
 
   // 404 handler for unmatched routes
   app.use(notFoundHandler)

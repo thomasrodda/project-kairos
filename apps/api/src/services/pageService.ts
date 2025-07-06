@@ -57,6 +57,13 @@ class PageService {
   /**
    * Check if a user has access to a page
    */
+  async verifyPageAccess(pageId: string, userId: string): Promise<boolean> {
+    return this.checkPageAccess(pageId, userId)
+  }
+
+  /**
+   * Check if a user has access to a page (private method)
+   */
   private async checkPageAccess(pageId: string, userId: string): Promise<boolean> {
     const page = await prisma.page.findFirst({
       where: {
