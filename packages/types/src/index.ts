@@ -26,6 +26,7 @@ export interface Block {
   type: 'heading1' | 'heading2' | 'paragraph' | 'bullet'
   content: string
   order: number
+  version: number
   createdAt: Date
   updatedAt: Date
   metadata?: Record<string, unknown>

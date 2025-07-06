@@ -1,7 +1,7 @@
-import { prisma, Block, Prisma } from '@kairos/database'
+import { prisma, Block, Prisma, BlockChange } from '@kairos/database'
 import { BlockType } from '@prisma/client'
 import { z } from 'zod'
-import { NotFoundError, ValidationError } from '../utils/errors'
+import { NotFoundError, ValidationError, ConflictError } from '../utils/errors'
 
 // Validation schemas
 export const createBlockSchema = z.object({
@@ -16,6 +16,7 @@ export const updateBlockSchema = z.object({
   content: z.string().optional(),
   order: z.number().int().min(0).optional(),
   metadata: z.record(z.any()).optional(),
+  version: z.number().int().min(1).optional(), // For optimistic locking
 })
 
 export const reorderBlocksSchema = z.object({
@@ -34,11 +35,37 @@ export const batchUpdateBlocksSchema = z.object({
       type: z.nativeEnum(BlockType).optional(),
       content: z.string().optional(),
       metadata: z.record(z.any()).optional(),
+      version: z.number().int().min(1).optional(), // For optimistic locking
     })
   ),
 })
 
 export class BlockService {
+  /**
+   * Track block changes for audit trail
+   */
+  private async trackBlockChange(
+    blockId: string,
+    operation: 'create' | 'update' | 'delete',
+    userId: string,
+    oldContent?: string | null,
+    newContent?: string | null,
+    oldFormatting?: any,
+    newFormatting?: any
+  ): Promise<BlockChange> {
+    return prisma.blockChange.create({
+      data: {
+        blockId,
+        operation,
+        oldContent,
+        newContent,
+        oldFormatting: oldFormatting ?? Prisma.JsonNull,
+        newFormatting: newFormatting ?? Prisma.JsonNull,
+        changedBy: userId,
+      },
+    })
+  }
+
   /**
    * Check if a user has access to a page through workspace ownership
    */
@@ -117,7 +144,7 @@ export class BlockService {
       })
     }
 
-    return prisma.block.create({
+    const newBlock = await prisma.block.create({
       data: {
         pageId,
         type: data.type,
@@ -126,6 +153,11 @@ export class BlockService {
         metadata: data.metadata ?? Prisma.JsonNull,
       },
     })
+
+    // Track the creation
+    await this.trackBlockChange(newBlock.id, 'create', userId, null, newBlock.content, null, newBlock.metadata)
+
+    return newBlock
   }
 
   /**
@@ -137,58 +169,94 @@ export class BlockService {
       throw new NotFoundError('Block', blockId)
     }
 
+    // Get current block to check version
+    const currentBlock = await prisma.block.findUnique({
+      where: { id: blockId },
+    })
+
+    if (!currentBlock) {
+      throw new NotFoundError('Block', blockId)
+    }
+
+    // Use provided version or assume version 1 for backward compatibility
+    const expectedVersion = data.version ?? 1
+
     // Handle order changes separately to maintain integrity
-    if (data.order !== undefined) {
-      const currentBlock = await prisma.block.findUnique({
-        where: { id: blockId },
-      })
+    if (data.order !== undefined && currentBlock.order !== data.order) {
+      const oldOrder = currentBlock.order
+      const newOrder = data.order
 
-      if (currentBlock && currentBlock.order !== data.order) {
-        const oldOrder = currentBlock.order
-        const newOrder = data.order
-
-        if (newOrder > oldOrder) {
-          // Moving down: shift blocks between old and new position up
-          await prisma.block.updateMany({
-            where: {
-              pageId,
-              order: {
-                gt: oldOrder,
-                lte: newOrder,
-              },
+      if (newOrder > oldOrder) {
+        // Moving down: shift blocks between old and new position up
+        await prisma.block.updateMany({
+          where: {
+            pageId,
+            order: {
+              gt: oldOrder,
+              lte: newOrder,
             },
-            data: {
-              order: { decrement: 1 },
+          },
+          data: {
+            order: { decrement: 1 },
+          },
+        })
+      } else {
+        // Moving up: shift blocks between new and old position down
+        await prisma.block.updateMany({
+          where: {
+            pageId,
+            order: {
+              gte: newOrder,
+              lt: oldOrder,
             },
-          })
-        } else {
-          // Moving up: shift blocks between new and old position down
-          await prisma.block.updateMany({
-            where: {
-              pageId,
-              order: {
-                gte: newOrder,
-                lt: oldOrder,
-              },
-            },
-            data: {
-              order: { increment: 1 },
-            },
-          })
-        }
+          },
+          data: {
+            order: { increment: 1 },
+          },
+        })
       }
     }
 
-    const updateData: Prisma.BlockUpdateInput = {}
+    const updateData: Prisma.BlockUpdateInput = {
+      version: { increment: 1 }, // Always increment version
+    }
     if (data.type !== undefined) updateData.type = data.type
     if (data.content !== undefined) updateData.content = data.content
     if (data.order !== undefined) updateData.order = data.order
     if (data.metadata !== undefined) updateData.metadata = data.metadata ?? Prisma.JsonNull
 
-    return prisma.block.update({
-      where: { id: blockId },
+    // Use updateMany for optimistic locking
+    const result = await prisma.block.updateMany({
+      where: {
+        id: blockId,
+        version: expectedVersion,
+      },
       data: updateData,
     })
+
+    // Check if update succeeded (version matched)
+    if (result.count === 0) {
+      throw new ConflictError('Block was modified by another user', {
+        field: 'version',
+        reason: 'Version mismatch - the block has been updated since you last fetched it',
+        currentVersion: currentBlock.version,
+        expectedVersion,
+      })
+    }
+
+    // Fetch and return the updated block
+    const updatedBlock = await prisma.block.findUnique({
+      where: { id: blockId },
+    })
+
+    if (!updatedBlock) {
+      throw new NotFoundError('Block', blockId)
+    }
+
+    // Track the update with old and new values
+    await this.trackBlockChange(blockId, 'update', userId, currentBlock.content, updatedBlock.content, currentBlock.metadata, updatedBlock.metadata)
+
+    return updatedBlock
   }
 
   /**
@@ -208,6 +276,9 @@ export class BlockService {
     if (!blockToDelete) {
       throw new NotFoundError('Block', blockId)
     }
+
+    // Track the deletion before actually deleting
+    await this.trackBlockChange(blockId, 'delete', userId, blockToDelete.content, null, blockToDelete.metadata, null)
 
     // Delete the block
     await prisma.block.delete({
@@ -277,7 +348,7 @@ export class BlockService {
       throw new NotFoundError('Page', pageId)
     }
 
-    // Verify all blocks belong to this page
+    // Verify all blocks belong to this page and get their current versions
     const blockIds = data.blocks.map((b) => b.id)
     const existingBlocks = await prisma.block.findMany({
       where: {
@@ -293,18 +364,78 @@ export class BlockService {
       })
     }
 
+    // Create a map of block versions for quick lookup
+    const blockVersionMap = new Map(existingBlocks.map((b) => [b.id, b.version]))
+
+    // Track which blocks had version conflicts
+    const versionConflicts: Array<{ id: string; currentVersion: number; expectedVersion: number }> = []
+
     // Update blocks in a transaction
-    const updatedBlocks = await prisma.$transaction(
-      data.blocks.map(({ id, ...updateData }) => {
-        const data: Prisma.BlockUpdateInput = {}
+    const results = await prisma.$transaction(
+      data.blocks.map(({ id, version, ...updateData }) => {
+        const expectedVersion = version ?? 1 // Use provided version or assume version 1 for backward compatibility
+        const currentVersion = blockVersionMap.get(id) ?? 1
+
+        const data: Prisma.BlockUpdateInput = {
+          version: { increment: 1 }, // Always increment version
+        }
         if (updateData.type !== undefined) data.type = updateData.type
         if (updateData.content !== undefined) data.content = updateData.content
         if (updateData.metadata !== undefined) data.metadata = updateData.metadata ?? Prisma.JsonNull
 
-        return prisma.block.update({
-          where: { id },
+        // Use updateMany for optimistic locking
+        return prisma.block.updateMany({
+          where: {
+            id,
+            version: expectedVersion,
+          },
           data,
         })
+      })
+    )
+
+    // Check for version conflicts
+    results.forEach((result, index) => {
+      if (result.count === 0) {
+        const block = data.blocks[index]
+        const currentVersion = blockVersionMap.get(block.id) ?? 1
+        versionConflicts.push({
+          id: block.id,
+          currentVersion,
+          expectedVersion: block.version ?? 1,
+        })
+      }
+    })
+
+    // If any blocks had version conflicts, throw an error
+    if (versionConflicts.length > 0) {
+      throw new ConflictError('Some blocks were modified by another user', {
+        field: 'blocks',
+        reason: 'Version mismatch - some blocks have been updated since you last fetched them',
+        conflicts: versionConflicts,
+      })
+    }
+
+    // Fetch and return all updated blocks
+    const updatedBlocks = await prisma.block.findMany({
+      where: {
+        id: { in: blockIds },
+      },
+      orderBy: { order: 'asc' },
+    })
+
+    // Track all successful updates
+    const updatedBlocksMap = new Map(updatedBlocks.map((b) => [b.id, b]))
+    const oldBlocksMap = new Map(existingBlocks.map((b) => [b.id, b]))
+
+    await Promise.all(
+      data.blocks.map(async ({ id }) => {
+        const oldBlock = oldBlocksMap.get(id)
+        const newBlock = updatedBlocksMap.get(id)
+
+        if (oldBlock && newBlock) {
+          await this.trackBlockChange(id, 'update', userId, oldBlock.content, newBlock.content, oldBlock.metadata, newBlock.metadata)
+        }
       })
     )
 

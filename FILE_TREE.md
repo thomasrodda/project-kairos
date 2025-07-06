@@ -87,6 +87,8 @@ apps
 │   │   │   ├── pages.ts
 │   │   │   └── workspace.routes.ts
 │   │   ├── services
+│   │   │   ├── **tests**
+│   │   │   │   └── blockService.test.ts
 │   │   │   ├── auth.service.ts
 │   │   │   ├── blockService.ts
 │   │   │   ├── firebase-admin.ts
@@ -389,6 +391,8 @@ packages
 prisma
 ├── migrations
 │   ├── 20250705162218_init
+│   │   └── migration.sql
+│   ├── 20250706112958_add_version_tracking
 │   │   └── migration.sql
 │   └── migration_lock.toml
 └── schema.prisma

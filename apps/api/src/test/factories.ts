@@ -56,6 +56,7 @@ export function createBlock(overrides: Partial<Block> = {}): Block {
     metadata: null,
     pageId: overrides.pageId || uuidv4(),
     order: 0,
+    version: 1,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,

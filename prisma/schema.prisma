@@ -18,7 +18,8 @@ model User {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  workspaces Workspace[]
+  workspaces   Workspace[]
+  blockChanges BlockChange[]
 
   @@map("users")
 }
@@ -48,12 +49,13 @@ model Page {
   updatedAt   DateTime @updatedAt
 
   // Relations
-  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  parent       Page?     @relation("PageHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children     Page[]    @relation("PageHierarchy")
-  blocks       Block[]
-  incomingLinks Link[]   @relation("LinkTarget")
-  outgoingLinks Link[]   @relation("LinkSource")
+  workspace     Workspace      @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parent        Page?          @relation("PageHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children      Page[]         @relation("PageHierarchy")
+  blocks        Block[]
+  incomingLinks Link[]         @relation("LinkTarget")
+  outgoingLinks Link[]         @relation("LinkSource")
+  snapshots     PageSnapshot[]
 
   @@index([workspaceId])
   @@index([parentId])
@@ -67,11 +69,13 @@ model Block {
   content   String   @default("")
   order     Int      @default(0)
   metadata  Json?
+  version   Int      @default(1)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  page         Page          @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  blockChanges BlockChange[]
 
   @@index([pageId])
   @@map("blocks")
@@ -89,6 +93,41 @@ model Link {
 
   @@unique([sourceId, targetId])
   @@map("links")
+}
+
+model PageSnapshot {
+  id           String   @id @default(cuid())
+  pageId       String
+  snapshotData Json
+  createdAt    DateTime @default(now())
+
+  // Relations
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+  @@index([createdAt])
+  @@map("page_snapshots")
+}
+
+model BlockChange {
+  id             String   @id @default(cuid())
+  blockId        String
+  operation      String   // "create", "update", "delete"
+  oldContent     String?
+  newContent     String?
+  oldFormatting  Json?
+  newFormatting  Json?
+  changedBy      String   // userId
+  changedAt      DateTime @default(now())
+
+  // Relations
+  block Block @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [changedBy], references: [id])
+
+  @@index([blockId])
+  @@index([changedBy])
+  @@index([changedAt])
+  @@map("block_changes")
 }
 
 enum BlockType {
