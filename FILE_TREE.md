@@ -50,6 +50,7 @@ AI System Prompt Files
 ├── Git & Github Guide.md
 ├── Inline SVG System Guide.md
 ├── Markdown Export Import Guide.md
+├── Page Management Implementation Plan.md
 ├── Performance Optimization Guide.md
 ├── Production Deployment Guide.md
 ├── Quick Commands.md
