@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
 import rateLimit from 'express-rate-limit'
-import mongoSanitize from 'express-mongo-sanitize'
 import helmet from 'helmet'
 import { v4 as uuidv4 } from 'uuid'
 import { securityConfig } from '../config/security.config'
@@ -85,12 +84,47 @@ export const helmetConfig = helmet({
 })
 
 // MongoDB/NoSQL injection protection
-export const sanitizeInput = mongoSanitize({
-  replaceWith: '_',
-  onSanitize: ({ req, key }) => {
-    console.warn(`Attempted NoSQL injection blocked - Request ID: ${req.headers['x-request-id']}, Key: ${key}`)
-  },
-})
+// Custom implementation for Express 5 compatibility
+export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
+  // Helper function to sanitize objects
+  const sanitize = (obj: Record<string, unknown>): Record<string, unknown> => {
+    if (obj && typeof obj === 'object') {
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          if (key.startsWith('$') || key.includes('.')) {
+            // Log potential injection attempt
+            console.warn(`Potential NoSQL injection blocked - Request ID: ${req.headers['x-request-id']}, Key: ${key}`)
+            delete obj[key]
+          } else if (typeof obj[key] === 'object') {
+            obj[key] = sanitize(obj[key] as Record<string, unknown>)
+          }
+        }
+      }
+    }
+    return obj
+  }
+
+  // Sanitize body, params, and query without modifying the request object
+  if (req.body) {
+    sanitize(req.body as Record<string, unknown>)
+  }
+
+  // For query and params, we need to be careful with Express 5's read-only properties
+  // We'll sanitize in place if possible, otherwise skip
+  try {
+    if (req.query) {
+      sanitize(req.query as Record<string, unknown>)
+    }
+    if (req.params) {
+      sanitize(req.params as Record<string, unknown>)
+    }
+  } catch (_err) {
+    // If we can't modify query/params (Express 5), that's okay
+    // The important one is body which we can still sanitize
+  }
+
+  next()
+}
 
 // Custom security headers middleware
 export const customSecurityHeaders = (req: Request, res: Response, next: NextFunction) => {

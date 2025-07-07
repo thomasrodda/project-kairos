@@ -20,24 +20,32 @@ const redisConfig = {
 export const redis = new Redis(redisConfig)
 
 // Handle Redis connection events
+let redisErrorLogged = false
+
 redis.on('connect', () => {
   console.log('Redis connected successfully')
+  redisErrorLogged = false
 })
 
-redis.on('error', (err) => {
-  console.error('Redis connection error:', err)
+redis.on('error', (_err) => {
+  // Only log the first error to avoid spam
+  if (!redisErrorLogged) {
+    console.warn('Redis not available - sync features will be disabled. To enable, install and start Redis.')
+    redisErrorLogged = true
+  }
 })
 
 redis.on('ready', () => {
   console.log('Redis ready to accept commands')
+  redisErrorLogged = false
 })
 
 redis.on('close', () => {
-  console.log('Redis connection closed')
+  // Silent close
 })
 
-redis.on('reconnecting', (delay: number) => {
-  console.log(`Redis reconnecting in ${delay}ms`)
+redis.on('reconnecting', (_delay: number) => {
+  // Silent reconnect attempts
 })
 
 /**
