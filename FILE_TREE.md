@@ -62,7 +62,8 @@ AI System Prompt Files
 ├── Testing Guide.md
 ├── Testing Todo List.md
 ├── Text Formatting Plan.md
-└── Troubleshooting Guide.md
+├── Troubleshooting Guide.md
+└── Workspace Management Implementation Plan.md
 apps
 ├── api
 │   ├── docs
