@@ -197,6 +197,16 @@ apps
 │   └── copy-icons.mjs
 ├── src
 │   ├── components
+│   │   ├── Auth
+│   │   │   ├── Auth.module.scss
+│   │   │   ├── ForgotPassword.tsx
+│   │   │   ├── Login.test.tsx
+│   │   │   ├── Login.tsx
+│   │   │   ├── ProtectedRoute.test.tsx
+│   │   │   ├── ProtectedRoute.tsx
+│   │   │   ├── Signup.test.tsx
+│   │   │   ├── Signup.tsx
+│   │   │   └── index.ts
 │   │   ├── Editor
 │   │   │   ├── Block
 │   │   │   │   ├── Block.issues.md
@@ -287,6 +297,8 @@ apps
 │   │   ├── Workspace.tsx
 │   │   └── index.ts
 │   ├── contexts
+│   │   ├── AuthContext.test.tsx
+│   │   ├── AuthContext.tsx
 │   │   ├── EditorContext.test.tsx
 │   │   ├── EditorContext.tsx
 │   │   └── EditorProvider.tsx

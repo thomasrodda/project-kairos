@@ -2,8 +2,8 @@ import { Router } from 'express'
 import { AuthService } from '../services/auth.service'
 import { requireAuth } from '../middleware/auth.middleware'
 import { asyncHandler } from '../middleware/errorHandler'
-import { successResponse, errorResponse } from '../utils/apiResponse'
-import { AuthenticationError, ValidationError } from '../utils/errors'
+import { successResponse } from '../utils/apiResponse'
+import { AuthenticationError } from '../utils/errors'
 
 const router = Router()
 
@@ -30,7 +30,7 @@ router.post(
         uid: decodedToken.uid,
         email: decodedToken.email,
       })
-    } catch (error) {
+    } catch {
       throw new AuthenticationError('Invalid token')
     }
   })
@@ -44,8 +44,8 @@ router.post(
   '/sync-user',
   requireAuth,
   asyncHandler(async (req, res) => {
-    // Use the authenticated user's UID
-    const user = await AuthService.syncUser(req.user!.id)
+    // Use the authenticated user's Firebase UID
+    const user = await AuthService.syncUser(req.decodedToken!.uid)
     successResponse(res, { user })
   })
 )

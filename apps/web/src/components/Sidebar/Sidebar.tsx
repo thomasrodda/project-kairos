@@ -13,9 +13,11 @@
 // State: isExpanded (boolean) - controls sidebar collapse/expand
 
 import { useState, forwardRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { SidebarButton } from '../SidebarButton'
 import { Icon } from '@kairos/ui'
 import { PageTree } from './PageTree'
+import { useAuthContext } from '../../contexts/AuthContext'
 import './Sidebar.scss'
 
 interface SidebarProps {
@@ -28,12 +30,24 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ workspaceId, cur
   // Component state - manages sidebar collapse/expand
 
   const [isExpanded, setIsExpanded] = useState(true)
+  const navigate = useNavigate()
+  const { user, logout } = useAuthContext()
 
   // Event handlers
 
   // Toggle sidebar expanded/collapsed state
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
+  }
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await logout()
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   // Button configuration data
@@ -95,6 +109,20 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ workspaceId, cur
             <SidebarButton key={button.id} icon={button.icon} text={button.text} variant="slim" isCollapsed={!isExpanded} id={button.id} />
           ))}
         </div>
+
+        {/* User section - Show user info and logout */}
+        {user && (
+          <div className="sidebar__user-section">
+            <div className="sidebar__divider" />
+            <div className="sidebar__user-info">
+              {isExpanded && <span className="sidebar__user-email">{user.email}</span>}
+              <button className="sidebar__logout-button" onClick={handleLogout} aria-label="Sign out" title="Sign out">
+                <Icon name="back" size={20} />
+                {isExpanded && <span>Sign out</span>}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </aside>
   )

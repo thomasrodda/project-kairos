@@ -23,7 +23,7 @@ export const securityConfig = {
   },
 
   // CORS allowed origins
-  corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : [process.env.VITE_API_URL || 'http://localhost:3000'],
+  corsOrigins: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : [process.env.CORS_ORIGIN || 'http://localhost:3000'],
 
   // Security headers
   contentSecurityPolicy: {

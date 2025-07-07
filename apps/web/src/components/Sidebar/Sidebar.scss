@@ -131,6 +131,66 @@
   }
 
   // =============================================================================
+  // USER SECTION - Authentication info and logout
+  // =============================================================================
+
+  &__user-section {
+    margin-top: var(--spacing-12);
+  }
+
+  &__divider {
+    height: 1px;
+    background-color: var(--color-border);
+    margin: 0 var(--spacing-8) var(--spacing-12);
+  }
+
+  &__user-info {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-8);
+    padding: 0 var(--spacing-8);
+  }
+
+  &__user-email {
+    font: var(--text-caption);
+    color: var(--color-text-muted);
+    padding: 0 var(--spacing-12);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__logout-button {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-12);
+    width: 100%;
+    padding: var(--spacing-8) var(--spacing-12);
+    background: none;
+    border: none;
+    border-radius: var(--radius-8);
+    color: var(--color-text-secondary);
+    font: var(--text-body-small);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: var(--color-surface-elevated-1);
+      color: var(--color-text-primary);
+    }
+
+    &:focus {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
+
+    .sidebar--collapsed & {
+      justify-content: center;
+      padding: var(--spacing-8);
+    }
+  }
+
+  // =============================================================================
   // RESPONSIVE ADJUSTMENTS
   // =============================================================================
 
