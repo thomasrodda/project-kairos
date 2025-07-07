@@ -80,7 +80,13 @@ function ErrorFallback({ error, retry, component }: { error: Error; retry: () =>
   )
 }
 
-export function Workspace() {
+interface WorkspaceProps {
+  workspaceId?: string
+  currentPageId?: string
+  onPageSelect?: (pageId: string) => void
+}
+
+export function Workspace({ workspaceId, currentPageId, onPageSelect }: WorkspaceProps) {
   const workspaceRef = useRef<HTMLDivElement>(null)
   const sidebarRef = useRef<HTMLElement>(null)
 
@@ -114,7 +120,13 @@ export function Workspace() {
           </aside>
         )}
       >
-        <Sidebar ref={sidebarRef} aria-label="Navigation sidebar" />
+        <Sidebar
+          ref={sidebarRef}
+          aria-label="Navigation sidebar"
+          workspaceId={workspaceId}
+          currentPageId={currentPageId}
+          onPageSelect={onPageSelect}
+        />
       </ErrorBoundary>
 
       {/* Main content area with error boundary */}

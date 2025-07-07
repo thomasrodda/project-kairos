@@ -15,9 +15,16 @@
 import { useState, forwardRef } from 'react'
 import { SidebarButton } from '../SidebarButton'
 import { Icon } from '@kairos/ui'
+import { PageTree } from './PageTree'
 import './Sidebar.scss'
 
-export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
+interface SidebarProps {
+  workspaceId?: string
+  currentPageId?: string
+  onPageSelect?: (pageId: string) => void
+}
+
+export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ workspaceId, currentPageId, onPageSelect }, ref) => {
   // Component state - manages sidebar collapse/expand
 
   const [isExpanded, setIsExpanded] = useState(true)
@@ -74,12 +81,10 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
         ))}
       </div>
 
-      {/* File tree section - Expandable file/page navigation (placeholder) */}
+      {/* File tree section - Expandable file/page navigation */}
       <div className="sidebar__file-tree">
-        {isExpanded && (
-          <div className="sidebar__file-tree-placeholder">
-            <p>File tree will go here</p>
-          </div>
+        {isExpanded && workspaceId && onPageSelect && (
+          <PageTree workspaceId={workspaceId} currentPageId={currentPageId} onPageSelect={onPageSelect} />
         )}
       </div>
 

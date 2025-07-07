@@ -261,6 +261,16 @@ apps
 │   │   ├── PerformanceTest
 │   │   │   └── PerformanceTest.tsx
 │   │   ├── Sidebar
+│   │   │   ├── PageTree
+│   │   │   │   ├── PageTree.module.scss
+│   │   │   │   ├── PageTree.test.tsx
+│   │   │   │   ├── PageTree.tsx
+│   │   │   │   ├── PageTreeItem.module.scss
+│   │   │   │   ├── PageTreeItem.test.tsx
+│   │   │   │   ├── PageTreeItem.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── usePageTree.test.ts
+│   │   │   │   └── usePageTree.ts
 │   │   │   ├── Sidebar.scss
 │   │   │   ├── Sidebar.test.tsx
 │   │   │   ├── Sidebar.tsx

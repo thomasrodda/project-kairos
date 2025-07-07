@@ -84,7 +84,7 @@ function App() {
 
   return (
     <EnhancedEditorProvider workspaceId={workspaceId || undefined} pageId={pageId || undefined}>
-      <Workspace />
+      <Workspace workspaceId={workspaceId || undefined} currentPageId={pageId || undefined} onPageSelect={setPageId} />
       {/* Show performance monitoring in development */}
       {process.env.NODE_ENV === 'development' && <PerformanceTest />}
     </EnhancedEditorProvider>
