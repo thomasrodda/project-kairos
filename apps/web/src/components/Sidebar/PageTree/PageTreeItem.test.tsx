@@ -1,7 +1,7 @@
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { PageTreeItem } from './PageTreeItem'
-import { Page } from '@kairos/types'
+import { Page } from '../../../utils/api/types'
 
 // Mock the Icon component
 jest.mock('@kairos/ui', () => ({
@@ -15,8 +15,8 @@ describe('PageTreeItem', () => {
     title: 'Test Page',
     order: 0,
     isFolder: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }
 
   const mockFolder: Page & { children?: Page[] } = {
@@ -25,8 +25,8 @@ describe('PageTreeItem', () => {
     title: 'Test Folder',
     order: 1,
     isFolder: true,
-    createdAt: new Date(),
-    updatedAt: new Date(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
     children: [
       {
         id: '3',
@@ -35,8 +35,8 @@ describe('PageTreeItem', () => {
         title: 'Child Page',
         order: 0,
         isFolder: false,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     ],
   }
@@ -221,8 +221,8 @@ describe('PageTreeItem', () => {
             title: 'Nested Folder',
             order: 0,
             isFolder: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
             children: [
               {
                 id: '4',
@@ -231,8 +231,8 @@ describe('PageTreeItem', () => {
                 title: 'Deeply Nested Page',
                 order: 0,
                 isFolder: false,
-                createdAt: new Date(),
-                updatedAt: new Date(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
               },
             ],
           } as Page & { children?: Page[] },

@@ -1,7 +1,7 @@
 import React from 'react'
 import { PageTreeItem } from './PageTreeItem'
 import { usePageTree } from './usePageTree'
-import { Page } from '@kairos/types'
+import { Page } from '../../../utils/api/types'
 import styles from './PageTree.module.scss'
 
 interface PageTreeProps {

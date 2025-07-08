@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { api } from '../../../utils/api/client'
-import { Page } from '@kairos/types'
+import { Page } from '../../../utils/api/types'
+import { useWorkspace } from '../../../contexts/WorkspaceContext'
 
 // Type for Page with children property
 type PageWithChildren = Page & { children: PageWithChildren[] }
@@ -11,74 +11,25 @@ interface UsePageTreeOptions {
   onPageSelect: (pageId: string) => void
 }
 
-interface PageTreeState {
-  pages: Page[]
-  expandedFolders: Set<string>
-  loading: boolean
-  error: Error | null
-}
-
 export function usePageTree({ workspaceId, currentPageId, onPageSelect }: UsePageTreeOptions) {
-  const [state, setState] = useState<PageTreeState>({
-    pages: [],
-    expandedFolders: new Set(),
-    loading: true,
-    error: null,
-  })
-
-  // Fetch pages from API
-  useEffect(() => {
-    if (!workspaceId) return
-
-    let cancelled = false
-
-    async function fetchPages() {
-      setState((prev) => ({ ...prev, loading: true, error: null }))
-
-      try {
-        const pages = await api.pages.list(workspaceId)
-
-        if (!cancelled) {
-          setState((prev) => ({
-            ...prev,
-            pages,
-            loading: false,
-          }))
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setState((prev) => ({
-            ...prev,
-            loading: false,
-            error: error instanceof Error ? error : new Error('Failed to load pages'),
-          }))
-        }
-      }
-    }
-
-    fetchPages()
-
-    return () => {
-      cancelled = true
-    }
-  }, [workspaceId])
+  const { pages, loading, error } = useWorkspace()
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set())
 
   // Toggle folder expansion
   const toggleFolder = useCallback((folderId: string) => {
-    setState((prev) => {
-      const newExpanded = new Set(prev.expandedFolders)
+    setExpandedFolders((prev) => {
+      const newExpanded = new Set(prev)
       if (newExpanded.has(folderId)) {
         newExpanded.delete(folderId)
       } else {
         newExpanded.add(folderId)
       }
-      return { ...prev, expandedFolders: newExpanded }
+      return newExpanded
     })
   }, [])
 
   // Build hierarchical tree structure
   const pageTree = useMemo(() => {
-    const { pages } = state
     if (pages.length === 0) return []
 
     // Create a map for quick lookup
@@ -116,48 +67,40 @@ export function usePageTree({ workspaceId, currentPageId, onPageSelect }: UsePag
 
     sortPages(rootPages)
     return rootPages
-  }, [state.pages])
+  }, [pages])
 
   // Handle page selection
   const handlePageSelect = useCallback(
     (pageId: string) => {
-      const page = state.pages.find((p) => p.id === pageId)
+      const page = pages.find((p) => p.id === pageId)
       if (page && !page.isFolder) {
         onPageSelect(pageId)
       }
     },
-    [state.pages, onPageSelect]
+    [pages, onPageSelect]
   )
 
   // Expand all parent folders of the current page
   useEffect(() => {
-    if (!currentPageId || state.pages.length === 0) return
+    if (!currentPageId || pages.length === 0) return
 
     const expandParents = (pageId: string) => {
-      const page = state.pages.find((p) => p.id === pageId)
+      const page = pages.find((p) => p.id === pageId)
       if (page?.parentId) {
-        setState((prev) => ({
-          ...prev,
-          expandedFolders: new Set([...prev.expandedFolders, page.parentId!]),
-        }))
+        setExpandedFolders((prev) => new Set([...prev, page.parentId!]))
         expandParents(page.parentId)
       }
     }
 
     expandParents(currentPageId)
-  }, [currentPageId, state.pages])
+  }, [currentPageId, pages])
 
   return {
     pageTree,
-    loading: state.loading,
-    error: state.error,
-    expandedFolders: state.expandedFolders,
+    loading,
+    error,
+    expandedFolders,
     toggleFolder,
     handlePageSelect,
-    refetch: () => {
-      // Trigger a re-fetch by changing workspaceId dependency
-      setState((prev) => ({ ...prev, loading: true }))
-      // The useEffect will handle the actual fetch
-    },
   }
 }

@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react'
 import { Icon } from '@kairos/ui'
-import { Page } from '@kairos/types'
+import { Page } from '../../../utils/api/types'
 import styles from './PageTreeItem.module.scss'
 
 interface PageTreeItemProps {

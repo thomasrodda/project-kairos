@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
-import { Workspace } from '@kairos/types'
+import { Workspace, Page } from '../utils/api/types'
 import { api } from '../utils/api/client'
 import { useAuthContext } from './AuthContext'
 import { pageService } from '../services'
@@ -19,16 +19,23 @@ interface WorkspaceContextValue {
   workspaces: Workspace[]
   currentWorkspace: Workspace | null
   currentPageId: string | null
+  pages: Page[]
   loading: boolean
   error: Error | null
 
-  // Actions
+  // Workspace Actions
   createWorkspace: (name: string, description?: string) => Promise<Workspace>
   selectWorkspace: (id: string) => Promise<void>
-  selectPage: (pageId: string) => void
   updateWorkspace: (id: string, data: { name?: string; description?: string }) => Promise<void>
   deleteWorkspace: (id: string) => Promise<void>
   refreshWorkspaces: () => Promise<void>
+
+  // Page Actions
+  selectPage: (pageId: string) => void
+  createPage: (data: { title: string; parentId?: string | null; isFolder?: boolean }) => Promise<Page>
+  updatePage: (pageId: string, data: { title?: string; parentId?: string | null; order?: number }) => Promise<void>
+  deletePage: (pageId: string) => Promise<void>
+  refreshPages: () => Promise<void>
 }
 
 const WorkspaceContext = createContext<WorkspaceContextValue | undefined>(undefined)
@@ -58,6 +65,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null)
   const [currentPageId, setCurrentPageId] = useState<string | null>(null)
+  const [pages, setPages] = useState<Page[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -164,6 +172,27 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       setWorkspaceStorage(storage)
     }
   }, [currentWorkspace])
+
+  // Load pages when workspace changes
+  const loadPages = useCallback(async () => {
+    if (!currentWorkspace) {
+      setPages([])
+      return
+    }
+
+    try {
+      const fetchedPages = await api.pages.list(currentWorkspace.id)
+      setPages(fetchedPages)
+    } catch (err) {
+      console.error('Failed to load pages:', err)
+      // Don't set error state here as it's not critical
+    }
+  }, [currentWorkspace])
+
+  // Load pages when workspace changes
+  useEffect(() => {
+    loadPages()
+  }, [loadPages])
 
   const createWorkspace = useCallback(async (name: string, description?: string): Promise<Workspace> => {
     try {
@@ -305,18 +334,97 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     await loadWorkspaces()
   }, [loadWorkspaces])
 
+  // Page CRUD operations
+  const createPage = useCallback(
+    async (data: { title: string; parentId?: string | null; isFolder?: boolean }): Promise<Page> => {
+      if (!currentWorkspace) {
+        throw new Error('No workspace selected')
+      }
+
+      try {
+        const newPage = await pageService.createPage(currentWorkspace.id, data)
+        setPages((prev) => [...prev, newPage])
+
+        // Select the new page if it's not a folder
+        if (!data.isFolder) {
+          selectPage(newPage.id)
+        }
+
+        return newPage
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error('Failed to create page')
+        console.error('Failed to create page:', error)
+        throw error
+      }
+    },
+    [currentWorkspace, selectPage]
+  )
+
+  const updatePage = useCallback(
+    async (pageId: string, data: { title?: string; parentId?: string | null; order?: number }) => {
+      if (!currentWorkspace) {
+        throw new Error('No workspace selected')
+      }
+
+      try {
+        const updatedPage = await pageService.updatePage(currentWorkspace.id, pageId, data)
+        setPages((prev) => prev.map((p) => (p.id === pageId ? updatedPage : p)))
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error('Failed to update page')
+        console.error('Failed to update page:', error)
+        throw error
+      }
+    },
+    [currentWorkspace]
+  )
+
+  const deletePage = useCallback(
+    async (pageId: string) => {
+      if (!currentWorkspace) {
+        throw new Error('No workspace selected')
+      }
+
+      try {
+        await pageService.deletePage(currentWorkspace.id, pageId)
+        setPages((prev) => prev.filter((p) => p.id !== pageId))
+
+        // If we deleted the current page, clear selection
+        if (currentPageId === pageId) {
+          setCurrentPageId(null)
+        }
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error('Failed to delete page')
+        console.error('Failed to delete page:', error)
+        throw error
+      }
+    },
+    [currentWorkspace, currentPageId]
+  )
+
+  const refreshPages = useCallback(async () => {
+    await loadPages()
+  }, [loadPages])
+
   const value: WorkspaceContextValue = {
+    // State
     workspaces,
     currentWorkspace,
     currentPageId,
+    pages,
     loading,
     error,
+    // Workspace Actions
     createWorkspace,
     selectWorkspace,
-    selectPage,
     updateWorkspace,
     deleteWorkspace,
     refreshWorkspaces,
+    // Page Actions
+    selectPage,
+    createPage,
+    updatePage,
+    deletePage,
+    refreshPages,
   }
 
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>
