@@ -3,7 +3,15 @@
 
 import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { BrowserRouter } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
+
+// Mock useNavigate hook
+const mockNavigate = jest.fn()
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+}))
 
 // Mock the SidebarButton component
 jest.mock('../SidebarButton', () => ({
@@ -23,17 +31,61 @@ jest.mock('@kairos/ui', () => ({
   ),
 }))
 
+// Mock the WorkspaceSelector component
+jest.mock('../WorkspaceSelector', () => ({
+  WorkspaceSelector: ({ isCollapsed, onCreateWorkspace }: any) => (
+    <div data-testid="workspace-selector" data-collapsed={isCollapsed}>
+      <button onClick={onCreateWorkspace}>Workspace Selector</button>
+    </div>
+  ),
+}))
+
+// Mock the WorkspaceCreationDialog component
+jest.mock('../WorkspaceCreationDialog', () => ({
+  WorkspaceCreationDialog: ({ isOpen, onClose }: any) =>
+    isOpen ? (
+      <div data-testid="workspace-creation-dialog">
+        <button onClick={onClose}>Close Dialog</button>
+      </div>
+    ) : null,
+}))
+
+// Mock the AuthContext
+jest.mock('../../contexts/AuthContext', () => ({
+  useAuthContext: () => ({
+    user: { email: 'test@example.com' },
+    logout: jest.fn(),
+  }),
+}))
+
+// Mock the PageTree component
+jest.mock('./PageTree', () => ({
+  PageTree: ({ workspaceId, currentPageId, onPageSelect }: any) => (
+    <div data-testid="page-tree" data-workspace-id={workspaceId} data-page-id={currentPageId}>
+      Page Tree
+    </div>
+  ),
+}))
+
+// Helper function to render with Router
+const renderWithRouter = (ui: React.ReactElement) => {
+  return render(<BrowserRouter>{ui}</BrowserRouter>)
+}
+
 describe('Sidebar', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
   describe('✅ Core Functionality', () => {
     it('starts in expanded state by default', () => {
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
       const sidebar = screen.getByRole('complementary')
       expect(sidebar).not.toHaveClass('sidebar--collapsed')
     })
 
     it('toggles between expanded and collapsed states', async () => {
       const user = userEvent.setup()
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
 
       const sidebar = screen.getByRole('complementary')
       const toggleButton = screen.getByLabelText('Collapse sidebar')
@@ -54,7 +106,7 @@ describe('Sidebar', () => {
 
     it('shows logo only when expanded', async () => {
       const user = userEvent.setup()
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
 
       // Initially expanded - logo visible
       expect(screen.getByTestId('icon-color-profile')).toBeInTheDocument()
@@ -70,19 +122,23 @@ describe('Sidebar', () => {
   })
 
   describe('✅ Primary Buttons', () => {
-    it('passes correct props to primary buttons', () => {
-      render(<Sidebar />)
+    it('renders workspace selector and primary buttons', () => {
+      renderWithRouter(<Sidebar />)
 
-      const workspaceButton = screen.getByTestId('sidebar-button-workspace-name')
-      expect(workspaceButton).toHaveAttribute('data-icon', 'profile')
-      expect(workspaceButton).toHaveAttribute('data-text', 'Workspace Name')
-      expect(workspaceButton).toHaveAttribute('data-variant', 'standard')
-      expect(workspaceButton).toHaveAttribute('data-collapsed', 'false')
+      // Check workspace selector is rendered
+      expect(screen.getByTestId('workspace-selector')).toBeInTheDocument()
+
+      // Check other primary buttons
+      const searchButton = screen.getByTestId('sidebar-button-search')
+      expect(searchButton).toHaveAttribute('data-icon', 'search')
+      expect(searchButton).toHaveAttribute('data-text', 'Search')
+      expect(searchButton).toHaveAttribute('data-variant', 'standard')
+      expect(searchButton).toHaveAttribute('data-collapsed', 'false')
     })
 
     it('updates button collapsed state when sidebar collapses', async () => {
       const user = userEvent.setup()
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
 
       const buttons = screen.getAllByTestId(/^sidebar-button-/)
 
@@ -102,14 +158,20 @@ describe('Sidebar', () => {
   })
 
   describe('✅ File Tree Section', () => {
-    it('shows file tree placeholder when expanded', () => {
-      render(<Sidebar />)
-      expect(screen.getByText('File tree will go here')).toBeInTheDocument()
+    it('shows page tree when expanded with workspace', () => {
+      renderWithRouter(<Sidebar workspaceId="workspace-1" currentPageId="page-1" onPageSelect={jest.fn()} />)
+      expect(screen.getByTestId('page-tree')).toBeInTheDocument()
+      expect(screen.getByTestId('page-tree')).toHaveAttribute('data-workspace-id', 'workspace-1')
+    })
+
+    it('does not show page tree when no workspace provided', () => {
+      renderWithRouter(<Sidebar />)
+      expect(screen.queryByTestId('page-tree')).not.toBeInTheDocument()
     })
 
     it('hides file tree when collapsed', async () => {
       const user = userEvent.setup()
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
 
       // Collapse sidebar
       await user.click(screen.getByLabelText('Collapse sidebar'))
@@ -120,7 +182,7 @@ describe('Sidebar', () => {
 
   describe('✅ Bottom Panel', () => {
     it('uses slim variant for bottom buttons', () => {
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
 
       const bottomButtons = ['page-templates', 'archive', 'help', 'settings', 'updates']
 
@@ -134,7 +196,7 @@ describe('Sidebar', () => {
   describe('✅ Toggle Icon', () => {
     it('applies flipped class when collapsed', async () => {
       const user = userEvent.setup()
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
 
       const icon = screen.getByTestId('icon-double-arrow')
 
@@ -151,7 +213,7 @@ describe('Sidebar', () => {
   describe('✅ Accessibility', () => {
     it('toggle button has descriptive labels', async () => {
       const user = userEvent.setup()
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
 
       // Initially shows collapse label
       let toggleButton = screen.getByRole('button', { name: 'Collapse sidebar' })
@@ -164,7 +226,7 @@ describe('Sidebar', () => {
     })
 
     it('all buttons are keyboard accessible', () => {
-      render(<Sidebar />)
+      renderWithRouter(<Sidebar />)
 
       // All buttons should be focusable
       const allButtons = screen.getAllByRole('button')

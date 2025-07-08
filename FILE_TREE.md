@@ -291,10 +291,20 @@ apps
 │   │   │   ├── SidebarButton.test.tsx
 │   │   │   ├── SidebarButton.tsx
 │   │   │   └── index.ts
-│   │   └── Workspace
-│   │   ├── Workspace.scss
-│   │   ├── Workspace.test.tsx
-│   │   ├── Workspace.tsx
+│   │   ├── Workspace
+│   │   │   ├── Workspace.scss
+│   │   │   ├── Workspace.test.tsx
+│   │   │   ├── Workspace.tsx
+│   │   │   └── index.ts
+│   │   ├── WorkspaceCreationDialog
+│   │   │   ├── WorkspaceCreationDialog.scss
+│   │   │   ├── WorkspaceCreationDialog.test.tsx
+│   │   │   ├── WorkspaceCreationDialog.tsx
+│   │   │   └── index.ts
+│   │   └── WorkspaceSelector
+│   │   ├── WorkspaceSelector.scss
+│   │   ├── WorkspaceSelector.test.tsx
+│   │   ├── WorkspaceSelector.tsx
 │   │   └── index.ts
 │   ├── contexts
 │   │   ├── AuthContext.test.tsx

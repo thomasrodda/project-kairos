@@ -37,13 +37,24 @@ This plan outlines the implementation of workspace management functionality for 
 - Prevention of last workspace deletion
 - Loading and error state management
 - Integration with App.tsx via WorkspaceProvider
-- Initial test coverage (5 core tests passing)
+- **Page selection state management (NEW)**
+- **Page persistence per workspace (NEW)**
+- **WorkspaceWrapper component for integration (NEW)**
+- **Error boundaries for workspace operations (NEW)**
+- **Comprehensive test coverage (27 tests total)**
+
+### ✅ Completed (Frontend - Phase 2)
+
+- Workspace selection/switching UI
+- WorkspaceSelector dropdown component
+- WorkspaceCreationDialog modal component
+- Integration with Sidebar
+- Comprehensive test coverage (49+ tests)
 
 ### 🔲 Not Implemented (Frontend)
 
-- Workspace selection/switching UI
 - Welcome page creation for new workspaces
-- Integration with existing components (PageTree, Editor)
+- ~~Integration with existing components (PageTree, Editor)~~ ✅ Partially complete
 
 ### 📋 Key Findings
 
@@ -79,7 +90,7 @@ This plan outlines the implementation of workspace management functionality for 
 - `/apps/api/src/app.ts` - Fixed CORS configuration
 - `/apps/api/src/routes/auth.routes.ts` - Fixed sync-user endpoint
 
-### Phase 1: Workspace State Management ✅ COMPLETED
+### Phase 1: Workspace State Management ✅ COMPLETED (with Priority Fixes)
 
 **Goal**: Create centralized workspace state that all components can access
 
@@ -88,48 +99,66 @@ This plan outlines the implementation of workspace management functionality for 
 1. ✅ Created `WorkspaceContext` with:
    - Current workspace state
    - Workspace list
+   - **Current page state (NEW)**
    - Loading/error states
    - Selection handlers
 2. ✅ Created `useWorkspace` hook for:
    - Fetching user's workspaces
    - Creating workspaces
    - Switching workspaces
+   - **Selecting pages (NEW)**
    - Persisting selection to localStorage
+   - **Persisting page selection per workspace (NEW)**
 3. ✅ Wrapped app with WorkspaceProvider
 4. ✅ Auto-creation of "My Workspace" for new users
 5. ✅ Prevention of last workspace deletion
 6. ✅ Comprehensive test suite created
+7. ✅ **App.tsx integration with WorkspaceWrapper (NEW)**
+8. ✅ **Error boundaries for workspace operations (NEW)**
+9. ✅ **Integration tests for complete flow (NEW)**
 
-**Actual Time**: ~2 hours
+**Actual Time**: ~4 hours (including priority fixes)
 
 **Key Files Created/Modified**:
 
-- `/src/contexts/WorkspaceContext.tsx` - Complete workspace state management
-- `/src/contexts/WorkspaceContext.test.tsx` - Test coverage for workspace context
-- `/src/App.tsx` - Added WorkspaceProvider integration
+- `/src/contexts/WorkspaceContext.tsx` - Complete workspace state management with page selection
+- `/src/contexts/WorkspaceContext.test.tsx` - Test coverage for workspace context (18 tests)
+- `/src/App.tsx` - Added WorkspaceProvider integration, WorkspaceWrapper, and error boundaries
+- `/src/integration/workspace-flow.test.tsx` - Integration tests for workspace flow (5 tests)
+- `/src/App.test.tsx` - App-level integration tests
+- `/src/App.error-boundary.test.tsx` - Error boundary tests (4 tests)
 
-### Phase 2: Workspace Selection UI
+### Phase 2: Workspace Selection UI ✅ COMPLETED
 
 **Goal**: Enable users to view and switch between workspaces
 
-**Tasks**:
+**Completed Tasks**:
 
-1. Create WorkspaceSelector component:
+1. ✅ Created WorkspaceSelector component:
 
    - Dropdown in sidebar header
    - Shows current workspace name
    - Lists all workspaces on click
    - "Create New Workspace" option
+   - Active workspace indicator (checkmark)
+   - Collapsed/expanded states
+   - Loading state support
 
-2. Create WorkspaceCreationDialog:
+2. ✅ Created WorkspaceCreationDialog:
 
    - Modal for new workspace creation
-   - Name input with validation
+   - Name input with validation (required, max 50 chars)
+   - Description field (optional, max 200 chars)
    - Create and auto-select new workspace
+   - Loading state with spinner
+   - Error handling and display
+   - Form reset on close
 
-3. Integrate with existing Sidebar component
+3. ✅ Integrated with existing Sidebar component
+4. ✅ Added comprehensive test coverage (49 tests)
+5. ✅ Fixed TypeScript and icon compatibility issues
 
-**Estimated Time**: 3-4 hours
+**Actual Time**: ~3 hours
 
 ### Phase 3: Default Workspace Logic
 
@@ -155,31 +184,36 @@ This plan outlines the implementation of workspace management functionality for 
 
 **Estimated Time**: 2-3 hours
 
-### Phase 4: Component Integration
+### Phase 4: Component Integration ✅ PARTIALLY COMPLETED
 
 **Goal**: Wire up all existing components with workspace context
 
-**Tasks**:
+**Completed Tasks**:
 
-1. Update App.tsx:
+1. ✅ Update App.tsx:
 
-   - Add WorkspaceProvider
+   - Added WorkspaceProvider
    - Pass workspace props to Workspace component
+   - Created WorkspaceWrapper for integration
+   - Added error boundaries
 
-2. Update Workspace component:
+2. ✅ Update Workspace component:
+   - Receives workspace props from App.tsx
+   - Passes to Sidebar and Editor components
 
-   - Get workspace from context
-   - Pass to Sidebar and Editor
+**Remaining Tasks**:
 
-3. Fix PageTree rendering:
+3. ⏳ Fix PageTree rendering:
 
-   - Receive workspaceId from props
-   - Show pages for current workspace
-   - Handle page selection
+   - Already receives workspaceId from props
+   - Need to integrate with page selection from context
+   - Handle page creation/deletion
 
-4. Update Editor to use workspace context
+4. ⏳ Update Editor to use workspace context:
+   - Currently receives pageId via props
+   - May need direct context access for some operations
 
-**Estimated Time**: 2-3 hours
+**Estimated Time**: ~1 hour remaining (most integration work completed in Phase 1)
 
 ### Phase 5: Testing & Polish
 
@@ -212,12 +246,14 @@ interface WorkspaceContextValue {
   // State
   workspaces: Workspace[]
   currentWorkspace: Workspace | null
+  currentPageId: string | null // NEW
   loading: boolean
   error: Error | null
 
   // Actions
   createWorkspace: (name: string) => Promise<Workspace>
   selectWorkspace: (id: string) => Promise<void>
+  selectPage: (pageId: string) => void // NEW
   updateWorkspace: (id: string, data: Partial<Workspace>) => Promise<void>
   deleteWorkspace: (id: string) => Promise<void>
   refreshWorkspaces: () => Promise<void>
@@ -242,13 +278,17 @@ interface WorkspaceStorage {
 
 ```
 App
-├── AuthProvider (new)
-│   └── WorkspaceProvider (new)
-│       └── Workspace
-│           ├── Sidebar
-│           │   ├── WorkspaceSelector (new)
-│           │   └── PageTree
-│           └── EditorWithSync
+├── AuthProvider
+│   └── WorkspaceProvider
+│       └── ProtectedRoute
+│           └── WorkspaceErrorBoundary  // NEW
+│               └── WorkspaceWrapper    // NEW
+│                   └── EnhancedEditorProvider (key prop for re-init)
+│                       └── Workspace
+│                           ├── Sidebar
+│                           │   ├── WorkspaceSelector (planned)
+│                           │   └── PageTree
+│                           └── EditorWithSync
 ```
 
 ### 4. API Integration Points
@@ -309,12 +349,22 @@ App
 - [x] Auto-creation of default workspace for new users
 - [x] Prevention of last workspace deletion
 - [x] Integration with authentication state
+- [x] **Page selection state management**
+- [x] **Page selection persistence per workspace**
+- [x] **App.tsx properly wired with workspace/page props**
+- [x] **EditorProvider re-initializes on page change**
+- [x] **Error boundaries for graceful failures**
+- [x] **Retry functionality for failed operations**
+- [x] **27 tests covering all functionality**
 
-### Phase 2
+### Phase 2 ✅ COMPLETED
 
-- [ ] Workspace selector shows in sidebar
-- [ ] Users can switch workspaces smoothly
-- [ ] New workspaces can be created
+- [x] Workspace selector shows in sidebar
+- [x] Users can switch workspaces smoothly
+- [x] New workspaces can be created
+- [x] Modal dialog for workspace creation
+- [x] Input validation and error handling
+- [x] 49 tests covering all functionality
 
 ### Phase 3
 
@@ -322,11 +372,13 @@ App
 - [ ] New workspaces get welcome page
 - [ ] Can't delete last workspace
 
-### Phase 4
+### Phase 4 ✅ PARTIALLY COMPLETED
 
-- [ ] PageTree shows pages for current workspace
-- [ ] All components use workspace context
-- [ ] No prop drilling for workspace data
+- [x] PageTree shows pages for current workspace (via props)
+- [x] Workspace component uses workspace context
+- [x] App.tsx passes workspace/page data to components
+- [ ] PageTree integration with page selection context
+- [ ] Direct context usage in Editor (if needed)
 
 ### Phase 5
 
@@ -402,23 +454,23 @@ App
 ## Total Estimated Time
 
 - Phase 0: ~~3-4 hours~~ ✅ COMPLETED (Actual: ~3 hours)
-- Phase 1: ~~2-3 hours~~ ✅ COMPLETED (Actual: ~2 hours)
-- Phase 2: 3-4 hours
+- Phase 1: ~~2-3 hours~~ ✅ COMPLETED (Actual: ~4 hours including priority fixes)
+- Phase 2: ~~3-4 hours~~ ✅ COMPLETED (Actual: ~3 hours)
 - Phase 3: 2-3 hours
-- Phase 4: 2-3 hours
+- Phase 4: ~~2-3 hours~~ ✅ PARTIALLY COMPLETED (~1 hour remaining)
 - Phase 5: 3-4 hours
 
-**Total: 15-22 hours** (5 hours completed, 10-17 hours remaining)
+**Total: 15-22 hours** (10 hours completed, 5-8 hours remaining)
 
 ## Next Steps
 
 1. ~~Review and approve this plan~~ ✅
 2. ~~Complete Phase 0 (Authentication UI)~~ ✅
 3. ~~Complete Phase 1 (Workspace State Management)~~ ✅
-4. **START PHASE 2: Workspace Selection UI** ← NEXT
-5. Proceed with phases sequentially
-6. Test thoroughly between phases
-7. Update documentation as we go
+4. ~~Complete Phase 2 (Workspace Selection UI)~~ ✅
+5. **START PHASE 3: Default Workspace Logic** ← NEXT
+6. Complete Phase 4 (remaining ~1 hour of work)
+7. Complete Phase 5 (Testing & Polish)
 
 ## Phase 0 Completion Summary
 
@@ -443,27 +495,88 @@ App
 
 **Ready for Phase 1**: The authentication foundation is solid and ready for workspace management features.
 
-## Phase 1 Completion Summary
+## Phase 1 Completion Summary (Including Priority Fixes)
 
 **Date Completed**: January 8, 2025
 
 **What Was Built**:
 
-- WorkspaceContext with full state management
-- useWorkspace hook for all workspace operations
+- WorkspaceContext with full state management including page selection
+- useWorkspace hook for all workspace and page operations
 - Auto-creation of "My Workspace" for new users
-- Workspace persistence using localStorage
+- Workspace and page persistence using localStorage
 - Prevention of last workspace deletion
-- Loading and error state handling
+- Loading and error state handling with retry functionality
 - Integration with existing auth system
-- Test suite with core functionality coverage
+- WorkspaceWrapper component connecting context to UI
+- Error boundaries for unexpected errors
+- Comprehensive test suite (27 tests total)
 
 **Key Features**:
 
 - Workspaces load automatically when user is authenticated
 - Last selected workspace is restored on app reload
+- Last selected page per workspace is restored
 - Workspace selection persists across sessions
-- Graceful handling of API errors
-- Optimistic updates for better UX
+- Page selection persists per workspace
+- Graceful handling of API errors with retry options
+- EditorProvider re-initializes when switching pages
+- Error boundaries catch and display unexpected errors
 
-**Ready for Phase 2**: The workspace state management is complete and ready for UI components to be built on top.
+**Priority Fixes Completed**:
+
+1. ✅ Wire up App.tsx with WorkspaceContext data
+2. ✅ Add page selection state management to WorkspaceContext
+3. ✅ Fix EditorProvider placement for proper re-initialization
+4. ✅ Add integration tests for complete workspace flow
+5. ✅ Implement error boundaries for workspace operations
+
+**Ready for Phase 2**: The workspace state management is complete with all integrations working and ready for UI components to be built on top.
+
+## Phase 2 Completion Summary
+
+**Date Completed**: January 8, 2025
+
+**What Was Built**:
+
+- WorkspaceSelector dropdown component with:
+  - Current workspace display
+  - Dropdown list of all workspaces
+  - Active workspace indicator (checkmark)
+  - "Create New Workspace" option
+  - Collapsed/expanded states
+  - Loading state support
+  - Keyboard navigation (Enter/Escape)
+- WorkspaceCreationDialog modal component with:
+  - Workspace name input (required, max 50 chars)
+  - Description textarea (optional, max 200 chars)
+  - Form validation and error display
+  - Loading state during creation
+  - Form reset on close/reopen
+  - Overlay click and Escape key to close
+- Sidebar integration:
+  - Replaced static "Workspace Name" button
+  - State management for dialog visibility
+  - Proper event handling and prop passing
+
+**Technical Details**:
+
+- Fixed TypeScript errors with icon names
+- Updated useDismiss hook usage for correct signature
+- Implemented proper CSS animations (slideDown, fadeIn, slideUp)
+- Created comprehensive test suites (49 tests total)
+- Added proper React Router mocking for Sidebar tests
+- Used existing design tokens and SCSS patterns
+
+**Key Files Created/Modified**:
+
+- `/src/components/WorkspaceSelector/WorkspaceSelector.tsx` - Dropdown component
+- `/src/components/WorkspaceSelector/WorkspaceSelector.scss` - Dropdown styles
+- `/src/components/WorkspaceSelector/WorkspaceSelector.test.tsx` - 27 tests
+- `/src/components/WorkspaceCreationDialog/WorkspaceCreationDialog.tsx` - Modal component
+- `/src/components/WorkspaceCreationDialog/WorkspaceCreationDialog.scss` - Modal styles
+- `/src/components/WorkspaceCreationDialog/WorkspaceCreationDialog.test.tsx` - 22 tests
+- `/src/components/Sidebar/Sidebar.tsx` - Updated to integrate new components
+- `/src/components/Sidebar/Sidebar.test.tsx` - Updated tests with proper mocking
+
+**Ready for Phase 3**: The workspace UI is complete and users can now create and switch between workspaces. Next phase will implement default workspace logic and welcome pages.

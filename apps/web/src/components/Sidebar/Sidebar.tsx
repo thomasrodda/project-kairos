@@ -18,6 +18,8 @@ import { SidebarButton } from '../SidebarButton'
 import { Icon } from '@kairos/ui'
 import { PageTree } from './PageTree'
 import { useAuthContext } from '../../contexts/AuthContext'
+import { WorkspaceSelector } from '../WorkspaceSelector'
+import { WorkspaceCreationDialog } from '../WorkspaceCreationDialog'
 import './Sidebar.scss'
 
 interface SidebarProps {
@@ -30,6 +32,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ workspaceId, cur
   // Component state - manages sidebar collapse/expand
 
   const [isExpanded, setIsExpanded] = useState(true)
+  const [showCreateDialog, setShowCreateDialog] = useState(false)
   const navigate = useNavigate()
   const { user, logout } = useAuthContext()
 
@@ -52,9 +55,8 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ workspaceId, cur
 
   // Button configuration data
 
-  // Primary buttons data (4 buttons) - main workspace actions
+  // Primary buttons data (3 buttons) - main workspace actions (workspace selector is separate)
   const primaryButtons = [
-    { icon: 'profile' as const, text: 'Workspace Name', id: 'workspace-name' },
     { icon: 'search' as const, text: 'Search', id: 'search' },
     { icon: 'image' as const, text: 'Image Library', id: 'image-library' },
     { icon: 'add' as const, text: 'Create Page', id: 'create-page' },
@@ -90,6 +92,10 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ workspaceId, cur
 
       {/* Primary buttons section - Main workspace actions */}
       <div className="sidebar__primary-buttons">
+        {/* Workspace selector - shows current workspace with dropdown */}
+        <WorkspaceSelector isCollapsed={!isExpanded} onCreateWorkspace={() => setShowCreateDialog(true)} />
+
+        {/* Other primary action buttons */}
         {primaryButtons.map((button) => (
           <SidebarButton key={button.id} icon={button.icon} text={button.text} variant="standard" isCollapsed={!isExpanded} id={button.id} />
         ))}
@@ -124,6 +130,9 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(({ workspaceId, cur
           </div>
         )}
       </div>
+
+      {/* Workspace creation dialog - shown when creating new workspace */}
+      <WorkspaceCreationDialog isOpen={showCreateDialog} onClose={() => setShowCreateDialog(false)} />
     </aside>
   )
 })
