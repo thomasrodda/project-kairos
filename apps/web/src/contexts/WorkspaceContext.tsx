@@ -16,12 +16,14 @@ interface WorkspaceContextValue {
   // State
   workspaces: Workspace[]
   currentWorkspace: Workspace | null
+  currentPageId: string | null
   loading: boolean
   error: Error | null
 
   // Actions
   createWorkspace: (name: string, description?: string) => Promise<Workspace>
   selectWorkspace: (id: string) => Promise<void>
+  selectPage: (pageId: string) => void
   updateWorkspace: (id: string, data: { name?: string; description?: string }) => Promise<void>
   deleteWorkspace: (id: string) => Promise<void>
   refreshWorkspaces: () => Promise<void>
@@ -53,6 +55,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const { user } = useAuthContext()
   const [workspaces, setWorkspaces] = useState<Workspace[]>([])
   const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null)
+  const [currentPageId, setCurrentPageId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
 
@@ -82,6 +85,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
           : fetchedWorkspaces[0]
 
         setCurrentWorkspace(workspaceToSelect)
+
+        // Load last selected page for this workspace
+        const pageId = storage.workspacePreferences[workspaceToSelect.id]?.lastPageId
+        if (pageId) {
+          setCurrentPageId(pageId)
+        }
       } else {
         // Create default workspace for new users
         const defaultWorkspace = await api.workspaces.create({
@@ -135,6 +144,11 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         throw new Error('Workspace not found')
       }
       setCurrentWorkspace(workspace)
+
+      // Load last selected page for this workspace
+      const storage = getWorkspaceStorage()
+      const pageId = storage.workspacePreferences[id]?.lastPageId
+      setCurrentPageId(pageId || null)
     },
     [workspaces]
   )
@@ -186,6 +200,24 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     [workspaces, currentWorkspace]
   )
 
+  const selectPage = useCallback(
+    (pageId: string) => {
+      setCurrentPageId(pageId)
+
+      // Save page selection to localStorage
+      if (currentWorkspace) {
+        const storage = getWorkspaceStorage()
+        storage.workspacePreferences = storage.workspacePreferences || {}
+        storage.workspacePreferences[currentWorkspace.id] = {
+          ...(storage.workspacePreferences[currentWorkspace.id] || {}),
+          lastPageId: pageId,
+        }
+        setWorkspaceStorage(storage)
+      }
+    },
+    [currentWorkspace]
+  )
+
   const refreshWorkspaces = useCallback(async () => {
     await loadWorkspaces()
   }, [loadWorkspaces])
@@ -193,10 +225,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const value: WorkspaceContextValue = {
     workspaces,
     currentWorkspace,
+    currentPageId,
     loading,
     error,
     createWorkspace,
     selectWorkspace,
+    selectPage,
     updateWorkspace,
     deleteWorkspace,
     refreshWorkspaces,

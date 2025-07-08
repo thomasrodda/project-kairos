@@ -53,21 +53,8 @@ Object.defineProperty(window, 'localStorage', {
 })
 
 // Test wrapper that simulates authentication
-const createWrapper = (authCallback?: (user: any) => void) => {
+const createWrapper = (_authCallback?: (_user: unknown) => void) => {
   const Wrapper = ({ children }: { children: React.ReactNode }) => {
-    // Set up auth state
-    ;(onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
-      // Simulate async auth check
-      setTimeout(() => {
-        if (authCallback) {
-          authCallback(callback)
-        } else {
-          callback({ uid: 'test-user-id', email: 'test@example.com' })
-        }
-      }, 0)
-      return jest.fn() // unsubscribe
-    })
-
     return (
       <AuthProvider>
         <WorkspaceProvider>{children}</WorkspaceProvider>
@@ -89,6 +76,13 @@ describe('WorkspaceContext', () => {
 
     // Reset API mocks
     ;(api.auth.syncUser as jest.Mock).mockResolvedValue(true)
+
+    // Set up auth state to return a user immediately
+    ;(onAuthStateChanged as jest.Mock).mockImplementation((auth, callback) => {
+      // Call the callback immediately with a user
+      callback({ uid: 'test-user-id', email: 'test@example.com' })
+      return jest.fn() // unsubscribe function
+    })
   })
 
   describe('✅ Core Functionality', () => {
@@ -97,10 +91,12 @@ describe('WorkspaceContext', () => {
 
       expect(result.current).toHaveProperty('workspaces')
       expect(result.current).toHaveProperty('currentWorkspace')
+      expect(result.current).toHaveProperty('currentPageId')
       expect(result.current).toHaveProperty('loading')
       expect(result.current).toHaveProperty('error')
       expect(result.current).toHaveProperty('createWorkspace')
       expect(result.current).toHaveProperty('selectWorkspace')
+      expect(result.current).toHaveProperty('selectPage')
       expect(result.current).toHaveProperty('updateWorkspace')
       expect(result.current).toHaveProperty('deleteWorkspace')
       expect(result.current).toHaveProperty('refreshWorkspaces')
@@ -132,8 +128,11 @@ describe('WorkspaceContext', () => {
         expect(result.current.loading).toBe(false)
       })
 
+      await waitFor(() => {
+        expect(result.current.workspaces).toEqual(mockWorkspaces)
+      })
+
       expect(api.workspaces.list).toHaveBeenCalled()
-      expect(result.current.workspaces).toEqual(mockWorkspaces)
       expect(result.current.currentWorkspace).toEqual(mockWorkspaces[0])
     })
 
@@ -234,6 +233,10 @@ describe('WorkspaceContext', () => {
         expect(result.current.loading).toBe(false)
       })
 
+      await waitFor(() => {
+        expect(result.current.currentWorkspace).not.toBeNull()
+      })
+
       expect(result.current.currentWorkspace).toEqual(mockWorkspaces[0])
 
       await act(async () => {
@@ -255,6 +258,10 @@ describe('WorkspaceContext', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false)
+      })
+
+      await waitFor(() => {
+        expect(result.current.workspaces).toHaveLength(1)
       })
 
       await act(async () => {
@@ -280,6 +287,10 @@ describe('WorkspaceContext', () => {
         expect(result.current.loading).toBe(false)
       })
 
+      await waitFor(() => {
+        expect(result.current.workspaces).toHaveLength(2)
+      })
+
       await act(async () => {
         await result.current.deleteWorkspace('1')
       })
@@ -300,12 +311,20 @@ describe('WorkspaceContext', () => {
         expect(result.current.loading).toBe(false)
       })
 
-      await expect(
-        act(async () => {
+      await waitFor(() => {
+        expect(result.current.workspaces).toHaveLength(1)
+      })
+
+      let error: Error | null = null
+      try {
+        await act(async () => {
           await result.current.deleteWorkspace('1')
         })
-      ).rejects.toThrow('Cannot delete your last workspace')
+      } catch (e) {
+        error = e as Error
+      }
 
+      expect(error?.message).toBe('Cannot delete your last workspace')
       expect(api.workspaces.delete).not.toHaveBeenCalled()
       expect(result.current.workspaces).toHaveLength(1)
     })
@@ -318,6 +337,10 @@ describe('WorkspaceContext', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false)
+      })
+
+      await waitFor(() => {
+        expect(result.current.workspaces).toHaveLength(1)
       })
 
       const updatedWorkspaces = [
@@ -340,15 +363,24 @@ describe('WorkspaceContext', () => {
       const mockError = new Error('API Error')
       ;(api.workspaces.list as jest.Mock).mockRejectedValue(mockError)
 
+      // Suppress console.error for this test
+      const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+
       const { result } = renderHook(() => useWorkspace(), { wrapper })
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false)
       })
 
+      await waitFor(() => {
+        expect(result.current.error).not.toBeNull()
+      })
+
       expect(result.current.error).toEqual(mockError)
       expect(result.current.workspaces).toEqual([])
       expect(result.current.currentWorkspace).toBeNull()
+
+      consoleSpy.mockRestore()
     })
 
     it('should handle workspace not found error', async () => {
@@ -369,6 +401,101 @@ describe('WorkspaceContext', () => {
     })
   })
 
+  describe('✅ Page Selection', () => {
+    it('should select a page and persist to localStorage', async () => {
+      const mockWorkspaces = [{ id: '1', userId: 'test-user-id', name: 'Workspace 1', createdAt: new Date(), updatedAt: new Date() }]
+      ;(api.workspaces.list as jest.Mock).mockResolvedValue(mockWorkspaces)
+
+      const { result } = renderHook(() => useWorkspace(), { wrapper })
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false)
+      })
+
+      // Wait for workspace to be set
+      await waitFor(() => {
+        expect(result.current.currentWorkspace).not.toBeNull()
+      })
+
+      expect(result.current.currentPageId).toBeNull()
+
+      await act(async () => {
+        result.current.selectPage('page-123')
+      })
+
+      expect(result.current.currentPageId).toBe('page-123')
+
+      // Check the last call to setItem contains the page ID
+      const calls = localStorageMock.setItem.mock.calls
+      const lastCall = calls[calls.length - 1]
+      expect(lastCall[0]).toBe('kairos_workspace_preferences')
+      expect(lastCall[1]).toContain('"lastPageId":"page-123"')
+    })
+
+    it('should restore last selected page when selecting workspace', async () => {
+      const mockWorkspaces = [
+        { id: '1', userId: 'test-user-id', name: 'Workspace 1', createdAt: new Date(), updatedAt: new Date() },
+        { id: '2', userId: 'test-user-id', name: 'Workspace 2', createdAt: new Date(), updatedAt: new Date() },
+      ]
+      ;(api.workspaces.list as jest.Mock).mockResolvedValue(mockWorkspaces)
+
+      // Set last page for workspace 2 in localStorage
+      localStorageMock.setItem(
+        'kairos_workspace_preferences',
+        JSON.stringify({
+          lastWorkspaceId: '1',
+          workspacePreferences: {
+            '2': { lastPageId: 'page-456' },
+          },
+        })
+      )
+
+      const { result } = renderHook(() => useWorkspace(), { wrapper })
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false)
+      })
+
+      await waitFor(() => {
+        expect(result.current.workspaces).toHaveLength(2)
+      })
+
+      await act(async () => {
+        await result.current.selectWorkspace('2')
+      })
+
+      expect(result.current.currentPageId).toBe('page-456')
+    })
+
+    it('should clear page selection when switching to workspace without saved page', async () => {
+      const mockWorkspaces = [
+        { id: '1', userId: 'test-user-id', name: 'Workspace 1', createdAt: new Date(), updatedAt: new Date() },
+        { id: '2', userId: 'test-user-id', name: 'Workspace 2', createdAt: new Date(), updatedAt: new Date() },
+      ]
+      ;(api.workspaces.list as jest.Mock).mockResolvedValue(mockWorkspaces)
+
+      const { result } = renderHook(() => useWorkspace(), { wrapper })
+
+      await waitFor(() => {
+        expect(result.current.loading).toBe(false)
+      })
+
+      // Select a page in workspace 1
+      await act(async () => {
+        result.current.selectPage('page-123')
+      })
+
+      expect(result.current.currentPageId).toBe('page-123')
+
+      // Switch to workspace 2 (no saved page)
+      await act(async () => {
+        await result.current.selectWorkspace('2')
+      })
+
+      expect(result.current.currentPageId).toBeNull()
+    })
+  })
+
   describe('✅ localStorage Integration', () => {
     it('should persist workspace selection to localStorage', async () => {
       const mockWorkspaces = [{ id: '1', userId: 'test-user-id', name: 'Workspace 1', createdAt: new Date(), updatedAt: new Date() }]
@@ -378,6 +505,10 @@ describe('WorkspaceContext', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false)
+      })
+
+      await waitFor(() => {
+        expect(result.current.currentWorkspace).not.toBeNull()
       })
 
       expect(localStorageMock.setItem).toHaveBeenCalledWith('kairos_workspace_preferences', expect.stringContaining('"lastWorkspaceId":"1"'))
@@ -394,6 +525,10 @@ describe('WorkspaceContext', () => {
 
       await waitFor(() => {
         expect(result.current.loading).toBe(false)
+      })
+
+      await waitFor(() => {
+        expect(result.current.currentWorkspace).not.toBeNull()
       })
 
       // Should still work and use first workspace

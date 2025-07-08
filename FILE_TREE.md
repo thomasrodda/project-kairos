@@ -315,7 +315,8 @@ apps
 │   │   └── useDismiss.ts
 │   ├── integration
 │   │   ├── Editor.integration.test.tsx
-│   │   └── markdown-detection.test.tsx
+│   │   ├── markdown-detection.test.tsx
+│   │   └── workspace-flow.test.tsx
 │   ├── pages
 │   ├── styles
 │   │   ├── base
@@ -339,6 +340,8 @@ apps
 │   │   ├── textSelection.test.ts
 │   │   └── textSelection.ts
 │   ├── App.dev.tsx
+│   ├── App.error-boundary.test.tsx
+│   ├── App.test.tsx
 │   ├── App.tsx
 │   ├── main.tsx
 │   ├── test-api-connection.ts
