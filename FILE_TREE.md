@@ -301,7 +301,9 @@ apps
 │   │   ├── AuthContext.tsx
 │   │   ├── EditorContext.test.tsx
 │   │   ├── EditorContext.tsx
-│   │   └── EditorProvider.tsx
+│   │   ├── EditorProvider.tsx
+│   │   ├── WorkspaceContext.test.tsx
+│   │   └── WorkspaceContext.tsx
 │   ├── hooks
 │   │   ├── index.ts
 │   │   ├── useAuth.ts

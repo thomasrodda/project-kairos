@@ -6,6 +6,7 @@ import { PerformanceTest } from './components/PerformanceTest/PerformanceTest'
 import { Login, Signup, ForgotPassword, ProtectedRoute } from './components/Auth'
 import { EnhancedEditorProvider } from './contexts/EditorProvider'
 import { AuthProvider } from './contexts/AuthContext'
+import { WorkspaceProvider } from './contexts/WorkspaceContext'
 import { initializeIconPerformance } from '@kairos/ui'
 
 function App() {
@@ -22,29 +23,31 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+        <WorkspaceProvider>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
 
-          {/* Protected routes */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <EnhancedEditorProvider>
-                  <Workspace />
-                  {/* Show performance monitoring in development */}
-                  {process.env.NODE_ENV === 'development' && <PerformanceTest />}
-                </EnhancedEditorProvider>
-              </ProtectedRoute>
-            }
-          />
+            {/* Protected routes */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <EnhancedEditorProvider>
+                    <Workspace />
+                    {/* Show performance monitoring in development */}
+                    {process.env.NODE_ENV === 'development' && <PerformanceTest />}
+                  </EnhancedEditorProvider>
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Catch all - redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Catch all - redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </WorkspaceProvider>
       </AuthProvider>
     </BrowserRouter>
   )

@@ -32,6 +32,9 @@ export function useAuthContext() {
   return context
 }
 
+// Alias for better developer experience
+export const useAuth = useAuthContext
+
 interface AuthProviderProps {
   children: React.ReactNode
 }
