@@ -92,7 +92,7 @@ function EditorApiSync({ children, workspaceId, pageId }: { children: React.Reac
 
   // Load page and blocks when pageId changes
   useEffect(() => {
-    if (!pageId || !user) {
+    if (!pageId || !workspaceId || !user) {
       setLoading(false)
       return
     }
@@ -104,7 +104,7 @@ function EditorApiSync({ children, workspaceId, pageId }: { children: React.Reac
     async function loadPage() {
       try {
         // Load page details
-        const page = await api.pages.get(pageId!)
+        const page = await api.pages.get(workspaceId!, pageId!)
 
         // Load blocks
         const blocks = await api.blocks.listByPage(pageId!)
@@ -141,7 +141,7 @@ function EditorApiSync({ children, workspaceId, pageId }: { children: React.Reac
       // Force save any pending changes when leaving the page
       forceSaveAll()
     }
-  }, [pageId, user, dispatch, forceSaveAll])
+  }, [pageId, workspaceId, user, dispatch, forceSaveAll])
 
   // Track existing blocks to detect new ones
   const previousBlockIds = useRef<Set<string>>(new Set())

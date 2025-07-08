@@ -36,7 +36,7 @@ export function usePageTree({ workspaceId, currentPageId, onPageSelect }: UsePag
       setState((prev) => ({ ...prev, loading: true, error: null }))
 
       try {
-        const pages = await api.pages.listByWorkspace(workspaceId)
+        const pages = await api.pages.list(workspaceId)
 
         if (!cancelled) {
           setState((prev) => ({

@@ -26,8 +26,24 @@ jest.mock('../../hooks/useDismiss', () => ({
   useDismiss: jest.fn(),
 }))
 
+// Mock the ConfirmationDialog component
+jest.mock('../common/ConfirmationDialog', () => ({
+  ConfirmationDialog: ({ isOpen, onConfirm, onCancel, title, message, confirmText, cancelText }: any) => {
+    if (!isOpen) return null
+    return (
+      <div role="dialog">
+        <h2>{title}</h2>
+        <p>{message}</p>
+        <button onClick={onCancel}>{cancelText || 'Cancel'}</button>
+        <button onClick={onConfirm}>{confirmText || 'Delete'}</button>
+      </div>
+    )
+  },
+}))
+
 describe('WorkspaceSelector', () => {
   const mockSelectWorkspace = jest.fn()
+  const mockDeleteWorkspace = jest.fn()
   const mockOnCreateWorkspace = jest.fn()
 
   const mockWorkspaceContext = {
@@ -38,6 +54,7 @@ describe('WorkspaceSelector', () => {
     ],
     currentWorkspace: { id: '1', name: 'Workspace 1', createdAt: new Date(), updatedAt: new Date() },
     selectWorkspace: mockSelectWorkspace,
+    deleteWorkspace: mockDeleteWorkspace,
     loading: false,
   }
 
@@ -130,8 +147,9 @@ describe('WorkspaceSelector', () => {
 
       const workspaceItems = screen.getAllByRole('menuitem')
       const currentWorkspaceItem = workspaceItems.find((item) => item.textContent?.includes('Workspace 1'))
+      const wrapper = currentWorkspaceItem?.closest('.workspace-selector__dropdown-item-wrapper')
 
-      expect(currentWorkspaceItem).toHaveClass('workspace-selector__dropdown-item--active')
+      expect(wrapper).toHaveClass('workspace-selector__dropdown-item-wrapper--active')
       expect(currentWorkspaceItem?.querySelector('[data-testid="icon-check"]')).toBeInTheDocument()
     })
 
@@ -272,6 +290,130 @@ describe('WorkspaceSelector', () => {
 
       // Dropdown should be closed
       expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('✅ Workspace Deletion', () => {
+    it('shows delete button on hover for workspaces when multiple exist', async () => {
+      const user = userEvent.setup()
+      render(<WorkspaceSelector isCollapsed={false} onCreateWorkspace={mockOnCreateWorkspace} />)
+
+      await user.click(screen.getByRole('button'))
+
+      // Find a workspace item wrapper
+      const workspaceItems = screen.getAllByRole('menuitem')
+      const workspace2Item = workspaceItems.find((item) => item.textContent?.includes('Workspace 2'))
+      const wrapper = workspace2Item?.closest('.workspace-selector__dropdown-item-wrapper')
+
+      expect(wrapper).toBeInTheDocument()
+
+      // Delete button should be present but hidden initially
+      const deleteButton = wrapper?.querySelector('[aria-label="Delete Workspace 2"]')
+      expect(deleteButton).toBeInTheDocument()
+    })
+
+    it('does not show delete button when only one workspace exists', async () => {
+      ;(useWorkspace as jest.Mock).mockReturnValue({
+        ...mockWorkspaceContext,
+        workspaces: [{ id: '1', name: 'Only Workspace', createdAt: new Date(), updatedAt: new Date() }],
+        currentWorkspace: { id: '1', name: 'Only Workspace', createdAt: new Date(), updatedAt: new Date() },
+      })
+
+      const user = userEvent.setup()
+      render(<WorkspaceSelector isCollapsed={false} onCreateWorkspace={mockOnCreateWorkspace} />)
+
+      await user.click(screen.getByRole('button'))
+
+      // No delete buttons should be present
+      expect(screen.queryByLabelText(/Delete/)).not.toBeInTheDocument()
+    })
+
+    it('opens confirmation dialog when delete button clicked', async () => {
+      const user = userEvent.setup()
+      render(<WorkspaceSelector isCollapsed={false} onCreateWorkspace={mockOnCreateWorkspace} />)
+
+      await user.click(screen.getByRole('button'))
+
+      // Click delete button for Workspace 2
+      const deleteButton = screen.getByLabelText('Delete Workspace 2')
+      await user.click(deleteButton)
+
+      // Confirmation dialog should appear
+      expect(screen.getByText('Delete Workspace?')).toBeInTheDocument()
+      expect(screen.getByText('Are you sure you want to delete "Workspace 2"? This action cannot be undone.')).toBeInTheDocument()
+    })
+
+    it('deletes workspace when confirmed', async () => {
+      const user = userEvent.setup()
+      mockDeleteWorkspace.mockResolvedValue(undefined)
+
+      render(<WorkspaceSelector isCollapsed={false} onCreateWorkspace={mockOnCreateWorkspace} />)
+
+      await user.click(screen.getByRole('button'))
+      await user.click(screen.getByLabelText('Delete Workspace 2'))
+
+      // Click confirm in dialog
+      const confirmButton = screen.getByRole('button', { name: 'Delete' })
+      await user.click(confirmButton)
+
+      expect(mockDeleteWorkspace).toHaveBeenCalledWith('2')
+
+      // Dialog should close and dropdown should close
+      await waitFor(() => {
+        expect(screen.queryByText('Delete Workspace?')).not.toBeInTheDocument()
+        expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+      })
+    })
+
+    it('cancels deletion when cancel clicked', async () => {
+      const user = userEvent.setup()
+      render(<WorkspaceSelector isCollapsed={false} onCreateWorkspace={mockOnCreateWorkspace} />)
+
+      await user.click(screen.getByRole('button'))
+      await user.click(screen.getByLabelText('Delete Workspace 2'))
+
+      // Click cancel in dialog
+      const cancelButton = screen.getByRole('button', { name: 'Cancel' })
+      await user.click(cancelButton)
+
+      expect(mockDeleteWorkspace).not.toHaveBeenCalled()
+
+      // Dialog should close but dropdown should remain open
+      expect(screen.queryByText('Delete Workspace?')).not.toBeInTheDocument()
+      expect(screen.getByRole('menu')).toBeInTheDocument()
+    })
+
+    it('handles deletion errors gracefully', async () => {
+      const user = userEvent.setup()
+      const consoleError = jest.spyOn(console, 'error').mockImplementation()
+      mockDeleteWorkspace.mockRejectedValue(new Error('Cannot delete last workspace'))
+
+      render(<WorkspaceSelector isCollapsed={false} onCreateWorkspace={mockOnCreateWorkspace} />)
+
+      await user.click(screen.getByRole('button'))
+      await user.click(screen.getByLabelText('Delete Workspace 2'))
+      await user.click(screen.getByRole('button', { name: 'Delete' }))
+
+      await waitFor(() => {
+        expect(consoleError).toHaveBeenCalledWith('Failed to delete workspace:', expect.any(Error))
+        expect(screen.queryByText('Delete Workspace?')).not.toBeInTheDocument()
+      })
+
+      consoleError.mockRestore()
+    })
+
+    it('prevents event propagation when delete button clicked', async () => {
+      const user = userEvent.setup()
+      render(<WorkspaceSelector isCollapsed={false} onCreateWorkspace={mockOnCreateWorkspace} />)
+
+      await user.click(screen.getByRole('button'))
+
+      // Click delete button
+      const deleteButton = screen.getByLabelText('Delete Workspace 2')
+      await user.click(deleteButton)
+
+      // Workspace should not have been selected
+      expect(mockSelectWorkspace).not.toHaveBeenCalled()
     })
   })
 

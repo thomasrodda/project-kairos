@@ -8,7 +8,7 @@ import { Page } from '@kairos/types'
 jest.mock('../../../utils/api/client', () => ({
   api: {
     pages: {
-      listByWorkspace: jest.fn(),
+      list: jest.fn(),
     },
   },
 }))
@@ -56,7 +56,7 @@ describe('PageTree', () => {
 
   describe('✅ Loading State', () => {
     it('should show loading state initially', () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockImplementation(
+      ;(api.pages.list as jest.Mock).mockImplementation(
         () => new Promise(() => {}) // Never resolves
       )
 
@@ -65,7 +65,7 @@ describe('PageTree', () => {
     })
 
     it('should have loading container class', () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockImplementation(() => new Promise(() => {}))
+      ;(api.pages.list as jest.Mock).mockImplementation(() => new Promise(() => {}))
 
       const { container } = render(<PageTree {...defaultProps} />)
       expect(container.querySelector('.loading')).toBeInTheDocument()
@@ -75,7 +75,7 @@ describe('PageTree', () => {
   describe('✅ Error State', () => {
     it('should show error message when API fails', async () => {
       const error = new Error('Network error')
-      ;(api.pages.listByWorkspace as jest.Mock).mockRejectedValue(error)
+      ;(api.pages.list as jest.Mock).mockRejectedValue(error)
 
       render(<PageTree {...defaultProps} />)
 
@@ -86,7 +86,7 @@ describe('PageTree', () => {
     })
 
     it('should have error container class', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockRejectedValue(new Error('Test error'))
+      ;(api.pages.list as jest.Mock).mockRejectedValue(new Error('Test error'))
 
       const { container } = render(<PageTree {...defaultProps} />)
 
@@ -98,7 +98,7 @@ describe('PageTree', () => {
 
   describe('✅ Empty State', () => {
     it('should show empty state when no pages exist', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue([])
+      ;(api.pages.list as jest.Mock).mockResolvedValue([])
 
       render(<PageTree {...defaultProps} />)
 
@@ -109,7 +109,7 @@ describe('PageTree', () => {
     })
 
     it('should have empty container class', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue([])
+      ;(api.pages.list as jest.Mock).mockResolvedValue([])
 
       const { container } = render(<PageTree {...defaultProps} />)
 
@@ -121,7 +121,7 @@ describe('PageTree', () => {
 
   describe('✅ Page Rendering', () => {
     it('should render all pages', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+      ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
       render(<PageTree {...defaultProps} />)
 
@@ -132,7 +132,7 @@ describe('PageTree', () => {
     })
 
     it('should pass correct props to PageTreeItem', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+      ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
       render(<PageTree {...defaultProps} currentPageId="1" />)
 
@@ -161,7 +161,7 @@ describe('PageTree', () => {
         },
       ]
 
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(hierarchicalPages)
+      ;(api.pages.list as jest.Mock).mockResolvedValue(hierarchicalPages)
 
       render(<PageTree {...defaultProps} />)
 
@@ -177,7 +177,7 @@ describe('PageTree', () => {
 
   describe('✅ Accessibility', () => {
     it('should have tree role and aria-label', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+      ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
       render(<PageTree {...defaultProps} />)
 
@@ -188,7 +188,7 @@ describe('PageTree', () => {
     })
 
     it('should have container class', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+      ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
       const { container } = render(<PageTree {...defaultProps} />)
 
@@ -200,24 +200,24 @@ describe('PageTree', () => {
 
   describe('✅ API Integration', () => {
     it('should call API with correct workspace ID', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue([])
+      ;(api.pages.list as jest.Mock).mockResolvedValue([])
 
       render(<PageTree {...defaultProps} workspaceId="test-workspace" />)
 
       await waitFor(() => {
-        expect(api.pages.listByWorkspace).toHaveBeenCalledWith('test-workspace')
+        expect(api.pages.list).toHaveBeenCalledWith('test-workspace')
       })
     })
 
     it('should not call API when workspace ID is not provided', () => {
       render(<PageTree {...defaultProps} workspaceId="" />)
 
-      expect(api.pages.listByWorkspace).not.toHaveBeenCalled()
+      expect(api.pages.list).not.toHaveBeenCalled()
     })
 
     it('should handle API call cancellation on unmount', async () => {
       let resolveFn: any
-      ;(api.pages.listByWorkspace as jest.Mock).mockImplementation(
+      ;(api.pages.list as jest.Mock).mockImplementation(
         () =>
           new Promise((resolve) => {
             resolveFn = resolve
@@ -241,35 +241,35 @@ describe('PageTree', () => {
 
   describe('✅ Re-rendering', () => {
     it('should refetch when workspace ID changes', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+      ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
       const { rerender } = render(<PageTree {...defaultProps} />)
 
       await waitFor(() => {
-        expect(api.pages.listByWorkspace).toHaveBeenCalledTimes(1)
+        expect(api.pages.list).toHaveBeenCalledTimes(1)
       })
 
       rerender(<PageTree {...defaultProps} workspaceId="workspace-2" />)
 
       await waitFor(() => {
-        expect(api.pages.listByWorkspace).toHaveBeenCalledTimes(2)
-        expect(api.pages.listByWorkspace).toHaveBeenLastCalledWith('workspace-2')
+        expect(api.pages.list).toHaveBeenCalledTimes(2)
+        expect(api.pages.list).toHaveBeenLastCalledWith('workspace-2')
       })
     })
 
     it('should not refetch when other props change', async () => {
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+      ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
       const { rerender } = render(<PageTree {...defaultProps} />)
 
       await waitFor(() => {
-        expect(api.pages.listByWorkspace).toHaveBeenCalledTimes(1)
+        expect(api.pages.list).toHaveBeenCalledTimes(1)
       })
 
       rerender(<PageTree {...defaultProps} currentPageId="1" />)
 
       // Should not refetch
-      expect(api.pages.listByWorkspace).toHaveBeenCalledTimes(1)
+      expect(api.pages.list).toHaveBeenCalledTimes(1)
     })
   })
 })

@@ -181,12 +181,27 @@ export const api = {
 
   // Pages
   pages: {
-    listByWorkspace: (workspaceId: string) => apiClient.get<any[]>(`/api/pages/${workspaceId}`),
-    create: (data: { workspaceId: string; title: string; parentId?: string; isFolder?: boolean }) => apiClient.post<any>('/api/pages', data),
-    get: (pageId: string) => apiClient.get<any>(`/api/pages/${pageId}`),
-    update: (pageId: string, data: { title?: string; icon?: string; isFolder?: boolean }) => apiClient.put<any>(`/api/pages/${pageId}`, data),
-    delete: (pageId: string) => apiClient.delete<void>(`/api/pages/${pageId}`),
-    move: (pageId: string, data: { parentId?: string; order?: number }) => apiClient.put<any>(`/api/pages/${pageId}/move`, data),
+    list: (workspaceId: string) => apiClient.get<any[]>(`/api/pages/${workspaceId}`),
+    get: (workspaceId: string, pageId: string) => apiClient.get<any>(`/api/pages/${workspaceId}/${pageId}`),
+    create: (workspaceId: string, data: { title: string; parentId?: string | null; isFolder?: boolean; order?: number }) =>
+      apiClient.post<any>(`/api/pages/${workspaceId}`, data),
+    update: (workspaceId: string, pageId: string, data: { title?: string; icon?: string; isFolder?: boolean; order?: number }) =>
+      apiClient.put<any>(`/api/pages/${workspaceId}/${pageId}`, data),
+    delete: (workspaceId: string, pageId: string) => apiClient.delete<void>(`/api/pages/${workspaceId}/${pageId}`),
+    move: (workspaceId: string, pageId: string, data: { parentId: string | null; order: number }) =>
+      apiClient.put<any>(`/api/pages/${workspaceId}/${pageId}/move`, data),
+    duplicate: (workspaceId: string, pageId: string, data: { parentId?: string | null }) =>
+      apiClient.post<any>(`/api/pages/${workspaceId}/${pageId}/duplicate`, data),
+    export: (workspaceId: string, pageId: string, params?: { format?: 'markdown' | 'json' }) =>
+      apiClient.get<{ content: string }>(`/api/pages/${workspaceId}/${pageId}/export`, { params }),
+    search: (workspaceId: string, params: { q: string }) => apiClient.get<any[]>(`/api/pages/${workspaceId}/search`, { params }),
+    breadcrumbs: (workspaceId: string, pageId: string) => apiClient.get<any[]>(`/api/pages/${workspaceId}/${pageId}/breadcrumbs`),
+    batch: (workspaceId: string, data: { updates: Array<{ pageId: string; data: any }> }) =>
+      apiClient.post<any[]>(`/api/pages/${workspaceId}/batch`, data),
+    stats: (workspaceId: string, pageId: string) =>
+      apiClient.get<{ wordCount: number; characterCount: number; blockCount: number; lastModified: string }>(
+        `/api/pages/${workspaceId}/${pageId}/stats`
+      ),
   },
 
   // Blocks

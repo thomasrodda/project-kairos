@@ -3,6 +3,8 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/src'],
+  // Automatically mock these modules
+  modulePathIgnorePatterns: ['<rootDir>/src/__mocks__'],
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',
@@ -22,6 +24,14 @@ module.exports = {
 
     // Handle regular SVG imports
     '\\.svg$': 'jest-transform-stub',
+
+    // Mock Firebase to prevent import.meta.env access
+    '^@/utils/firebase$': '<rootDir>/src/__mocks__/utils/firebase.ts',
+    '^.*/utils/firebase$': '<rootDir>/src/__mocks__/utils/firebase.ts',
+
+    // Mock API client to prevent import.meta.env access
+    '^@/utils/api/client$': '<rootDir>/src/__mocks__/utils/api/client.ts',
+    '^.*/utils/api/client$': '<rootDir>/src/__mocks__/utils/api/client.ts',
 
     // Path aliases
     '^@/(.*)$': '<rootDir>/src/$1',

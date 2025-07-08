@@ -46,15 +46,14 @@ function App() {
         setWorkspaceId(workspace.id)
 
         // Get pages in workspace
-        const pages = await api.pages.listByWorkspace(workspace.id)
+        const pages = await api.pages.list(workspace.id)
 
         let page
         if (pages.length > 0) {
           page = pages[0]
         } else {
           // Create default page
-          page = await api.pages.create({
-            workspaceId: workspace.id,
+          page = await api.pages.create(workspace.id, {
             title: 'Welcome to Kairos',
             isFolder: false,
           })

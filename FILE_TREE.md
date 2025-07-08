@@ -196,6 +196,11 @@ apps
 ├── scripts
 │   └── copy-icons.mjs
 ├── src
+│   ├── **mocks**
+│   │   └── utils
+│   │   ├── api
+│   │   │   └── client.ts
+│   │   └── firebase.ts
 │   ├── components
 │   │   ├── Auth
 │   │   │   ├── Auth.module.scss
@@ -301,10 +306,16 @@ apps
 │   │   │   ├── WorkspaceCreationDialog.test.tsx
 │   │   │   ├── WorkspaceCreationDialog.tsx
 │   │   │   └── index.ts
-│   │   └── WorkspaceSelector
-│   │   ├── WorkspaceSelector.scss
-│   │   ├── WorkspaceSelector.test.tsx
-│   │   ├── WorkspaceSelector.tsx
+│   │   ├── WorkspaceSelector
+│   │   │   ├── WorkspaceSelector.scss
+│   │   │   ├── WorkspaceSelector.test.tsx
+│   │   │   ├── WorkspaceSelector.tsx
+│   │   │   └── index.ts
+│   │   └── common
+│   │   └── ConfirmationDialog
+│   │   ├── ConfirmationDialog.module.scss
+│   │   ├── ConfirmationDialog.test.tsx
+│   │   ├── ConfirmationDialog.tsx
 │   │   └── index.ts
 │   ├── contexts
 │   │   ├── AuthContext.test.tsx
@@ -328,6 +339,9 @@ apps
 │   │   ├── markdown-detection.test.tsx
 │   │   └── workspace-flow.test.tsx
 │   ├── pages
+│   ├── services
+│   │   ├── index.ts
+│   │   └── page.service.ts
 │   ├── styles
 │   │   ├── base
 │   │   │   └── reset.scss
@@ -341,6 +355,7 @@ apps
 │   │   ├── api
 │   │   │   ├── client.ts
 │   │   │   └── types.ts
+│   │   ├── defaultContent.ts
 │   │   ├── firebase.ts
 │   │   ├── formattingRenderer.tsx
 │   │   ├── markdownDetection.test.ts

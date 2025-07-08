@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Icon } from '@kairos/ui'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { useDismiss } from '../../hooks/useDismiss'
+import { ConfirmationDialog } from '../common/ConfirmationDialog'
 import './WorkspaceSelector.scss'
 
 interface WorkspaceSelectorProps {
@@ -10,8 +11,9 @@ interface WorkspaceSelectorProps {
 }
 
 export function WorkspaceSelector({ isCollapsed = false, onCreateWorkspace }: WorkspaceSelectorProps) {
-  const { workspaces, currentWorkspace, selectWorkspace, loading } = useWorkspace()
+  const { workspaces, currentWorkspace, selectWorkspace, deleteWorkspace, loading } = useWorkspace()
   const [isOpen, setIsOpen] = useState(false)
+  const [workspaceToDelete, setWorkspaceToDelete] = useState<{ id: string; name: string } | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useDismiss(dropdownRef, {
@@ -42,6 +44,29 @@ export function WorkspaceSelector({ isCollapsed = false, onCreateWorkspace }: Wo
   const handleCreateWorkspace = () => {
     setIsOpen(false)
     onCreateWorkspace()
+  }
+
+  const handleDeleteClick = (e: React.MouseEvent, workspace: { id: string; name: string }) => {
+    e.stopPropagation() // Prevent workspace selection
+    setWorkspaceToDelete(workspace)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!workspaceToDelete) return
+
+    try {
+      await deleteWorkspace(workspaceToDelete.id)
+      setWorkspaceToDelete(null)
+      setIsOpen(false) // Close dropdown after successful deletion
+    } catch (error) {
+      console.error('Failed to delete workspace:', error)
+      // The error is already handled in the context, just close the dialog
+      setWorkspaceToDelete(null)
+    }
+  }
+
+  const handleCancelDelete = () => {
+    setWorkspaceToDelete(null)
   }
 
   // Don't render if no workspaces loaded
@@ -77,24 +102,34 @@ export function WorkspaceSelector({ isCollapsed = false, onCreateWorkspace }: Wo
 
           <div className="workspace-selector__dropdown-list">
             {workspaces.map((workspace) => (
-              <button
+              <div
                 key={workspace.id}
-                className={`workspace-selector__dropdown-item ${
-                  workspace.id === currentWorkspace.id ? 'workspace-selector__dropdown-item--active' : ''
+                className={`workspace-selector__dropdown-item-wrapper ${
+                  workspace.id === currentWorkspace.id ? 'workspace-selector__dropdown-item-wrapper--active' : ''
                 }`}
-                onClick={() => handleSelectWorkspace(workspace.id)}
-                role="menuitem"
               >
-                <span className="workspace-selector__dropdown-item-icon">
-                  <Icon name="workspace" size={20} />
-                </span>
-                <span className="workspace-selector__dropdown-item-name">{workspace.name}</span>
-                {workspace.id === currentWorkspace.id && (
-                  <span className="workspace-selector__dropdown-item-check">
-                    <Icon name="check" size={16} />
+                <button className="workspace-selector__dropdown-item" onClick={() => handleSelectWorkspace(workspace.id)} role="menuitem">
+                  <span className="workspace-selector__dropdown-item-icon">
+                    <Icon name="workspace" size={20} />
                   </span>
+                  <span className="workspace-selector__dropdown-item-name">{workspace.name}</span>
+                  {workspace.id === currentWorkspace.id && (
+                    <span className="workspace-selector__dropdown-item-check">
+                      <Icon name="check" size={16} />
+                    </span>
+                  )}
+                </button>
+                {workspaces.length > 1 && (
+                  <button
+                    className="workspace-selector__dropdown-item-delete"
+                    onClick={(e) => handleDeleteClick(e, { id: workspace.id, name: workspace.name })}
+                    aria-label={`Delete ${workspace.name}`}
+                    title="Delete workspace"
+                  >
+                    <Icon name="close" size={16} />
+                  </button>
                 )}
-              </button>
+              </div>
             ))}
           </div>
 
@@ -112,6 +147,17 @@ export function WorkspaceSelector({ isCollapsed = false, onCreateWorkspace }: Wo
           </button>
         </div>
       )}
+
+      <ConfirmationDialog
+        isOpen={!!workspaceToDelete}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        title="Delete Workspace?"
+        message={`Are you sure you want to delete "${workspaceToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        confirmButtonVariant="danger"
+      />
     </div>
   )
 }

@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useCallback, useEffect, Rea
 import { Workspace } from '@kairos/types'
 import { api } from '../utils/api/client'
 import { useAuthContext } from './AuthContext'
+import { pageService } from '../services'
+import { generateWelcomePageContent } from '../utils/defaultContent'
 
 interface WorkspaceStorage {
   lastWorkspaceId: string | null
@@ -99,6 +101,46 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
         })
         setWorkspaces([defaultWorkspace])
         setCurrentWorkspace(defaultWorkspace)
+
+        // Create welcome page for the default workspace
+        try {
+          const welcomeBlocks = generateWelcomePageContent()
+          const welcomePage = await pageService.createPage(defaultWorkspace.id, {
+            title: 'Welcome',
+            parentId: null,
+            isFolder: false,
+          })
+
+          // Create blocks for the welcome page
+          if (welcomePage && welcomePage.id) {
+            const blockPromises = welcomeBlocks.map((block, index) =>
+              api.blocks.create({
+                pageId: welcomePage.id,
+                type: block.type,
+                content: block.content,
+                order: index,
+                metadata: {
+                  ...block.metadata,
+                  formatting: block.formatting || [],
+                },
+              })
+            )
+
+            await Promise.all(blockPromises)
+
+            // Update workspace preferences to set this page as lastPageId
+            const storage = getWorkspaceStorage()
+            storage.workspacePreferences = storage.workspacePreferences || {}
+            storage.workspacePreferences[defaultWorkspace.id] = {
+              lastPageId: welcomePage.id,
+            }
+            setWorkspaceStorage(storage)
+            setCurrentPageId(welcomePage.id)
+          }
+        } catch (pageError) {
+          // Log error but don't fail workspace creation
+          console.error('Failed to create welcome page for default workspace:', pageError)
+        }
       }
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to load workspaces')
@@ -129,6 +171,47 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       const newWorkspace = await api.workspaces.create({ name, description })
       setWorkspaces((prev) => [...prev, newWorkspace])
       setCurrentWorkspace(newWorkspace)
+
+      // Create welcome page for the new workspace
+      try {
+        const welcomeBlocks = generateWelcomePageContent()
+        const welcomePage = await pageService.createPage(newWorkspace.id, {
+          title: 'Welcome',
+          parentId: null,
+          isFolder: false,
+        })
+
+        // Create blocks for the welcome page
+        if (welcomePage && welcomePage.id) {
+          const blockPromises = welcomeBlocks.map((block, index) =>
+            api.blocks.create({
+              pageId: welcomePage.id,
+              type: block.type,
+              content: block.content,
+              order: index,
+              metadata: {
+                ...block.metadata,
+                formatting: block.formatting || [],
+              },
+            })
+          )
+
+          await Promise.all(blockPromises)
+
+          // Update workspace preferences to set this page as lastPageId
+          const storage = getWorkspaceStorage()
+          storage.workspacePreferences = storage.workspacePreferences || {}
+          storage.workspacePreferences[newWorkspace.id] = {
+            lastPageId: welcomePage.id,
+          }
+          setWorkspaceStorage(storage)
+          setCurrentPageId(welcomePage.id)
+        }
+      } catch (pageError) {
+        // Log error but don't fail workspace creation
+        console.error('Failed to create welcome page:', pageError)
+      }
+
       return newWorkspace
     } catch (err) {
       const error = err instanceof Error ? err : new Error('Failed to create workspace')

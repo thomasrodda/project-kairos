@@ -1,6 +1,49 @@
 // apps/web/src/test/setup.ts
 import '@testing-library/jest-dom'
 
+// Mock Firebase auth module globally
+jest.mock('firebase/auth', () => ({
+  getAuth: jest.fn(() => ({
+    currentUser: null,
+    onAuthStateChanged: jest.fn((callback) => {
+      callback(null)
+      return jest.fn()
+    }),
+  })),
+  signInWithEmailAndPassword: jest.fn(() => Promise.resolve({ user: { uid: 'test-uid', email: 'test@example.com' } })),
+  createUserWithEmailAndPassword: jest.fn(() => Promise.resolve({ user: { uid: 'test-uid', email: 'test@example.com' } })),
+  signOut: jest.fn(() => Promise.resolve()),
+  sendPasswordResetEmail: jest.fn(() => Promise.resolve()),
+  onAuthStateChanged: jest.fn((auth, callback) => {
+    callback(null)
+    return jest.fn()
+  }),
+}))
+
+// Mock Firebase app module
+jest.mock('firebase/app', () => ({
+  initializeApp: jest.fn(() => ({ name: 'test-app' })),
+}))
+
+// Mock Firebase firestore module
+jest.mock('firebase/firestore', () => ({
+  getFirestore: jest.fn(() => ({})),
+  collection: jest.fn(),
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+  setDoc: jest.fn(),
+  updateDoc: jest.fn(),
+  deleteDoc: jest.fn(),
+}))
+
+// Mock Firebase storage module
+jest.mock('firebase/storage', () => ({
+  getStorage: jest.fn(() => ({})),
+  ref: jest.fn(),
+  uploadBytes: jest.fn(),
+  getDownloadURL: jest.fn(),
+}))
+
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

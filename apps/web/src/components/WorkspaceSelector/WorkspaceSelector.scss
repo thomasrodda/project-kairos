@@ -96,12 +96,28 @@
       overflow-y: auto;
     }
 
+    &-item-wrapper {
+      display: flex;
+      align-items: center;
+      position: relative;
+
+      &:hover .workspace-selector__dropdown-item-delete {
+        opacity: 1;
+      }
+
+      &--active .workspace-selector__dropdown-item {
+        background-color: var(--color-surface-selected);
+        font-weight: 500;
+      }
+    }
+
     &-item {
-      width: 100%;
+      flex: 1;
       display: flex;
       align-items: center;
       gap: var(--spacing-sm);
       padding: var(--spacing-sm) var(--spacing-md);
+      padding-right: var(--spacing-lg); // Make room for delete button
       background: transparent;
       border: none;
       color: var(--color-text-primary);
@@ -117,11 +133,6 @@
       &:focus-visible {
         outline: 2px solid var(--color-primary);
         outline-offset: -2px;
-      }
-
-      &--active {
-        background-color: var(--color-surface-selected);
-        font-weight: 500;
       }
 
       &--create {
@@ -147,6 +158,40 @@
         align-items: center;
         justify-content: center;
         color: var(--color-primary);
+      }
+    }
+
+    &-item-delete {
+      position: absolute;
+      right: var(--spacing-sm);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      color: var(--color-text-tertiary);
+      cursor: pointer;
+      opacity: 0;
+      transition:
+        opacity 0.15s ease,
+        background-color 0.15s ease,
+        color 0.15s ease;
+
+      &:hover {
+        background-color: var(--color-danger-bg);
+        color: var(--color-danger);
+      }
+
+      &:focus-visible {
+        opacity: 1;
+        outline: 2px solid var(--color-primary);
+        outline-offset: -2px;
       }
     }
 

@@ -33,7 +33,7 @@ jest.mock('./utils/api/client', () => ({
     },
     pages: {
       get: jest.fn(),
-      listByWorkspace: jest.fn(),
+      list: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
@@ -128,7 +128,7 @@ describe('App Integration Tests', () => {
     })
     ;(api.auth.syncUser as jest.Mock).mockResolvedValue(true)
     ;(api.workspaces.list as jest.Mock).mockResolvedValue([mockWorkspace])
-    ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue([mockPage])
+    ;(api.pages.list as jest.Mock).mockResolvedValue([mockPage])
     ;(api.pages.get as jest.Mock).mockResolvedValue(mockPage)
     ;(api.blocks.listByPage as jest.Mock).mockResolvedValue(mockBlocks)
   })
@@ -208,14 +208,14 @@ describe('App Integration Tests', () => {
 
       // Verify page was loaded
       await waitFor(() => {
-        expect(api.pages.get).toHaveBeenCalledWith('page-1')
+        expect(api.pages.get).toHaveBeenCalledWith('workspace-1', 'page-1')
         expect(api.blocks.listByPage).toHaveBeenCalledWith('page-1')
       })
     })
 
     it('should handle page selection from sidebar', async () => {
       const page2 = { ...mockPage, id: 'page-2', title: 'Second Page' }
-      ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue([mockPage, page2])
+      ;(api.pages.list as jest.Mock).mockResolvedValue([mockPage, page2])
       ;(api.pages.get as jest.Mock).mockResolvedValue(page2)
 
       render(<App />)
@@ -227,7 +227,7 @@ describe('App Integration Tests', () => {
 
       // Wait for pages to be loaded
       await waitFor(() => {
-        expect(api.pages.listByWorkspace).toHaveBeenCalledWith('workspace-1')
+        expect(api.pages.list).toHaveBeenCalledWith('workspace-1')
       })
 
       // Find and click the second page button
@@ -236,7 +236,7 @@ describe('App Integration Tests', () => {
 
       // Verify new page was loaded
       await waitFor(() => {
-        expect(api.pages.get).toHaveBeenCalledWith('page-2')
+        expect(api.pages.get).toHaveBeenCalledWith('workspace-1', 'page-2')
       })
 
       // Verify localStorage was updated with page selection

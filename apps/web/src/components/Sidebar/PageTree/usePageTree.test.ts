@@ -7,7 +7,7 @@ import { Page } from '@kairos/types'
 jest.mock('../../../utils/api/client', () => ({
   api: {
     pages: {
-      listByWorkspace: jest.fn(),
+      list: jest.fn(),
     },
   },
 }))
@@ -51,7 +51,7 @@ describe('usePageTree', () => {
   })
 
   it('should fetch pages on mount', async () => {
-    ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+    ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
     const { result } = renderHook(() =>
       usePageTree({
@@ -66,12 +66,12 @@ describe('usePageTree', () => {
       expect(result.current.loading).toBe(false)
     })
 
-    expect(api.pages.listByWorkspace).toHaveBeenCalledWith('workspace-1')
+    expect(api.pages.list).toHaveBeenCalledWith('workspace-1')
     expect(result.current.pageTree).toHaveLength(2) // Two root pages
   })
 
   it('should build hierarchical tree structure', async () => {
-    ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+    ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
     const { result } = renderHook(() =>
       usePageTree({
@@ -90,7 +90,7 @@ describe('usePageTree', () => {
   })
 
   it('should handle page selection', async () => {
-    ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+    ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
     const { result } = renderHook(() =>
       usePageTree({
@@ -111,7 +111,7 @@ describe('usePageTree', () => {
   })
 
   it('should not select folders', async () => {
-    ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+    ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
     const { result } = renderHook(() =>
       usePageTree({
@@ -132,7 +132,7 @@ describe('usePageTree', () => {
   })
 
   it('should toggle folder expansion', async () => {
-    ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(mockPages)
+    ;(api.pages.list as jest.Mock).mockResolvedValue(mockPages)
 
     const { result } = renderHook(() =>
       usePageTree({
@@ -175,7 +175,7 @@ describe('usePageTree', () => {
       },
     ]
 
-    ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(nestedPages)
+    ;(api.pages.list as jest.Mock).mockResolvedValue(nestedPages)
 
     const { result } = renderHook(() =>
       usePageTree({
@@ -195,7 +195,7 @@ describe('usePageTree', () => {
 
   it('should handle API errors', async () => {
     const error = new Error('Failed to fetch')
-    ;(api.pages.listByWorkspace as jest.Mock).mockRejectedValue(error)
+    ;(api.pages.list as jest.Mock).mockRejectedValue(error)
 
     const { result } = renderHook(() =>
       usePageTree({
@@ -220,7 +220,7 @@ describe('usePageTree', () => {
       })
     )
 
-    expect(api.pages.listByWorkspace).not.toHaveBeenCalled()
+    expect(api.pages.list).not.toHaveBeenCalled()
   })
 
   it('should sort pages by order', async () => {
@@ -230,7 +230,7 @@ describe('usePageTree', () => {
       { ...mockPages[2], order: 1 },
     ]
 
-    ;(api.pages.listByWorkspace as jest.Mock).mockResolvedValue(unsortedPages)
+    ;(api.pages.list as jest.Mock).mockResolvedValue(unsortedPages)
 
     const { result } = renderHook(() =>
       usePageTree({
