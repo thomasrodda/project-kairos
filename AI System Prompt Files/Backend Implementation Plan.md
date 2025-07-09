@@ -2,397 +2,371 @@
 
 ## Overview
 
-This plan implements a Notion-inspired backend architecture for Project Kairos, prioritizing performance, scalability, and future extensibility while keeping initial complexity manageable.
+This document outlines the comprehensive plan for implementing the backend of Project Kairos, focusing on the MVP requirements while building a foundation for future features.
 
-## Core Architecture Decisions
+## Architecture Summary
 
-### 1. Block Storage Strategy
+- **API**: Express with Vercel Serverless Functions
+- **Database**: PostgreSQL via Supabase with Prisma ORM
+- **Authentication**: Firebase Auth (Google OAuth + Email)
+- **Real-time**: Deferred to post-MVP (Supabase Realtime ready)
+- **File Storage**: Deferred to post-MVP (Supabase Storage ready)
 
-- **Individual block records** (not JSON documents)
-- Each block is a separate database row
-- Enables granular updates, lazy loading, and future collaboration
-- Trade-off: More complex queries for better performance
+## Setup Progress ✅
 
-### 2. Multi-Tenancy
+### Completed Setup (as of 2025-01-09)
 
-- Build with user isolation from the start
-- All tables include user_id for data separation
-- Collaboration features can be added later via workspace_members table
-- No additional complexity for single-user experience
+1. **Firebase Configuration**
 
-### 3. Auto-Save Strategy
+   - ✅ Firebase project: `project-kairos-2885a`
+   - ✅ Service account credentials configured
+   - ✅ Web app configuration obtained
+   - ✅ Authentication providers enabled (Email/Password, Google)
 
-- **Debounced saves**: 1 second after user stops typing
-- **Immediate saves**: On block blur or navigation
-- **Optimistic updates**: Update UI immediately, sync in background
-- **Conflict detection**: Version numbers on each block
+2. **Supabase Database**
 
-### 4. Version History
+   - ✅ Supabase project created
+   - ✅ Connection string configured (Transaction pooler on port 6543)
+   - ✅ All database tables created:
+     - `users` table with Firebase UID integration
+     - `workspaces` table for user workspaces
+     - `pages` table with hierarchical structure
+     - `blocks` table with content and metadata
+     - `links` table for page relationships
+   - ✅ Indexes and foreign keys established
 
-- **Hybrid approach**: Snapshots + individual changes
-- Full page snapshots every 100 edits or 24 hours
-- Individual block changes stored between snapshots
-- 30-day retention for free users (configurable)
+3. **Development Environment**
+   - ✅ Environment variables configured in `.env.local`
+   - ✅ Prisma client generated
+   - ✅ Database connection verified
+   - ✅ API server tested and responding
+   - ✅ Development scripts updated with `dotenv-cli` for env loading
 
-## Database Schema
+## Phase 1: Authentication & User Management (Week 1)
+
+### 1.1 Firebase Admin Setup
+
+```typescript
+// apps/api/lib/firebase-admin.ts
+- Initialize Firebase Admin SDK
+- Create token verification middleware
+- Handle token refresh scenarios
+```
+
+### 1.2 Authentication Endpoints
+
+```typescript
+POST / api / auth / verify // Verify Firebase token, create/update user
+POST / api / auth / logout // Optional: Clear any server-side session
+GET / api / auth / me // Get current user profile
+```
+
+### 1.3 User Profile Management
+
+```typescript
+// After successful Firebase auth:
+1. Verify Firebase ID token
+2. Check if user exists in our DB
+3. If not, create user record with Firebase UID
+4. Return user profile + JWT for subsequent requests
+```
+
+### 1.4 Authentication Middleware
+
+```typescript
+// apps/api/middleware/auth.ts
+- Extract Firebase token from Authorization header
+- Verify token with Firebase Admin
+- Attach user to request object
+- Handle unauthorized scenarios
+```
+
+## Phase 2: Core CRUD Operations (Week 2)
+
+### 2.1 Workspace Management
+
+```typescript
+GET    /api/workspaces              // List user's workspaces
+POST   /api/workspaces              // Create new workspace
+GET    /api/workspaces/:id          // Get workspace details
+PUT    /api/workspaces/:id          // Update workspace (name, settings)
+DELETE /api/workspaces/:id          // Delete workspace (soft delete)
+```
+
+### 2.2 Page Management
+
+```typescript
+GET    /api/workspaces/:workspaceId/pages     // List pages in workspace
+POST   /api/workspaces/:workspaceId/pages     // Create new page
+GET    /api/pages/:id                          // Get page with blocks
+PUT    /api/pages/:id                          // Update page metadata
+DELETE /api/pages/:id                          // Delete page (soft delete)
+PUT    /api/pages/:id/reorder                  // Reorder pages
+```
+
+### 2.3 Block Operations
+
+```typescript
+GET    /api/pages/:pageId/blocks              // Get all blocks for a page
+PUT    /api/pages/:pageId/blocks              // Bulk update blocks (main save)
+POST   /api/pages/:pageId/blocks              // Add new block
+PUT    /api/blocks/:id                        // Update single block
+DELETE /api/blocks/:id                        // Delete block
+PUT    /api/pages/:pageId/blocks/reorder      // Reorder blocks
+```
+
+## Phase 3: Auto-save & Content Sync (Week 3)
+
+### 3.1 Auto-save Endpoint
+
+```typescript
+PUT /api/pages/:id/content
+// Accepts partial updates
+// Handles conflict detection
+// Returns save status
+```
+
+### 3.2 Debounced Save Strategy
+
+- Frontend debounces saves (2 seconds after last change)
+- Maximum save interval (30 seconds during continuous typing)
+- Retry queue for failed saves
+- Optimistic UI updates with rollback on failure
+
+### 3.3 Content Versioning (Simplified)
+
+```typescript
+// Store last 10 versions per page
+- content_versions table
+- Automatic cleanup of old versions
+- Simple rollback capability
+```
+
+## Phase 4: Frontend Integration (Week 4)
+
+### 4.1 API Client Service
+
+```typescript
+// apps/web/src/services/api/
+├── client.ts          // Axios instance with auth interceptor
+├── auth.ts           // Authentication methods
+├── workspaces.ts     // Workspace CRUD
+├── pages.ts          // Page operations
+└── blocks.ts         // Block operations
+```
+
+### 4.2 React Query Integration
+
+```typescript
+// Data fetching hooks
+useWorkspaces() // List workspaces
+useWorkspace(id) // Single workspace
+usePages(workspaceId)
+usePage(id)
+useAutoSave() // Debounced save hook
+```
+
+### 4.3 Context Updates
+
+```typescript
+// Extend existing contexts
+- AuthContext: User state, login/logout
+- WorkspaceContext: Current workspace
+- EditorContext: Add save state, sync status
+```
+
+## Database Schema Updates
+
+### Required Indexes
 
 ```sql
--- Users (synced from Firebase Auth)
-CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  firebase_uid VARCHAR(255) UNIQUE NOT NULL,
-  email VARCHAR(255) NOT NULL,
-  display_name VARCHAR(255),
-  photo_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Workspaces
-CREATE TABLE workspaces (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-  name VARCHAR(255) NOT NULL,
-  description TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Pages (hierarchical structure)
-CREATE TABLE pages (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
-  parent_id UUID REFERENCES pages(id) ON DELETE CASCADE,
-  title VARCHAR(255) NOT NULL,
-  icon VARCHAR(50), -- emoji icon
-  position DECIMAL(10, 5) NOT NULL, -- for ordering
-  is_folder BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Blocks (individual content units)
-CREATE TABLE blocks (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  page_id UUID REFERENCES pages(id) ON DELETE CASCADE,
-  type VARCHAR(50) NOT NULL, -- paragraph, h1, h2, h3, bullet
-  content TEXT, -- plain text content
-  formatting JSONB DEFAULT '[]', -- array of {start, end, type, data}
-  position DECIMAL(10, 5) NOT NULL, -- for ordering
-  version INTEGER DEFAULT 1, -- for optimistic locking
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Indexes for performance
-CREATE INDEX idx_workspaces_user ON workspaces(user_id);
-CREATE INDEX idx_pages_workspace ON pages(workspace_id);
-CREATE INDEX idx_pages_parent ON pages(parent_id);
-CREATE INDEX idx_blocks_page_position ON blocks(page_id, position);
-CREATE INDEX idx_blocks_updated ON blocks(updated_at);
-
--- Version History Tables
-CREATE TABLE page_snapshots (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  page_id UUID REFERENCES pages(id) ON DELETE CASCADE,
-  snapshot_data JSONB NOT NULL, -- compressed blocks data
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE block_changes (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  block_id UUID REFERENCES blocks(id) ON DELETE CASCADE,
-  operation VARCHAR(20) NOT NULL, -- create, update, delete
-  old_content TEXT,
-  new_content TEXT,
-  old_formatting JSONB,
-  new_formatting JSONB,
-  changed_by UUID REFERENCES users(id),
-  changed_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Future: Collaboration
--- CREATE TABLE workspace_members (
---   workspace_id UUID REFERENCES workspaces(id) ON DELETE CASCADE,
---   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
---   role VARCHAR(20) NOT NULL, -- owner, editor, viewer
---   PRIMARY KEY (workspace_id, user_id)
--- );
+-- Performance optimization
+CREATE INDEX idx_workspaces_user_id ON workspaces(user_id);
+CREATE INDEX idx_pages_workspace_id ON pages(workspace_id);
+CREATE INDEX idx_blocks_page_id_position ON blocks(page_id, position);
 ```
 
-## API Endpoints
+### Soft Delete Implementation
 
-### Authentication
-
-```typescript
-POST / api / auth / verify // Verify Firebase token
-POST / api / auth / sync - user // Create/update user from Firebase
-```
-
-### Workspaces
-
-```typescript
-GET    /api/workspaces           // List user's workspaces
-POST   /api/workspaces           // Create workspace
-GET    /api/workspaces/:id       // Get workspace details
-PUT    /api/workspaces/:id       // Update workspace
-DELETE /api/workspaces/:id       // Delete workspace
-```
-
-### Pages
-
-```typescript
-GET    /api/workspaces/:id/pages // Get page tree for workspace
-POST   /api/pages                // Create page
-GET    /api/pages/:id            // Get page with metadata
-PUT    /api/pages/:id            // Update page metadata
-DELETE /api/pages/:id            // Delete page and blocks
-PUT    /api/pages/:id/move       // Move page in hierarchy
-```
-
-### Blocks
-
-```typescript
-GET    /api/pages/:id/blocks     // Get blocks (with pagination)
-POST   /api/blocks                // Create single block
-PUT    /api/blocks/:id            // Update single block
-DELETE /api/blocks/:id            // Delete single block
-POST   /api/blocks/batch          // Batch operations
-PUT    /api/blocks/reorder        // Reorder blocks
-```
-
-### Version History
-
-```typescript
-GET    /api/pages/:id/history     // Get version history
-GET    /api/pages/:id/snapshot/:version // Get specific version
-POST   /api/pages/:id/restore/:version  // Restore version
-```
-
-## Implementation Phases
-
-### Phase 1: Core Foundation (Weeks 1-3)
-
-1. **Database Setup**
-
-   - Set up PostgreSQL with Prisma ORM
-   - Create all tables and indexes
-   - Seed with test data
-
-2. **Authentication**
-
-   - Firebase Admin SDK integration
-   - Token verification middleware
-   - User sync endpoint
-
-3. **Basic CRUD**
-   - Workspace operations
-   - Page operations
-   - Block operations (single)
-
-### Phase 2: Real-time Sync (Weeks 4-5)
-
-1. **Auto-save Implementation**
-
-   - Debounced save logic
-   - Optimistic locking
-   - Conflict detection
-
-2. **Batch Operations**
-
-   - Bulk block updates
-   - Efficient reordering
-   - Paste operation support
-
-3. **Performance Optimization**
-   - Query optimization
-   - Connection pooling
-   - Response caching
-
-### Phase 3: Advanced Features (Weeks 6-7)
-
-1. **Version History**
-
-   - Snapshot system
-   - Change tracking
-   - History UI endpoints
-
-2. **Search & Export**
-
-   - Full-text search
-   - Markdown export
-   - Import functionality
-
-3. **Real-time Updates**
-   - WebSocket setup
-   - Change notifications
-   - Multi-tab sync
-
-### Phase 4: Scale & Polish (Week 8+)
-
-1. **Performance**
-
-   - Redis caching
-   - Database read replicas
-   - CDN for static assets
-
-2. **Monitoring**
-
-   - Error tracking (Sentry)
-   - Performance monitoring
-   - Usage analytics
-
-3. **Security**
-   - Rate limiting
-   - Input validation
-   - Security headers
-
-## Technical Implementation Details
-
-### Block Formatting Structure
-
-```typescript
-interface TextFormat {
-  start: number
-  end: number
-  type: 'bold' | 'italic' | 'underline' | 'link'
-  data?: { url: string } // for links
+```prisma
+model Workspace {
+  deletedAt DateTime?
+  // Add to all models for soft delete
 }
-
-interface Block {
-  id: string
-  type: BlockType
-  content: string
-  formatting: TextFormat[]
-  position: number
-  version: number
-}
-```
-
-### Auto-save Implementation
-
-```typescript
-// Frontend
-const saveBlock = debounce(async (blockId: string, content: string, formatting: TextFormat[]) => {
-  try {
-    const response = await api.updateBlock(blockId, {
-      content,
-      formatting,
-      version: currentVersion,
-    })
-
-    if (response.version !== currentVersion + 1) {
-      // Handle conflict
-      await resolveConflict(blockId)
-    }
-  } catch (error) {
-    // Queue for retry
-    offlineQueue.add({ blockId, content, formatting })
-  }
-}, 1000)
-
-// Backend
-app.put('/api/blocks/:id', async (req, res) => {
-  const { content, formatting, version } = req.body
-
-  // Optimistic locking
-  const updated = await prisma.block.updateMany({
-    where: {
-      id: req.params.id,
-      version: version,
-    },
-    data: {
-      content,
-      formatting,
-      version: { increment: 1 },
-      updatedAt: new Date(),
-    },
-  })
-
-  if (updated.count === 0) {
-    return res.status(409).json({
-      success: false,
-      error: { code: 'VERSION_CONFLICT' },
-    })
-  }
-
-  // Track change for version history
-  await trackBlockChange(req.params.id, 'update', oldContent, content)
-
-  res.json({ success: true, version: version + 1 })
-})
-```
-
-### Position Management for Ordering
-
-```typescript
-// Generate position between two blocks
-function generatePosition(before: number | null, after: number | null): number {
-  if (!before) return after ? after / 2 : 1
-  if (!after) return before + 1
-  return (before + after) / 2
-}
-
-// Rebalance positions if they get too close
-async function rebalancePositions(pageId: string) {
-  const blocks = await prisma.block.findMany({
-    where: { pageId },
-    orderBy: { position: 'asc' },
-  })
-
-  const updates = blocks.map((block, index) => ({
-    where: { id: block.id },
-    data: { position: (index + 1) * 1000 },
-  }))
-
-  await prisma.$transaction(updates.map((update) => prisma.block.update(update)))
-}
-```
-
-## Monitoring & Observability
-
-### Key Metrics
-
-- API response times (p50, p95, p99)
-- Block save success rate
-- Active users per hour
-- Storage usage per user
-- Error rates by endpoint
-
-### Logging Strategy
-
-```typescript
-// Structured logging
-logger.info('Block updated', {
-  blockId,
-  userId,
-  pageId,
-  duration: Date.now() - startTime,
-  version,
-})
 ```
 
 ## Security Considerations
 
-1. **Authentication**: All endpoints require valid Firebase token
-2. **Authorization**: Users can only access their own data
-3. **Rate Limiting**: 100 requests per minute per user
-4. **Input Validation**: Zod schemas for all inputs
-5. **SQL Injection**: Prevented by Prisma parameterized queries
-6. **XSS Prevention**: Content sanitization on output
+### 1. Input Validation
 
-## Cost Optimization
+- Use Zod schemas for all endpoints
+- Validate Firebase tokens on every request
+- Sanitize user-generated content
+- Prevent XSS in block content
 
-1. **Database**: Use connection pooling, optimize queries
-2. **Storage**: Compress old snapshots, purge old history
-3. **Compute**: Cache frequently accessed data
-4. **Bandwidth**: Paginate large responses
+### 2. Authorization Rules
 
-## Future Considerations
+- Users can only access their own workspaces
+- Workspace membership check before page access
+- Rate limiting on all endpoints
+- CORS configuration for production
 
-1. **Collaboration**: Workspace sharing, real-time cursors
-2. **AI Features**: Vector embeddings for content
-3. **Mobile Sync**: Offline-first architecture
-4. **Enterprise**: SSO, audit logs, compliance
+### 3. Data Privacy
 
-This implementation plan provides a solid foundation that matches Notion's architecture while being practical to implement for a single developer.
+- No analytics tracking without consent
+- Minimal user data collection
+- Secure token storage (httpOnly cookies for future)
+- GDPR-compliant data handling
+
+## Error Handling Strategy
+
+### Standard Error Response
+
+```typescript
+{
+  error: {
+    code: "WORKSPACE_NOT_FOUND",
+    message: "The requested workspace does not exist",
+    details: {} // Optional additional context
+  }
+}
+```
+
+### HTTP Status Codes
+
+- 200: Success
+- 201: Created
+- 400: Bad Request (validation errors)
+- 401: Unauthorized (no/invalid token)
+- 403: Forbidden (no access to resource)
+- 404: Not Found
+- 429: Rate Limited
+- 500: Internal Server Error
+
+## Testing Strategy
+
+### 1. Unit Tests
+
+- Authentication middleware
+- Validation schemas
+- Business logic helpers
+
+### 2. Integration Tests
+
+- API endpoint testing with Supertest
+- Database operations with test database
+- Authentication flow testing
+
+### 3. E2E Tests (Post-MVP)
+
+- Full user flows from login to content editing
+- Auto-save reliability testing
+- Error scenario handling
+
+## Performance Optimization
+
+### 1. Database
+
+- Indexed queries for common operations
+- Pagination for large datasets
+- Efficient block loading (limit to viewport)
+
+### 2. API
+
+- Response compression
+- Edge caching for static data
+- Connection pooling for database
+
+### 3. Frontend
+
+- Optimistic updates for better UX
+- Request deduplication
+- Progressive data loading
+
+## Deployment Checklist
+
+### Environment Variables
+
+```env
+# Required for production
+DATABASE_URL=
+FIREBASE_CLIENT_EMAIL=
+FIREBASE_PRIVATE_KEY=
+FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_*=
+```
+
+### Vercel Configuration
+
+- Environment variables set
+- Database connection limits configured
+- CORS origins updated for production
+- Rate limiting enabled
+
+## Development Timeline
+
+### Week 1: Authentication
+
+- [ ] Firebase Admin setup
+- [ ] Auth endpoints
+- [ ] User creation flow
+- [ ] Frontend auth integration
+
+### Week 2: CRUD Operations
+
+- [ ] Workspace endpoints
+- [ ] Page management
+- [ ] Block operations
+- [ ] Frontend workspace selector
+
+### Week 3: Auto-save
+
+- [ ] Save endpoint with conflict detection
+- [ ] Debounced save implementation
+- [ ] Save status indicators
+- [ ] Error recovery
+
+### Week 4: Polish & Testing
+
+- [ ] Integration testing
+- [ ] Error handling improvements
+- [ ] Performance optimization
+- [ ] Deployment preparation
+
+## Success Metrics
+
+1. **Authentication**: < 500ms token verification
+2. **Page Load**: < 1s for page with 100 blocks
+3. **Auto-save**: < 200ms save time
+4. **Reliability**: 99.9% uptime for API
+5. **Data Loss**: Zero data loss from auto-save
+
+## Future Considerations (Post-MVP)
+
+1. **Real-time Collaboration**
+
+   - WebSocket integration
+   - Operational Transforms for conflict resolution
+   - Presence indicators
+
+2. **Advanced Features**
+
+   - Full-text search with PostgreSQL
+   - AI integration endpoints
+   - File upload handling
+   - Export functionality
+
+3. **Performance**
+   - Redis caching layer
+   - CDN for static assets
+   - Database read replicas
+
+## Next Steps
+
+1. Set up Supabase project and get connection string
+2. Configure Firebase Admin SDK credentials
+3. Implement authentication middleware
+4. Create first workspace endpoint
+5. Test with Postman/Thunder Client
+
+This plan provides a solid foundation for the MVP while keeping future features in mind. The modular approach allows for incremental development and testing.

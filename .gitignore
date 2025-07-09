@@ -12,3 +12,10 @@ coverage/
 **/dist/
 cypress/screenshots/
 cypress/videos/
+
+# Firebase
+firebase-service-account.json
+
+# Development
+dev.log
+nohup.out

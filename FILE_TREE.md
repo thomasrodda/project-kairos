@@ -203,7 +203,6 @@ apps
 │   ├── integration
 │   │   ├── Editor.integration.test.tsx
 │   │   └── markdown-detection.test.tsx
-│   ├── pages
 │   ├── styles
 │   │   ├── base
 │   │   │   └── reset.scss
@@ -224,6 +223,8 @@ apps
 │   ├── App.tsx
 │   ├── main.tsx
 │   └── vite-env.d.ts
+├── .env -> ../../.env
+├── .env.local -> ../../.env.local
 ├── .eslintrc.json
 ├── index.html
 ├── jest.config.js
