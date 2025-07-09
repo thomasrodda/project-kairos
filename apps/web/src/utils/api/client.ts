@@ -181,7 +181,7 @@ export const api = {
 
   // Pages
   pages: {
-    list: (workspaceId: string) => apiClient.get<any[]>(`/api/pages/${workspaceId}`),
+    list: (workspaceId: string) => apiClient.get<{ pages: any[] }>(`/api/pages/${workspaceId}`).then((res) => res.pages || []),
     get: (workspaceId: string, pageId: string) => apiClient.get<any>(`/api/pages/${workspaceId}/${pageId}`),
     create: (workspaceId: string, data: { title: string; parentId?: string | null; isFolder?: boolean; order?: number }) =>
       apiClient.post<any>(`/api/pages/${workspaceId}`, data),

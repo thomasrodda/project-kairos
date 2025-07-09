@@ -30,7 +30,8 @@ export function usePageTree({ workspaceId, currentPageId, onPageSelect }: UsePag
 
   // Build hierarchical tree structure
   const pageTree = useMemo(() => {
-    if (pages.length === 0) return []
+    // Ensure pages is an array
+    if (!Array.isArray(pages) || pages.length === 0) return []
 
     // Create a map for quick lookup
     const pageMap = new Map<string, PageWithChildren>()

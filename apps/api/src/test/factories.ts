@@ -23,6 +23,7 @@ export function createWorkspace(overrides: Partial<Workspace> = {}): Workspace {
   return {
     id,
     name: `Workspace ${id}`,
+    description: null,
     userId: overrides.userId || uuidv4(),
     createdAt: new Date(),
     updatedAt: new Date(),

@@ -175,16 +175,17 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   // Load pages when workspace changes
   const loadPages = useCallback(async () => {
-    if (!currentWorkspace) {
+    if (!currentWorkspace?.id) {
       setPages([])
       return
     }
 
     try {
       const fetchedPages = await api.pages.list(currentWorkspace.id)
-      setPages(fetchedPages)
+      setPages(fetchedPages || [])
     } catch (err) {
       console.error('Failed to load pages:', err)
+      setPages([]) // Set empty array on error
       // Don't set error state here as it's not critical
     }
   }, [currentWorkspace])

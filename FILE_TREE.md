@@ -475,5 +475,7 @@ prisma
 │   │   └── migration.sql
 │   ├── 20250706112958_add_version_tracking
 │   │   └── migration.sql
+│   ├── 20250709085836_add_workspace_description
+│   │   └── migration.sql
 │   └── migration_lock.toml
 └── schema.prisma
