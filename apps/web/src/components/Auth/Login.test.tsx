@@ -15,12 +15,15 @@ jest.mock('react-router-dom', () => ({
 const mockLogin = jest.fn()
 const mockClearError = jest.fn()
 let mockError: string | null = null
+let mockUser: any = null
 
 jest.mock('../../contexts/AuthContext', () => ({
   useAuthContext: () => ({
     login: mockLogin,
     error: mockError,
     clearError: mockClearError,
+    user: mockUser,
+    loading: false,
   }),
 }))
 
@@ -28,6 +31,7 @@ describe('Login Component', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockError = null
+    mockUser = null
   })
 
   const renderLogin = () => {
@@ -86,9 +90,12 @@ describe('Login Component', () => {
 
     it('submits form with valid credentials', async () => {
       const user = userEvent.setup()
-      mockLogin.mockResolvedValue(undefined)
+      mockLogin.mockImplementation(async () => {
+        // Simulate successful login by updating the mock user
+        mockUser = { uid: '123', email: 'test@example.com' }
+      })
 
-      renderLogin()
+      const { rerender } = renderLogin()
 
       await user.type(screen.getByLabelText(/email/i), 'test@example.com')
       await user.type(screen.getByLabelText(/password/i), 'password123')
@@ -96,7 +103,17 @@ describe('Login Component', () => {
 
       await waitFor(() => {
         expect(mockLogin).toHaveBeenCalledWith('test@example.com', 'password123')
-        expect(mockNavigate).toHaveBeenCalledWith('/')
+      })
+
+      // Rerender to trigger useEffect with updated user
+      rerender(
+        <MemoryRouter>
+          <Login />
+        </MemoryRouter>
+      )
+
+      await waitFor(() => {
+        expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true })
       })
     })
 
@@ -109,9 +126,10 @@ describe('Login Component', () => {
       expect(mockLogin).not.toHaveBeenCalled()
     })
 
-    it('disables form during submission', async () => {
+    it('shows loading state during submission', async () => {
       const user = userEvent.setup()
-      mockLogin.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 100)))
+      // Create a slower login mock to see the loading state
+      mockLogin.mockImplementation(() => new Promise((resolve) => setTimeout(resolve, 50)))
 
       renderLogin()
 
@@ -119,17 +137,20 @@ describe('Login Component', () => {
       await user.type(screen.getByLabelText(/password/i), 'password123')
 
       const submitButton = screen.getByRole('button', { name: /sign in/i })
+
+      // Check initial state
+      expect(submitButton).toHaveTextContent(/sign in/i)
+      expect(submitButton).not.toBeDisabled()
+
       await user.click(submitButton)
 
-      expect(submitButton).toBeDisabled()
-      expect(submitButton).toHaveTextContent(/signing in/i)
-      expect(screen.getByLabelText(/email/i)).toBeDisabled()
-      expect(screen.getByLabelText(/password/i)).toBeDisabled()
-
+      // After clicking, the loading screen should appear
       await waitFor(() => {
-        expect(submitButton).not.toBeDisabled()
-        expect(submitButton).toHaveTextContent(/sign in/i)
+        expect(screen.getByText(/signing you in/i)).toBeInTheDocument()
       })
+
+      // Verify login was called
+      expect(mockLogin).toHaveBeenCalledWith('test@example.com', 'password123')
     })
   })
 

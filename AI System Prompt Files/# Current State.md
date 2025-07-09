@@ -143,6 +143,7 @@
 - Focus restoration after slash command cancellation needs browser environment
 - ~~Formatting doesn't persist across blocks~~ **Cross-block formatting working** ✅
 - ~~No keyboard shortcuts for formatting~~ **Keyboard shortcuts implemented** ✅ (Ctrl/Cmd+B/I/U/K all working)
+- ~~Double login issue - required logging in twice~~ **Fixed** ✅ (auth state now properly waits for backend sync)
 
 ## 📋 Immediate Next Steps
 
@@ -186,7 +187,6 @@ Based on Development Plan and current progress:
 
 ### Major Features Pending
 
-- **Frontend Authentication UI**: Login/signup components
 - **Pages & File Tree UI**: Visual page management interface
 - **Internal Linking**: @-mentions and backlinks
 - **AI Features**: Grammar checking, lore consistency

@@ -1,14 +1,24 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthContext } from '../../contexts/AuthContext'
 import styles from './Auth.module.scss'
 
 export function Login() {
   const navigate = useNavigate()
-  const { login, error, clearError } = useAuthContext()
+  const location = useLocation()
+  const { login, error, clearError, user, loading } = useAuthContext()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isAuthenticating, setIsAuthenticating] = useState(false)
+
+  // Navigate when user becomes authenticated
+  useEffect(() => {
+    if (user && !loading) {
+      const from = (location.state as any)?.from?.pathname || '/'
+      navigate(from, { replace: true })
+    }
+  }, [user, loading, navigate, location])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,14 +28,30 @@ export function Login() {
     }
 
     setIsSubmitting(true)
+    setIsAuthenticating(true)
     try {
       await login(email, password)
-      navigate('/')
+      // Navigation will be handled by the useEffect when user state updates
     } catch {
       // Error is handled in AuthContext
+      setIsAuthenticating(false)
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  // Show loading state while authenticating
+  if (isAuthenticating && !error) {
+    return (
+      <div className={styles.authContainer}>
+        <div className={styles.authCard}>
+          <div style={{ textAlign: 'center', padding: '2rem' }}>
+            <h2>Signing you in...</h2>
+            <p style={{ marginTop: '1rem', color: '#666' }}>Please wait while we authenticate your account.</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

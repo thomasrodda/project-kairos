@@ -60,6 +60,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } catch (err) {
           console.error('Auth state change error:', err)
           setError('Failed to sync user data')
+          // Don't set the user if sync fails to prevent login loop
+          setUser(null)
         } finally {
           setLoading(false)
         }
