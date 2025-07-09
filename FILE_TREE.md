@@ -276,6 +276,10 @@ apps
 │   │   │   └── index.ts
 │   │   ├── PerformanceTest
 │   │   │   └── PerformanceTest.tsx
+│   │   ├── ProfileDropdown
+│   │   │   ├── ProfileDropdown.scss
+│   │   │   ├── ProfileDropdown.tsx
+│   │   │   └── index.ts
 │   │   ├── Sidebar
 │   │   │   ├── PageTree
 │   │   │   │   ├── PageTree.module.scss
