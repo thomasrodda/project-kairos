@@ -9,9 +9,11 @@
     "test": "jest"
   },
   "dependencies": {
+    "@kairos/database": "*",
     "@kairos/types": "*",
     "@kairos/utils": "*",
     "@vercel/node": "^3.2.26",
+    "dotenv": "^17.2.0",
     "firebase-admin": "^12.7.0"
   },
   "devDependencies": {

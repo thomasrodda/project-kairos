@@ -2102,6 +2102,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kairos/api@workspace:apps/api"
   dependencies:
+    "@kairos/database": "npm:*"
     "@kairos/types": "npm:*"
     "@kairos/utils": "npm:*"
     "@types/cors": "npm:^2.8.18"
@@ -2110,6 +2111,7 @@ __metadata:
     "@types/node": "npm:^22.0.0"
     "@vercel/node": "npm:^3.2.26"
     cors: "npm:^2.8.5"
+    dotenv: "npm:^17.2.0"
     express: "npm:^5.1.0"
     firebase-admin: "npm:^12.7.0"
     jest: "npm:^29.7.0"
@@ -2121,7 +2123,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@kairos/database@workspace:packages/database":
+"@kairos/database@npm:*, @kairos/database@workspace:packages/database":
   version: 0.0.0-use.local
   resolution: "@kairos/database@workspace:packages/database"
   dependencies:
@@ -5555,6 +5557,13 @@ __metadata:
   version: 16.6.1
   resolution: "dotenv@npm:16.6.1"
   checksum: 10c0/15ce56608326ea0d1d9414a5c8ee6dcf0fffc79d2c16422b4ac2268e7e2d76ff5a572d37ffe747c377de12005f14b3cc22361e79fc7f1061cce81f77d2c973dc
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^17.2.0":
+  version: 17.2.0
+  resolution: "dotenv@npm:17.2.0"
+  checksum: 10c0/d4cb5c2a09c288c921ef47a78f51c765a763266e23e84465cde6a87b28b9f7fc5a9d1fe349ed3c880b4c7297f82dd736dba5b08fe95ce53833ce4a7258d0fc43
   languageName: node
   linkType: hard
 

@@ -64,6 +64,15 @@ AI System Prompt Files
 └── Troubleshooting Guide.md
 apps
 ├── api
+│   ├── lib
+│   │   └── firebase-admin.ts
+│   ├── middleware
+│   │   └── auth.ts
+│   ├── types
+│   │   └── express.d.ts
+│   ├── .env
+│   ├── auth.test.ts
+│   ├── auth.ts
 │   ├── dev-server.ts
 │   ├── hello.test.ts
 │   ├── hello.ts
