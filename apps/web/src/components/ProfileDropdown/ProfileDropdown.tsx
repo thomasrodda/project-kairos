@@ -2,7 +2,7 @@
 // Profile dropdown component that shows workspace selection, account details, and settings
 // in a tabbed interface when clicked
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Icon } from '@kairos/ui'
 import { useDismiss } from '../../hooks/useDismiss'
@@ -20,7 +20,9 @@ type TabType = 'workspaces' | 'account' | 'settings'
 export function ProfileDropdown({ isCollapsed = false, onCreateWorkspace }: ProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [activeTab, setActiveTab] = useState<TabType>('workspaces')
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 })
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const navigate = useNavigate()
   const { user, logout } = useAuthContext()
   const { workspaces, currentWorkspace, selectWorkspace, deleteWorkspace } = useWorkspace()
@@ -30,6 +32,17 @@ export function ProfileDropdown({ isCollapsed = false, onCreateWorkspace }: Prof
     onDismiss: () => setIsOpen(false),
     enabled: isOpen,
   })
+
+  // Calculate dropdown position when it opens
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const buttonRect = buttonRef.current.getBoundingClientRect()
+      setDropdownPosition({
+        top: buttonRect.bottom + 4,
+        left: buttonRect.left,
+      })
+    }
+  }, [isOpen])
 
   const handleLogout = async () => {
     try {
@@ -59,6 +72,7 @@ export function ProfileDropdown({ isCollapsed = false, onCreateWorkspace }: Prof
   return (
     <div className="profile-dropdown" ref={dropdownRef}>
       <button
+        ref={buttonRef}
         className={`profile-dropdown__trigger ${isCollapsed ? 'profile-dropdown__trigger--collapsed' : ''}`}
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
@@ -69,13 +83,19 @@ export function ProfileDropdown({ isCollapsed = false, onCreateWorkspace }: Prof
         {!isCollapsed && (
           <>
             <span className="profile-dropdown__text">My Workspace</span>
-            <Icon name="large-arrow" size={16} className={`profile-dropdown__arrow ${isOpen ? 'profile-dropdown__arrow--open' : ''}`} />
+            <Icon name="large-arrow" size={16} className="profile-dropdown__arrow" />
           </>
         )}
       </button>
 
       {isOpen && (
-        <div className="profile-dropdown__menu">
+        <div
+          className="profile-dropdown__menu"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+          }}
+        >
           {/* Tabs */}
           <div className="profile-dropdown__tabs">
             <button

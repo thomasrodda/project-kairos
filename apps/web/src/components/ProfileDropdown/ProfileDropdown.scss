@@ -9,33 +9,34 @@
   &__trigger {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--spacing-12);
     width: 100%;
-    padding: 12px 16px;
+    padding: var(--spacing-8) var(--spacing-8);
     border: none;
     background: transparent;
-    color: var(--text);
-    font-size: 14px;
-    font-weight: 500;
-    line-height: 1.2;
+    color: var(--color-button-text-default);
+    font: var(--text-ui-label-md);
     text-align: left;
     cursor: pointer;
     transition:
       background-color 0.2s ease,
       color 0.2s ease;
-    border-radius: 8px;
+    border-radius: var(--radius-8);
+    position: relative;
+    overflow: hidden;
 
     &:hover {
-      background-color: var(--surface);
+      background-color: var(--color-surface-elevated-1);
+      color: var(--color-button-text-hover);
     }
 
     &:active {
-      background-color: var(--surface-hover);
+      background-color: var(--color-surface);
     }
 
     &--collapsed {
       justify-content: center;
-      padding: 12px;
+      padding: var(--spacing-8);
 
       .profile-dropdown__text,
       .profile-dropdown__arrow {
@@ -52,27 +53,19 @@
   }
 
   &__arrow {
-    color: var(--text-muted);
-    transition: transform 0.2s ease;
-
-    &--open {
-      transform: rotate(180deg);
-    }
+    color: var(--color-button-text-default);
+    transform: rotate(90deg);
   }
 
   // Dropdown menu
   &__menu {
-    position: absolute;
-    top: calc(100% + 4px);
-    left: 0;
-    right: 0;
+    position: fixed;
     min-width: 320px;
     max-width: 400px;
-    background: var(--background);
+    background: var(--color-surface-elevated-1);
     border: 1px solid var(--border);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
     z-index: 1000;
     animation: dropdown-enter 0.2s ease-out;
 
