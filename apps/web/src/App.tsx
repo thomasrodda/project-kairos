@@ -5,9 +5,12 @@ import { Workspace } from './components/Workspace'
 import { Login } from './components/Auth/Login'
 import { Register } from './components/Auth/Register'
 import { ProtectedRoute } from './components/Auth/ProtectedRoute'
+import { WorkspaceCreation } from './components/Auth/WorkspaceCreation'
 import { PerformanceTest } from './components/PerformanceTest/PerformanceTest'
 import { EditorProvider } from './contexts/EditorContext'
 import { AuthProvider } from './contexts/AuthContext'
+import { BackendHealthProvider } from './contexts/BackendHealthContext'
+import { BackendHealthCheck } from './components/BackendHealthCheck'
 import { initializeIconPerformance } from '@kairos/ui'
 
 function App() {
@@ -23,31 +26,44 @@ function App() {
 
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+      <BackendHealthProvider>
+        <BackendHealthCheck>
+          <AuthProvider>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-          {/* Protected routes */}
-          <Route
-            path="/workspace"
-            element={
-              <ProtectedRoute>
-                <EditorProvider>
-                  <Workspace />
-                  {/* Show performance monitoring in development */}
-                  {process.env.NODE_ENV === 'development' && <PerformanceTest />}
-                </EditorProvider>
-              </ProtectedRoute>
-            }
-          />
+              {/* Protected routes */}
+              <Route
+                path="/workspace/new"
+                element={
+                  <ProtectedRoute requireWorkspace={false}>
+                    <WorkspaceCreation />
+                  </ProtectedRoute>
+                }
+              />
 
-          {/* Default redirect */}
-          <Route path="/" element={<Navigate to="/workspace" replace />} />
-          <Route path="*" element={<Navigate to="/workspace" replace />} />
-        </Routes>
-      </AuthProvider>
+              <Route
+                path="/workspace/:workspaceId?"
+                element={
+                  <ProtectedRoute>
+                    <EditorProvider>
+                      <Workspace />
+                      {/* Show performance monitoring in development */}
+                      {process.env.NODE_ENV === 'development' && <PerformanceTest />}
+                    </EditorProvider>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Default redirect */}
+              <Route path="/" element={<Navigate to="/workspace" replace />} />
+              <Route path="*" element={<Navigate to="/workspace" replace />} />
+            </Routes>
+          </AuthProvider>
+        </BackendHealthCheck>
+      </BackendHealthProvider>
     </BrowserRouter>
   )
 }

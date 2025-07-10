@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../contexts/AuthContext'
+import { Icon } from '@kairos/ui'
 import './Register.scss'
 
 export const Register: React.FC = () => {
@@ -68,6 +69,9 @@ export const Register: React.FC = () => {
     <div className="register">
       <div className="register__container">
         <div className="register__card">
+          <div className="register__logo">
+            <Icon name="color-profile" size={48} />
+          </div>
           <h1 className="register__title">Create Your Account</h1>
           <p className="register__subtitle">Join Project Kairos to start your creative journey</p>
 

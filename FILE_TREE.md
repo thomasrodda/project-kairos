@@ -84,6 +84,7 @@ apps
 │   ├── block-types.test.ts
 │   ├── blocks.ts
 │   ├── dev-server.ts
+│   ├── health.ts
 │   ├── hello.test.ts
 │   ├── hello.ts
 │   ├── jest.config.js
@@ -157,9 +158,17 @@ apps
 │   │   │   │   ├── ProtectedRoute.scss
 │   │   │   │   ├── ProtectedRoute.tsx
 │   │   │   │   └── index.ts
-│   │   │   └── Register
-│   │   │   ├── Register.scss
-│   │   │   ├── Register.tsx
+│   │   │   ├── Register
+│   │   │   │   ├── Register.scss
+│   │   │   │   ├── Register.tsx
+│   │   │   │   └── index.ts
+│   │   │   └── WorkspaceCreation
+│   │   │   ├── WorkspaceCreation.scss
+│   │   │   ├── WorkspaceCreation.tsx
+│   │   │   └── index.ts
+│   │   ├── BackendHealthCheck
+│   │   │   ├── BackendHealthCheck.scss
+│   │   │   ├── BackendHealthCheck.tsx
 │   │   │   └── index.ts
 │   │   ├── Editor
 │   │   │   ├── Block
@@ -232,6 +241,7 @@ apps
 │   │   └── index.ts
 │   ├── contexts
 │   │   ├── AuthContext.tsx
+│   │   ├── BackendHealthContext.tsx
 │   │   ├── EditorContext.test.tsx
 │   │   └── EditorContext.tsx
 │   ├── hooks
@@ -249,7 +259,8 @@ apps
 │   ├── styles
 │   │   ├── base
 │   │   │   └── reset.scss
-│   │   └── index.scss
+│   │   ├── index.scss
+│   │   └── mixins.scss
 │   ├── test
 │   │   ├── mocks
 │   │   │   └── dnd-kit.tsx

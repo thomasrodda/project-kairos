@@ -23,6 +23,7 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
   // Component state - manages sidebar collapse/expand
 
   const [isExpanded, setIsExpanded] = useState(true)
+  const [imageError, setImageError] = useState(false)
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -105,8 +106,16 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
         {user && (
           <div className="sidebar__user-section">
             <div className="sidebar__user-info">
-              {user.photoURL && <img src={user.photoURL} alt={user.displayName || user.email || 'User'} className="sidebar__user-avatar" />}
-              {!user.photoURL && (
+              {user.photoURL && !imageError ? (
+                <img
+                  src={user.photoURL}
+                  alt={user.displayName || user.email || 'User'}
+                  className="sidebar__user-avatar"
+                  onError={() => setImageError(true)}
+                  referrerPolicy="no-referrer"
+                  crossOrigin="anonymous"
+                />
+              ) : (
                 <div className="sidebar__user-avatar-placeholder">
                   <Icon name="profile" size={20} />
                 </div>

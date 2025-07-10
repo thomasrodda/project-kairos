@@ -21,6 +21,11 @@ const PORT = 3001
 app.use(cors())
 app.use(express.json())
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
 // Mount the hello function
 app.all('/api/hello', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../contexts/AuthContext'
+import { Icon } from '@kairos/ui'
 import './Login.scss'
 
 export const Login: React.FC = () => {
@@ -51,6 +52,9 @@ export const Login: React.FC = () => {
     <div className="login">
       <div className="login__container">
         <div className="login__card">
+          <div className="login__logo">
+            <Icon name="color-profile" size={48} />
+          </div>
           <h1 className="login__title">Welcome to Project Kairos</h1>
           <p className="login__subtitle">Sign in to access your creative workspace</p>
 
