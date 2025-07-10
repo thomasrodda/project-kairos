@@ -29,6 +29,13 @@ jest.mock('../../lib/prisma', () => ({
       findMany: jest.fn(),
       update: jest.fn(),
       updateMany: jest.fn(),
+      createMany: jest.fn(),
+    },
+    contentVersion: {
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      findMany: jest.fn(),
+      deleteMany: jest.fn(),
     },
   },
 }))
@@ -681,6 +688,163 @@ describe('/api/pages/[id]/content', () => {
       expect(jsonData.data.page.blocks[0].metadata).toEqual({
         align: 'center',
         color: 'blue',
+      })
+    })
+
+    it('should create content version after successful update', async () => {
+      const mockPage = {
+        id: 'cuid123456789012345678901',
+        title: 'Current Title',
+        updatedAt: new Date('2024-01-01'),
+        blocks: [
+          {
+            id: 'cuid12345678901234567890b1',
+            type: 'paragraph',
+            content: 'Original content',
+            order: 0,
+            metadata: null,
+          },
+        ],
+      }
+
+      const mockUpdatedPage = {
+        id: 'cuid123456789012345678901',
+        title: 'Updated Title',
+        updatedAt: new Date(),
+        blocks: [
+          {
+            id: 'cuid12345678901234567890b1',
+            type: 'paragraph',
+            content: 'Updated content',
+            order: 0,
+            metadata: null,
+            updatedAt: new Date(),
+          },
+        ],
+      }
+
+      let contentVersionCreated = false
+      let createdVersionData: any = null
+
+      mockPrisma.$transaction.mockImplementation(async (callback) => {
+        const tx = {
+          page: {
+            findFirst: jest.fn().mockResolvedValue(mockPage),
+            update: jest.fn().mockResolvedValue(mockUpdatedPage),
+            findUnique: jest.fn().mockResolvedValue(mockUpdatedPage),
+          },
+          block: {
+            findMany: jest
+              .fn()
+              .mockResolvedValueOnce([{ id: 'cuid12345678901234567890b1' }]) // For validation
+              .mockResolvedValueOnce([
+                {
+                  id: 'cuid12345678901234567890b1',
+                  type: 'paragraph',
+                  content: 'Updated content',
+                  order: 0,
+                  metadata: null,
+                },
+              ]), // For version snapshot
+            update: jest.fn(),
+            updateMany: jest.fn(),
+          },
+          contentVersion: {
+            findFirst: jest.fn().mockResolvedValue({ versionNumber: 5 }), // Latest version
+            create: jest.fn().mockImplementation((data) => {
+              contentVersionCreated = true
+              createdVersionData = data.data
+              return Promise.resolve({})
+            }),
+            findMany: jest.fn().mockResolvedValue([]), // No old versions to delete
+            deleteMany: jest.fn(),
+          },
+        }
+        return await callback(tx)
+      })
+
+      req.body = {
+        title: 'Updated Title',
+        blocks: [
+          {
+            id: 'cuid12345678901234567890b1',
+            type: 'paragraph',
+            content: 'Updated content',
+            order: 0,
+          },
+        ],
+      }
+
+      await handler(req as any, res as any)
+
+      expect(statusCode).toBe(200)
+      expect(contentVersionCreated).toBe(true)
+      expect(createdVersionData).toMatchObject({
+        pageId: 'cuid123456789012345678901',
+        versionNumber: 6, // 5 + 1
+        title: 'Updated Title',
+        userId: 'test-user-id',
+      })
+      expect(createdVersionData.blocks).toHaveLength(1)
+      expect(createdVersionData.blocks[0]).toMatchObject({
+        content: 'Updated content',
+        type: 'paragraph',
+      })
+    })
+
+    it('should cleanup old versions keeping only last 10', async () => {
+      const mockPage = {
+        id: 'cuid123456789012345678901',
+        title: 'Current Title',
+        updatedAt: new Date('2024-01-01'),
+        blocks: [],
+      }
+
+      const mockUpdatedPage = {
+        id: 'cuid123456789012345678901',
+        title: 'Updated Title',
+        updatedAt: new Date(),
+        blocks: [],
+      }
+
+      // Mock old versions to delete
+      const oldVersions = Array.from({ length: 5 }, (_, i) => ({ id: `old-version-${i}` }))
+      let deleteManyCall: any = null
+
+      mockPrisma.$transaction.mockImplementation(async (callback) => {
+        const tx = {
+          page: {
+            findFirst: jest.fn().mockResolvedValue(mockPage),
+            update: jest.fn().mockResolvedValue(mockUpdatedPage),
+            findUnique: jest.fn().mockResolvedValue(mockUpdatedPage),
+          },
+          block: {
+            findMany: jest.fn().mockResolvedValue([]),
+            update: jest.fn(),
+            updateMany: jest.fn(),
+          },
+          contentVersion: {
+            findFirst: jest.fn().mockResolvedValue({ versionNumber: 15 }),
+            create: jest.fn(),
+            findMany: jest.fn().mockResolvedValue(oldVersions), // Return old versions to delete
+            deleteMany: jest.fn().mockImplementation((args) => {
+              deleteManyCall = args
+              return Promise.resolve({})
+            }),
+          },
+        }
+        return await callback(tx)
+      })
+
+      req.body = { title: 'Updated Title' }
+
+      await handler(req as any, res as any)
+
+      expect(statusCode).toBe(200)
+      expect(deleteManyCall).toEqual({
+        where: {
+          id: { in: oldVersions.map((v) => v.id) },
+        },
       })
     })
   })

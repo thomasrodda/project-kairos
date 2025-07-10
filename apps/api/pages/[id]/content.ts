@@ -38,7 +38,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
         select: {
           id: true,
+          title: true,
           updatedAt: true,
+          blocks: {
+            where: { deletedAt: null },
+            orderBy: { order: 'asc' },
+            select: {
+              id: true,
+              type: true,
+              content: true,
+              order: true,
+              metadata: true,
+            },
+          },
         },
       })
 
@@ -120,6 +132,59 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           },
           data: {
             deletedAt: new Date(),
+          },
+        })
+      }
+
+      // Create content version after successful update
+      // Get the latest version number for this page
+      const latestVersion = await tx.contentVersion.findFirst({
+        where: { pageId },
+        orderBy: { versionNumber: 'desc' },
+        select: { versionNumber: true },
+      })
+
+      const nextVersionNumber = (latestVersion?.versionNumber ?? 0) + 1
+
+      // Get the current state of all blocks after updates
+      const currentBlocks = await tx.block.findMany({
+        where: {
+          pageId,
+          deletedAt: null,
+        },
+        orderBy: { order: 'asc' },
+        select: {
+          id: true,
+          type: true,
+          content: true,
+          order: true,
+          metadata: true,
+        },
+      })
+
+      // Create the content version
+      await tx.contentVersion.create({
+        data: {
+          pageId,
+          versionNumber: nextVersionNumber,
+          title: data.title ?? page.title,
+          blocks: currentBlocks,
+          userId: user.id,
+        },
+      })
+
+      // Clean up old versions (keep only last 10)
+      const versionsToDelete = await tx.contentVersion.findMany({
+        where: { pageId },
+        orderBy: { versionNumber: 'desc' },
+        skip: 10,
+        select: { id: true },
+      })
+
+      if (versionsToDelete.length > 0) {
+        await tx.contentVersion.deleteMany({
+          where: {
+            id: { in: versionsToDelete.map((v) => v.id) },
           },
         })
       }

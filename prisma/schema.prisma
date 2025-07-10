@@ -19,7 +19,8 @@ model User {
   deletedAt   DateTime?
 
   // Relations
-  workspaces Workspace[]
+  workspaces      Workspace[]
+  contentVersions ContentVersion[]
 
   @@map("users")
 }
@@ -51,12 +52,13 @@ model Page {
   deletedAt   DateTime?
 
   // Relations
-  workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  parent       Page?     @relation("PageHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children     Page[]    @relation("PageHierarchy")
-  blocks       Block[]
-  incomingLinks Link[]   @relation("LinkTarget")
-  outgoingLinks Link[]   @relation("LinkSource")
+  workspace       Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parent          Page?            @relation("PageHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children        Page[]           @relation("PageHierarchy")
+  blocks          Block[]
+  incomingLinks   Link[]           @relation("LinkTarget")
+  outgoingLinks   Link[]           @relation("LinkSource")
+  contentVersions ContentVersion[]
 
   @@index([workspaceId])
   @@index([parentId])
@@ -93,6 +95,24 @@ model Link {
 
   @@unique([sourceId, targetId])
   @@map("links")
+}
+
+model ContentVersion {
+  id            String   @id @default(cuid())
+  pageId        String
+  versionNumber Int
+  title         String
+  blocks        Json     // Snapshot of all blocks at this version
+  userId        String
+  createdAt     DateTime @default(now())
+  
+  // Relations
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([pageId, versionNumber])
+  @@index([pageId, createdAt(sort: Desc)])
+  @@map("content_versions")
 }
 
 enum BlockType {

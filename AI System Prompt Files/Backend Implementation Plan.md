@@ -290,7 +290,7 @@ All critical integration steps have been successfully implemented:
    - Fixed Google profile image loading with proper CORS attributes
    - Added user profile display in sidebar with logout functionality
 
-## Phase 3: Auto-save & Content Sync (Week 3) 🔄
+## Phase 3: Auto-save & Content Sync (Week 3) ✅
 
 ### 3.1 Auto-save Endpoint ✅ (Completed 2025-01-10)
 
@@ -329,14 +329,25 @@ PUT /api/pages/:id/content
 - ✅ Added save status to sidebar with real-time updates
 - ✅ Handles beforeunload event to save on page exit
 
-### 3.3 Content Versioning (Simplified)
+### 3.3 Content Versioning (Simplified) ✅ (Completed 2025-01-10)
 
 ```typescript
 // Store last 10 versions per page
-- content_versions table
-- Automatic cleanup of old versions
-- Simple rollback capability
+- ✅ content_versions table created with Prisma schema
+- ✅ Automatic cleanup of old versions (keeps last 10)
+- ✅ Simple rollback capability via restore endpoint
 ```
+
+**Implementation Details:**
+
+- ✅ Created `ContentVersion` model in Prisma schema
+- ✅ Version creation integrated into auto-save endpoint
+- ✅ GET `/api/pages/:id/versions` - List version history
+- ✅ GET `/api/pages/:id/versions/:versionId` - Get version details
+- ✅ POST `/api/pages/:id/versions/:versionId` - Restore from version
+- ✅ Automatic version number incrementing
+- ✅ Comprehensive test coverage for all versioning features
+- ✅ API documentation updated
 
 ## Phase 4: Frontend Integration (Week 4) 🔄 (Current Focus)
 
@@ -515,17 +526,22 @@ NEXT_PUBLIC_FIREBASE_*=
 - [x] Block operations
 - [x] Frontend auth-backend integration ✅ (Completed July 10, 2025)
 
-### Week 3: Auto-save ✅ (Completed Jan 10, 2025)
+### Week 3: Auto-save & Versioning ✅ (Completed Jan 10, 2025)
 
 - [x] Auto-save endpoint ✅ (Completed Jan 10, 2025)
 - [x] Connect editor to backend endpoints ✅ (PageContext integration)
 - [x] Debounced save implementation ✅ (useAutoSave hook)
 - [x] Save status indicators ✅ (SaveStatusIndicator component)
 - [x] Error recovery ✅ (Retry logic with exponential backoff)
+- [x] Content versioning system ✅ (Completed Jan 10, 2025)
+  - Version history tracking
+  - Restore from previous versions
+  - Automatic cleanup (keep last 10)
 
 ### Week 4: Polish & Testing 🔄 (In Progress)
 
 - [x] Basic component testing
+- [x] Content versioning tests ✅
 - [ ] Full integration testing
 - [ ] Error handling improvements
 - [ ] Performance optimization
@@ -578,15 +594,23 @@ NEXT_PUBLIC_FIREBASE_*=
    - ✅ Connected editor state changes to auto-save via PageContext
    - ✅ Implemented save status indicators in sidebar
    - ✅ Added retry logic with exponential backoff for failed saves
-5. 🔄 **NEXT: Complete Editor-Backend Integration**
+5. ✅ **Phase 3.3 Content Versioning complete (Jan 10, 2025)**
+   - Created ContentVersion model in Prisma schema
+   - Integrated version creation into auto-save endpoint
+   - Added GET/POST endpoints for version management
+   - Implemented automatic cleanup (keeps last 10 versions)
+   - Full test coverage (15 tests passing)
+   - Applied migration to Supabase via SQL editor
+6. 🔄 **NEXT: Complete Editor-Backend Integration**
    - Fix PageContext to properly load pages from workspace
    - Test full auto-save flow with real backend
    - Add optimistic UI updates with rollback
-6. 🔄 **Then: Implement workspace selector in sidebar**
+   - Add UI for viewing and restoring versions
+7. 🔄 **Then: Implement workspace selector in sidebar**
    - Add workspace dropdown/selector UI
    - Connect to workspace switching logic
    - Update routing to include workspace ID
-7. 🔄 Add page management UI
+8. 🔄 **Add page management UI**
    - Create page tree component
    - Implement page CRUD operations
    - Add drag-and-drop for page organization

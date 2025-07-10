@@ -78,8 +78,13 @@ apps
 │   │   └── auth.ts
 │   ├── pages
 │   │   └── [id]
+│   │   ├── versions
+│   │   │   ├── [versionId].test.ts
+│   │   │   └── [versionId].ts
 │   │   ├── content.test.ts
-│   │   └── content.ts
+│   │   ├── content.ts
+│   │   ├── versions.test.ts
+│   │   └── versions.ts
 │   ├── types
 │   │   └── express.d.ts
 │   ├── .env
@@ -389,6 +394,9 @@ packages
 └── tsconfig.json
 prisma
 ├── migrations
-│   └── 20250110_update_block_types
-│   └── migration.sql
+│   ├── 20250110205032_add_content_versioning
+│   │   └── migration.sql
+│   ├── 20250110_update_block_types
+│   │   └── migration.sql
+│   └── 20250710205032_add_content_versioning
 └── schema.prisma

@@ -20,7 +20,10 @@ apps/api/
 ├── pages.ts              # Page management
 ├── pages/
 │   └── [id]/
-│       └── content.ts    # Auto-save endpoint
+│       ├── content.ts    # Auto-save endpoint
+│       ├── versions.ts   # Get page versions
+│       └── versions/
+│           └── [versionId].ts  # Get/restore specific version
 ├── blocks.ts             # Block operations
 ├── lib/
 │   ├── firebase-admin.ts # Firebase Admin SDK setup
@@ -183,6 +186,104 @@ Auto-save endpoint for page content. Features:
 - Returns updated page data with new `updatedAt` timestamp
 
 **Conflict Detection**: If `lastUpdatedAt` is provided and doesn't match the current page's `updatedAt`, returns 409 Conflict.
+
+**Content Versioning**: Each successful save automatically creates a content version snapshot. The system keeps the last 10 versions for rollback capability.
+
+### Content Versioning (NEW)
+
+#### Get Page Versions
+
+```
+GET /api/pages/:id/versions
+```
+
+Retrieves the version history for a page.
+
+**Response**:
+
+```json
+{
+  "page": {
+    "id": "page-id",
+    "title": "Current Page Title"
+  },
+  "versions": [
+    {
+      "id": "version-id",
+      "versionNumber": 3,
+      "title": "Version Title",
+      "createdAt": "2025-01-10T10:00:00.000Z",
+      "createdBy": {
+        "displayName": "User Name",
+        "email": "user@example.com"
+      }
+    }
+  ]
+}
+```
+
+#### Get Version Details
+
+```
+GET /api/pages/:id/versions/:versionId
+```
+
+Retrieves the full content of a specific version.
+
+**Response**:
+
+```json
+{
+  "version": {
+    "id": "version-id",
+    "versionNumber": 3,
+    "title": "Version Title",
+    "blocks": [
+      {
+        "id": "block-id",
+        "type": "paragraph",
+        "content": "Block content",
+        "order": 0,
+        "metadata": {}
+      }
+    ],
+    "createdAt": "2025-01-10T10:00:00.000Z",
+    "createdBy": {
+      "displayName": "User Name",
+      "email": "user@example.com"
+    }
+  }
+}
+```
+
+#### Restore Version
+
+```
+POST /api/pages/:id/versions/:versionId
+```
+
+Restores a page to a previous version. This operation:
+
+- Updates the page title to the version's title
+- Soft deletes all current blocks
+- Creates new blocks from the version snapshot
+- Creates a new version to record the restore action
+
+**Response**:
+
+```json
+{
+  "page": {
+    "id": "page-id",
+    "title": "Restored Title",
+    "updatedAt": "2025-01-10T11:00:00.000Z",
+    "blocks": [...]
+  },
+  "message": "Page restored successfully from version"
+}
+```
+
+**Version Cleanup**: The system automatically maintains only the last 10 versions per page to manage storage.
 
 ### Blocks
 

@@ -23,12 +23,16 @@ echo "🔍 Running type checks..."
 yarn typecheck
 
 # Prompt before running tests (using /dev/tty for interactive input)
-echo "🧪 Do you want to run tests before commit? (y/n): "
-read run_tests < /dev/tty
+if [ -t 0 ] && [ -z "$CI" ]; then
+  echo "🧪 Do you want to run tests before commit? (y/n): "
+  read run_tests < /dev/tty
 
-if [ "$run_tests" = "y" ] || [ "$run_tests" = "Y" ]; then
-  echo "🧪 Running tests..."
-  yarn test --passWithNoTests --bail
+  if [ "$run_tests" = "y" ] || [ "$run_tests" = "Y" ]; then
+    echo "🧪 Running tests..."
+    yarn test --passWithNoTests --bail
+  else
+    echo "⚠️ Skipping tests on commit."
+  fi
 else
-  echo "⚠️ Skipping tests on commit."
+  echo "⚠️ Skipping interactive test prompt (CI mode or no TTY)."
 fi
