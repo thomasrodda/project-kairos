@@ -149,6 +149,7 @@ PUT    /api/blocks/reorder          // ✅ Reorder blocks
 - ✅ Proper TypeScript types throughout
 - ✅ Reusable validation and error handling utilities
 - ✅ Database connection verified and working
+- ✅ BlockType enum updated to match frontend (h1, h2, h3, paragraph, bullet) - Fixed 2025-01-10
 
 ## Phase 2.5: Frontend Authentication Integration (Required for Testing)
 

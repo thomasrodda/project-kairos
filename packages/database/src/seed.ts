@@ -34,12 +34,12 @@ async function main() {
       blocks: {
         create: [
           {
-            type: 'HEADING1',
+            type: 'h1',
             content: 'Welcome to Project Kairos',
             order: 0,
           },
           {
-            type: 'PARAGRAPH',
+            type: 'paragraph',
             content: 'This is your first page. Start writing!',
             order: 1,
           },

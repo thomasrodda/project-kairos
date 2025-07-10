@@ -42,6 +42,7 @@ AI System Prompt Files
 ├── CI CD Guide.md
 ├── Component Structure Guide.md
 ├── Data Model Guide.md
+├── Database Connection Notes.md
 ├── Editor Testing Plan.md
 ├── Enhanced Custom Editor Plan.md
 ├── Environment Setup Guide.md
@@ -80,6 +81,7 @@ apps
 │   ├── .env
 │   ├── auth.test.ts
 │   ├── auth.ts
+│   ├── block-types.test.ts
 │   ├── blocks.ts
 │   ├── dev-server.ts
 │   ├── hello.test.ts
@@ -342,4 +344,7 @@ packages
 ├── package.json
 └── tsconfig.json
 prisma
+├── migrations
+│   └── 20250110_update_block_types
+│   └── migration.sql
 └── schema.prisma

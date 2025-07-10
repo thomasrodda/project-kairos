@@ -96,8 +96,9 @@ model Link {
 }
 
 enum BlockType {
-  PARAGRAPH
-  HEADING1
-  HEADING2
-  BULLET
+  paragraph
+  h1
+  h2
+  h3
+  bullet
 }
