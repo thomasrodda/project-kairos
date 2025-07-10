@@ -17,6 +17,8 @@ import { useNavigate } from 'react-router-dom'
 import { SidebarButton } from '../SidebarButton'
 import { Icon } from '@kairos/ui'
 import { useAuth } from '../../contexts/AuthContext'
+import { usePageContext } from '../../contexts/PageContext'
+import { SaveStatusIndicator } from '../SaveStatusIndicator'
 import './Sidebar.scss'
 
 export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
@@ -25,6 +27,7 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
   const [isExpanded, setIsExpanded] = useState(true)
   const [imageError, setImageError] = useState(false)
   const { user, logout } = useAuth()
+  const { saveStatus, lastSaved, forceSave } = usePageContext()
   const navigate = useNavigate()
 
   // Event handlers
@@ -77,6 +80,13 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
           <Icon name="double-arrow" size={20} className={`sidebar__toggle-icon ${isExpanded ? '' : 'sidebar__toggle-icon--flipped'}`} />
         </button>
       </div>
+
+      {/* Save status indicator - shows auto-save state */}
+      {isExpanded && (
+        <div className="sidebar__save-status">
+          <SaveStatusIndicator status={saveStatus} lastSaved={lastSaved} onRetry={forceSave} />
+        </div>
+      )}
 
       {/* Primary buttons section - Main workspace actions */}
       <div className="sidebar__primary-buttons">

@@ -228,6 +228,10 @@ apps
 │   │   │   └── index.ts
 │   │   ├── PerformanceTest
 │   │   │   └── PerformanceTest.tsx
+│   │   ├── SaveStatusIndicator
+│   │   │   ├── SaveStatusIndicator.scss
+│   │   │   ├── SaveStatusIndicator.tsx
+│   │   │   └── index.ts
 │   │   ├── Sidebar
 │   │   │   ├── Sidebar.scss
 │   │   │   ├── Sidebar.test.tsx
@@ -247,9 +251,11 @@ apps
 │   │   ├── AuthContext.tsx
 │   │   ├── BackendHealthContext.tsx
 │   │   ├── EditorContext.test.tsx
-│   │   └── EditorContext.tsx
+│   │   ├── EditorContext.tsx
+│   │   └── PageContext.tsx
 │   ├── hooks
 │   │   ├── index.ts
+│   │   ├── useAutoSave.ts
 │   │   ├── useCrossBlockSelection.test.tsx
 │   │   ├── useCrossBlockSelection.ts
 │   │   ├── useDismiss.test.ts

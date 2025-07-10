@@ -1,0 +1,89 @@
+// apps/web/src/components/SaveStatusIndicator/SaveStatusIndicator.scss
+// Styles for the save status indicator component
+
+.save-status {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-size-sm;
+  line-height: 1;
+  transition: all 200ms ease;
+  color: $color-text-secondary;
+
+  &--saving {
+    background-color: rgba($color-primary, 0.1);
+    color: $color-primary;
+  }
+
+  &--saved {
+    background-color: rgba($color-success, 0.1);
+    color: $color-success;
+  }
+
+  &--error {
+    background-color: rgba($color-danger, 0.1);
+    color: $color-danger;
+  }
+
+  &--idle {
+    background-color: transparent;
+  }
+}
+
+.save-status__icon {
+  flex-shrink: 0;
+
+  &--spinning {
+    animation: spin 1s linear infinite;
+  }
+
+  &--success {
+    color: $color-success;
+  }
+
+  &--error {
+    color: $color-danger;
+  }
+
+  &--idle {
+    color: $color-text-tertiary;
+  }
+}
+
+.save-status__text {
+  white-space: nowrap;
+}
+
+.save-status__retry {
+  margin-left: $spacing-xs;
+  padding: $spacing-xxs $spacing-xs;
+  background-color: transparent;
+  border: 1px solid currentColor;
+  border-radius: $radius-xs;
+  color: inherit;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all 150ms ease;
+
+  &:hover {
+    background-color: currentColor;
+    color: $color-bg-primary;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

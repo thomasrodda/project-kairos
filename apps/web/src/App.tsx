@@ -10,6 +10,7 @@ import { PerformanceTest } from './components/PerformanceTest/PerformanceTest'
 import { EditorProvider } from './contexts/EditorContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { BackendHealthProvider } from './contexts/BackendHealthContext'
+import { PageProvider } from './contexts/PageContext'
 import { BackendHealthCheck } from './components/BackendHealthCheck'
 import { initializeIconPerformance } from '@kairos/ui'
 
@@ -49,9 +50,11 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <EditorProvider>
-                      <Workspace />
-                      {/* Show performance monitoring in development */}
-                      {process.env.NODE_ENV === 'development' && <PerformanceTest />}
+                      <PageProvider>
+                        <Workspace />
+                        {/* Show performance monitoring in development */}
+                        {process.env.NODE_ENV === 'development' && <PerformanceTest />}
+                      </PageProvider>
                     </EditorProvider>
                   </ProtectedRoute>
                 }
