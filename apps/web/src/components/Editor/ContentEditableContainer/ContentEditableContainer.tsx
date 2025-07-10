@@ -9,6 +9,7 @@ import type { EditorBlock, BlockType, FormatType } from '../../../contexts/Edito
 import { generateId } from '@kairos/utils'
 import { SlashCommandMenu } from '../SlashCommandMenu'
 import { shouldConvertMarkdown, convertMarkdownToFormatting, extractLinkUrl } from '../../../utils/markdownDetection'
+import { shouldConvertBlockMarkdown, removeMarkdownPrefix } from '../../../utils/blockMarkdownDetection'
 import { toggleFormat } from '../../../utils/textFormatting'
 import './ContentEditableContainer.scss'
 
@@ -310,6 +311,28 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
       // Insert the typed character at the correct position
       const newContent = block.content.slice(0, offset) + data + block.content.slice(offset)
+
+      // Check for block-level markdown (e.g., # heading, - bullet)
+      const blockMarkdownPattern = shouldConvertBlockMarkdown(newContent, offset + data.length, data)
+
+      if (blockMarkdownPattern) {
+        // Remove markdown prefix from content
+        const cleanContent = removeMarkdownPrefix(newContent, blockMarkdownPattern)
+
+        // Save cursor position at the start of the clean content
+        savedSelection.current = { blockId, offset: 0 }
+
+        // Mark that we're doing an internal update
+        isInternalUpdate.current = true
+
+        // Update block content (removing markdown prefix)
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: cleanContent })
+
+        // Change block type
+        dispatch({ type: 'CHANGE_BLOCK_TYPE', blockId, blockType: blockMarkdownPattern.blockType })
+
+        return
+      }
 
       // Check for markdown pattern completion
       const markdownPattern = shouldConvertMarkdown(newContent, offset + data.length, data)

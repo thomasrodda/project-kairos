@@ -147,6 +147,20 @@ apps
 │   └── copy-icons.mjs
 ├── src
 │   ├── components
+│   │   ├── Auth
+│   │   │   ├── Login
+│   │   │   │   ├── Login.scss
+│   │   │   │   ├── Login.test.tsx
+│   │   │   │   ├── Login.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── ProtectedRoute
+│   │   │   │   ├── ProtectedRoute.scss
+│   │   │   │   ├── ProtectedRoute.tsx
+│   │   │   │   └── index.ts
+│   │   │   └── Register
+│   │   │   ├── Register.scss
+│   │   │   ├── Register.tsx
+│   │   │   └── index.ts
 │   │   ├── Editor
 │   │   │   ├── Block
 │   │   │   │   ├── Block.issues.md
@@ -160,6 +174,9 @@ apps
 │   │   │   │   ├── DraggableBlock.tsx
 │   │   │   │   └── index.ts
 │   │   │   ├── ContentEditableContainer
+│   │   │   │   ├── ContentEditableContainer.blockmarkdown.manual.test.tsx
+│   │   │   │   ├── ContentEditableContainer.blockmarkdown.simple.test.tsx
+│   │   │   │   ├── ContentEditableContainer.blockmarkdown.test.tsx
 │   │   │   │   ├── ContentEditableContainer.markdown.test.tsx
 │   │   │   │   ├── ContentEditableContainer.scss
 │   │   │   │   ├── ContentEditableContainer.simple.test.tsx
@@ -214,6 +231,7 @@ apps
 │   │   ├── Workspace.tsx
 │   │   └── index.ts
 │   ├── contexts
+│   │   ├── AuthContext.tsx
 │   │   ├── EditorContext.test.tsx
 │   │   └── EditorContext.tsx
 │   ├── hooks
@@ -225,6 +243,9 @@ apps
 │   ├── integration
 │   │   ├── Editor.integration.test.tsx
 │   │   └── markdown-detection.test.tsx
+│   ├── lib
+│   │   ├── api-client.ts
+│   │   └── firebase.ts
 │   ├── styles
 │   │   ├── base
 │   │   │   └── reset.scss
@@ -235,6 +256,8 @@ apps
 │   │   ├── setup.ts
 │   │   └── utils.tsx
 │   ├── utils
+│   │   ├── blockMarkdownDetection.test.ts
+│   │   ├── blockMarkdownDetection.ts
 │   │   ├── formattingRenderer.tsx
 │   │   ├── markdownDetection.test.ts
 │   │   ├── markdownDetection.ts

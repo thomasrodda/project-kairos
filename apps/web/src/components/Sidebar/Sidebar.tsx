@@ -13,20 +13,30 @@
 // State: isExpanded (boolean) - controls sidebar collapse/expand
 
 import { useState, forwardRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { SidebarButton } from '../SidebarButton'
 import { Icon } from '@kairos/ui'
+import { useAuth } from '../../contexts/AuthContext'
 import './Sidebar.scss'
 
 export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
   // Component state - manages sidebar collapse/expand
 
   const [isExpanded, setIsExpanded] = useState(true)
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
 
   // Event handlers
 
   // Toggle sidebar expanded/collapsed state
   const toggleExpanded = () => {
     setIsExpanded(!isExpanded)
+  }
+
+  // Handle logout
+  const handleLogout = async () => {
+    await logout()
+    navigate('/login')
   }
 
   // Button configuration data
@@ -90,6 +100,28 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
             <SidebarButton key={button.id} icon={button.icon} text={button.text} variant="slim" isCollapsed={!isExpanded} id={button.id} />
           ))}
         </div>
+
+        {/* User section */}
+        {user && (
+          <div className="sidebar__user-section">
+            <div className="sidebar__user-info">
+              {user.photoURL && <img src={user.photoURL} alt={user.displayName || user.email || 'User'} className="sidebar__user-avatar" />}
+              {!user.photoURL && (
+                <div className="sidebar__user-avatar-placeholder">
+                  <Icon name="profile" size={20} />
+                </div>
+              )}
+              {isExpanded && (
+                <div className="sidebar__user-details">
+                  <span className="sidebar__user-name">{user.displayName || user.email?.split('@')[0] || 'User'}</span>
+                  <button className="sidebar__logout-button" onClick={handleLogout} aria-label="Sign out">
+                    Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </aside>
   )
