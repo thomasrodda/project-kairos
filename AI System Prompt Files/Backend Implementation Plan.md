@@ -239,6 +239,44 @@ Before we can test the Phase 2 endpoints or proceed to Phase 3, we need to imple
 - ✅ User menu with logout option
 - 🔄 Workspace selector in sidebar (Next Step)
 
+### 2.5.8 Missing Integration Steps 🚨 (Critical Gap)
+
+The frontend auth components were built but NOT connected to the backend. These steps are required:
+
+1. **Connect Frontend to Backend After Firebase Login**
+
+   ```typescript
+   // In AuthContext after successful Firebase login:
+   - Call apiClient.verifyAuth() to sync user with backend
+   - Handle new users: redirect to workspace creation
+   - Handle existing users: fetch workspaces via apiClient.getCurrentUser()
+   ```
+
+2. **Add Workspace Creation Flow for New Users**
+
+   ```typescript
+   // New component: WorkspaceCreation.tsx
+   - Simple form to name first workspace
+   - Call apiClient.createWorkspace()
+   - Redirect to editor after creation
+   ```
+
+3. **Implement Backend Health Check**
+
+   ```typescript
+   // On app startup:
+   - Check if backend is reachable
+   - Show appropriate error if backend is down
+   ```
+
+4. **Add Token Refresh Logic**
+   ```typescript
+   // In API client:
+   - Handle Firebase token expiration
+   - Refresh token before requests if needed
+   - Handle 401 responses gracefully
+   ```
+
 ## Phase 3: Auto-save & Content Sync (Week 3) 🔄
 
 ### 3.1 Auto-save Endpoint
@@ -441,7 +479,7 @@ NEXT_PUBLIC_FIREBASE_*=
 - [x] Workspace endpoints
 - [x] Page management
 - [x] Block operations
-- [x] Frontend workspace selector 🔄 (Next Step)
+- [ ] Frontend workspace selector 🔄 (Blocked by Phase 2.5.8)
 
 ### Week 3: Auto-save 🔄 (In Progress)
 
@@ -489,9 +527,14 @@ NEXT_PUBLIC_FIREBASE_*=
 ## Next Steps
 
 1. ✅ Frontend authentication complete (Jan 17, 2025)
-2. 🔄 Connect API client to backend endpoints
+2. 🚨 **CRITICAL: Complete Phase 2.5.8 Missing Integration Steps**
+   - Connect AuthContext to backend API
+   - Add workspace creation flow for new users
+   - Implement backend health check
 3. 🔄 Implement workspace selector in sidebar
 4. 🔄 Wire up editor to save blocks to database
 5. 🔄 Add page management UI
+
+**Note**: Steps 3-5 depend on completing the missing integration (step 2) first.
 
 This plan provides a solid foundation for the MVP while keeping future features in mind. The modular approach allows for incremental development and testing.
