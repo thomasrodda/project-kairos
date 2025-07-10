@@ -39,12 +39,13 @@
   - Keyboard navigation (arrow keys + Enter)
   - ESC to cancel with cursor restoration
 
-- [ ] **Formatting Toolbar** 🔄
+- [x] **Formatting Toolbar** ✅
 
   - Text selection detection
   - Floating toolbar positioning
   - Bold, italic, underline formatting
   - Link creation functionality
+  - Keyboard shortcuts (Ctrl/Cmd+B/I/U/K)
 
 - [x] **Block Management** ✅
 
@@ -54,25 +55,33 @@
   - Copy/paste support (custom Kairos format)
   - Click empty space to focus last block
 
-- [ ] **Markdown Support**
+- [x] **Block-Level Markdown Support** ✅ (Completed Jan 17, 2025)
   - **Live markdown formatting** (typing `# ` auto-converts to H1, `## ` to H2, etc.)
+  - Block creation from markdown syntax (# for H1, ## for H2, ### for H3, - for bullets)
+  - Inline markdown auto-conversion (**bold**, _italic_, etc.)
+  - Triggers on space after markdown prefix at block start
+  - Automatic cursor repositioning after conversion
+  
+- [ ] **Advanced Markdown Features**
   - Markdown paste detection and parsing
-  - Block creation from markdown syntax
   - Markdown export functionality
   - Cross-app copy/paste compatibility
 
 ### Phase 3: Authentication & Data
 
-- [ ] **Firebase Authentication Setup**
+- [x] **Firebase Authentication Setup** ✅ (Backend Complete, Frontend Jan 17, 2025)
 
-  - Google OAuth integration
-  - User session management
-  - Protected route structure
+  - Google OAuth integration (Firebase client SDK)
+  - User session management (AuthContext with Firebase listeners)
+  - Protected route structure (React Router with auth guards)
+  - Login/Register pages with error handling
+  - API client with automatic auth token injection
 
-- [ ] **Database Schema & API Endpoints**
+- [x] **Database Schema & API Endpoints** ✅
   - User, Workspace, Page, and Block models
-  - CRUD operations for all entities
-  - Real-time sync infrastructure
+  - CRUD operations for all entities (workspaces, pages, blocks)
+  - Real-time sync infrastructure (ready for implementation)
+  - Comprehensive test coverage for all endpoints
 
 ### Phase 4: Pages & Navigation
 
@@ -173,25 +182,25 @@
 
 ## 🚀 Current Focus: Next Feature to Implement
 
-### **Formatting Toolbar**
+### **Frontend-Backend Integration**
 
-**Priority**: High - Essential for rich text editing
+**Priority**: Critical - Connects all the pieces together
 
 **Why this next**:
 
-- Users expect basic text formatting capabilities
-- Builds on the existing text selection system
-- Enhances the editor without major architectural changes
-- Completes the core editing experience
+- Authentication system is complete on both frontend and backend
+- CRUD operations are ready and tested on the backend
+- Need to connect the editor to persist data
+- Enables testing of the full user flow
 
 **Implementation approach**:
 
-1. **Detect text selection** within and across blocks
-2. **Floating toolbar** that appears above selected text
-3. **Basic formatting options**: Bold, Italic, Underline, Link
-4. **Apply formatting** using document.execCommand or custom approach
-5. **Keyboard shortcuts** (Ctrl/Cmd+B, I, U, K)
-6. **Mobile-friendly** touch interactions
+1. **Connect API client** to backend endpoints
+2. **Test authentication flow** end-to-end
+3. **Implement workspace selector** in sidebar
+4. **Connect editor** to save blocks to database
+5. **Add page management** UI (create, rename, delete)
+6. **Implement auto-save** with debouncing
 
 **Custom Text Editor Notes**:
 
@@ -209,20 +218,21 @@
 
 **Acceptance criteria**:
 
-- Clean, professional-looking interface with sidebar and editor
-- Users can type in text blocks and create new ones with Enter
-- Empty blocks can be deleted with Backspace
-- Different heading levels are visually distinct
-- **Live markdown formatting works** (typing `# ` converts to H1)
-- Basic responsive layout works on different screen sizes
-- Blocks maintain focus and cursor position correctly
+- Users can log in with Google OAuth or email/password
+- Workspace selector shows user's workspaces
+- Editor saves blocks to the database
+- Page management works (create, rename, delete pages)
+- Auto-save triggers after 2 seconds of inactivity
+- Save status indicator shows when saving/saved
+- Data persists across page refreshes
 
-**Files to create**:
+**Files to update**:
 
-- Layout components (Sidebar, MainEditor, App layout)
-- Block components (TextBlock, HeadingBlock base components)
-- Basic SCSS styling for layout and typography
-- Block management utilities and types
+- API client service files (connect to real endpoints)
+- WorkspaceContext (add current workspace state)
+- EditorContext (add save functionality)
+- Sidebar component (add workspace selector)
+- Editor component (integrate auto-save)
 
 ---
 
