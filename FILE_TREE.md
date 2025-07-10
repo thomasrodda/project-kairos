@@ -76,6 +76,10 @@ apps
 │   │   └── prisma.ts
 │   ├── middleware
 │   │   └── auth.ts
+│   ├── pages
+│   │   └── [id]
+│   │   ├── content.test.ts
+│   │   └── content.ts
 │   ├── types
 │   │   └── express.d.ts
 │   ├── .env

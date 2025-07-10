@@ -292,14 +292,26 @@ All critical integration steps have been successfully implemented:
 
 ## Phase 3: Auto-save & Content Sync (Week 3) 🔄
 
-### 3.1 Auto-save Endpoint
+### 3.1 Auto-save Endpoint ✅ (Completed 2025-01-10)
 
 ```typescript
 PUT /api/pages/:id/content
-// Accepts partial updates
-// Handles conflict detection
-// Returns save status
+// ✅ Accepts partial updates (title, blocks, deletions)
+// ✅ Handles conflict detection using updatedAt timestamps
+// ✅ Returns save status with updated page data
+// ✅ Atomic transactions for data consistency
 ```
+
+**Implementation Details:**
+
+- ✅ Created endpoint at `/apps/api/pages/[id]/content.ts`
+- ✅ Added Zod validation schema `updatePageContentSchema`
+- ✅ Supports partial block updates with metadata
+- ✅ Implements soft delete for removed blocks
+- ✅ Conflict detection returns 409 status when page modified elsewhere
+- ✅ Frontend API client method `savePageContent()` added
+- ✅ Comprehensive test suite (16 tests, all passing)
+- ✅ Backend API Guide updated with documentation
 
 ### 3.2 Debounced Save Strategy
 
@@ -492,10 +504,11 @@ NEXT_PUBLIC_FIREBASE_*=
 - [x] Workspace endpoints
 - [x] Page management
 - [x] Block operations
-- [ ] Frontend workspace selector 🔄 (Blocked by Phase 2.5.8)
+- [x] Frontend auth-backend integration ✅ (Completed July 10, 2025)
 
 ### Week 3: Auto-save 🔄 (In Progress)
 
+- [x] Auto-save endpoint ✅ (Completed Jan 10, 2025)
 - [ ] Connect editor to backend endpoints
 - [ ] Debounced save implementation
 - [ ] Save status indicators
@@ -546,15 +559,21 @@ NEXT_PUBLIC_FIREBASE_*=
    - Implemented backend health check
    - Added token refresh logic
    - Fixed UI/UX issues (login styling, profile images)
-3. 🔄 **NEXT: Implement workspace selector in sidebar**
+3. ✅ **Phase 3.1 Auto-save Endpoint complete (Jan 10, 2025)**
+   - Created PUT /api/pages/:id/content endpoint
+   - Implemented partial updates and conflict detection
+   - Added frontend API client method
+   - Comprehensive test coverage
+4. 🔄 **NEXT: Phase 3.2 - Implement debounced auto-save in frontend**
+   - Add useAutoSave hook with debouncing logic
+   - Connect editor state changes to auto-save
+   - Implement save status indicators
+   - Add retry logic for failed saves
+5. 🔄 **Then: Implement workspace selector in sidebar**
    - Add workspace dropdown/selector UI
    - Connect to workspace switching logic
    - Update routing to include workspace ID
-4. 🔄 Wire up editor to save blocks to database
-   - Connect editor state to backend API
-   - Implement auto-save functionality
-   - Add save status indicators
-5. 🔄 Add page management UI
+6. 🔄 Add page management UI
    - Create page tree component
    - Implement page CRUD operations
    - Add drag-and-drop for page organization

@@ -269,6 +269,44 @@ class ApiClient {
       body: JSON.stringify({ blocks: data }),
     })
   }
+
+  // Auto-save endpoint
+  async savePageContent(
+    pageId: string,
+    data: {
+      title?: string
+      blocks?: Array<{
+        id: string
+        type: string
+        content: string
+        order: number
+        metadata?: Record<string, unknown>
+      }>
+      deletedBlockIds?: string[]
+      lastUpdatedAt?: string
+    }
+  ) {
+    return this.request<{
+      page: {
+        id: string
+        title: string
+        updatedAt: string
+        blocks: Array<{
+          id: string
+          type: string
+          content: string
+          order: number
+          metadata: Record<string, unknown> | null
+          updatedAt: string
+        }>
+      }
+      saveStatus: 'success' | 'conflict'
+      savedAt: string
+    }>(`/pages/${pageId}/content`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  }
 }
 
 export const apiClient = new ApiClient()

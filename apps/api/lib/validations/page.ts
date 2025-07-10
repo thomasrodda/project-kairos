@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { BlockType } from '@prisma/client'
 
 // Page creation schema
 export const createPageSchema = z.object({
@@ -24,6 +25,32 @@ export const pageIdSchema = z.object({
   id: z.string().cuid(),
 })
 
+// Content update schema for auto-save
+export const updatePageContentSchema = z.object({
+  // Page title update (optional)
+  title: z.string().min(1).max(255).trim().optional(),
+
+  // Partial block updates
+  blocks: z
+    .array(
+      z.object({
+        id: z.string().cuid(),
+        type: z.nativeEnum(BlockType),
+        content: z.string(),
+        order: z.number().int().min(0),
+        metadata: z.record(z.unknown()).optional(),
+      })
+    )
+    .optional(),
+
+  // Blocks to delete (soft delete)
+  deletedBlockIds: z.array(z.string().cuid()).optional(),
+
+  // For conflict detection - last known update timestamp
+  lastUpdatedAt: z.string().datetime().optional(),
+})
+
 export type CreatePageInput = z.infer<typeof createPageSchema>
 export type UpdatePageInput = z.infer<typeof updatePageSchema>
 export type ReorderPagesInput = z.infer<typeof reorderPagesSchema>
+export type UpdatePageContentInput = z.infer<typeof updatePageContentSchema>
