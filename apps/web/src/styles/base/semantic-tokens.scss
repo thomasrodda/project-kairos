@@ -1,0 +1,46 @@
+// apps/web/src/styles/base/semantic-tokens.scss
+// =============================================================================
+// SEMANTIC TOKEN MAPPINGS
+// =============================================================================
+// Maps semantic names to design token values for easier use in components
+
+:root {
+  // =============================================================================
+  // SEMANTIC SPACING
+  // =============================================================================
+  // Maps common sizing names to numeric spacing values
+  --spacing-xxs: var(--spacing-2); // 0.125rem = 2px
+  --spacing-xs: var(--spacing-4); // 0.25rem = 4px
+  --spacing-sm: var(--spacing-8); // 0.5rem = 8px
+  --spacing-md: var(--spacing-16); // 1rem = 16px
+  --spacing-lg: var(--spacing-24); // 1.5rem = 24px
+  --spacing-xl: var(--spacing-32); // 2rem = 32px
+  --spacing-2xl: var(--spacing-48); // 3rem = 48px
+
+  // =============================================================================
+  // SEMANTIC RADIUS
+  // =============================================================================
+  // Maps semantic radius names to numeric values
+  --radius-xs: var(--radius-4); // 0.25rem = 4px
+  --radius-sm: var(--radius-8); // 0.5rem = 8px
+  --radius-md: var(--radius-12); // 0.75rem = 12px
+  --radius-lg: var(--radius-16); // 1rem = 16px
+  --radius-xl: var(--radius-20); // 1.25rem = 20px
+
+  // =============================================================================
+  // SEMANTIC FONT SIZES
+  // =============================================================================
+  // Maps semantic font size names (used in mixins)
+  --font-size-xs: var(--font-size-12);
+  --font-size-sm: var(--font-size-14);
+  --font-size-md: var(--font-size-16);
+  --font-size-lg: var(--font-size-18);
+  --font-size-xl: var(--font-size-20);
+
+  // =============================================================================
+  // SEMANTIC COLORS
+  // =============================================================================
+  // Additional semantic color mappings for common use cases
+  --color-danger: var(--color-error-500);
+  --color-success: var(--color-success-500);
+}

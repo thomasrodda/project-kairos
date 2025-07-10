@@ -273,7 +273,8 @@ apps
 │   │   └── firebase.ts
 │   ├── styles
 │   │   ├── base
-│   │   │   └── reset.scss
+│   │   │   ├── reset.scss
+│   │   │   └── semantic-tokens.scss
 │   │   ├── index.scss
 │   │   └── mixins.scss
 │   ├── test

@@ -4,27 +4,27 @@
 .save-status {
   display: flex;
   align-items: center;
-  gap: $spacing-xs;
-  padding: $spacing-xs $spacing-sm;
-  border-radius: $radius-sm;
-  font-size: $font-size-sm;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
   line-height: 1;
   transition: all 200ms ease;
-  color: $color-text-secondary;
+  color: var(--color-text-secondary);
 
   &--saving {
-    background-color: rgba($color-primary, 0.1);
-    color: $color-primary;
+    background-color: var(--color-primary-100);
+    color: var(--color-primary-500);
   }
 
   &--saved {
-    background-color: rgba($color-success, 0.1);
-    color: $color-success;
+    background-color: var(--color-success-100);
+    color: var(--color-status-success);
   }
 
   &--error {
-    background-color: rgba($color-danger, 0.1);
-    color: $color-danger;
+    background-color: var(--color-error-100);
+    color: var(--color-status-error);
   }
 
   &--idle {
@@ -40,15 +40,15 @@
   }
 
   &--success {
-    color: $color-success;
+    color: var(--color-status-success);
   }
 
   &--error {
-    color: $color-danger;
+    color: var(--color-status-error);
   }
 
   &--idle {
-    color: $color-text-tertiary;
+    color: var(--color-text-tertiary);
   }
 }
 
@@ -57,20 +57,20 @@
 }
 
 .save-status__retry {
-  margin-left: $spacing-xs;
-  padding: $spacing-xxs $spacing-xs;
+  margin-left: var(--spacing-xs);
+  padding: var(--spacing-xxs) var(--spacing-xs);
   background-color: transparent;
   border: 1px solid currentColor;
-  border-radius: $radius-xs;
+  border-radius: var(--radius-xs);
   color: inherit;
-  font-size: $font-size-xs;
-  font-weight: $font-weight-medium;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 150ms ease;
 
   &:hover {
     background-color: currentColor;
-    color: $color-bg-primary;
+    color: var(--color-bg-primary);
   }
 
   &:focus-visible {
