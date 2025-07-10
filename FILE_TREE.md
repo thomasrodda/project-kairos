@@ -65,7 +65,14 @@ AI System Prompt Files
 apps
 ├── api
 │   ├── lib
-│   │   └── firebase-admin.ts
+│   │   ├── validations
+│   │   │   ├── block.ts
+│   │   │   ├── page.ts
+│   │   │   └── workspace.ts
+│   │   ├── api-response.ts
+│   │   ├── auth-helpers.ts
+│   │   ├── firebase-admin.ts
+│   │   └── prisma.ts
 │   ├── middleware
 │   │   └── auth.ts
 │   ├── types
@@ -73,12 +80,16 @@ apps
 │   ├── .env
 │   ├── auth.test.ts
 │   ├── auth.ts
+│   ├── blocks.ts
 │   ├── dev-server.ts
 │   ├── hello.test.ts
 │   ├── hello.ts
 │   ├── jest.config.js
 │   ├── package.json
-│   └── tsconfig.json
+│   ├── pages.ts
+│   ├── tsconfig.json
+│   ├── workspaces.test.ts
+│   └── workspaces.ts
 └── web
 ├── cypress
 │   ├── e2e

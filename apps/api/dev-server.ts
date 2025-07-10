@@ -11,6 +11,9 @@ import cors from 'cors'
 import { createServer } from 'http'
 import hello from './hello'
 import { verify, me, logout } from './auth'
+import workspaces from './workspaces'
+import pages from './pages'
+import blocks from './blocks'
 
 const app = express()
 const PORT = 3001
@@ -38,6 +41,39 @@ app.get('/api/auth/me', (req, res) => {
 app.post('/api/auth/logout', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   logout(req as any, res as any)
+})
+
+// Mount workspace endpoints
+app.all('/api/workspaces', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  workspaces(req as any, res as any)
+})
+
+// Mount page endpoints
+app.all('/api/pages', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  pages(req as any, res as any)
+})
+
+app.put('/api/pages/reorder', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  pages(req as any, res as any)
+})
+
+// Mount block endpoints
+app.all('/api/blocks', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  blocks(req as any, res as any)
+})
+
+app.put('/api/blocks/bulk', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  blocks(req as any, res as any)
+})
+
+app.put('/api/blocks/reorder', (req, res) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  blocks(req as any, res as any)
 })
 
 const server = createServer(app)

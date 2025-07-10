@@ -16,6 +16,7 @@ model User {
   photoURL    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 
   // Relations
   workspaces Workspace[]
@@ -29,6 +30,7 @@ model Workspace {
   userId    String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   // Relations
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -46,6 +48,7 @@ model Page {
   isFolder    Boolean @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 
   // Relations
   workspace    Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -69,6 +72,7 @@ model Block {
   metadata  Json?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 
   // Relations
   page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)

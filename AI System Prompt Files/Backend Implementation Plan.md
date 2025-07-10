@@ -93,39 +93,148 @@ GET / api / auth / me // ✅ Get current user profile with workspaces
 - ✅ Development server configuration updated
 - ✅ All endpoints tested and working with proper error responses
 
-## Phase 2: Core CRUD Operations (Week 2)
+## Phase 2: Core CRUD Operations (Week 2) ✅
 
-### 2.1 Workspace Management
+### Completed (as of 2025-01-10)
 
-```typescript
-GET    /api/workspaces              // List user's workspaces
-POST   /api/workspaces              // Create new workspace
-GET    /api/workspaces/:id          // Get workspace details
-PUT    /api/workspaces/:id          // Update workspace (name, settings)
-DELETE /api/workspaces/:id          // Delete workspace (soft delete)
-```
-
-### 2.2 Page Management
+### 2.1 Workspace Management ✅
 
 ```typescript
-GET    /api/workspaces/:workspaceId/pages     // List pages in workspace
-POST   /api/workspaces/:workspaceId/pages     // Create new page
-GET    /api/pages/:id                          // Get page with blocks
-PUT    /api/pages/:id                          // Update page metadata
-DELETE /api/pages/:id                          // Delete page (soft delete)
-PUT    /api/pages/:id/reorder                  // Reorder pages
+GET    /api/workspaces              // ✅ List user's workspaces
+POST   /api/workspaces              // ✅ Create new workspace
+GET    /api/workspaces?id=xxx       // ✅ Get workspace details
+PUT    /api/workspaces?id=xxx       // ✅ Update workspace (name)
+DELETE /api/workspaces?id=xxx       // ✅ Delete workspace (soft delete)
 ```
 
-### 2.3 Block Operations
+### 2.2 Page Management ✅
 
 ```typescript
-GET    /api/pages/:pageId/blocks              // Get all blocks for a page
-PUT    /api/pages/:pageId/blocks              // Bulk update blocks (main save)
-POST   /api/pages/:pageId/blocks              // Add new block
-PUT    /api/blocks/:id                        // Update single block
-DELETE /api/blocks/:id                        // Delete block
-PUT    /api/pages/:pageId/blocks/reorder      // Reorder blocks
+GET    /api/pages?workspaceId=xxx   // ✅ List pages in workspace
+POST   /api/pages?workspaceId=xxx   // ✅ Create new page
+GET    /api/pages?id=xxx            // ✅ Get page with blocks
+PUT    /api/pages?id=xxx            // ✅ Update page metadata
+DELETE /api/pages?id=xxx            // ✅ Delete page (soft delete)
+PUT    /api/pages/reorder           // ✅ Reorder pages
 ```
+
+### 2.3 Block Operations ✅
+
+```typescript
+GET    /api/blocks?pageId=xxx       // ✅ Get all blocks for a page
+GET    /api/blocks?id=xxx           // ✅ Get single block
+POST   /api/blocks?pageId=xxx       // ✅ Add new block
+PUT    /api/blocks?id=xxx           // ✅ Update single block
+PUT    /api/blocks/bulk             // ✅ Bulk update blocks (main save)
+DELETE /api/blocks?id=xxx           // ✅ Delete block (soft delete)
+PUT    /api/blocks/reorder          // ✅ Reorder blocks
+```
+
+### 2.4 Implementation Details ✅
+
+- ✅ Prisma client integration with connection pooling
+- ✅ Soft delete fields added to all models (`deletedAt`)
+- ✅ Comprehensive Zod validation schemas for all endpoints
+- ✅ Consistent error handling with standardized response format
+- ✅ Authentication required on all endpoints
+- ✅ Authorization checks (users can only access their own data)
+- ✅ Hierarchical page structure with parent/child relationships
+- ✅ Workspace endpoints fully tested (14 passing tests)
+- ✅ Development server updated with all routes
+
+### 2.5 Technical Achievements ✅
+
+- ✅ RESTful API design with query parameters
+- ✅ Transaction support for complex operations
+- ✅ Proper TypeScript types throughout
+- ✅ Reusable validation and error handling utilities
+- ✅ Database connection verified and working
+
+## Phase 2.5: Frontend Authentication Integration (Required for Testing)
+
+### Overview
+
+Before we can test the Phase 2 endpoints or proceed to Phase 3, we need to implement basic authentication UI in the frontend. This will allow users to log in and obtain Firebase tokens needed for API calls.
+
+### 2.5.1 Firebase Setup in Frontend
+
+```typescript
+// apps/web/src/lib/firebase.ts
+- Initialize Firebase client SDK
+- Configure authentication providers (Google OAuth)
+- Export auth instance and helper functions
+```
+
+### 2.5.2 Authentication Components
+
+```typescript
+// apps/web/src/components/Auth/
+├── LoginPage.tsx          // Main login page with Google sign-in button
+├── AuthGuard.tsx         // Wrapper component for protected routes
+└── UserMenu.tsx          // User profile dropdown with logout
+```
+
+### 2.5.3 Authentication Context
+
+```typescript
+// apps/web/src/contexts/AuthContext.tsx
+- User state management
+- Login/logout functions
+- Token refresh logic
+- Loading states
+```
+
+### 2.5.4 API Client Setup
+
+```typescript
+// apps/web/src/services/api/
+├── client.ts             // Axios instance with auth interceptor
+├── auth.ts              // Auth endpoints (verify, me)
+├── workspaces.ts        // Workspace CRUD operations
+├── pages.ts             // Page operations
+└── blocks.ts            // Block operations
+```
+
+### 2.5.5 Route Protection
+
+```typescript
+// Update App.tsx
+- Add login route
+- Protect workspace routes with AuthGuard
+- Redirect to login when unauthenticated
+```
+
+### 2.5.6 Implementation Steps
+
+1. **Install Dependencies**
+
+   ```bash
+   yarn workspace @kairos/web add firebase axios
+   ```
+
+2. **Add Firebase Config**
+
+   - Use existing Firebase web configuration
+   - Add to environment variables
+
+3. **Create Login Flow**
+
+   - Simple login page with Google button
+   - Handle authentication state
+   - Store token for API calls
+
+4. **Update Editor Integration**
+   - Add workspace selector
+   - Connect to real backend data
+   - Enable auto-save with auth
+
+### 2.5.7 Minimal UI Requirements
+
+- Login page with Google OAuth button
+- Loading spinner during auth
+- Basic error handling
+- User menu with logout option
+- Workspace selector in sidebar
 
 ## Phase 3: Auto-save & Content Sync (Week 3)
 
