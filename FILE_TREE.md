@@ -43,6 +43,7 @@ AI System Prompt Files
 ├── Component Structure Guide.md
 ├── Data Model Guide.md
 ├── Database Connection Notes.md
+├── Database Migration Strategy.md
 ├── Editor Testing Plan.md
 ├── Enhanced Custom Editor Plan.md
 ├── Environment Setup Guide.md

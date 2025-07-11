@@ -58,7 +58,9 @@ export function useAutoSave({
   // Save function
   const performSave = useCallback(
     async (isRetry = false) => {
+      console.log('performSave called', { pageId, isDirty, isRetry })
       if (!pageId || !isDirty) {
+        console.log('performSave: Skipping save', { pageId, isDirty })
         return
       }
 
@@ -75,7 +77,10 @@ export function useAutoSave({
             type: block.type,
             content: block.content,
             order: index,
-            metadata: block.metadata || {},
+            metadata: {
+              ...block.metadata,
+              formatting: block.formatting || [],
+            },
           })),
           deletedBlockIds: Array.from(deletedBlockIdsRef.current),
           lastUpdatedAt: lastSavedRef.current?.toISOString(),
@@ -188,6 +193,7 @@ export function useAutoSave({
   // Trigger auto-save when content changes
   useEffect(() => {
     if (isDirty && pageId) {
+      console.log('useAutoSave: Content changed, triggering debounced save', { isDirty, pageId })
       debouncedSave()
     }
 
