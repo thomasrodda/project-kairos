@@ -52,6 +52,7 @@ AI System Prompt Files
 ├── Inline SVG System Guide.md
 ├── Markdown Export Import Guide.md
 ├── Performance Optimization Guide.md
+├── Prisma Supabase Connection Guide.md
 ├── Production Deployment Guide.md
 ├── Quick Commands.md
 ├── Scss Structure Guide.md

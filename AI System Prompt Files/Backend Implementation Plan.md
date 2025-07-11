@@ -386,24 +386,42 @@ PUT /api/pages/:id/content
 
 ## Known Issues & Workarounds
 
-### Prisma + Supabase Connection Pooler Issue ⚠️
+### Prisma + Supabase Connection Pooler Issue (IPv4) ⚠️
 
-**Problem**: Prisma encounters "prepared statement already exists" errors when using Supabase's connection pooler (ports 6543/5432). This is a known incompatibility between Prisma's prepared statements and PgBouncer.
+**Problem**:
 
-**Current Workaround**:
+1. Prisma encounters "prepared statement already exists" errors when using Supabase's connection pooler
+2. Direct connections (port 5432) require IPv6, which many developers don't have
+3. Transaction pooler (port 6543) doesn't support prepared statements by default
 
-- Created `auth-mock.ts` for development that bypasses database calls
-- Development server uses mock auth to avoid Prisma errors
-- Production deployment will need a different solution
+**Solution for IPv4 Users**:
 
-**Recommended Solutions**:
+```env
+# Use transaction pooler with pgbouncer=true for ALL operations
+DATABASE_URL="postgresql://[USER]:[PASSWORD]@[HOST].pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+```
+
+**Current Implementation**:
+
+- ✅ Updated Prisma schema to use only DATABASE_URL (removed directUrl)
+- ✅ Configured connection string with `pgbouncer=true`
+- ✅ Development server uses `auth-mock.ts` to bypass database during rapid iteration
+- ✅ All environment files updated with proper connection strings
+
+**Migration Handling**:
+Since IPv4 users can't use direct connections for migrations:
+
+1. Generate migration SQL locally: `prisma migrate diff`
+2. Apply migrations via Supabase Dashboard → SQL Editor
+3. Or use `prisma db push` for simple changes (may not work for complex migrations)
+
+**Recommended Alternatives**:
 
 1. **Local PostgreSQL** for development (most reliable)
-2. **Direct database connection** with IP whitelisting
-3. **Switch to Supabase client library** instead of Prisma
-4. **Alternative database providers** (PlanetScale, Railway, Neon)
+2. **Alternative providers with IPv4 support** (Neon, Railway, PlanetScale)
+3. **Supabase client library** instead of Prisma (better integration)
 
-**Note**: This issue only affects development. For production, consider using a database provider that works well with Prisma or refactoring to use Supabase's client library directly.
+**Documentation**: See [Prisma Supabase Connection Guide.md](./Prisma Supabase Connection Guide.md) for detailed setup instructions.
 
 ## Database Schema Updates
 
