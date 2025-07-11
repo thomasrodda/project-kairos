@@ -1,5 +1,6 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
 import { prisma } from '@kairos/database'
+import { createPageId, createBlockId } from '@kairos/utils'
 import { requireAuth } from './lib/auth-helpers'
 import { asyncHandler, sendSuccess, sendError, methodNotAllowed, HttpStatus } from './lib/api-response'
 import { createWorkspaceSchema, updateWorkspaceSchema, workspaceIdSchema } from './lib/validations/workspace'
@@ -66,14 +67,50 @@ async function handleGet(req: VercelRequest, res: VercelResponse, userId: string
 async function handlePost(req: VercelRequest, res: VercelResponse, userId: string) {
   const data = createWorkspaceSchema.parse(req.body)
 
-  const workspace = await prisma.workspace.create({
-    data: {
-      name: data.name,
-      userId,
-    },
+  // Create workspace with a default page and empty paragraph block in a transaction
+  const result = await prisma.$transaction(async (tx) => {
+    // Create the workspace
+    const workspace = await tx.workspace.create({
+      data: {
+        name: data.name,
+        userId,
+      },
+    })
+
+    // Create a default page
+    const defaultPage = await tx.page.create({
+      data: {
+        id: createPageId(),
+        title: 'Getting Started',
+        workspaceId: workspace.id,
+        order: 0,
+      },
+    })
+
+    // Create an empty paragraph block for the default page
+    await tx.block.create({
+      data: {
+        id: createBlockId(),
+        type: 'paragraph',
+        content: '',
+        pageId: defaultPage.id,
+        order: 0,
+        metadata: {},
+      },
+    })
+
+    return { workspace, defaultPageId: defaultPage.id }
   })
 
-  return sendSuccess(res, workspace, HttpStatus.CREATED)
+  // Return workspace with default page ID
+  return sendSuccess(
+    res,
+    {
+      ...result.workspace,
+      defaultPageId: result.defaultPageId,
+    },
+    HttpStatus.CREATED
+  )
 }
 
 // PUT /api/workspaces?id=xxx

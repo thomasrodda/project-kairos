@@ -14,6 +14,7 @@ const MOCK_USER = {
       id: 'mock-workspace-123',
       name: 'My Development Workspace',
       createdAt: new Date().toISOString(),
+      defaultPageId: 'mock-page-123',
     },
   ],
 }

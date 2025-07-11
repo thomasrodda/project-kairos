@@ -16,6 +16,13 @@ jest.mock('@kairos/database', () => ({
     user: {
       findUnique: jest.fn(),
     },
+    page: {
+      create: jest.fn(),
+    },
+    block: {
+      create: jest.fn(),
+    },
+    $transaction: jest.fn(),
   },
 }))
 
@@ -212,7 +219,7 @@ describe('/api/workspaces', () => {
       req.headers.authorization = 'Bearer valid-token'
     })
 
-    it('should create new workspace', async () => {
+    it('should create new workspace with default page and block', async () => {
       req.body = { name: 'New Workspace' }
 
       const mockWorkspace = {
@@ -224,18 +231,48 @@ describe('/api/workspaces', () => {
         deletedAt: null,
       }
 
-      mockPrisma.workspace.create.mockResolvedValue(mockWorkspace)
+      const mockPage = {
+        id: 'new-page-id',
+        title: 'Getting Started',
+        workspaceId: 'new-workspace-id',
+        order: 0,
+      }
+
+      const mockBlock = {
+        id: 'new-block-id',
+        type: 'paragraph',
+        content: '',
+        pageId: 'new-page-id',
+        position: 0,
+        metadata: {},
+      }
+
+      // Mock the transaction to execute the callback and return the result
+      mockPrisma.$transaction.mockImplementation(async (callback) => {
+        const tx = {
+          workspace: {
+            create: jest.fn().mockResolvedValue(mockWorkspace),
+          },
+          page: {
+            create: jest.fn().mockResolvedValue(mockPage),
+          },
+          block: {
+            create: jest.fn().mockResolvedValue(mockBlock),
+          },
+        }
+        return callback(tx)
+      })
 
       await handler(req as any, res as any)
 
       expect(statusCode).toBe(201)
-      expect(jsonData).toEqual({ data: mockWorkspace })
-      expect(mockPrisma.workspace.create).toHaveBeenCalledWith({
+      expect(jsonData).toEqual({
         data: {
-          name: 'New Workspace',
-          userId: 'test-user-id',
+          ...mockWorkspace,
+          defaultPageId: 'new-page-id',
         },
       })
+      expect(mockPrisma.$transaction).toHaveBeenCalled()
     })
 
     it('should validate workspace name', async () => {
@@ -245,6 +282,24 @@ describe('/api/workspaces', () => {
 
       expect(statusCode).toBe(400)
       expect(jsonData.error.code).toBe('VALIDATION_ERROR')
+    })
+
+    it('should rollback workspace creation if page creation fails', async () => {
+      req.body = { name: 'New Workspace' }
+
+      // Mock the transaction to throw an error during page creation
+      mockPrisma.$transaction.mockRejectedValue(new Error('Failed to create page'))
+
+      await handler(req as any, res as any)
+
+      expect(statusCode).toBe(500)
+      expect(jsonData).toEqual({
+        error: {
+          code: 'INTERNAL_ERROR',
+          message: 'Failed to create page',
+        },
+      })
+      expect(mockPrisma.$transaction).toHaveBeenCalled()
     })
   })
 

@@ -17,6 +17,10 @@ interface WorkspaceResponse {
   workspace: Workspace
 }
 
+interface CreateWorkspaceResponse extends Workspace {
+  defaultPageId: string
+}
+
 class WorkspaceService extends BaseApiClient {
   async getWorkspaces() {
     return this.request<WorkspacesResponse>('/workspaces')
@@ -27,7 +31,7 @@ class WorkspaceService extends BaseApiClient {
   }
 
   async createWorkspace(data: { name: string }) {
-    return this.request<WorkspaceResponse>('/workspaces', {
+    return this.request<CreateWorkspaceResponse>('/workspaces', {
       method: 'POST',
       body: JSON.stringify(data),
     })

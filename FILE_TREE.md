@@ -66,6 +66,7 @@ AI System Prompt Files
 └── Troubleshooting Guide.md
 apps
 ├── api
+│   ├── **tests**
 │   ├── lib
 │   │   ├── validations
 │   │   │   ├── block.ts
@@ -93,6 +94,7 @@ apps
 │   ├── auth.test.ts
 │   ├── auth.ts
 │   ├── block-types.test.ts
+│   ├── blocks-mock.ts
 │   ├── blocks.ts
 │   ├── dev-server.ts
 │   ├── health.ts
@@ -100,6 +102,7 @@ apps
 │   ├── hello.ts
 │   ├── jest.config.js
 │   ├── package.json
+│   ├── pages-mock.ts
 │   ├── pages.ts
 │   ├── tsconfig.json
 │   ├── workspaces.test.ts
@@ -175,6 +178,7 @@ apps
 │   │   │   │   └── index.ts
 │   │   │   └── WorkspaceCreation
 │   │   │   ├── WorkspaceCreation.scss
+│   │   │   ├── WorkspaceCreation.test.tsx
 │   │   │   ├── WorkspaceCreation.tsx
 │   │   │   └── index.ts
 │   │   ├── BackendHealthCheck
@@ -291,6 +295,8 @@ apps
 │   │   │   └── firebase.ts
 │   │   └── firebase.ts
 │   ├── services
+│   │   ├── **mocks**
+│   │   │   └── api.ts
 │   │   └── api
 │   │   ├── auth.ts
 │   │   ├── blocks.ts

@@ -24,15 +24,15 @@ export const WorkspaceCreation: React.FC = () => {
 
     try {
       // Create the workspace
-      const { workspace } = await apiClient.createWorkspace({
+      const workspace = await apiClient.createWorkspace({
         name: workspaceName.trim(),
       })
 
       // Refresh user data to update the workspace list
       await refreshUserData()
 
-      // Navigate to the new workspace
-      navigate(`/workspace/${workspace.id}`)
+      // Navigate directly to the default page in the new workspace
+      navigate(`/workspace/${workspace.id}/page/${workspace.defaultPageId}`)
     } catch (err) {
       console.error('Error creating workspace:', err)
       setError(err instanceof Error ? err.message : 'Failed to create workspace')

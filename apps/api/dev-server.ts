@@ -14,8 +14,10 @@ import hello from './hello'
 import { verify, me, logout } from './auth-mock'
 // import { verify, me, logout } from './auth' // Original auth with Prisma
 import workspaces from './workspaces'
-import pages from './pages'
-import blocks from './blocks'
+import pagesMock from './pages-mock' // Use mock pages for development
+// import pages from './pages' // Original pages with Prisma
+import blocksMock from './blocks-mock' // Use mock blocks for development
+// import blocks from './blocks' // Original blocks with Prisma
 
 const app = express()
 const PORT = 3001
@@ -59,28 +61,28 @@ app.all('/api/workspaces', (req, res) => {
 // Mount page endpoints
 app.all('/api/pages', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pages(req as any, res as any)
+  pagesMock(req as any, res as any)
 })
 
 app.put('/api/pages/reorder', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pages(req as any, res as any)
+  pagesMock(req as any, res as any)
 })
 
 // Mount block endpoints
 app.all('/api/blocks', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blocks(req as any, res as any)
+  blocksMock(req as any, res as any)
 })
 
 app.put('/api/blocks/bulk', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blocks(req as any, res as any)
+  blocksMock(req as any, res as any)
 })
 
 app.put('/api/blocks/reorder', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blocks(req as any, res as any)
+  blocksMock(req as any, res as any)
 })
 
 const server = createServer(app)

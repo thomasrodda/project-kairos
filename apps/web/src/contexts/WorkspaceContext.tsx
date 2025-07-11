@@ -103,13 +103,12 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
       }
 
       try {
-        const response = await apiClient.createWorkspace({ name })
-        const newWorkspace = response.workspace
+        const workspace = await apiClient.createWorkspace({ name })
 
         // Refresh user data to get updated workspace list
         await refreshUserData()
 
-        return newWorkspace
+        return workspace
       } catch (err) {
         console.error('Failed to create workspace:', err)
         throw err
