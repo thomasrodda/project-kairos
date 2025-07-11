@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom'
 import { useAuth } from './AuthContext'
 import { useEditor } from './EditorContext'
 import { useAutoSave } from '../hooks/useAutoSave'
-import { apiClient } from '../lib/api-client'
+import { apiClient } from '../services/api'
 import { EditorBlock } from './EditorContext'
 
 interface Page {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../../contexts/AuthContext'
-import { apiClient } from '../../../lib/api-client'
+import { apiClient } from '../../../services/api'
 import './WorkspaceCreation.scss'
 
 export const WorkspaceCreation: React.FC = () => {

@@ -88,6 +88,7 @@ apps
 │   ├── types
 │   │   └── express.d.ts
 │   ├── .env
+│   ├── auth-mock.ts
 │   ├── auth.test.ts
 │   ├── auth.ts
 │   ├── block-types.test.ts
@@ -269,8 +270,15 @@ apps
 │   │   ├── Editor.integration.test.tsx
 │   │   └── markdown-detection.test.tsx
 │   ├── lib
-│   │   ├── api-client.ts
 │   │   └── firebase.ts
+│   ├── services
+│   │   └── api
+│   │   ├── auth.ts
+│   │   ├── blocks.ts
+│   │   ├── client.ts
+│   │   ├── index.ts
+│   │   ├── pages.ts
+│   │   └── workspaces.ts
 │   ├── styles
 │   │   ├── base
 │   │   │   ├── reset.scss

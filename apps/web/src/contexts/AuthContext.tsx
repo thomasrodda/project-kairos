@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, onAuthStateChanged } from 'firebase/auth'
 import { auth, signInWithGoogle, signInWithEmail, signUpWithEmail, logout } from '../lib/firebase'
-import { apiClient } from '../lib/api-client'
+import { apiClient } from '../services/api'
 
 interface BackendUser {
   id: string
@@ -74,6 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const backendUserData: BackendUser = {
         ...response.user,
         firebaseUid: firebaseUser.uid,
+        displayName: response.user.name || firebaseUser.displayName,
         workspaces: response.user.workspaces || [],
       }
 

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { apiClient } from '../lib/api-client'
+import { apiClient } from '../services/api'
 
 interface BackendHealthContextType {
   isBackendAvailable: boolean

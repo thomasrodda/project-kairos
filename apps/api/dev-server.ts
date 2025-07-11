@@ -10,7 +10,9 @@ import express from 'express'
 import cors from 'cors'
 import { createServer } from 'http'
 import hello from './hello'
-import { verify, me, logout } from './auth'
+// Use mock auth for development to avoid Prisma issues
+import { verify, me, logout } from './auth-mock'
+// import { verify, me, logout } from './auth' // Original auth with Prisma
 import workspaces from './workspaces'
 import pages from './pages'
 import blocks from './blocks'

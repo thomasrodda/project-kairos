@@ -4,7 +4,7 @@
 
 import { useRef, useCallback, useEffect } from 'react'
 import { useEditor } from '../contexts/EditorContext'
-import { apiClient } from '../lib/api-client'
+import { apiClient } from '../services/api'
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 

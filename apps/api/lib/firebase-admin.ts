@@ -36,8 +36,11 @@ function initializeFirebase() {
 }
 
 // Initialize on module load if not in test environment
+// Delay initialization to ensure environment variables are loaded
 if (process.env.NODE_ENV !== 'test') {
-  initializeFirebase()
+  setTimeout(() => {
+    initializeFirebase()
+  }, 0)
 }
 
 // Lazy getter for auth to ensure Firebase is initialized when needed

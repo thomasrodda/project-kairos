@@ -1,6 +1,15 @@
 // apps/web/src/test/setup.ts
 import '@testing-library/jest-dom'
 
+// Mock import.meta.env for Vite environment variables
+;(global as any).import = {
+  meta: {
+    env: {
+      VITE_API_URL: 'http://localhost:3001',
+    },
+  },
+}
+
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
