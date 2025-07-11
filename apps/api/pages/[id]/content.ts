@@ -6,6 +6,8 @@ import { requireAuth } from '../../lib/auth-helpers'
 import { updatePageContentSchema } from '../../lib/validations/page'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('Content save endpoint called:', req.method, req.query)
+
   if (req.method !== 'PUT') {
     return sendError(res, 'METHOD_NOT_ALLOWED', 'Only PUT method is allowed', HttpStatus.METHOD_NOT_ALLOWED)
   }
@@ -21,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const pageId = z.string().cuid().parse(id)
+    const pageId = z.string().min(1).parse(id) // Support cuid2
     const data = updatePageContentSchema.parse(req.body)
 
     // Start a transaction for all updates
@@ -79,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Extract block IDs
         const blockIds = data.blocks.map((b) => b.id)
 
-        // Verify all blocks exist and belong to this page
+        // Find which blocks already exist
         const existingBlocks = await tx.block.findMany({
           where: {
             id: { in: blockIds },
@@ -89,24 +91,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           select: { id: true },
         })
 
-        if (existingBlocks.length !== blockIds.length) {
-          throw new Error('INVALID_BLOCK_IDS')
-        }
+        const existingBlockIds = new Set(existingBlocks.map((b) => b.id))
 
-        // Update all blocks
-        const blockUpdates = data.blocks.map((block) =>
-          tx.block.update({
-            where: { id: block.id },
-            data: {
+        // Separate blocks into new and existing
+        const blocksToCreate = data.blocks.filter((b) => !existingBlockIds.has(b.id))
+        const blocksToUpdate = data.blocks.filter((b) => existingBlockIds.has(b.id))
+
+        // Create new blocks
+        if (blocksToCreate.length > 0) {
+          await tx.block.createMany({
+            data: blocksToCreate.map((block) => ({
+              id: block.id,
+              pageId,
               type: block.type,
               content: block.content,
               order: block.order,
               metadata: block.metadata as any,
-            },
+            })),
           })
-        )
+        }
 
-        await Promise.all(blockUpdates)
+        // Update existing blocks
+        if (blocksToUpdate.length > 0) {
+          const blockUpdates = blocksToUpdate.map((block) =>
+            tx.block.update({
+              where: { id: block.id },
+              data: {
+                type: block.type,
+                content: block.content,
+                order: block.order,
+                metadata: block.metadata as any,
+              },
+            })
+          )
+
+          await Promise.all(blockUpdates)
+        }
       }
 
       // Handle block deletions
@@ -218,6 +238,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       savedAt: new Date().toISOString(),
     })
   } catch (error) {
+    console.error('Content save error:', error)
+    console.error('Request body:', JSON.stringify(req.body, null, 2))
+
     // Handle specific errors
     if (error instanceof Error) {
       switch (error.message) {
@@ -236,6 +259,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Handle validation errors
     if (error instanceof z.ZodError) {
+      console.error('Validation failed:', error.errors)
       return sendError(res, 'VALIDATION_ERROR', 'Invalid request data', HttpStatus.BAD_REQUEST, {
         errors: error.errors,
       })

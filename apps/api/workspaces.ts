@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
-import { prisma } from '@kairos/database'
+import { prisma } from './lib/prisma'
 import { createPageId, createBlockId } from '@kairos/utils'
 import { requireAuth } from './lib/auth-helpers'
 import { asyncHandler, sendSuccess, sendError, methodNotAllowed, HttpStatus } from './lib/api-response'

@@ -1,7 +1,9 @@
 // packages/utils/src/index.ts
+import { createId } from '@paralleldrive/cuid2'
+
 // Utility functions
 export const generateId = (): string => {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36)
+  return createId()
 }
 
 // Environment validation
@@ -29,6 +31,6 @@ export const truncateText = (text: string, maxLength: number): string => {
 }
 
 // Block utilities (for future use)
-export const createBlockId = () => generateId()
-export const createPageId = () => generateId()
-export const createWorkspaceId = () => generateId()
+export const createBlockId = (): string => createId()
+export const createPageId = (): string => createId()
+export const createWorkspaceId = (): string => createId()

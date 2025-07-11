@@ -115,7 +115,8 @@ export class BaseApiClient {
           throw new Error(error.message || `Request failed: ${retryResponse.statusText}`)
         }
 
-        return retryResponse.json()
+        const retryJson = await retryResponse.json()
+        return retryJson.data !== undefined ? retryJson.data : retryJson
       }
     }
 
@@ -128,7 +129,9 @@ export class BaseApiClient {
     }
 
     // Return parsed JSON
-    return response.json()
+    const json = await response.json()
+    // If the response has a 'data' property, unwrap it
+    return json.data !== undefined ? json.data : json
   }
 
   // Health check

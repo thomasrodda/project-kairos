@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "dev": "tsx watch dev-server.ts",
+    "dev": "dotenv -e ../../.env.local -- tsx watch dev-server.ts",
     "build": "tsc --noEmit",
     "typecheck": "tsc --noEmit",
     "test": "jest"

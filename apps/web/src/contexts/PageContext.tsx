@@ -152,17 +152,30 @@ export function PageProvider({ children }: PageProviderProps) {
         const response = await apiClient.getPages(currentWorkspace!.id)
         const pages = response.pages
 
-        if (pages.length > 0) {
+        console.log('Loading default page for workspace:', currentWorkspace!.id)
+        console.log('Found pages:', pages)
+
+        if (pages && pages.length > 0) {
           // Load the first page
+          console.log('Loading first page:', pages[0].id)
           await loadPage(pages[0].id)
         } else {
           // Create a default page
+          console.log('No pages found, creating default page')
           const newPage = await createPage(currentWorkspace!.id, 'Untitled Page')
           await loadPage(newPage.id)
         }
       } catch (err) {
         console.error('Failed to load default page:', err)
-        setError('Failed to load workspace pages')
+        // Try to create a new page if loading fails
+        try {
+          console.log('Attempting to create a new page after load failure')
+          const newPage = await createPage(currentWorkspace!.id, 'Untitled Page')
+          await loadPage(newPage.id)
+        } catch (createErr) {
+          console.error('Failed to create default page:', createErr)
+          setError('Failed to load workspace pages')
+        }
       }
     }
   }, [currentWorkspace, user, loadPage, createPage])

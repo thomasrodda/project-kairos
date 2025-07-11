@@ -1,5 +1,13 @@
 import { z } from 'zod'
-import { BlockType } from '@prisma/client'
+
+// Define BlockType enum locally to avoid import issues
+enum BlockType {
+  paragraph = 'paragraph',
+  h1 = 'h1',
+  h2 = 'h2',
+  h3 = 'h3',
+  bullet = 'bullet',
+}
 
 // Block type enum matching Prisma schema
 const blockTypeSchema = z.nativeEnum(BlockType)
@@ -24,7 +32,7 @@ export const updateBlockSchema = z.object({
 export const bulkUpdateBlocksSchema = z.object({
   blocks: z.array(
     z.object({
-      id: z.string().cuid(),
+      id: z.string().min(1), // Changed from .cuid() to support cuid2
       type: blockTypeSchema,
       content: z.string(),
       order: z.number().int().min(0),
@@ -35,12 +43,12 @@ export const bulkUpdateBlocksSchema = z.object({
 
 // Block reorder schema
 export const reorderBlocksSchema = z.object({
-  blockIds: z.array(z.string().cuid()).min(1),
+  blockIds: z.array(z.string().min(1)).min(1), // Changed from .cuid() to support cuid2
 })
 
 // Block params schema
 export const blockIdSchema = z.object({
-  id: z.string().cuid(),
+  id: z.string().min(1), // Changed from .cuid() to support cuid2
 })
 
 export type CreateBlockInput = z.infer<typeof createBlockSchema>

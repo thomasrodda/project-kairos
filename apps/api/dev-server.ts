@@ -10,14 +10,12 @@ import express from 'express'
 import cors from 'cors'
 import { createServer } from 'http'
 import hello from './hello'
-// Use mock auth for development to avoid Prisma issues
-import { verify, me, logout } from './auth-mock'
-// import { verify, me, logout } from './auth' // Original auth with Prisma
+// Use real auth endpoints
+import { verify, me, logout } from './auth'
 import workspaces from './workspaces'
-import pagesMock from './pages-mock' // Use mock pages for development
-// import pages from './pages' // Original pages with Prisma
-import blocksMock from './blocks-mock' // Use mock blocks for development
-// import blocks from './blocks' // Original blocks with Prisma
+import pages from './pages' // Real pages endpoints
+import blocks from './blocks' // Real blocks endpoints
+import contentHandler from './pages/[id]/content' // Auto-save endpoint
 
 const app = express()
 const PORT = 3001
@@ -61,28 +59,46 @@ app.all('/api/workspaces', (req, res) => {
 // Mount page endpoints
 app.all('/api/pages', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pagesMock(req as any, res as any)
+  pages(req as any, res as any)
 })
 
 app.put('/api/pages/reorder', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  pagesMock(req as any, res as any)
+  pages(req as any, res as any)
 })
 
 // Mount block endpoints
 app.all('/api/blocks', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blocksMock(req as any, res as any)
+  blocks(req as any, res as any)
 })
 
 app.put('/api/blocks/bulk', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blocksMock(req as any, res as any)
+  blocks(req as any, res as any)
 })
 
 app.put('/api/blocks/reorder', (req, res) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  blocksMock(req as any, res as any)
+  blocks(req as any, res as any)
+})
+
+// Mount auto-save endpoint
+app.put('/api/pages/:id/content', (req, res) => {
+  console.log('Auto-save route hit:', req.params.id)
+  console.log('Request body:', JSON.stringify(req.body))
+
+  // Create a new request object with the ID in query
+  const modifiedReq = {
+    ...req,
+    query: { id: req.params.id },
+    body: req.body,
+    headers: req.headers,
+    method: req.method,
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  contentHandler(modifiedReq as any, res as any)
 })
 
 const server = createServer(app)

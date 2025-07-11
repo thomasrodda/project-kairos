@@ -31,8 +31,8 @@ export const WorkspaceCreation: React.FC = () => {
       // Refresh user data to update the workspace list
       await refreshUserData()
 
-      // Navigate directly to the default page in the new workspace
-      navigate(`/workspace/${workspace.id}/page/${workspace.defaultPageId}`)
+      // Navigate to the workspace - the PageContext will handle loading/creating the default page
+      navigate(`/workspace/${workspace.id}`)
     } catch (err) {
       console.error('Error creating workspace:', err)
       setError(err instanceof Error ? err.message : 'Failed to create workspace')

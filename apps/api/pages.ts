@@ -1,5 +1,5 @@
 import { VercelRequest, VercelResponse } from '@vercel/node'
-import { prisma } from '@kairos/database'
+import { prisma } from './lib/prisma'
 import { requireAuth } from './lib/auth-helpers'
 import { asyncHandler, sendSuccess, sendError, methodNotAllowed, HttpStatus } from './lib/api-response'
 import { createPageSchema, updatePageSchema, reorderPagesSchema, pageIdSchema } from './lib/validations/page'
@@ -57,7 +57,12 @@ async function handleGet(req: VercelRequest, res: VercelResponse, userId: string
       return sendError(res, 'PAGE_NOT_FOUND', 'The requested page does not exist', HttpStatus.NOT_FOUND)
     }
 
-    return sendSuccess(res, page)
+    // Return page and blocks separately to match frontend expectations
+    const { blocks, ...pageData } = page
+    return sendSuccess(res, {
+      page: pageData,
+      blocks: blocks || [],
+    })
   }
 
   // List pages in workspace
@@ -84,7 +89,7 @@ async function handleGet(req: VercelRequest, res: VercelResponse, userId: string
       orderBy: [{ parentId: 'asc' }, { order: 'asc' }],
     })
 
-    return sendSuccess(res, pages)
+    return sendSuccess(res, { pages })
   }
 
   return sendError(res, 'MISSING_PARAMETER', 'Either id or workspaceId is required', HttpStatus.BAD_REQUEST)

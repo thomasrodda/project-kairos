@@ -1,28 +1,36 @@
 import { z } from 'zod'
-import { BlockType } from '@prisma/client'
+
+// Define BlockType enum locally to avoid import issues
+enum BlockType {
+  paragraph = 'paragraph',
+  h1 = 'h1',
+  h2 = 'h2',
+  h3 = 'h3',
+  bullet = 'bullet',
+}
 
 // Page creation schema
 export const createPageSchema = z.object({
   title: z.string().min(1).max(255).trim().default('Untitled'),
-  parentId: z.string().cuid().optional(),
+  parentId: z.string().min(1).optional(), // Changed from .cuid() to support cuid2
   isFolder: z.boolean().default(false),
 })
 
 // Page update schema
 export const updatePageSchema = z.object({
   title: z.string().min(1).max(255).trim().optional(),
-  parentId: z.string().cuid().nullable().optional(),
+  parentId: z.string().min(1).nullable().optional(), // Changed from .cuid() to support cuid2
   order: z.number().int().min(0).optional(),
 })
 
 // Page reorder schema
 export const reorderPagesSchema = z.object({
-  pageIds: z.array(z.string().cuid()).min(1),
+  pageIds: z.array(z.string().min(1)).min(1), // Changed from .cuid() to support cuid2
 })
 
 // Page params schema
 export const pageIdSchema = z.object({
-  id: z.string().cuid(),
+  id: z.string().min(1), // Changed from .cuid() to support cuid2
 })
 
 // Content update schema for auto-save
@@ -34,7 +42,7 @@ export const updatePageContentSchema = z.object({
   blocks: z
     .array(
       z.object({
-        id: z.string().cuid(),
+        id: z.string().min(1), // Changed from .cuid() to support cuid2
         type: z.nativeEnum(BlockType),
         content: z.string(),
         order: z.number().int().min(0),
@@ -44,7 +52,7 @@ export const updatePageContentSchema = z.object({
     .optional(),
 
   // Blocks to delete (soft delete)
-  deletedBlockIds: z.array(z.string().cuid()).optional(),
+  deletedBlockIds: z.array(z.string().min(1)).optional(), // Changed from .cuid() to support cuid2
 
   // For conflict detection - last known update timestamp
   lastUpdatedAt: z.string().datetime().optional(),

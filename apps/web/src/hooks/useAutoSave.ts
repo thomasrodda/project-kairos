@@ -86,6 +86,9 @@ export function useAutoSave({
           lastUpdatedAt: lastSavedRef.current?.toISOString(),
         }
 
+        // Log what we're sending
+        console.log('Sending save data:', JSON.stringify(saveData, null, 2))
+
         // Call API
         const response = await apiClient.savePageContent(pageId, saveData)
 
