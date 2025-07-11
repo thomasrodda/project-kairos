@@ -19,6 +19,8 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { useEditorState, useEditorDispatch } from '../../../contexts/EditorContext'
 import { useDismiss, useCrossBlockSelection } from '../../../hooks'
 import { PageTitle } from '../PageTitle'
+import { SaveStatus } from '../../SaveStatus'
+import { usePageContext } from '../../../contexts/PageContext'
 import { DraggableBlock } from '../Block/DraggableBlock'
 import { Block } from '../Block'
 import { ContentEditableContainer } from '../ContentEditableContainer'
@@ -29,6 +31,7 @@ export function EditorContent() {
   const editorState = useEditorState()
   const dispatch = useEditorDispatch()
   const { pageTitle, blocks, focusedBlockId, selectedBlockIds, crossBlockSelection } = editorState
+  const { saveStatus, forceSave } = usePageContext()
   const editorRef = useRef<HTMLDivElement>(null)
   const contentEditableRef = useRef<HTMLDivElement>(null)
   const formattingToolbarRef = useRef<HTMLDivElement>(null)
@@ -67,6 +70,13 @@ export function EditorContent() {
   // Handle keyboard shortcuts for selected blocks and text
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Handle Ctrl/Cmd+S for manual save
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        forceSave()
+        return
+      }
+
       // Handle text selection shortcuts first
       if (crossBlockSelection) {
         // Escape clears text selection
@@ -107,7 +117,7 @@ export function EditorContent() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [selectedBlockIds, focusedBlockId, crossBlockSelection, dispatch, clearSelection])
+  }, [selectedBlockIds, focusedBlockId, crossBlockSelection, dispatch, clearSelection, forceSave])
 
   // Handle copy event for cross-block selection
   useEffect(() => {
@@ -351,7 +361,10 @@ export function EditorContent() {
         </div>
 
         {/* Page title - always visible and editable */}
-        <PageTitle title={pageTitle} />
+        <div className="editor-content__header">
+          <PageTitle title={pageTitle} />
+          <SaveStatus status={saveStatus} className="editor-content__save-status" />
+        </div>
 
         {/* All blocks in a single contentEditable container */}
         <div className="editor-content__blocks" role="group" aria-label="Document blocks">

@@ -116,7 +116,13 @@ async function handlePost(req: VercelRequest, res: VercelResponse, userId: strin
     return sendError(res, 'WORKSPACE_NOT_FOUND', 'The requested workspace does not exist', HttpStatus.NOT_FOUND)
   }
 
-  const data = createPageSchema.parse(req.body)
+  let data
+  try {
+    data = createPageSchema.parse(req.body)
+  } catch (error: any) {
+    console.error('Page creation validation error:', error)
+    return sendError(res, 'VALIDATION_ERROR', error.message || 'Invalid request data', HttpStatus.BAD_REQUEST)
+  }
 
   // If parentId is provided, verify it exists in the same workspace
   if (data.parentId) {

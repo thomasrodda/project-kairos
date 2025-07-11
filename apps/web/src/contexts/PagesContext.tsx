@@ -139,7 +139,7 @@ export function PagesProvider({ children }: PagesProviderProps) {
       try {
         const newPage = await pageService.createPage(selectedWorkspace.id, {
           title,
-          parentId: parentId || null,
+          parentId: parentId || undefined,
           isFolder,
         })
 
@@ -157,10 +157,15 @@ export function PagesProvider({ children }: PagesProviderProps) {
         })
 
         return newPage
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to create page:', err)
+        console.error('Error details:', err.response || err.message || err)
+
+        // Try to extract a more specific error message
+        const errorMessage = err.response?.data?.error?.message || err.message || `Failed to create ${isFolder ? 'folder' : 'page'}`
+
         showToast?.({
-          message: `Failed to create ${isFolder ? 'folder' : 'page'}`,
+          message: errorMessage,
           type: 'error',
         })
         return null

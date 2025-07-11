@@ -12,6 +12,7 @@ export function PageTree() {
   const { currentWorkspace } = useWorkspace()
   const [isCreating, setIsCreating] = useState(false)
   const [newPageTitle, setNewPageTitle] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handlePageSelect = useCallback(
     (pageId: string, isFolder: boolean) => {
@@ -23,19 +24,24 @@ export function PageTree() {
   )
 
   const handleCreatePage = useCallback(async () => {
-    if (!newPageTitle.trim()) return
+    if (!newPageTitle.trim() || isSubmitting) return
 
-    setIsCreating(true)
+    setIsSubmitting(true)
     const newPage = await createPage(newPageTitle.trim())
+    setIsSubmitting(false)
 
-    if (newPage && !newPage.isFolder) {
-      // Navigate to the new page
-      handlePageSelect(newPage.id, false)
+    if (newPage) {
+      // Success - clear the form and navigate if it's not a folder
+      setNewPageTitle('')
+      setIsCreating(false)
+
+      if (!newPage.isFolder) {
+        // Navigate to the new page
+        handlePageSelect(newPage.id, false)
+      }
     }
-
-    setNewPageTitle('')
-    setIsCreating(false)
-  }, [newPageTitle, createPage, handlePageSelect])
+    // If createPage returned null (error), keep the input visible
+  }, [newPageTitle, createPage, handlePageSelect, isSubmitting])
 
   const handleCreateFolder = useCallback(async () => {
     const folderName = prompt('Enter folder name:')
@@ -112,7 +118,7 @@ export function PageTree() {
               onChange={(e) => setNewPageTitle(e.target.value)}
               onKeyDown={handleKeyDown}
               onBlur={() => {
-                if (!newPageTitle.trim()) {
+                if (!newPageTitle.trim() && !isSubmitting) {
                   setIsCreating(false)
                 }
               }}

@@ -122,10 +122,13 @@ export class BaseApiClient {
 
     // Handle other error responses
     if (!response.ok) {
-      const error = await response.json().catch(() => ({
+      const errorData = await response.json().catch(() => ({
         message: `HTTP error! status: ${response.status}`,
       }))
-      throw new Error(error.message || `Request failed: ${response.statusText}`)
+      console.error('API Error Response:', errorData)
+      const error = new Error(errorData.error?.message || errorData.message || `Request failed: ${response.statusText}`)
+      ;(error as any).response = { data: errorData, status: response.status }
+      throw error
     }
 
     // Return parsed JSON

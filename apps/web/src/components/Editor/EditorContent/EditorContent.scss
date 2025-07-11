@@ -12,6 +12,19 @@
   min-height: 100%;
   cursor: text; // Show text cursor when hovering over empty space
 
+  &__header {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  &__save-status {
+    position: absolute;
+    top: var(--spacing-8);
+    right: 0;
+  }
+
   &__blocks {
     // Blocks container
     margin-top: var(--spacing-32);

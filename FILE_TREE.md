@@ -248,6 +248,10 @@ apps
 │   │   │   └── index.ts
 │   │   ├── PerformanceTest
 │   │   │   └── PerformanceTest.tsx
+│   │   ├── SaveStatus
+│   │   │   ├── SaveStatus.scss
+│   │   │   ├── SaveStatus.tsx
+│   │   │   └── index.ts
 │   │   ├── SaveStatusIndicator
 │   │   │   ├── SaveStatusIndicator.scss
 │   │   │   ├── SaveStatusIndicator.tsx

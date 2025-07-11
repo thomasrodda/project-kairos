@@ -92,7 +92,7 @@ class PageService extends BaseApiClient {
     return this.request<PageResponse>(`/pages?id=${id}`)
   }
 
-  async createPage(workspaceId: string, data: { title: string; parentId?: string | null; isFolder?: boolean }) {
+  async createPage(workspaceId: string, data: { title: string; parentId?: string; isFolder?: boolean }) {
     return this.request<{ page: Page }>(`/pages?workspaceId=${workspaceId}`, {
       method: 'POST',
       body: JSON.stringify(data),

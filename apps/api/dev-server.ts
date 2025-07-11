@@ -58,6 +58,8 @@ app.all('/api/workspaces', (req, res) => {
 
 // Mount page endpoints
 app.all('/api/pages', (req, res) => {
+  console.log('Pages endpoint hit:', req.method, req.query)
+  console.log('Request body:', req.body)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   pages(req as any, res as any)
 })
