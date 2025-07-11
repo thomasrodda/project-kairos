@@ -249,17 +249,23 @@ apps
 │   │   │   ├── SidebarButton.test.tsx
 │   │   │   ├── SidebarButton.tsx
 │   │   │   └── index.ts
-│   │   └── Workspace
-│   │   ├── Workspace.scss
-│   │   ├── Workspace.test.tsx
-│   │   ├── Workspace.tsx
+│   │   ├── Workspace
+│   │   │   ├── Workspace.scss
+│   │   │   ├── Workspace.test.tsx
+│   │   │   ├── Workspace.tsx
+│   │   │   └── index.ts
+│   │   └── WorkspaceSelector
+│   │   ├── WorkspaceSelector.scss
+│   │   ├── WorkspaceSelector.test.tsx
+│   │   ├── WorkspaceSelector.tsx
 │   │   └── index.ts
 │   ├── contexts
 │   │   ├── AuthContext.tsx
 │   │   ├── BackendHealthContext.tsx
 │   │   ├── EditorContext.test.tsx
 │   │   ├── EditorContext.tsx
-│   │   └── PageContext.tsx
+│   │   ├── PageContext.tsx
+│   │   └── WorkspaceContext.tsx
 │   ├── hooks
 │   │   ├── index.ts
 │   │   ├── useAutoSave.ts
@@ -271,6 +277,8 @@ apps
 │   │   ├── Editor.integration.test.tsx
 │   │   └── markdown-detection.test.tsx
 │   ├── lib
+│   │   ├── **mocks**
+│   │   │   └── firebase.ts
 │   │   └── firebase.ts
 │   ├── services
 │   │   └── api

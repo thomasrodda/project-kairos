@@ -2,8 +2,8 @@
 // Context for managing the current page and auto-save functionality
 
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
-import { useParams } from 'react-router-dom'
 import { useAuth } from './AuthContext'
+import { useWorkspace } from './WorkspaceContext'
 import { useEditor } from './EditorContext'
 import { useAutoSave } from '../hooks/useAutoSave'
 import { apiClient } from '../services/api'
@@ -45,8 +45,8 @@ interface PageProviderProps {
 }
 
 export function PageProvider({ children }: PageProviderProps) {
-  const { workspaceId } = useParams<{ workspaceId: string }>()
   const { user } = useAuth()
+  const { currentWorkspace } = useWorkspace()
   const { dispatch } = useEditor()
 
   const [currentPage, setCurrentPage] = useState<Page | null>(null)
@@ -140,7 +140,7 @@ export function PageProvider({ children }: PageProviderProps) {
 
   // Load default page when workspace changes
   useEffect(() => {
-    if (workspaceId && user) {
+    if (currentWorkspace && user) {
       // For now, create or load a default page
       // In the future, this should load the last opened page or show a page selector
       loadDefaultPage()
@@ -149,7 +149,7 @@ export function PageProvider({ children }: PageProviderProps) {
     async function loadDefaultPage() {
       try {
         // Try to get pages in the workspace
-        const response = await apiClient.getPages(workspaceId!)
+        const response = await apiClient.getPages(currentWorkspace!.id)
         const pages = response.pages
 
         if (pages.length > 0) {
@@ -157,7 +157,7 @@ export function PageProvider({ children }: PageProviderProps) {
           await loadPage(pages[0].id)
         } else {
           // Create a default page
-          const newPage = await createPage(workspaceId!, 'Untitled Page')
+          const newPage = await createPage(currentWorkspace!.id, 'Untitled Page')
           await loadPage(newPage.id)
         }
       } catch (err) {
@@ -165,7 +165,7 @@ export function PageProvider({ children }: PageProviderProps) {
         setError('Failed to load workspace pages')
       }
     }
-  }, [workspaceId, user, loadPage, createPage])
+  }, [currentWorkspace, user, loadPage, createPage])
 
   const value: PageContextValue = {
     currentPage,

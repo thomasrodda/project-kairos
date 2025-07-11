@@ -23,6 +23,9 @@ module.exports = {
     // Handle regular SVG imports
     '\\.svg$': 'jest-transform-stub',
 
+    // Mock firebase lib to avoid import.meta issues
+    '^../lib/firebase$': '<rootDir>/src/lib/__mocks__/firebase.ts',
+
     // Path aliases
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@kairos/utils$': '<rootDir>/../../packages/utils/src',

@@ -6,6 +6,12 @@ import '@testing-library/jest-dom'
   meta: {
     env: {
       VITE_API_URL: 'http://localhost:3001',
+      VITE_FIREBASE_API_KEY: 'test-api-key',
+      VITE_FIREBASE_AUTH_DOMAIN: 'test-auth-domain',
+      VITE_FIREBASE_PROJECT_ID: 'test-project-id',
+      VITE_FIREBASE_STORAGE_BUCKET: 'test-storage-bucket',
+      VITE_FIREBASE_MESSAGING_SENDER_ID: 'test-sender-id',
+      VITE_FIREBASE_APP_ID: 'test-app-id',
     },
   },
 }

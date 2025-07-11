@@ -11,6 +11,7 @@ import { EditorProvider } from './contexts/EditorContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { BackendHealthProvider } from './contexts/BackendHealthContext'
 import { PageProvider } from './contexts/PageContext'
+import { WorkspaceProvider } from './contexts/WorkspaceContext'
 import { BackendHealthCheck } from './components/BackendHealthCheck'
 import { initializeIconPerformance } from '@kairos/ui'
 
@@ -49,13 +50,15 @@ function App() {
                 path="/workspace/:workspaceId?"
                 element={
                   <ProtectedRoute>
-                    <EditorProvider>
-                      <PageProvider>
-                        <Workspace />
-                        {/* Show performance monitoring in development */}
-                        {process.env.NODE_ENV === 'development' && <PerformanceTest />}
-                      </PageProvider>
-                    </EditorProvider>
+                    <WorkspaceProvider>
+                      <EditorProvider>
+                        <PageProvider>
+                          <Workspace />
+                          {/* Show performance monitoring in development */}
+                          {process.env.NODE_ENV === 'development' && <PerformanceTest />}
+                        </PageProvider>
+                      </EditorProvider>
+                    </WorkspaceProvider>
                   </ProtectedRoute>
                 }
               />

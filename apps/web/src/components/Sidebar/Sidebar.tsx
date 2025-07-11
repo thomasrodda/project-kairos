@@ -19,6 +19,7 @@ import { Icon } from '@kairos/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { usePageContext } from '../../contexts/PageContext'
 import { SaveStatusIndicator } from '../SaveStatusIndicator'
+import { WorkspaceSelector } from '../WorkspaceSelector'
 import './Sidebar.scss'
 
 export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
@@ -45,9 +46,8 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
 
   // Button configuration data
 
-  // Primary buttons data (4 buttons) - main workspace actions
+  // Primary buttons data (3 buttons) - main workspace actions (workspace selector is now separate)
   const primaryButtons = [
-    { icon: 'profile' as const, text: 'Workspace Name', id: 'workspace-name' },
     { icon: 'search' as const, text: 'Search', id: 'search' },
     { icon: 'image' as const, text: 'Image Library', id: 'image-library' },
     { icon: 'add' as const, text: 'Create Page', id: 'create-page' },
@@ -87,6 +87,11 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
           <SaveStatusIndicator status={saveStatus} lastSaved={lastSaved} onRetry={forceSave} />
         </div>
       )}
+
+      {/* Workspace selector */}
+      <div className="sidebar__workspace-selector">
+        <WorkspaceSelector isCollapsed={!isExpanded} />
+      </div>
 
       {/* Primary buttons section - Main workspace actions */}
       <div className="sidebar__primary-buttons">
