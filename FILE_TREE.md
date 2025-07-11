@@ -41,6 +41,7 @@ AI System Prompt Files
 ├── Backend Implementation Plan.md
 ├── CI CD Guide.md
 ├── Component Structure Guide.md
+├── Current Issues.md
 ├── Data Model Guide.md
 ├── Database Connection Notes.md
 ├── Database Migration Strategy.md
