@@ -3,7 +3,7 @@
 
 .slash-command-menu {
   position: absolute;
-  z-index: 1000;
+  z-index: var(--z-slash-menu);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-12);

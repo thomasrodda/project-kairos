@@ -13,7 +13,7 @@
   cursor: grab;
   opacity: 0;
   transition: var(--animate-opacity), var(--animate-colors);
-  z-index: 10;
+  z-index: var(--z-index-above);
 
   // Subtle fade-in animation when appearing
   animation: none;

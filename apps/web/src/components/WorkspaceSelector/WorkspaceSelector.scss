@@ -64,7 +64,7 @@
   border: 1px solid var(--border-primary);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
-  z-index: 100;
+  z-index: var(--z-index-dropdown);
   overflow: hidden;
 
   &-header {
