@@ -20,6 +20,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { usePageContext } from '../../contexts/PageContext'
 import { SaveStatusIndicator } from '../SaveStatusIndicator'
 import { WorkspaceSelector } from '../WorkspaceSelector'
+import { PageTree } from '../PageTree'
 import './Sidebar.scss'
 
 export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
@@ -100,14 +101,8 @@ export const Sidebar = forwardRef<HTMLElement>((props, ref) => {
         ))}
       </div>
 
-      {/* File tree section - Expandable file/page navigation (placeholder) */}
-      <div className="sidebar__file-tree">
-        {isExpanded && (
-          <div className="sidebar__file-tree-placeholder">
-            <p>File tree will go here</p>
-          </div>
-        )}
-      </div>
+      {/* File tree section - Expandable file/page navigation */}
+      <div className="sidebar__file-tree">{isExpanded && <PageTree />}</div>
 
       {/* Bottom panel section - Elevated secondary actions and settings */}
       <div className="sidebar__bottom-panel">

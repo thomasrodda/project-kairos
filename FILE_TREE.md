@@ -233,6 +233,14 @@ apps
 │   │   │   ├── Editor.test.tsx
 │   │   │   ├── Editor.tsx
 │   │   │   └── index.ts
+│   │   ├── PageTree
+│   │   │   ├── PageTree.scss
+│   │   │   ├── PageTree.test.tsx
+│   │   │   ├── PageTree.tsx
+│   │   │   ├── PageTreeItem.scss
+│   │   │   ├── PageTreeItem.test.tsx
+│   │   │   ├── PageTreeItem.tsx
+│   │   │   └── index.ts
 │   │   ├── PerformanceTest
 │   │   │   └── PerformanceTest.tsx
 │   │   ├── SaveStatusIndicator
@@ -265,6 +273,7 @@ apps
 │   │   ├── EditorContext.test.tsx
 │   │   ├── EditorContext.tsx
 │   │   ├── PageContext.tsx
+│   │   ├── PagesContext.tsx
 │   │   └── WorkspaceContext.tsx
 │   ├── hooks
 │   │   ├── index.ts
@@ -272,7 +281,8 @@ apps
 │   │   ├── useCrossBlockSelection.test.tsx
 │   │   ├── useCrossBlockSelection.ts
 │   │   ├── useDismiss.test.ts
-│   │   └── useDismiss.ts
+│   │   ├── useDismiss.ts
+│   │   └── useToast.tsx
 │   ├── integration
 │   │   ├── Editor.integration.test.tsx
 │   │   └── markdown-detection.test.tsx

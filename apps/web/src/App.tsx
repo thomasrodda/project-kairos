@@ -12,6 +12,8 @@ import { AuthProvider } from './contexts/AuthContext'
 import { BackendHealthProvider } from './contexts/BackendHealthContext'
 import { PageProvider } from './contexts/PageContext'
 import { WorkspaceProvider } from './contexts/WorkspaceContext'
+import { PagesProvider } from './contexts/PagesContext'
+import { ToastProvider } from './hooks/useToast'
 import { BackendHealthCheck } from './components/BackendHealthCheck'
 import { initializeIconPerformance } from '@kairos/ui'
 
@@ -31,42 +33,46 @@ function App() {
       <BackendHealthProvider>
         <BackendHealthCheck>
           <AuthProvider>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+            <ToastProvider>
+              <Routes>
+                {/* Public routes */}
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-              {/* Protected routes */}
-              <Route
-                path="/workspace/new"
-                element={
-                  <ProtectedRoute requireWorkspace={false}>
-                    <WorkspaceCreation />
-                  </ProtectedRoute>
-                }
-              />
+                {/* Protected routes */}
+                <Route
+                  path="/workspace/new"
+                  element={
+                    <ProtectedRoute requireWorkspace={false}>
+                      <WorkspaceCreation />
+                    </ProtectedRoute>
+                  }
+                />
 
-              <Route
-                path="/workspace/:workspaceId?"
-                element={
-                  <ProtectedRoute>
-                    <WorkspaceProvider>
-                      <EditorProvider>
-                        <PageProvider>
-                          <Workspace />
-                          {/* Show performance monitoring in development */}
-                          {process.env.NODE_ENV === 'development' && <PerformanceTest />}
-                        </PageProvider>
-                      </EditorProvider>
-                    </WorkspaceProvider>
-                  </ProtectedRoute>
-                }
-              />
+                <Route
+                  path="/workspace/:workspaceId?/*"
+                  element={
+                    <ProtectedRoute>
+                      <WorkspaceProvider>
+                        <PagesProvider>
+                          <EditorProvider>
+                            <PageProvider>
+                              <Workspace />
+                              {/* Show performance monitoring in development */}
+                              {process.env.NODE_ENV === 'development' && <PerformanceTest />}
+                            </PageProvider>
+                          </EditorProvider>
+                        </PagesProvider>
+                      </WorkspaceProvider>
+                    </ProtectedRoute>
+                  }
+                />
 
-              {/* Default redirect */}
-              <Route path="/" element={<Navigate to="/workspace" replace />} />
-              <Route path="*" element={<Navigate to="/workspace" replace />} />
-            </Routes>
+                {/* Default redirect */}
+                <Route path="/" element={<Navigate to="/workspace" replace />} />
+                <Route path="*" element={<Navigate to="/workspace" replace />} />
+              </Routes>
+            </ToastProvider>
           </AuthProvider>
         </BackendHealthCheck>
       </BackendHealthProvider>

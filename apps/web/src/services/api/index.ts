@@ -37,7 +37,7 @@ export const apiClient = {
   createPage: (workspaceId: string, data: { title: string; parentId?: string }) => pageService.createPage(workspaceId, data),
   updatePage: (id: string, data: { title: string }) => pageService.updatePage(id, data),
   deletePage: (id: string) => pageService.deletePage(id),
-  reorderPages: (data: { pageId: string; newOrder: number }[]) => pageService.reorderPages(data),
+  reorderPages: (pageIds: string[]) => pageService.reorderPages({ pageIds }),
   savePageContent: (pageId: string, data: any) => pageService.savePageContent(pageId, data),
 
   // Block methods

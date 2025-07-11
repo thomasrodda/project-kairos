@@ -129,7 +129,7 @@ export function PageProvider({ children }: PageProviderProps) {
           parentId,
         })
 
-        return response.page
+        return response
       } catch (err) {
         console.error('Failed to create page:', err)
         throw err

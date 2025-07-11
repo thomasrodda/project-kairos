@@ -12,9 +12,12 @@
 // Props: None (pure layout component)
 // State: Error boundary state for each panel
 
-import { Component, ReactNode, useEffect, useRef } from 'react'
+import { Component, ReactNode, useEffect, useRef, forwardRef } from 'react'
+import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom'
 import { Sidebar } from '../Sidebar'
 import { Editor } from '../Editor'
+import { usePageContext } from '../../contexts/PageContext'
+import { usePagesContext } from '../../contexts/PagesContext'
 import './Workspace.scss'
 
 // Error boundary for individual panels
@@ -126,8 +129,53 @@ export function Workspace() {
           </main>
         )}
       >
-        <Editor ref={editorRef} aria-label="Document editor" />
+        <Routes>
+          <Route path="page/:pageId" element={<PageEditor ref={editorRef} />} />
+          <Route path="*" element={<NoPageSelected />} />
+        </Routes>
       </ErrorBoundary>
+    </div>
+  )
+}
+
+// Component for editing a specific page
+const PageEditor = forwardRef<HTMLElement>((props, ref) => {
+  const { pageId } = useParams<{ pageId: string }>()
+  const { loadPage } = usePageContext()
+  const { setSelectedPageId } = usePagesContext()
+
+  useEffect(() => {
+    if (pageId) {
+      loadPage(pageId)
+      setSelectedPageId(pageId)
+    }
+  }, [pageId, loadPage, setSelectedPageId])
+
+  return <Editor ref={ref} aria-label="Document editor" />
+})
+
+PageEditor.displayName = 'PageEditor'
+
+// Component shown when no page is selected
+function NoPageSelected() {
+  const { pages } = usePagesContext()
+  const navigate = useNavigate()
+  const { workspaceId } = useParams<{ workspaceId: string }>()
+
+  useEffect(() => {
+    // If there are pages, navigate to the first one
+    if (pages.length > 0 && workspaceId) {
+      const firstPage = pages.find((p) => !p.isFolder) || pages[0]
+      if (firstPage && !firstPage.isFolder) {
+        navigate(`/workspace/${workspaceId}/page/${firstPage.id}`)
+      }
+    }
+  }, [pages, workspaceId, navigate])
+
+  return (
+    <div className="workspace__no-page">
+      <h2>No page selected</h2>
+      <p>Select a page from the sidebar or create a new one to get started.</p>
     </div>
   )
 }

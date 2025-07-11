@@ -7,6 +7,7 @@ interface Page {
   parentId: string | null
   order: number
   icon: string | null
+  isFolder?: boolean
   createdAt: string
   updatedAt: string
   deletedAt: string | null
@@ -91,14 +92,14 @@ class PageService extends BaseApiClient {
     return this.request<PageResponse>(`/pages?id=${id}`)
   }
 
-  async createPage(workspaceId: string, data: { title: string; parentId?: string }) {
+  async createPage(workspaceId: string, data: { title: string; parentId?: string | null; isFolder?: boolean }) {
     return this.request<{ page: Page }>(`/pages?workspaceId=${workspaceId}`, {
       method: 'POST',
       body: JSON.stringify(data),
-    })
+    }).then((res) => res.page)
   }
 
-  async updatePage(id: string, data: { title: string }) {
+  async updatePage(id: string, data: { title?: string; parentId?: string | null }) {
     return this.request<{ page: Page }>(`/pages?id=${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -111,10 +112,10 @@ class PageService extends BaseApiClient {
     })
   }
 
-  async reorderPages(data: { pageId: string; newOrder: number }[]) {
+  async reorderPages(data: { pageIds: string[] }) {
     return this.request<{ success: boolean }>('/pages/reorder', {
       method: 'PUT',
-      body: JSON.stringify({ pages: data }),
+      body: JSON.stringify(data),
     })
   }
 
