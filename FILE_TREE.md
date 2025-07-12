@@ -61,6 +61,7 @@ AI System Prompt Files
 ├── Security Guide.md
 ├── Slash Command Feature Development.md
 ├── Styling Consistency Review.md
+├── Styling Guide.md
 ├── Test Evaluation Guide.md
 ├── Test Review Checklist.md
 ├── Testing Guide.md
@@ -251,9 +252,6 @@ apps
 │   │   │   ├── PageTreeItem.test.tsx
 │   │   │   ├── PageTreeItem.tsx
 │   │   │   └── index.ts
-│   │   ├── PerformanceTest
-│   │   │   ├── PerformanceTest.scss
-│   │   │   └── PerformanceTest.tsx
 │   │   ├── SaveStatus
 │   │   │   ├── SaveStatus.scss
 │   │   │   ├── SaveStatus.tsx
@@ -306,6 +304,11 @@ apps
 │   │   ├── **mocks**
 │   │   │   └── firebase.ts
 │   │   └── firebase.ts
+│   ├── pages
+│   │   └── StyleGuide
+│   │   ├── StyleGuide.scss
+│   │   ├── StyleGuide.tsx
+│   │   └── index.ts
 │   ├── services
 │   │   ├── **mocks**
 │   │   │   └── api.ts
