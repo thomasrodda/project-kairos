@@ -38,7 +38,7 @@
       var(--animate-colors),
       border var(--speed-fast) var(--ease-smooth);
     padding: var(--spacing-2) var(--spacing-4);
-    margin: var(--spacing-1) 0;
+    margin: var(--spacing-1) var(--spacing-0);
     box-sizing: content-box; // Ensure padding is added to min-height
 
     // Ensure text selection works
@@ -65,7 +65,7 @@
     code {
       font-family: var(--font-family-code);
       background-color: var(--color-surface-elevated-1);
-      padding: 0.125em 0.25em;
+      padding: var(--spacing-2) var(--spacing-4);
       border-radius: var(--radius-2);
       font-size: 0.9em;
     }
@@ -101,10 +101,10 @@
   &--h1 .block__content {
     font-size: var(--font-size-30);
     line-height: var(--line-height-tight);
-    font-weight: 700;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: var(--font-weight-bold);
+    font-family: var(--font-family-primary);
     color: var(--color-text-primary);
-    margin: var(--spacing-32) 0 var(--spacing-16);
+    margin: var(--spacing-32) var(--spacing-0) var(--spacing-16);
     padding: var(--spacing-4) var(--spacing-8);
     min-height: calc(var(--line-height-tight) * 1em); // Match h1 line-height
   }
@@ -112,10 +112,10 @@
   &--h2 .block__content {
     font-size: var(--font-size-24);
     line-height: var(--line-height-tight);
-    font-weight: 700;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: var(--font-weight-bold);
+    font-family: var(--font-family-primary);
     color: var(--color-text-primary);
-    margin: var(--spacing-24) 0 var(--spacing-12);
+    margin: var(--spacing-24) var(--spacing-0) var(--spacing-12);
     padding: var(--spacing-4) var(--spacing-8);
     min-height: calc(var(--line-height-tight) * 1em); // Match h2 line-height
   }
@@ -123,10 +123,10 @@
   &--h3 .block__content {
     font-size: var(--font-size-20);
     line-height: var(--line-height-snug);
-    font-weight: 700;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: var(--font-weight-bold);
+    font-family: var(--font-family-primary);
     color: var(--color-text-primary);
-    margin: var(--spacing-20) 0 var(--spacing-8);
+    margin: var(--spacing-20) var(--spacing-0) var(--spacing-8);
     padding: var(--spacing-4) var(--spacing-8);
     min-height: calc(var(--line-height-snug) * 1em); // Match h3 line-height
   }
@@ -135,9 +135,9 @@
     font-size: var(--font-size-16);
     line-height: var(--line-height-relaxed);
     font-weight: normal;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: var(--font-family-primary);
     color: var(--color-text-primary);
-    margin: var(--spacing-8) 0;
+    margin: var(--spacing-8) var(--spacing-0);
     padding: var(--spacing-2) var(--spacing-8);
   }
 
@@ -157,10 +157,10 @@
     .block__content {
       font-size: var(--font-size-16);
       line-height: var(--line-height-relaxed);
-      font-weight: normal;
-      font-family: 'Inter', system-ui, sans-serif;
+      font-weight: var(--font-weight-normal);
+      font-family: var(--font-family-primary);
       color: var(--color-text-primary);
-      margin: var(--spacing-4) 0;
+      margin: var(--spacing-4) var(--spacing-0);
       flex: 1;
       padding: var(--spacing-2) var(--spacing-4);
     }
@@ -171,13 +171,13 @@
     &--h1 .block__content,
     &--h2 .block__content,
     &--h3 .block__content {
-      margin-top: 0;
+      margin-top: var(--spacing-0);
     }
   }
 
   &:last-child {
     .block__content {
-      margin-bottom: 0;
+      margin-bottom: var(--spacing-0);
     }
   }
 
@@ -193,11 +193,11 @@
 
   .block__content {
     strong {
-      font-weight: 700 !important; // Override block-level font-weight
+      font-weight: var(--font-weight-bold);
     }
 
     em {
-      font-style: italic !important; // Override any font-style reset
+      font-style: italic;
     }
 
     del {
@@ -206,9 +206,9 @@
     }
 
     code {
-      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-family: var(--font-family-code);
       font-size: 0.875em;
-      padding: 0.125em 0.25em;
+      padding: var(--spacing-2) var(--spacing-4);
       background-color: var(--color-surface-elevated-1);
       border-radius: var(--radius-2);
       color: var(--color-text-primary);

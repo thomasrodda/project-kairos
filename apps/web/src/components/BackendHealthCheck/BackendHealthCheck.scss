@@ -7,7 +7,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: var(--spacing-md);
+    gap: var(--spacing-16);
     background-color: var(--color-background);
     color: var(--color-text-secondary);
 
@@ -18,8 +18,8 @@
 
   &__spinner {
     @include spinner;
-    width: 48px;
-    height: 48px;
+    width: var(--spacing-48);
+    height: var(--spacing-48);
   }
 
   &__error {
@@ -28,57 +28,57 @@
     align-items: center;
     justify-content: center;
     background-color: var(--color-background);
-    padding: var(--spacing-md);
+    padding: var(--spacing-16);
   }
 
   &__error-content {
-    max-width: 600px;
+    max-width: var(--width-modal-md);
     background: var(--color-surface);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-xl);
+    border-radius: var(--radius-8);
+    padding: var(--spacing-32);
     box-shadow: var(--shadow-md);
     text-align: center;
 
     h2 {
       font-size: var(--font-size-2xl);
       color: var(--color-error);
-      margin-bottom: var(--spacing-md);
+      margin-bottom: var(--spacing-16);
     }
 
     > p {
       color: var(--color-text-secondary);
       font-size: var(--font-size-md);
-      margin-bottom: var(--spacing-xl);
+      margin-bottom: var(--spacing-32);
     }
   }
 
   &__instructions {
     text-align: left;
     background: var(--color-background);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-xl);
+    border-radius: var(--radius-8);
+    padding: var(--spacing-24);
+    margin-bottom: var(--spacing-32);
 
     h3 {
       font-size: var(--font-size-lg);
       color: var(--color-text-primary);
-      margin-bottom: var(--spacing-sm);
+      margin-bottom: var(--spacing-8);
     }
 
     ol {
       margin: 0;
-      padding-left: var(--spacing-lg);
+      padding-left: var(--spacing-24);
       color: var(--color-text-secondary);
 
       li {
-        margin-bottom: var(--spacing-xs);
+        margin-bottom: var(--spacing-4);
       }
     }
 
     code {
       background: var(--color-surface);
-      padding: 2px 6px;
-      border-radius: var(--radius-sm);
+      padding: var(--spacing-2) var(--spacing-8);
+      border-radius: var(--radius-4);
       font-family: var(--font-family-mono);
       font-size: var(--font-size-sm);
       color: var(--color-text-primary);
@@ -87,7 +87,7 @@
 
   &__retry {
     @include button-primary;
-    padding: var(--spacing-sm) var(--spacing-lg);
+    padding: var(--spacing-8) var(--spacing-24);
 
     &:disabled {
       opacity: 0.6;

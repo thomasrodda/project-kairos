@@ -40,8 +40,8 @@
   }
 
   &__toggle {
-    width: 32px;
-    height: 32px;
+    width: var(--size-button-md);
+    height: var(--size-button-md);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -168,8 +168,8 @@
   }
 
   &__user-avatar {
-    width: 32px;
-    height: 32px;
+    width: var(--size-button-md);
+    height: var(--size-button-md);
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
@@ -178,8 +178,8 @@
   }
 
   &__user-avatar-placeholder {
-    width: 32px;
-    height: 32px;
+    width: var(--size-button-md);
+    height: var(--size-button-md);
     border-radius: 50%;
     background-color: var(--color-surface-elevated-1);
     display: flex;
@@ -225,7 +225,7 @@
   // RESPONSIVE ADJUSTMENTS
   // =============================================================================
 
-  @media (max-width: 768px) {
+  @media (max-width: #{var(--breakpoint-md)}) {
     position: fixed;
     top: 0;
     left: 0;

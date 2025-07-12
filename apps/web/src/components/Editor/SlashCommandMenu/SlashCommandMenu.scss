@@ -8,10 +8,10 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-12);
   box-shadow: var(--shadow-dropdown);
-  min-width: 200px;
-  max-width: 300px;
+  min-width: var(--width-dropdown-min);
+  max-width: var(--width-dropdown-max);
   overflow: hidden;
-  transform: translateY(calc(-100% - 8px)); // Position above with 8px gap
+  transform: translateY(calc(-100% - var(--spacing-8))); // Position above with spacing-8 gap
 
   &__search {
     padding: var(--spacing-8) var(--spacing-12);
@@ -30,7 +30,7 @@
   }
 
   &__options {
-    max-height: 300px;
+    max-height: var(--width-dropdown-max); // Using dropdown max width for consistency
     overflow-y: auto;
     padding: var(--spacing-4);
   }
@@ -47,7 +47,7 @@
     font: var(--text-ui-label-md);
     color: var(--text-primary);
     cursor: pointer;
-    transition: background-color 0.1s ease;
+    transition: background-color var(--speed-fast) var(--ease-smooth);
     text-align: left;
 
     &:focus {

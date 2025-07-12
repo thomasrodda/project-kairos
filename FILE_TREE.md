@@ -166,6 +166,9 @@ apps
 ├── src
 │   ├── components
 │   │   ├── Auth
+│   │   │   ├── GoogleLogo
+│   │   │   │   ├── GoogleLogo.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── Login
 │   │   │   │   ├── Login.scss
 │   │   │   │   ├── Login.test.tsx
@@ -249,6 +252,7 @@ apps
 │   │   │   ├── PageTreeItem.tsx
 │   │   │   └── index.ts
 │   │   ├── PerformanceTest
+│   │   │   ├── PerformanceTest.scss
 │   │   │   └── PerformanceTest.tsx
 │   │   ├── SaveStatus
 │   │   │   ├── SaveStatus.scss

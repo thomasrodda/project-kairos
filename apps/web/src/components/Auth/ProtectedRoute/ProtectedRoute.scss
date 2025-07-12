@@ -11,9 +11,9 @@
   }
 
   &__spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid var(--color-border);
+    width: var(--size-button-lg);
+    height: var(--size-button-lg);
+    border: var(--spacing-2) solid var(--color-border);
     border-top-color: var(--color-primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;

@@ -3,7 +3,7 @@
 .page-tree-item {
   display: flex;
   align-items: center;
-  min-height: 32px;
+  min-height: var(--size-button-md);
   padding: var(--spacing-xs) var(--spacing-md);
   padding-left: var(--spacing-md);
   cursor: pointer;
@@ -35,9 +35,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    padding: 0;
+    width: var(--size-icon-md);
+    height: var(--size-icon-md);
+    padding: var(--spacing-0);
     border: none;
     background: transparent;
     color: var(--color-text-secondary);
@@ -50,8 +50,8 @@
     }
 
     svg {
-      width: 12px;
-      height: 12px;
+      width: var(--size-icon-xs);
+      height: var(--size-icon-xs);
       transform: rotate(-90deg);
       transition: transform var(--transition-fast);
     }
@@ -62,14 +62,14 @@
   }
 
   &__expand-placeholder {
-    width: 20px;
-    height: 20px;
+    width: var(--size-icon-md);
+    height: var(--size-icon-md);
     flex-shrink: 0;
   }
 
   &__icon {
-    width: 16px;
-    height: 16px;
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
     color: var(--color-text-secondary);
     flex-shrink: 0;
   }
@@ -85,7 +85,7 @@
 
   &__edit-input {
     flex: 1;
-    padding: 2px 4px;
+    padding: var(--spacing-2) var(--spacing-4);
     background: var(--color-surface);
     border: 1px solid var(--color-primary);
     border-radius: var(--border-radius-sm);
@@ -140,6 +140,6 @@
   &__context-menu-divider {
     height: 1px;
     background-color: var(--color-border);
-    margin: var(--spacing-xs) 0;
+    margin: var(--spacing-xs) var(--spacing-0);
   }
 }

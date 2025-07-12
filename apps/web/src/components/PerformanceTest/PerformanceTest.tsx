@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Icon, iconPerformanceMonitor, CRITICAL_ICONS, IMPORTANT_ICONS } from '@kairos/ui'
 import type { IconName, IconLoadMetrics } from '@kairos/ui'
+import './PerformanceTest.scss'
 
 export function PerformanceTest() {
   const [showMetrics, setShowMetrics] = useState(false)
@@ -21,80 +22,49 @@ export function PerformanceTest() {
   }
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-border)',
-        borderRadius: '8px',
-        padding: '16px',
-        zIndex: 9999,
-        maxWidth: '400px',
-        fontSize: '12px',
-      }}
-    >
-      <h4 style={{ margin: '0 0 12px 0' }}>Icon Performance Test</h4>
+    <div className="performance-test">
+      <h4 className="performance-test__title">Icon Performance Test</h4>
 
-      <div style={{ marginBottom: '12px' }}>
-        <strong>Critical Icons:</strong>
-        <div style={{ display: 'flex', gap: '4px', margin: '4px 0' }}>
+      <div className="performance-test__section">
+        <strong className="performance-test__label">Critical Icons:</strong>
+        <div className="performance-test__icon-list">
           {CRITICAL_ICONS.map((icon: IconName) => (
             <Icon key={icon} name={icon} size={16} />
           ))}
         </div>
       </div>
 
-      <div style={{ marginBottom: '12px' }}>
-        <strong>Important Icons:</strong>
-        <div style={{ display: 'flex', gap: '4px', margin: '4px 0' }}>
+      <div className="performance-test__section">
+        <strong className="performance-test__label">Important Icons:</strong>
+        <div className="performance-test__icon-list">
           {IMPORTANT_ICONS.map((icon: IconName) => (
             <Icon key={icon} name={icon} size={16} />
           ))}
         </div>
       </div>
 
-      <button
-        onClick={() => setShowMetrics(!showMetrics)}
-        style={{
-          background: 'var(--color-primary-500)',
-          color: 'white',
-          border: 'none',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          fontSize: '12px',
-          marginBottom: '8px',
-        }}
-      >
+      <button onClick={() => setShowMetrics(!showMetrics)} className="performance-test__toggle-button">
         {showMetrics ? 'Hide' : 'Show'} Metrics
       </button>
 
       {showMetrics && (
-        <div>
-          <p>
+        <div className="performance-test__metrics">
+          <p className="performance-test__metrics-stat">
             <strong>Total loaded:</strong> {metrics.length}
           </p>
-          <p>
+          <p className="performance-test__metrics-stat">
             <strong>Avg load time:</strong> {iconPerformanceMonitor.getAverageLoadTime().toFixed(2)}ms
           </p>
-          <p>
+          <p className="performance-test__metrics-stat">
             <strong>Cache hit rate:</strong> {(iconPerformanceMonitor.getCacheHitRate() * 100).toFixed(1)}%
           </p>
 
           {metrics.length > 0 && (
-            <details style={{ marginTop: '8px' }}>
+            <details className="performance-test__metrics-details">
               <summary>Recent loads</summary>
-              <div style={{ maxHeight: '200px', overflow: 'auto', marginTop: '4px' }}>
+              <div className="performance-test__metrics-list">
                 {metrics.slice(-10).map((metric, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      padding: '2px 0',
-                      borderBottom: '1px solid var(--color-border)',
-                      fontSize: '10px',
-                    }}
-                  >
+                  <div key={i} className="performance-test__metrics-item">
                     {metric.iconName}: {metric.loadTime.toFixed(1)}ms
                     {metric.cacheHit && ' (cached)'}
                     {metric.error && ' (error)'}
