@@ -87,7 +87,7 @@
   // Removed global focus outline that was causing purple borders on all elements
 
   // Responsive behavior
-  @media (max-width: 768px) {
+  @media (width <= 768px) {
     // Stack layout on mobile if needed
     // For now, maintain side-by-side but adjust proportions
     .workspace__panel--sidebar {
@@ -95,7 +95,7 @@
     }
   }
 
-  @media (max-width: 480px) {
+  @media (width <= 480px) {
     // Even narrower sidebar on very small screens
     .workspace__panel--sidebar {
       width: 120px;

@@ -277,11 +277,12 @@ apps
 │   │   │   ├── Workspace.test.tsx
 │   │   │   ├── Workspace.tsx
 │   │   │   └── index.ts
-│   │   └── WorkspaceSelector
-│   │   ├── WorkspaceSelector.scss
-│   │   ├── WorkspaceSelector.test.tsx
-│   │   ├── WorkspaceSelector.tsx
-│   │   └── index.ts
+│   │   ├── WorkspaceSelector
+│   │   │   ├── WorkspaceSelector.scss
+│   │   │   ├── WorkspaceSelector.test.tsx
+│   │   │   ├── WorkspaceSelector.tsx
+│   │   │   └── index.ts
+│   │   └── component-template.scss
 │   ├── contexts
 │   │   ├── AuthContext.tsx
 │   │   ├── BackendHealthContext.tsx

@@ -253,6 +253,142 @@ For detailed status, see [# Current State.md](AI System Prompt Files/# Current S
 - No inline styles unless dynamic
 - Meaningful component and variable names
 
+## 🎨 Styling Guidelines
+
+### Required Token Usage
+
+**ALWAYS use CSS custom properties (design tokens) for the following:**
+
+#### Colors
+
+- Text: `var(--color-text-primary)`, `var(--color-text-secondary)`, etc.
+- Backgrounds: `var(--color-surface)`, `var(--color-surface-hover)`, etc.
+- Borders: `var(--color-border)`, `var(--color-border-hover)`, etc.
+- Brand colors: `var(--color-primary-*)`, `var(--color-accent-*)`, etc.
+- Semantic colors: `var(--color-success)`, `var(--color-error)`, etc.
+
+#### Spacing
+
+- Padding/Margin: `var(--spacing-xs)` through `var(--spacing-2xl)`
+- Gap: `var(--spacing-*)` for flex/grid gaps
+- Common values:
+  ```scss
+  var(--spacing-xs)   // 4px
+  var(--spacing-sm)   // 8px
+  var(--spacing-12)   // 12px
+  var(--spacing-md)   // 16px
+  var(--spacing-lg)   // 24px
+  var(--spacing-xl)   // 32px
+  ```
+
+#### Typography
+
+- Font sizes: `var(--font-size-12)` through `var(--font-size-32)`
+- Font weights: `var(--font-weight-regular)`, `var(--font-weight-medium)`, `var(--font-weight-bold)`
+- Font families: `var(--font-family-primary)`, `var(--font-family-mono)`
+- Line heights: `var(--line-height-tight)`, `var(--line-height-normal)`, etc.
+
+#### Layout & Dimensions
+
+- Z-index: `var(--z-index-dropdown)`, `var(--z-index-modal)`, etc.
+- Icon sizes: `var(--size-icon-sm)`, `var(--size-icon-md)`, etc.
+- Component sizes: `var(--size-button-md)`, `var(--width-sidebar-expanded)`, etc.
+- Shadows: `var(--shadow-sm)`, `var(--shadow-md)`, `var(--shadow-lg)`
+- Border radius: `var(--radius-sm)`, `var(--radius-md)`, `var(--radius-lg)`
+
+#### Animations
+
+- Durations: `var(--duration-fast)`, `var(--duration-normal)`, `var(--duration-slow)`
+- Easing: `var(--easing-standard)`, `var(--easing-decelerate)`, `var(--easing-accelerate)`
+
+### Unit Guidelines
+
+- **Typography & Spacing**: Use `rem` for scalable values
+- **Borders**: Use `px` for precise 1px borders
+- **Responsive widths**: Use `%` or viewport units (`vw`, `vh`)
+- **Media queries**: Use `em` for breakpoints
+- **Icon sizes**: Use design tokens, fallback to `px` if needed
+
+### Forbidden Practices
+
+**NEVER use:**
+
+- Hard-coded color values (e.g., `#4285F4`, `rgba(0,0,0,0.1)`)
+  - Exception: Google brand colors documented in GoogleLogo component
+- Magic numbers for spacing (e.g., `12px`, `1.5rem`)
+- Arbitrary z-index values (e.g., `z-index: 100`)
+- `!important` without documenting why it's necessary
+- Inline styles for static values (dynamic values are acceptable)
+
+### Component Styling Pattern
+
+```scss
+// Component: ComponentName
+// Description: Brief description of component purpose
+
+.component-name {
+  // Layout
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+
+  // Sizing
+  width: 100%;
+  min-height: var(--size-button-md);
+
+  // Visual
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+
+  // Typography
+  font-size: var(--font-size-14);
+  color: var(--color-text-primary);
+
+  // Transitions
+  transition: background var(--duration-fast) var(--easing-standard);
+
+  // States
+  &:hover {
+    background: var(--color-surface-hover);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+
+  // Modifiers
+  &--large {
+    padding: var(--spacing-lg);
+    font-size: var(--font-size-16);
+  }
+}
+```
+
+### Linting & Enforcement
+
+Stylelint is configured to enforce design token usage:
+
+- Run `yarn lint:styles` to check style compliance
+- Run `yarn lint:styles:fix` to auto-fix issues
+- Pre-commit hooks run stylelint on all SCSS files
+
+### Quick Reference
+
+| Value Type | Token Pattern      | Example                     |
+| ---------- | ------------------ | --------------------------- |
+| Text color | `--color-text-*`   | `var(--color-text-primary)` |
+| Background | `--color-surface*` | `var(--color-surface)`      |
+| Spacing    | `--spacing-*`      | `var(--spacing-md)`         |
+| Font size  | `--font-size-*`    | `var(--font-size-16)`       |
+| Z-index    | `--z-index-*`      | `var(--z-index-modal)`      |
+| Icon size  | `--size-icon-*`    | `var(--size-icon-md)`       |
+| Shadow     | `--shadow-*`       | `var(--shadow-md)`          |
+| Radius     | `--radius-*`       | `var(--radius-lg)`          |
+
+**Remember**: When in doubt, check existing components or run `yarn lint:styles` to validate your styles!
+
 ## Development Notes
 
 - **WSL Users**: Vite is configured with polling for file watching

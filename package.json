@@ -9,8 +9,10 @@
   "scripts": {
     "dev": "concurrently \"yarn workspace @kairos/web dev\" \"yarn workspace @kairos/api dev\" --names \"web,api\" --prefix-colors \"blue,green\"",
     "build": "yarn workspaces foreach -A run build",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
-    "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix && yarn lint:styles --fix",
+    "lint:check": "eslint . --ext .ts,.tsx,.js,.jsx && yarn lint:styles",
+    "lint:styles": "stylelint '**/*.{scss,css}' --ignore-path .gitignore",
+    "lint:styles:fix": "stylelint '**/*.{scss,css}' --ignore-path .gitignore --fix",
     "typecheck": "yarn workspaces foreach -A run typecheck",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -53,6 +55,9 @@
     "pg": "^8.16.3",
     "postcss": "^8.5.3",
     "prettier": "^3.3.3",
+    "stylelint": "^16.10.0",
+    "stylelint-config-standard-scss": "^13.1.0",
+    "stylelint-declaration-strict-value": "^1.10.6",
     "typescript": "^5.8.3"
   },
   "lint-staged": {
@@ -60,7 +65,11 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,md,scss,css}": [
+    "*.{json,md}": [
+      "prettier --write"
+    ],
+    "*.{scss,css}": [
+      "stylelint --fix",
       "prettier --write"
     ]
   },

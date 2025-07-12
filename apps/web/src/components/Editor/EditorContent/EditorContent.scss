@@ -5,6 +5,7 @@
   max-width: var(--editor-max-width); // Uses 45rem from layout tokens
   margin: 0 auto;
   padding: var(--spacing-32) 0;
+
   // Add left padding to accommodate drag handles
   padding-left: var(--spacing-48); // Space for drag handles that appear at -40px
 
@@ -28,6 +29,7 @@
   &__blocks {
     // Blocks container
     margin-top: var(--spacing-32);
+
     // Add minimum height to ensure click area below blocks
     min-height: 50vh;
 
@@ -43,23 +45,17 @@
 .editor-content {
   // Ensure text selection is allowed
   user-select: text;
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
 
   * {
     user-select: text;
-    -webkit-user-select: text;
   }
 
   // Make sure blocks don't interfere with selection
   .block {
     user-select: text;
-    -webkit-user-select: text;
   }
 
   .block__content {
     user-select: text;
-    -webkit-user-select: text;
   }
 }

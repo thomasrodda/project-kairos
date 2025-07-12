@@ -1,0 +1,106 @@
+{
+  "extends": ["stylelint-config-standard-scss"],
+  "plugins": ["stylelint-declaration-strict-value"],
+  "rules": {
+    "scale-unlimited/declaration-strict-value": [
+      [
+        "/^color/",
+        "/^background/",
+        "/^border(-[a-z]+)?-color/",
+        "/^outline-color/",
+        "/^text-decoration-color/",
+        "fill",
+        "stroke",
+        "/^font-size/",
+        "/^font-weight/",
+        "/^font-family/",
+        "line-height",
+        "letter-spacing",
+        "/^padding/",
+        "/^margin/",
+        "gap",
+        "row-gap",
+        "column-gap",
+        "/^width/",
+        "/^height/",
+        "/^min-/",
+        "/^max-/",
+        "top",
+        "right",
+        "bottom",
+        "left",
+        "z-index",
+        "/^box-shadow/",
+        "/^border(-[a-z]+)?-radius/",
+        "/^transition/",
+        "/^animation/"
+      ],
+      {
+        "ignoreValues": [
+          "inherit",
+          "initial",
+          "unset",
+          "none",
+          "auto",
+          "0",
+          "0px",
+          "1px",
+          "100%",
+          "transparent",
+          "currentColor",
+          "currentcolor",
+          "normal",
+          "ease",
+          "ease-in",
+          "ease-out",
+          "ease-in-out",
+          "linear",
+          "spin",
+          "rotate",
+          "/^-?[0-9]+\\.?[0-9]*(px|em|rem|%|vh|vw|deg|s|ms)?$/",
+          "/^calc\\(/",
+          "/^var\\(--/",
+          "/^\\$/"
+        ],
+        "expandShorthand": true,
+        "recurseLonghand": true
+      }
+    ],
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "scss/dollar-variable-pattern": null,
+    "scss/at-mixin-pattern": null,
+    "scss/at-function-pattern": null,
+    "max-nesting-depth": 4,
+    "selector-max-compound-selectors": 4,
+    "declaration-block-no-redundant-longhand-properties": null,
+    "scss/at-import-partial-extension": null,
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "property-no-vendor-prefix": [
+      true,
+      {
+        "ignoreProperties": ["appearance", "backface-visibility"]
+      }
+    ],
+    "value-no-vendor-prefix": [
+      true,
+      {
+        "ignoreValues": ["box", "inline-box"]
+      }
+    ]
+  },
+  "ignoreFiles": [
+    "**/*.js",
+    "**/*.jsx",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.json",
+    "**/*.md",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/coverage/**"
+  ]
+}

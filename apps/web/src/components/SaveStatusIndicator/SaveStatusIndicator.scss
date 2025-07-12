@@ -60,7 +60,7 @@
   margin-left: var(--spacing-xs);
   padding: var(--spacing-xxs) var(--spacing-xs);
   background-color: transparent;
-  border: 1px solid currentColor;
+  border: 1px solid currentcolor;
   border-radius: var(--radius-xs);
   color: inherit;
   font-size: var(--font-size-xs);
@@ -69,12 +69,12 @@
   transition: all 150ms ease;
 
   &:hover {
-    background-color: currentColor;
+    background-color: currentcolor;
     color: var(--color-bg-primary);
   }
 
   &:focus-visible {
-    outline: 2px solid currentColor;
+    outline: 2px solid currentcolor;
     outline-offset: 2px;
   }
 }
@@ -83,6 +83,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }

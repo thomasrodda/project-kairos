@@ -53,6 +53,7 @@
 
     input {
       @include input-base;
+
       width: 100%;
     }
   }
@@ -69,6 +70,7 @@
 
   &__submit {
     @include button-primary;
+
     width: 100%;
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: var(--font-size-md);

@@ -1,0 +1,206 @@
+// Component: [ComponentName]
+// Description: [Brief description of component purpose and functionality]
+// Usage: Copy this template when creating new components
+// Location: /apps/web/src/components/[FeatureFolder]/[ComponentName]/[ComponentName].scss
+
+// Import any component-specific mixins if needed
+// @import '@kairos/design-tokens/mixins';
+
+.component-name {
+  // ========================================
+  // Layout & Positioning
+  // ========================================
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  position: relative;
+
+  // ========================================
+  // Sizing & Dimensions
+  // ========================================
+  width: 100%;
+  min-height: var(--size-button-md);
+  max-width: var(--width-modal-md); // if applicable
+
+  // ========================================
+  // Visual Styling
+  // ========================================
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm); // if elevated
+
+  // ========================================
+  // Typography
+  // ========================================
+  font-family: var(--font-family-primary);
+  font-size: var(--font-size-14);
+  font-weight: var(--font-weight-regular);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+
+  // ========================================
+  // Transitions & Animations
+  // ========================================
+  transition:
+    background var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard),
+    box-shadow var(--duration-normal) var(--easing-decelerate);
+
+  // ========================================
+  // States
+  // ========================================
+  &:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-border-hover);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // ========================================
+  // Modifiers (BEM)
+  // ========================================
+  &--primary {
+    background: var(--color-primary-500);
+    color: var(--color-text-inverse);
+    border-color: transparent;
+
+    &:hover {
+      background: var(--color-primary-600);
+    }
+  }
+
+  &--large {
+    padding: var(--spacing-lg);
+    font-size: var(--font-size-16);
+    min-height: var(--size-button-lg);
+  }
+
+  &--small {
+    padding: var(--spacing-sm);
+    font-size: var(--font-size-12);
+    min-height: var(--size-button-sm);
+  }
+
+  &--full-width {
+    width: 100%;
+    max-width: none;
+  }
+
+  // ========================================
+  // Child Elements (BEM)
+  // ========================================
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  &__title {
+    font-size: var(--font-size-18);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  &__content {
+    flex: 1;
+    padding: var(--spacing-md) 0;
+  }
+
+  &__footer {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--color-border);
+  }
+
+  &__icon {
+    width: var(--size-icon-md);
+    height: var(--size-icon-md);
+    flex-shrink: 0;
+  }
+
+  // ========================================
+  // Responsive Design
+  // ========================================
+  @include breakpoint-down(sm) {
+    padding: var(--spacing-sm);
+    gap: var(--spacing-sm);
+
+    &__footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  // ========================================
+  // Dark Mode Support (if applicable)
+  // ========================================
+  @media (prefers-color-scheme: dark) {
+    // Dark mode overrides handled by CSS custom properties
+    // Add specific overrides only if needed
+  }
+
+  // ========================================
+  // Print Styles (if applicable)
+  // ========================================
+  @media print {
+    box-shadow: none;
+    border: 1px solid var(--color-neutral-300);
+  }
+}
+
+// ========================================
+// Utility Classes (if needed)
+// ========================================
+.component-name-wrapper {
+  // Container styles if component needs a wrapper
+  padding: var(--spacing-lg);
+}
+
+// ========================================
+// Animation Keyframes (if needed)
+// ========================================
+@keyframes component-name-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-sm));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ========================================
+// Notes & TODOs
+// ========================================
+// - Replace 'component-name' with actual component name using kebab-case
+// - Update all class names following BEM methodology
+// - Remove unused sections and modifiers
+// - Add component-specific design tokens if needed
+// - Ensure all values use design tokens (no hard-coded values)
+// - Test with yarn lint:styles to ensure compliance
+// - Consider accessibility: focus states, color contrast, keyboard navigation
+// - Test responsive behavior across breakpoints
+// - Document any exceptions to design token usage
