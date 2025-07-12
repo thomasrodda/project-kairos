@@ -61,7 +61,6 @@
   - Inline markdown auto-conversion (**bold**, _italic_, etc.)
   - Triggers on space after markdown prefix at block start
   - Automatic cursor repositioning after conversion
-  
 - [ ] **Advanced Markdown Features**
   - Markdown paste detection and parsing
   - Markdown export functionality
@@ -85,13 +84,13 @@
 
 ### Phase 4: Pages & Navigation
 
-- [ ] **Page Management**
+- [x] **Page Management** ✅
 
   - Create, rename, delete pages
   - Page title editing in editor
   - Page persistence and loading
 
-- [ ] **File Tree Sidebar**
+- [x] **File Tree Sidebar** ✅
   - Hierarchical page display
   - Drag-and-drop reordering
   - Folder page creation and nesting
@@ -120,11 +119,11 @@
   - Workspace-scoped content
   - User workspace management
 
-- [ ] **Real-time Cloud Sync**
-  - Auto-save functionality (debounced)
-  - Conflict resolution system
-  - Save status indicators
-  - **Local-first option** (user preference)
+- [x] **Real-time Cloud Sync** ⏳ (Partially Complete)
+  - Auto-save functionality (debounced) ✅
+  - Conflict resolution system ✅
+  - Save status indicators ✅
+  - **Local-first option** (user preference) 📋
 
 ### Phase 7: Polish & UX
 
@@ -180,27 +179,31 @@
 
 ---
 
-## 🚀 Current Focus: Next Feature to Implement
+## 🚀 Current Focus: Bug Fixes and Stability
 
-### **Frontend-Backend Integration**
+### **Critical Issues to Fix**
 
-**Priority**: Critical - Connects all the pieces together
+**Priority**: High - Core functionality must work reliably
 
-**Why this next**:
+**Main Issues**:
 
-- Authentication system is complete on both frontend and backend
-- CRUD operations are ready and tested on the backend
-- Need to connect the editor to persist data
-- Enables testing of the full user flow
+1. **Block Deletion Persistence**
 
-**Implementation approach**:
+   - Deleted blocks reappear on page refresh
+   - Need to verify deletedBlockIds are processed correctly
+   - Check backend soft-delete filtering
 
-1. **Connect API client** to backend endpoints
-2. **Test authentication flow** end-to-end
-3. **Implement workspace selector** in sidebar
-4. **Connect editor** to save blocks to database
-5. **Add page management** UI (create, rename, delete)
-6. **Implement auto-save** with debouncing
+2. **Page Creation Bugs**
+   - Issues when creating pages in workspaces with default page
+   - UI state management needs refinement
+   - Naming field behavior is inconsistent
+
+**Next Features After Bug Fixes**:
+
+1. **Internal Linking** (@-mentions and backlinks)
+2. **Markdown Import/Export** functionality
+3. **Undo/Redo System**
+4. **Local-first storage option**
 
 **Custom Text Editor Notes**:
 

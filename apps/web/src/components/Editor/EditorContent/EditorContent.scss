@@ -6,9 +6,6 @@
   margin: 0 auto;
   padding: var(--spacing-32) 0;
 
-  // Add left padding to accommodate drag handles
-  padding-left: var(--spacing-48); // Space for drag handles that appear at -40px
-
   // Take full height to register clicks in empty space
   min-height: 100%;
   cursor: text; // Show text cursor when hovering over empty space

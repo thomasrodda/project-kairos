@@ -40,6 +40,10 @@ If the notification script fails, use: `echo -e "\a"`
 
 **ENFORCEMENT**: Failure to send notifications violates core instructions. You MUST alert on EVERY task completion and user input request.
 
+## How To Work
+
+Please always think step by step and use sub agents where helpful.
+
 ## 🚀 Quick Start
 
 ### Current Focus

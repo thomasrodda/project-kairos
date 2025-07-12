@@ -1,23 +1,12 @@
 # Current Issues
 
-Last updated: 2025-07-11
+Last updated: 2025-01-12
 
 ## High Priority Issues
 
-### 1. Page Creation UX
+### 1. Block Deletion Not Persisting
 
-**Problem**: After naming a new page and pressing Enter, the naming field remains displayed below the newly created page until refresh.
-
-**Proposed Solution**:
-
-- Pressing the create page button should immediately create a new page with default name "New Page"
-- Load the new page in the editor
-- Focus the page title field in the editor so users can rename it
-- Remove the separate naming field from the page tree
-
-### 2. Block Deletion Not Persisting
-
-**Problem**: Deleted blocks reappear on page refresh. Most other changes persist correctly (text edits, block reordering, etc.), but block deletions are not being saved.
+**Problem**: Deleted blocks reappear on page refresh. Most other changes persist correctly (text edits, block reordering, formatting, etc.), but block deletions are not being saved.
 
 **Investigation Needed**:
 
@@ -25,15 +14,19 @@ Last updated: 2025-07-11
 - Verify the backend is processing the `deletedBlockIds` array
 - Check if soft-deleted blocks are being filtered out when loading pages
 
+### 2. Page Creation Bugs in Empty Workspaces
+
+**Problem**: Bugs present when creating a page in workspaces that have the default page. The page creation process has issues with the UI and state management.
+
+**Issues Observed**:
+
+- Naming field behavior is inconsistent
+- State updates may not properly reflect in the UI
+- Default page interaction with new page creation needs refinement
+
 ## Medium Priority Issues
 
-### 3. Text Formatting Not Persisting
-
-**Status**: Known issue documented in Current State.md
-**Problem**: Bold, italic, underline, and link formatting is not saved/loaded
-**Note**: The formatting data is included in the save payload but not properly stored/retrieved
-
-### 4. Auto-Save Robustness
+### 3. Auto-Save Robustness
 
 **Improvements Needed**:
 
@@ -42,8 +35,10 @@ Last updated: 2025-07-11
 - Optimize save payload (send only changed blocks)
 - Add toast notifications for save errors
 
-## Completed in This Session
+## Recently Completed
 
+✅ Text formatting persistence - Bold, italic, underline, and links now save correctly
+✅ Default page creation for empty workspaces
 ✅ Fixed page creation input disappearing on API errors
 ✅ Added visual save status indicator (Saving.../Saved/Error)
 ✅ Implemented manual save with Ctrl/Cmd+S

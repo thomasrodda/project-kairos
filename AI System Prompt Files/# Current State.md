@@ -27,6 +27,7 @@ This document provides a real-time snapshot of what's built, what's in progress,
 - **Block-level markdown** (# for H1, ## for H2, - for bullets)
 - **Format preservation** during copy/paste operations
 - **Separate formatting layer** (plain text + TextFormat array)
+- **Formatting persistence** to database ✅
 
 ### Backend Infrastructure
 
@@ -77,12 +78,13 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 - **Local PostgreSQL** setup for development
 - **Real API endpoints** replacing mock endpoints
-- **Auto-save functionality** tested for:
+- **Auto-save functionality** working for:
   - Basic text editing within blocks
   - Block reordering via drag-and-drop
+  - Text formatting (bold/italic/underline/links)
 - **Temporary solution** - Supabase will be used in production
 - **Known limitations**:
-  - Text formatting (bold/italic/etc) not yet persisted
+  - Block deletions not persisting
   - Cross-block operations not tested
   - No offline queueing for failed saves
 
@@ -98,18 +100,18 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 ## 🚧 In Progress
 
-### Current Sprint: Default Page Creation
+### Current Sprint: Bug Fixes and Stability
 
-- **Automatic page creation** for empty workspaces
-- **Default "New Page"** with empty paragraph block
-- **Immediate editing** capability for new pages
+- **Fix block deletion persistence** - deleted blocks reappear on refresh
+- **Fix page creation bugs** in empty workspaces
+- **Improve auto-save reliability** for all operations
 
 ## 🐛 Known Issues
 
 ### Editor
 
 1. **Cross-block formatting** not yet supported (formatting only works within single blocks)
-2. **Formatting persistence** - Rich text formatting not saved to database yet
+2. **Block deletion persistence** - Deleted blocks reappear on page refresh
 3. **Undo/redo** not implemented for formatting changes
 
 ### Backend
@@ -120,7 +122,7 @@ This document provides a real-time snapshot of what's built, what's in progress,
 ### Integration
 
 1. **Offline handling** - No offline queue for failed saves
-2. **Empty workspace handling** - New workspaces have no pages, preventing page creation through UI
+2. **Page creation bugs** - Issues when creating pages in workspaces with default page
 
 ## 📊 Test Coverage Status
 
@@ -147,8 +149,8 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 ### Immediate (This Week)
 
-1. Complete default page creation for empty workspaces
-2. Add formatting persistence to database
+1. Fix block deletion persistence issue
+2. Fix page creation bugs in workspaces
 3. Test and fix cross-block operations (selection, copy/paste)
 4. Add offline queue for failed saves
 
