@@ -1,376 +1,504 @@
 # Testing Guide
 
-> Testing strategy for Project Kairos using Jest (unit/component) and Cypress (e2e). Ensures app stability and catches bugs early.
+## ⚠️ CRITICAL: Test Quality Over Quantity
 
-## Core Philosophy
+**STOP! Before writing any test, ask yourself:**
 
-**Write tests to find bugs, not to reach coverage targets.**
+1. What real user bug will this test prevent?
+2. If this test fails, what would break for users?
+3. Am I testing user behavior or implementation details?
 
-We follow the 80/20 rule: 80% of bugs come from 20% of the code. Focus testing effort on high-risk, high-value areas rather than trying to test everything.
+If you can't answer these questions, don't write the test. **Writing tests just to make CI pass is harmful** - it creates false confidence and maintenance burden.
 
-### Testing Pyramid
+## 🎯 Core Testing Philosophy
+
+### The Golden Rule
+
+**Write tests to prevent real bugs that could affect users, not to reach coverage targets.**
+
+Every test you write should have a clear purpose: preventing a specific bug that could impact user experience. If a test doesn't prevent a real bug, it's worse than no test at all.
+
+### Why Tests Fail in CI
+
+Tests often fail in CI (GitHub Actions) but pass locally because:
+
+- **Incomplete mocks** - The mock doesn't match what the real code needs
+- **Environment differences** - CI has no .env files or external services
+- **Timing issues** - CI runners are slower than local machines
+- **Missing dependencies** - Setup files or configurations not properly included
+
+See "Debugging CI Failures" section for solutions.
+
+### Testing Trophy Approach (2025 Best Practice)
+
+We follow Kent C. Dodds' Testing Trophy model: **"Write tests. Not too many. Mostly integration."**
 
 ```
-       /\      E2E Tests (10%)
-      /  \     - Complete user journeys
-     /    \    - Expensive, use sparingly
-    /------\
-   /        \  Integration Tests (20%)
-  /          \ - Component interactions
- /            \- API endpoint testing
-/--------------\
-Unit Tests (70%)
-- Fast, isolated, focused
-- Individual components/functions
+      🏆 E2E Tests (10%)
+    /    \  Critical user journeys
+   /  🔗  \
+  / Integ. \ Integration Tests (60%)
+ /  Tests   \ Component interactions
+/____________\
+  Unit Tests   Unit Tests (30%)
+    (30%)      Isolated logic & utilities
 ```
 
-### What NOT to Test
+### Key Principles
 
-- ❌ React framework internals
-- ❌ Third-party libraries (@dnd-kit, Prisma client)
-- ❌ Simple prop passing or getters/setters
-- ❌ Pure CSS/styling (unless it affects functionality)
-- ❌ Configuration files
-- ❌ Code you didn't write
+1. **Test user behavior, not implementation** - The more your tests resemble how users interact with your app, the more confidence they provide
+2. **Quality over quantity** - One good integration test is worth ten implementation-detail unit tests
+3. **Fix the code, not the tests** - When tests fail, the code is wrong. Never change tests to match broken behavior
+4. **80/20 rule** - 80% of bugs come from 20% of code. Focus testing on high-risk areas
+5. **Business outcomes matter** - Connect test coverage to real metrics (e.g., "This test suite prevents 90% of login issues")
 
-### Risk-Based Testing Priority
+## 🛠️ Testing Stack
 
-#### 🔴 High Priority (Test Thoroughly)
+### Current Tools (What we use now)
 
-- Editor core: typing, formatting, block operations
-- Data persistence and state management
-- Cross-block selection and multi-block operations
-- Keyboard shortcuts and accessibility
-- Any feature that could cause data loss
+- **Jest** - Test runner and assertion library
+- **React Testing Library** - Component testing with user-centric queries
+- **Cypress** - End-to-end testing
+- **Supertest** - API endpoint testing
 
-#### 🟡 Medium Priority (Standard Coverage)
+### Modern Alternatives (Consider for future)
 
-- UI components with complex logic
-- Navigation and routing
-- Form validations
-- Utility functions with business logic
+- **Vitest** - Faster alternative to Jest for Vite projects, with better TypeScript/ESM support
+- **Playwright** - More powerful E2E testing with better performance and debugging
+- **MSW (Mock Service Worker)** - Network-level API mocking for more realistic tests
 
-#### 🟢 Low Priority (Basic Coverage)
+## 📝 How to Write Tests
 
-- Static components
-- Simple display components
-- Helper functions with straightforward logic
+### Test Structure Pattern
 
----
-
-## Test Organization Format
-
-Use **clear headings with checkmarks** for readable terminal output:
+Every component test file MUST include these four categories:
 
 ```typescript
-describe('Component Name', () => {
+describe('ComponentName', () => {
+  // ✅ Core Functionality
   describe('✅ Core Functionality', () => {
-    it('should do specific thing correctly', () => {
-      // Test implementation
-    })
+    test('renders with required props', () => {})
+    test('displays correct initial state', () => {})
   })
 
-  describe('✅ Error Handling', () => {
-    it('should handle invalid input gracefully', () => {
-      // Test implementation
-    })
-  })
-
+  // ✅ User Interactions
   describe('✅ User Interactions', () => {
-    it('should respond to clicks correctly', () => {
-      // Test implementation
-    })
+    test('handles click events correctly', async () => {})
+    test('supports keyboard navigation', async () => {})
   })
 
+  // ✅ Error Handling
+  describe('✅ Error Handling', () => {
+    test('handles invalid props gracefully', () => {})
+    test('shows error state on API failure', async () => {})
+  })
+
+  // ✅ Accessibility
   describe('✅ Accessibility', () => {
-    it('should have proper ARIA labels', () => {
-      // Test implementation
-    })
+    test('has proper ARIA labels', () => {})
+    test('is keyboard navigable', async () => {})
   })
 })
 ```
 
-**Terminal Output Example:**
+### Writing Good Tests
 
-```
-✅ Core Functionality
-  ✓ should render a valid icon with SVG content
-✅ Error Handling
-  ✓ should show fallback when icon loading fails
-```
-
----
-
-## Required Test Categories
-
-Every component needs tests for:
-
-1. **✅ Core Functionality** - Main features, props, rendering
-2. **✅ Error Handling** - Invalid props, network failures, edge cases
-3. **✅ User Interactions** - Clicks, keyboard navigation, hover states
-4. **✅ Accessibility** - ARIA labels, screen readers, keyboard-only navigation
-
----
-
-## When to Write Tests
-
-### Progressive Testing Strategy
-
-1. **Start Small**: Write tests for the happy path first
-2. **Bug-Driven**: When a bug is found, write a test that reproduces it
-3. **Feature-Driven**: Write tests alongside new features
-4. **User-Driven**: Convert user-reported issues into test cases
-
-### Test-Writing Triggers
-
-✅ **Always write a test when:**
-
-- You fix a bug (regression test)
-- You add a new feature
-- You refactor complex logic
-- Users report an issue
-- You find yourself manually testing the same thing repeatedly
-
-⚠️ **Consider skipping a test when:**
-
-- The code is trivial (single line, no logic)
-- It's a pure UI component with no behavior
-- The effort greatly exceeds the risk
-
-## What to Test
-
-### Test Real Behavior (not implementation details)
+#### ✅ DO Test Like a User
 
 ```typescript
-// ✅ Good - Tests actual behavior
-it('should hide button text when sidebar is collapsed', () => {
-  render(<SidebarButton text="Settings" isCollapsed={true} />)
-  expect(screen.queryByText('Settings')).not.toBeInTheDocument()
-})
+// GOOD: Tests what users see and do
+test('user can add item to cart', async () => {
+  render(<ProductCard product={mockProduct} />)
 
-// ❌ Bad - Tests implementation details
-it('should have collapsed class when isCollapsed prop is true', () => {
-  expect(container.firstChild).toHaveClass('sidebar-button--collapsed')
+  const addButton = screen.getByRole('button', { name: /add to cart/i })
+  await userEvent.click(addButton)
+
+  expect(screen.getByText(/added to cart/i)).toBeInTheDocument()
 })
 ```
 
-### Test User Interactions
+#### ❌ DON'T Test Implementation Details
 
 ```typescript
-it('should call onClick when user clicks button', () => {
+// BAD: Tests internal state and methods
+test('clicking button calls handleClick', () => {
   const handleClick = jest.fn()
-  render(<SidebarButton text="Settings" onClick={handleClick} />)
+  render(<Button onClick={handleClick} />)
 
   fireEvent.click(screen.getByRole('button'))
-  expect(handleClick).toHaveBeenCalledTimes(1)
+  expect(handleClick).toHaveBeenCalledTimes(1) // Testing the mock, not the behavior!
 })
 ```
 
----
+### Common Unnecessary Tests to AVOID
 
-## Technical Standards
+**CRITICAL**: These tests add no value and should never be written:
 
-### Mocking Strategy
-
-- **Mock external dependencies** (APIs, complex utilities)
-- **Don't mock** the component being tested or simple utilities
-- Use `console.warn` and `console.error` mocks when needed
-
-### Async Testing
-
-- Use `waitFor` for async operations
-- Test loading states before final states
-- Use `await` for promises
-
-### Accessibility Testing
-
-- Use `screen.getByRole()` when possible
-- Test ARIA labels with `{ name: 'expected label' }`
-- Verify keyboard navigation works
-
----
-
-## File Structure
-
-**Test File Location:** Place next to component
-
-```
-components/Icon/
-├── Icon.tsx
-├── Icon.test.tsx  ← Test file here
-└── index.ts
-```
-
-**Test File Naming:**
-
-- Component tests: `ComponentName.test.tsx`
-- Utility tests: `utilityName.test.ts`
-- Integration tests: `featureName.test.tsx`
-
----
-
-## Running Tests
-
-```bash
-# Test specific component
-yarn workspace @kairos/ui test Icon.test.tsx
-
-# Watch mode for development
-yarn workspace @kairos/ui test --watch Icon.test.tsx
-
-# All tests with coverage
-yarn test:coverage
-
-# E2E tests
-yarn test:e2e
-```
-
-### Performance Standards
-
-- **Unit tests**: < 50ms each
-- **Integration tests**: < 500ms each
-- **E2E tests**: < 5s each
-- **Full suite**: < 2 minutes
-
-💡 **Tip**: Use `test.skip` for slow tests during development, but don't forget to re-enable them!
-
----
-
-## Success Criteria
-
-### Good Test Suite Has:
-
-- ✅ Clear terminal output with checkmark headings
-- ✅ Tests for high-risk areas first
-- ✅ Real user scenarios, not implementation details
-- ✅ Both success and error cases covered
-- ✅ Fast execution (under 2 minutes total)
-- ✅ Follows 70/20/10 testing pyramid
-
-### Quality Checklist:
-
-- [ ] All tests pass on first run
-- [ ] No TypeScript/ESLint errors
-- [ ] Tests cover main user workflows
-- [ ] Error states are tested
-- [ ] Accessibility is verified
-
----
-
-## Example Test File Template
+#### ❌ Component Renders Without Crashing
 
 ```typescript
-// ComponentName.test.tsx
-import { render, screen, fireEvent } from '@testing-library/react'
-import { ComponentName } from './ComponentName'
-
-describe('Component Name', () => {
-  describe('✅ Core Functionality', () => {
-    it('should render basic content correctly', () => {
-      render(<ComponentName />)
-      expect(screen.getByText('Expected Text')).toBeInTheDocument()
-    })
-  })
-
-  describe('✅ User Interactions', () => {
-    it('should respond to clicks', () => {
-      const handleClick = jest.fn()
-      render(<ComponentName onClick={handleClick} />)
-      fireEvent.click(screen.getByRole('button'))
-      expect(handleClick).toHaveBeenCalled()
-    })
-  })
-
-  describe('✅ Error Handling', () => {
-    it('should handle invalid props gracefully', () => {
-      render(<ComponentName invalidProp="test" />)
-      expect(screen.getByText('Fallback Content')).toBeInTheDocument()
-    })
-  })
-
-  describe('✅ Accessibility', () => {
-    it('should have proper ARIA labels', () => {
-      render(<ComponentName aria-label="Custom Label" />)
-      expect(screen.getByRole('button', { name: 'Custom Label' })).toBeInTheDocument()
-    })
-  })
+// UNNECESSARY: Too basic, provides no value
+test('renders without crashing', () => {
+  render(<MyComponent />)
+  // This test is pointless - if it crashes, other tests will fail anyway
 })
 ```
 
-This approach ensures reliable, user-friendly, and maintainable code with clear feedback about what's working.
-
----
-
-## Integration Testing Patterns
-
-### When to Use Integration Tests
-
-- Testing data flow between parent/child components
-- Testing state management with multiple components
-- Testing API endpoints with database
-- Testing complex user workflows
-
-### Example: Editor Integration Test
+#### ❌ Props Are Passed Correctly
 
 ```typescript
-describe('Editor Integration', () => {
-  it('should maintain formatting when moving blocks', async () => {
-    const { user } = render(<Editor />)
-
-    // Type and format text
-    await user.type(screen.getByRole('textbox'), 'Hello world')
-    await user.keyboard('{Control>}a{/Control}')
-    await user.keyboard('{Control>}b{/Control}')
-
-    // Move block
-    const dragHandle = screen.getByLabelText('Drag handle')
-    await user.drag(dragHandle, screen.getByTestId('drop-zone-2'))
-
-    // Verify formatting preserved
-    expect(screen.getByText('Hello world')).toHaveStyle('font-weight: bold')
-  })
+// UNNECESSARY: Testing React, not your code
+test('passes props to child component', () => {
+  const { container } = render(<Parent text="hello" />)
+  expect(container.querySelector('.child')).toHaveTextContent('hello')
+  // Just test the end result users see, not prop passing
 })
 ```
 
----
-
-## Common Testing Scenarios
-
-### Testing Async Operations
+#### ❌ State Updates Correctly
 
 ```typescript
-// ✅ Good - Properly waits for async operations
-it('should save data after debounce', async () => {
-  render(<AutoSaveEditor />)
-  await user.type(screen.getByRole('textbox'), 'New content')
+// UNNECESSARY: Testing React's useState, not your app
+test('updates state when button clicked', () => {
+  // Don't test that setState was called
+  // Test what the user sees after the state change
+})
+```
+
+#### ❌ CSS Classes or Styles
+
+```typescript
+// UNNECESSARY: Implementation detail that changes often
+test('has correct CSS class', () => {
+  render(<Button variant="primary" />)
+  expect(screen.getByRole('button')).toHaveClass('btn-primary')
+  // Test behavior, not styling implementation
+})
+```
+
+#### ❌ Mocking Everything
+
+```typescript
+// UNNECESSARY: Over-mocked test that tests nothing real
+test('calls API when form submitted', () => {
+  const mockApi = jest.fn()
+  render(<Form onSubmit={mockApi} />)
+  fireEvent.submit(screen.getByRole('form'))
+  expect(mockApi).toHaveBeenCalled()
+  // You're testing your mock, not the actual behavior!
+})
+```
+
+### Tests That MUST Be Written
+
+#### ✅ User Workflows
+
+```typescript
+// NECESSARY: Tests actual user journey
+test('user can complete checkout process', async () => {
+  // Add item to cart
+  // Go to checkout
+  // Fill in details
+  // Verify order confirmation appears
+})
+```
+
+#### ✅ Error Handling
+
+```typescript
+// NECESSARY: Users need to see errors
+test('shows error message when payment fails', async () => {
+  mockPaymentAPI.mockRejectedValue(new Error('Card declined'))
+
+  await userEvent.click(screen.getByRole('button', { name: /pay now/i }))
+
+  expect(screen.getByText(/payment failed/i)).toBeInTheDocument()
+})
+```
+
+#### ✅ Data Integrity
+
+```typescript
+// NECESSARY: Ensures user data isn't lost
+test('auto-saves draft when user types', async () => {
+  await userEvent.type(screen.getByRole('textbox'), 'Important notes')
 
   // Wait for debounce
   await waitFor(() => {
-    expect(mockSave).toHaveBeenCalledWith('New content')
-  }, { timeout: 1000 })
-})
-```
-
-### Testing Error States
-
-```typescript
-// ✅ Good - Tests actual user impact of errors
-it('should show retry button when save fails', async () => {
-  mockSave.mockRejectedValue(new Error('Network error'))
-  render(<AutoSaveEditor />)
-
-  await user.type(screen.getByRole('textbox'), 'Content')
-
-  await waitFor(() => {
-    expect(screen.getByRole('button', { name: 'Retry save' })).toBeInTheDocument()
+    expect(mockSaveAPI).toHaveBeenCalledWith({ content: 'Important notes' })
   })
 })
 ```
 
----
+### Query Priority (Use in this order)
 
-## Related Documentation
+1. **getByRole** - How screen readers see your app
+2. **getByLabelText** - For form elements
+3. **getByPlaceholderText** - When label isn't visible
+4. **getByText** - For non-interactive elements
+5. **getByDisplayValue** - Current value of form elements
+6. **getByAltText** - For images
+7. **getByTitle** - Last resort
+8. **getByTestId** - Only when nothing else works
 
-- **[Test Evaluation Guide.md](./Test Evaluation Guide.md)** - Detailed guidelines for evaluating test quality
-- **[Test Review Checklist.md](./Test Review Checklist.md)** - Complete inventory of all tests in the project
-- **[Editor Testing Plan.md](./Editor Testing Plan.md)** - Comprehensive test coverage for the editor
+### Async Testing Pattern
+
+```typescript
+// Always use userEvent over fireEvent for realistic interactions
+import userEvent from '@testing-library/user-event'
+
+test('async form submission', async () => {
+  const user = userEvent.setup()
+  render(<ContactForm />)
+
+  await user.type(screen.getByLabelText(/email/i), 'user@example.com')
+  await user.click(screen.getByRole('button', { name: /submit/i }))
+
+  // Wait for async operations
+  await waitFor(() => {
+    expect(screen.getByText(/thank you/i)).toBeInTheDocument()
+  })
+})
+```
+
+### Mocking Strategy
+
+#### When to Mock
+
+- External services (APIs, databases)
+- Browser APIs not available in tests
+- Modules with side effects
+- Time-dependent operations
+
+#### When NOT to Mock
+
+- The component you're testing
+- Child components (test integration)
+- Utility functions
+- State management
+
+#### Mock Example
+
+```typescript
+// Mock only external dependencies
+jest.mock('@/services/api', () => ({
+  fetchUser: jest.fn(() => Promise.resolve({ id: 1, name: 'Test User' })),
+}))
+
+// Or use MSW for more realistic API mocking (recommended)
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+
+const server = setupServer(
+  rest.get('/api/user/:id', (req, res, ctx) => {
+    return res(ctx.json({ id: req.params.id, name: 'Test User' }))
+  })
+)
+```
+
+### Common Mock Pitfalls (That Break CI)
+
+#### ❌ Incomplete Transaction Mocks
+
+```typescript
+// BAD: Incomplete mock that will fail in CI
+mockPrisma.$transaction.mockImplementation(async (callback) => {
+  const tx = {
+    page: { findFirst: jest.fn() },
+    block: { findMany: jest.fn() },
+    // Missing contentVersion! Will cause "Cannot read properties of undefined"
+  }
+  return callback(tx)
+})
+```
+
+#### ✅ Complete Transaction Mocks
+
+```typescript
+// GOOD: Complete mock that matches actual Prisma structure
+mockPrisma.$transaction.mockImplementation(async (callback) => {
+  const tx = {
+    page: mockPrisma.page,
+    block: mockPrisma.block,
+    contentVersion: mockPrisma.contentVersion, // Include ALL models used
+    // Or spread all models: ...mockPrisma
+  }
+  return callback(tx)
+})
+```
+
+**Key Rule**: If your test fails with "Cannot read properties of undefined" in CI but works locally, you probably have an incomplete mock. Always mock the full structure that the real code expects.
+
+## 🎯 What to Test (Risk-Based Approach)
+
+### High Priority (Test Extensively)
+
+- **Authentication & Authorization** - Security is critical
+- **Payment Processing** - Financial data must be correct
+- **Data Persistence** - User work must not be lost
+- **Core User Flows** - Primary app functionality
+
+### Medium Priority (Good Coverage)
+
+- **Form Validation** - Prevent bad data
+- **Error States** - Users need feedback
+- **Edge Cases** - Boundary conditions
+- **Performance-Critical Paths** - Slow = unusable
+
+### Low Priority (Basic Tests)
+
+- **Static Content** - Rarely changes
+- **Style-Only Components** - Visual regression tests better
+- **Third-Party Integrations** - Test the integration, not the library
+
+## 📊 Coverage Guidelines
+
+### Meaningful Metrics
+
+Instead of chasing percentage targets, measure:
+
+- **Bug Prevention Rate**: How many production bugs do tests catch?
+- **Test Stability**: How often do tests fail for non-bug reasons?
+- **Maintenance Cost**: Time spent fixing tests vs preventing bugs
+- **User Journey Coverage**: Are all critical paths tested?
+
+### Coverage Targets (Guidelines, not rules)
+
+- **Critical Paths**: 70%+ coverage (auth, payments, data)
+- **Core Features**: 60%+ coverage
+- **UI Components**: 50%+ coverage
+- **Utilities**: 80%+ coverage (pure functions are easy to test)
+
+Remember: 100% coverage with bad tests is worse than 60% coverage with good tests.
+
+## 🚀 Running Tests
+
+### Commands
+
+```bash
+# Run all tests
+yarn test
+
+# Watch mode for development
+yarn test:watch
+
+# Coverage report
+yarn test:coverage
+
+# Run specific test file
+yarn test ComponentName.test.tsx
+
+# Run tests matching pattern
+yarn test --testNamePattern="should handle errors"
+
+# Run only changed files
+yarn test --onlyChanged
+```
+
+### Performance Tips
+
+- Run tests in parallel: `yarn test --maxWorkers=4`
+- Use `test.only` when debugging specific tests
+- Skip slow E2E tests locally: `yarn test --testPathIgnorePatterns=e2e`
+
+### Debugging CI Failures
+
+When tests fail in GitHub Actions but pass locally:
+
+1. **Check the CI logs carefully**
+
+   ```bash
+   # Look for specific error messages
+   # "Cannot read properties of undefined" = incomplete mock
+   # "Connection refused" = service not started
+   # "Timeout" = async operation took too long
+   ```
+
+2. **Run tests exactly like CI**
+
+   ```bash
+   # CI runs with specific flags
+   yarn test --coverage --passWithNoTests
+   ```
+
+3. **Common CI-specific issues**
+
+   - **Environment variables**: CI may not have .env files
+   - **Timing issues**: CI runners are slower, increase timeouts
+   - **Mock completeness**: Ensure all dependencies are mocked
+   - **Database/service connections**: CI has no external services
+
+4. **Fix strategies**
+   - Add `--passWithNoTests` flag if some test suites are empty
+   - Increase timeouts for async operations in CI environment
+   - Ensure all mocks match the real implementation structure
+   - Check that setup files are properly configured in jest.config.js
+
+## 🤖 AI-Friendly Test Patterns
+
+When writing tests that AI assistants will work with:
+
+1. **Clear Test Names**: Describe the scenario and expected outcome
+
+   ```typescript
+   test('displays error message when API returns 404', async () => {})
+   ```
+
+2. **Self-Documenting Structure**: Use consistent patterns
+
+   ```typescript
+   // Arrange - Set up test conditions
+   const mockData = { id: 1, name: 'Test' }
+
+   // Act - Perform the action
+   render(<Component data={mockData} />)
+
+   // Assert - Check the outcome
+   expect(screen.getByText('Test')).toBeInTheDocument()
+   ```
+
+3. **Business Context**: Include comments about why this test matters
+   ```typescript
+   // This test prevents issue #123 where users lost data on network errors
+   test('auto-saves draft when network fails', async () => {})
+   ```
+
+## 🔍 Test Quality Checklist
+
+Before submitting tests, verify:
+
+- [ ] **Tests fail when code is broken** - Break the code and ensure test catches it
+- [ ] **Tests pass consistently** - Run 10 times, should pass 10 times
+- [ ] **Tests run fast** - Under 100ms for unit, under 1s for integration
+- [ ] **Tests are readable** - Another developer can understand without explanation
+- [ ] **Tests prevent real bugs** - Each test stops a specific user-facing issue
+- [ ] **Tests use semantic queries** - getByRole > getByTestId
+- [ ] **Tests handle async properly** - waitFor, userEvent, async/await used correctly
+- [ ] **Tests include accessibility** - Keyboard navigation and ARIA tested
+
+## 📚 Additional Resources
+
+### Internal Docs
+
+- [Test Inventory.md](Test Inventory.md) - Current test status and quality metrics
+- [Quick Commands.md](Quick Commands.md) - All testing commands reference
+
+### External Resources
+
+- [Testing Library Docs](https://testing-library.com/) - Query best practices
+- [Jest Documentation](https://jestjs.io/) - Assertion matchers
+- [Cypress Best Practices](https://docs.cypress.io/guides/references/best-practices) - E2E patterns
+- [MSW Documentation](https://mswjs.io/) - Modern API mocking
+
+## 🎓 Key Takeaways for AI Assistants
+
+When writing or reviewing tests:
+
+1. **Always test from the user's perspective** - If a user can't do it, don't test it
+2. **Integration > Unit** - One good integration test beats many unit tests
+3. **Mock sparingly** - Only mock what you must (external services)
+4. **Make tests fail first** - Ensure they catch real bugs before making them pass
+5. **Keep tests maintainable** - Clear, simple tests are better than clever ones
+6. **Connect to business value** - Every test should prevent a real user issue
+
+Remember: The goal is not to have tests, but to have confidence that the application works correctly for users.

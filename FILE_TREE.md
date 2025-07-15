@@ -45,7 +45,6 @@ AI System Prompt Files
 ├── Data Model Guide.md
 ├── Database Connection Notes.md
 ├── Database Migration Strategy.md
-├── Editor Testing Plan.md
 ├── Enhanced Custom Editor Plan.md
 ├── Environment Setup Guide.md
 ├── Error Handling Guide.md
@@ -62,10 +61,8 @@ AI System Prompt Files
 ├── Slash Command Feature Development.md
 ├── Styling Consistency Review.md
 ├── Styling Guide.md
-├── Test Evaluation Guide.md
-├── Test Review Checklist.md
+├── Test Inventory.md
 ├── Testing Guide.md
-├── Testing Todo List.md
 ├── Text Formatting Plan.md
 └── Troubleshooting Guide.md
 apps

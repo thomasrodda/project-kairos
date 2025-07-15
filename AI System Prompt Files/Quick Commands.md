@@ -93,7 +93,7 @@ yarn workspace @kairos/api test
 cat "AI System Prompt Files/# Current State.md"     # Current status
 cat "AI System Prompt Files/# 0. INDEX.md"          # Doc index
 cat FILE_TREE.md                                    # File structure
-cat "AI System Prompt Files/Editor Testing Plan.md" # Test status
+cat "AI System Prompt Files/Test Inventory.md"     # Test status
 
 # Check environment
 node --version            # Should be 22+

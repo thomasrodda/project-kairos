@@ -97,10 +97,8 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 ### Implementation Guides
 
 - **[Component Structure Guide.md](AI System Prompt Files/Component Structure Guide.md)** - React patterns
-- **[Testing Guide.md](AI System Prompt Files/Testing Guide.md)** - Test patterns
-- **[Test Evaluation Guide.md](AI System Prompt Files/Test Evaluation Guide.md)** - Test quality guidelines
-- **[Test Review Checklist.md](AI System Prompt Files/Test Review Checklist.md)** - Test inventory & tracking
-- **[Editor Testing Plan.md](AI System Prompt Files/Editor Testing Plan.md)** - Editor test coverage
+- **[Testing Guide.md](AI System Prompt Files/Testing Guide.md)** - Comprehensive testing strategy and patterns
+- **[Test Inventory.md](AI System Prompt Files/Test Inventory.md)** - Current test status and quality tracking
 - **[Text Formatting Plan.md](AI System Prompt Files/Text Formatting Plan.md)** - Rich text implementation
 - **[Backend Api Guide.md](AI System Prompt Files/Backend Api Guide.md)** - API design
 - **[Data Model Guide.md](AI System Prompt Files/Data Model Guide.md)** - Database schema
@@ -239,15 +237,13 @@ For detailed status, see [# Current State.md](AI System Prompt Files/# Current S
 
 ### Testing Guidelines
 
-- Use checkmark headings format (✅ Core Functionality)
-- Write tests so that they correctly test the app, and not just so they pass
-- Write tests using modern 2025 best practices
-- Test user behavior, not implementation details
-- Include edge cases and error scenarios
-- Mock external dependencies appropriately
+See [Testing Guide.md](AI System Prompt Files/Testing Guide.md) for comprehensive testing strategy and patterns.
+
+**Quick reminders:**
+
+- Test user behavior, not implementation
 - Run `yarn test` before committing
-- **Review test quality** using Test Evaluation Guide.md
-- **Track test reviews** with Test Review Checklist.md
+- Use the 4-category test structure (Core, Interactions, Errors, A11y)
 
 ### Code Style
 
@@ -440,5 +436,5 @@ cat "AI System Prompt Files/# 0. INDEX.md"
 cat FILE_TREE.md
 
 # Test coverage status
-cat "AI System Prompt Files/Editor Testing Plan.md"
+cat "AI System Prompt Files/Test Inventory.md"
 ```

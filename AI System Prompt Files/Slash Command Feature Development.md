@@ -18,7 +18,7 @@ The slash command feature allows users to quickly change block types by typing "
 - [x] Added auto-dismiss when typing non-slash characters
 - [x] Created comprehensive test suites (31 tests total)
 - [x] Added focus restoration when cancelling with ESC
-- [x] Updated documentation (Current State.md, Editor Testing Plan.md, Development Plan.md)
+- [x] Updated documentation (Current State.md, Test Inventory.md, Development Plan.md)
 
 ### Basic Functionality
 
@@ -148,7 +148,7 @@ The slash command feature allows users to quickly change block types by typing "
 - [# 2. User Stories.md](./# 2. User Stories.md) - See "Changing block type via slash command"
 - [Component Structure Guide.md](./Component Structure Guide.md) - Component patterns
 - [Testing Guide.md](./Testing Guide.md) - Testing best practices
-- [Editor Testing Plan.md](./Editor Testing Plan.md) - Full test coverage
+- [Test Inventory.md](./Test Inventory.md) - Full test coverage
 
 ## 📝 Notes
 
