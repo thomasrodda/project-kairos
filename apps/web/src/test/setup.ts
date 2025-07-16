@@ -1,6 +1,24 @@
 // apps/web/src/test/setup.ts
 import '@testing-library/jest-dom'
 
+// Polyfill TextEncoder/TextDecoder for Node.js environment
+if (typeof TextEncoder === 'undefined') {
+  global.TextEncoder = class TextEncoder {
+    encode(input: string): Uint8Array {
+      const buffer = Buffer.from(input, 'utf-8')
+      return new Uint8Array(buffer)
+    }
+  } as any
+}
+
+if (typeof TextDecoder === 'undefined') {
+  global.TextDecoder = class TextDecoder {
+    decode(input: Uint8Array): string {
+      return Buffer.from(input).toString('utf-8')
+    }
+  } as any
+}
+
 // Mock import.meta.env for Vite environment variables
 ;(global as any).import = {
   meta: {
