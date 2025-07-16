@@ -5,7 +5,7 @@
 ### Overall Metrics
 
 - **Total Tests**: 300+ passing
-- **Average Quality Score**: 11.9/20 (critical improvement needed - was grossly overestimated at 19.1/20)
+- **Average Quality Score**: 12.4/20 (improving - ContentEditableContainer now at 16/20)
 - **Test Execution Time**: ~15 seconds for full suite
 - **Framework**: Jest + React Testing Library + Cypress
 - **Major Issues Found**: Widespread use of fireEvent, testing implementation details, missing accessibility tests
@@ -24,7 +24,7 @@
 | Component                         | Tests | Quality | Status        | Notes                                                          |
 | --------------------------------- | ----- | ------- | ------------- | -------------------------------------------------------------- |
 | Block.test.tsx                    | 31    | 19/20   | ✅ Excellent  | User-focused tests with userEvent, comprehensive a11y coverage |
-| ContentEditableContainer.test.tsx | 26    | 12/20   | ⚠️ Needs Work | fireEvent, no accessibility, tests state not UI                |
+| ContentEditableContainer.test.tsx | 24    | 16/20   | ✅ Good       | User-focused tests with userEvent, good accessibility coverage |
 | DraggableBlock.test.tsx           | 16    | 19/20   | ✅ Good       | Solid drag behavior, minor a11y improvements                   |
 | Editor.test.tsx                   | 32    | 8/20    | 🔴 Poor       | Tests implementation not behavior, empty test sections         |
 | EditorContent.test.tsx            | 9     | 8/20    | 🔴 Poor       | fireEvent, querySelector, tests implementation details         |
@@ -144,7 +144,18 @@
    - Removed redundant setup/teardown
    - Optimized mock implementations
 
-### Latest Improvement (Today)
+### Latest Improvements
+
+**ContentEditableContainer.test.tsx Major Refactor** (24 tests, 16/20 quality)
+
+- ✅ Replaced all `fireEvent` with `userEvent` for realistic interactions
+- ✅ Removed tests checking state instead of user-visible behavior
+- ✅ Added comprehensive accessibility tests (keyboard nav, focus management)
+- ✅ Removed skipped undo/redo tests (feature not implemented)
+- ✅ Simplified complex test helpers - removed manual DOM manipulation
+- ✅ Added error handling tests (XSS prevention, special characters)
+- ✅ Tests now focus on user behavior through store interactions
+- ✅ All tests passing with modern testing practices
 
 **Block.test.tsx Complete Rewrite** (31 tests, 19/20 quality)
 
