@@ -74,7 +74,7 @@ yarn typecheck    # Check TypeScript types
 
 Project Kairos is a creative writing and worldbuilding web application designed for novelists, writers, and D&D campaign planners. It combines block-based editing with AI-driven tools for consistency checking and writing assistance.
 
-**Current Status**: Block editor fully functional with drag-and-drop, cross-block selection, slash commands, text formatting (bold, italic, underline, links), keyboard shortcuts (Ctrl/Cmd+B/I/U/K), inline markdown auto-conversion, and block-level markdown (# for H1, ## for H2, - for bullets). Database migration Phase 1 complete with auto-save working for text editing and block reordering.
+**Current Status**: Block editor fully functional with drag-and-drop, cross-block selection, slash commands, text formatting (bold, italic, underline, links), keyboard shortcuts (Ctrl/Cmd+B/I/U/K), inline markdown auto-conversion, and block-level markdown (# for H1, ## for H2, - for bullets). Database migration Phase 1 complete with auto-save working for text editing, block reordering, and block deletion (fixed January 17, 2025).
 
 ## 🗺️ Document Navigation
 
@@ -222,8 +222,9 @@ For detailed status, see [# Current State.md](AI System Prompt Files/# Current S
 - ✅ Test coverage: 300+ tests passing across all components
 - ✅ Block-level markdown complete (# to H1, ## to H2, - to bullets)
 - ✅ Database migration Phase 1 complete (local PostgreSQL)
-- ✅ Auto-save working for text editing and block reordering
-- 📋 Next: Default page creation, formatting persistence
+- ✅ Auto-save working for text editing, block reordering, and block deletion
+- ✅ Block deletion persistence fixed (January 17, 2025)
+- 📋 Next: Page creation bugs, component library, style guide enhancements
 
 ## Development Best Practices
 

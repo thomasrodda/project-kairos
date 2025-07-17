@@ -142,6 +142,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         })
 
         if (blocksToDelete.length !== data.deletedBlockIds.length) {
+          console.error('Invalid delete block IDs:', {
+            requested: data.deletedBlockIds,
+            found: blocksToDelete.map((b) => b.id),
+            difference: data.deletedBlockIds.filter((id) => !blocksToDelete.find((b) => b.id === id)),
+          })
           throw new Error('INVALID_DELETE_BLOCK_IDS')
         }
 

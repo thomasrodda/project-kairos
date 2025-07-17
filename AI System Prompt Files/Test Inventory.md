@@ -60,6 +60,14 @@
 | AuthContext.test.tsx   | -     | -       | 🔄 Planned | Needs implementation                               |
 | ThemeContext.test.tsx  | 8     | 18/20   | ✅ Good    | Basic coverage                                     |
 
+### Custom Hooks
+
+| Hook                             | Tests | Quality | Status     | Notes                                                       |
+| -------------------------------- | ----- | ------- | ---------- | ----------------------------------------------------------- |
+| useAutoSave.integration.test.tsx | 2     | 17/20   | ✅ Good    | Tests block deletion tracking, validates fix (Jan 17, 2025) |
+| useCrossBlockSelection           | -     | -       | 🔄 Planned | Needs testing                                               |
+| useDismiss                       | -     | -       | 🔄 Planned | Needs testing                                               |
+
 ### Backend/API
 
 | Endpoint        | Tests | Quality | Status        | Notes                                                |

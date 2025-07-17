@@ -82,10 +82,10 @@ This document provides a real-time snapshot of what's built, what's in progress,
   - Basic text editing within blocks
   - Block reordering via drag-and-drop
   - Text formatting (bold/italic/underline/links)
+  - ✅ Block deletions (FIXED January 17, 2025)
 - **Temporary solution** - Supabase will be used in production
 - **Known limitations**:
-  - Block deletions not persisting
-  - Cross-block operations not tested
+  - Cross-block operations not fully tested
   - No offline queueing for failed saves
 
 ### Design System & Styling (Phase 2) ✅ NEW
@@ -121,7 +121,7 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 ### Next Sprint: Bug Fixes and Stability
 
-- **Fix block deletion persistence** - deleted blocks reappear on refresh
+- ✅ **Fix block deletion persistence** - COMPLETED (January 17, 2025)
 - **Fix page creation bugs** in empty workspaces
 - **Improve auto-save reliability** for all operations
 
@@ -130,7 +130,7 @@ This document provides a real-time snapshot of what's built, what's in progress,
 ### Editor
 
 1. **Cross-block formatting** not yet supported (formatting only works within single blocks)
-2. **Block deletion persistence** - Deleted blocks reappear on page refresh
+2. ~~**Block deletion persistence**~~ - ✅ FIXED: Deleted blocks now properly persist (January 17, 2025)
 3. **Undo/redo** not implemented for formatting changes
 
 ### Backend
@@ -189,7 +189,16 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 ## 📝 Development Notes
 
-### Recent Changes (January 13, 2025)
+### Recent Changes (January 17, 2025)
+
+- ✅ Fixed block deletion persistence issue
+- ✅ Implemented proper deletion tracking in useAutoSave hook
+- ✅ Added comparison against last saved state (not just previous render)
+- ✅ Fixed page change detection to prevent clearing deletions on re-renders
+- ✅ Tested multiple deletion scenarios (single, multiple, cross-save, cross-page)
+- ✅ Backend properly soft-deletes blocks and filters them on retrieval
+
+### Previous Changes (January 13, 2025)
 
 - ✅ Created interactive Style Guide accessible via Ctrl+Shift+S
 - ✅ Implemented spacing examples with visual representation

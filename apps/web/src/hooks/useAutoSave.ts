@@ -46,6 +46,10 @@ export function useAutoSave({
 
   // Track deleted block IDs since last save
   const deletedBlockIdsRef = useRef<Set<string>>(new Set())
+  // Track the blocks state at the last successful save
+  const lastSavedBlocksRef = useRef<any[]>(blocks)
+  // Track the previous blocks array to detect deletions
+  const previousBlocksRef = useRef<any[]>(blocks)
 
   // Retry queue for failed saves
   const retryCountRef = useRef(0)
@@ -87,7 +91,12 @@ export function useAutoSave({
         }
 
         // Log what we're sending
-        console.log('Sending save data:', JSON.stringify(saveData, null, 2))
+        console.log('Sending save data:', {
+          title: saveData.title,
+          blocksCount: saveData.blocks.length,
+          deletedBlockIds: saveData.deletedBlockIds,
+          blocks: saveData.blocks.map((b) => ({ id: b.id, content: b.content.substring(0, 30) + '...' })),
+        })
 
         // Call API
         const response = await apiClient.savePageContent(pageId, saveData)
@@ -104,6 +113,10 @@ export function useAutoSave({
         deletedBlockIdsRef.current.clear()
         retryCountRef.current = 0
         saveCountRef.current++
+
+        // Update the last saved blocks reference to the current saved state
+        lastSavedBlocksRef.current = blocks
+        previousBlocksRef.current = blocks
 
         // Update editor state
         dispatch({ type: 'MARK_SAVED' })
@@ -187,10 +200,47 @@ export function useAutoSave({
     await performSave()
   }, [performSave])
 
+  // Track the current page ID to detect changes
+  const currentPageIdRef = useRef(pageId)
+
+  // Reset tracking when page changes
+  useEffect(() => {
+    if (currentPageIdRef.current !== pageId) {
+      // Page actually changed
+      deletedBlockIdsRef.current.clear()
+      lastSavedBlocksRef.current = blocks
+      previousBlocksRef.current = blocks
+      currentPageIdRef.current = pageId
+      console.log('Page changed, resetting deletion tracking')
+    }
+  }, [pageId, blocks])
+
   // Track deleted blocks
   useEffect(() => {
-    // This would need to be implemented with a more sophisticated state tracking
-    // For now, we'll rely on the API to handle soft deletes
+    // Skip if we just loaded a new page
+    if (previousBlocksRef.current.length === 0 && blocks.length > 0) {
+      previousBlocksRef.current = blocks
+      lastSavedBlocksRef.current = blocks
+      return
+    }
+
+    // Clear existing deletions and recalculate from last saved state
+    deletedBlockIdsRef.current.clear()
+
+    // Compare current blocks with last saved blocks to find ALL deletions since last save
+    const currentBlockIds = new Set(blocks.map((block: any) => block.id))
+    const lastSavedBlockIds = new Set(lastSavedBlocksRef.current.map((block: any) => block.id))
+
+    // Find blocks that were in last saved state but not in current
+    lastSavedBlockIds.forEach((id) => {
+      if (!currentBlockIds.has(id)) {
+        deletedBlockIdsRef.current.add(id)
+        console.log('Block deleted since last save:', id)
+      }
+    })
+
+    // Update the previous blocks reference
+    previousBlocksRef.current = blocks
   }, [blocks])
 
   // Trigger auto-save when content changes
