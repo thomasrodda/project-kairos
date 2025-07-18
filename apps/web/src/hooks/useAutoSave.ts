@@ -2,7 +2,7 @@
 // Auto-save hook that implements debounced saving with retry logic
 // Saves after 2 seconds of inactivity or maximum 30 seconds during continuous typing
 
-import { useRef, useCallback, useEffect } from 'react'
+import { useRef, useCallback, useEffect, useState } from 'react'
 import { useEditor } from '../contexts/EditorContext'
 import { apiClient } from '../services/api'
 
@@ -34,8 +34,8 @@ export function useAutoSave({
   const { state, dispatch } = useEditor()
   const { pageTitle, blocks, isDirty, lastSaved: lastSavedFromState } = state
 
-  // Track save status
-  const saveStatusRef = useRef<SaveStatus>('idle')
+  // Track save status - use state for status to trigger re-renders
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
   const lastSavedRef = useRef<Date | null>(lastSavedFromState)
   const saveCountRef = useRef(0)
 
@@ -56,20 +56,15 @@ export function useAutoSave({
   const maxRetries = 3
   const retryDelayMs = 1000 // Start with 1 second, exponential backoff
 
-  // Get the current save status
-  const getSaveStatus = useCallback(() => saveStatusRef.current, [])
-
   // Save function
   const performSave = useCallback(
     async (isRetry = false) => {
-      console.log('performSave called', { pageId, isDirty, isRetry })
       if (!pageId || !isDirty) {
-        console.log('performSave: Skipping save', { pageId, isDirty })
         return
       }
 
       // Set saving status
-      saveStatusRef.current = 'saving'
+      setSaveStatus('saving')
       onSaveStart?.()
 
       try {
@@ -108,7 +103,7 @@ export function useAutoSave({
         }
 
         // Update state on success
-        saveStatusRef.current = 'saved'
+        setSaveStatus('saved')
         lastSavedRef.current = new Date(response.savedAt)
         deletedBlockIdsRef.current.clear()
         retryCountRef.current = 0
@@ -123,7 +118,7 @@ export function useAutoSave({
         onSaveSuccess?.()
       } catch (error) {
         console.error('Auto-save failed:', error)
-        saveStatusRef.current = 'error'
+        setSaveStatus('error')
 
         // Retry logic
         if (!isRetry && retryCountRef.current < maxRetries) {
@@ -246,7 +241,10 @@ export function useAutoSave({
   // Trigger auto-save when content changes
   useEffect(() => {
     if (isDirty && pageId) {
-      console.log('useAutoSave: Content changed, triggering debounced save', { isDirty, pageId })
+      // Set status back to idle when content becomes dirty
+      if (saveStatus === 'saved') {
+        setSaveStatus('idle')
+      }
       debouncedSave()
     }
 
@@ -259,7 +257,7 @@ export function useAutoSave({
         clearTimeout(maxDelayTimerRef.current)
       }
     }
-  }, [isDirty, pageId, debouncedSave])
+  }, [isDirty, pageId, debouncedSave, saveStatus])
 
   // Save on page unload (beforeunload)
   useEffect(() => {
@@ -280,7 +278,7 @@ export function useAutoSave({
   }, [isDirty, pageId, forceSave])
 
   return {
-    saveStatus: getSaveStatus(),
+    saveStatus,
     lastSaved: lastSavedRef.current,
     forceSave,
   }

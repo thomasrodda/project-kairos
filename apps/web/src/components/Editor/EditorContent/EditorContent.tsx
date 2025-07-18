@@ -19,7 +19,6 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSo
 import { useEditorState, useEditorDispatch } from '../../../contexts/EditorContext'
 import { useDismiss, useCrossBlockSelection } from '../../../hooks'
 import { PageTitle } from '../PageTitle'
-import { SaveStatus } from '../../SaveStatus'
 import { usePageContext } from '../../../contexts/PageContext'
 import { DraggableBlock } from '../Block/DraggableBlock'
 import { Block } from '../Block'
@@ -31,7 +30,7 @@ export function EditorContent() {
   const editorState = useEditorState()
   const dispatch = useEditorDispatch()
   const { pageTitle, blocks, focusedBlockId, selectedBlockIds, crossBlockSelection } = editorState
-  const { saveStatus, forceSave } = usePageContext()
+  const { forceSave } = usePageContext()
   const editorRef = useRef<HTMLDivElement>(null)
   const contentEditableRef = useRef<HTMLDivElement>(null)
   const formattingToolbarRef = useRef<HTMLDivElement>(null)
@@ -363,7 +362,6 @@ export function EditorContent() {
         {/* Page title - always visible and editable */}
         <div className="editor-content__header">
           <PageTitle title={pageTitle} />
-          <SaveStatus status={saveStatus} className="editor-content__save-status" />
         </div>
 
         {/* All blocks in a single contentEditable container */}

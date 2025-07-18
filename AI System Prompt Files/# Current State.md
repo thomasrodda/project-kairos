@@ -2,7 +2,7 @@
 
 This document provides a real-time snapshot of what's built, what's in progress, and known issues.
 
-**Last Updated**: January 13, 2025 (Style Guide Implementation)
+**Last Updated**: January 18, 2025 (Save Status Indicator Update)
 
 ## ✅ Completed Features
 
@@ -53,7 +53,7 @@ This document provides a real-time snapshot of what's built, what's in progress,
 - **Health check** system with auto-retry
 - **Token refresh** logic with 5-minute buffer
 - **Auto-save integration** with debouncing and retry
-- **Save status indicators** in sidebar
+- **Save status indicator** at top of editor (shows "All changes saved" or "Unsaved changes")
 - **Workspace management** system with UI selector ✅ NEW
 
 ### Workspace Management (Phase 4.2)
@@ -189,7 +189,16 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 ## 📝 Development Notes
 
-### Recent Changes (January 17, 2025)
+### Recent Changes (January 18, 2025)
+
+- ✅ Moved save status indicator from sidebar to top center of editor
+- ✅ Simplified save indicator to show "All changes saved" or "Unsaved changes"
+- ✅ Removed animated icons - text only display
+- ✅ Fixed issue where save status would get stuck on "Saving..."
+- ✅ Converted useAutoSave hook from refs to state for proper re-renders
+- ✅ Made indicator subtle with semi-transparent background
+
+### Previous Changes (January 17, 2025)
 
 - ✅ Fixed block deletion persistence issue
 - ✅ Implemented proper deletion tracking in useAutoSave hook

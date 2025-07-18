@@ -1,9 +1,19 @@
 .editor {
   flex: 1;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   overflow-y: auto;
   padding: var(--spacing-64);
+  position: relative;
+
+  &__save-indicator {
+    position: fixed;
+    top: var(--spacing-16);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: var(--z-index-dropdown);
+  }
 
   &__content {
     width: 100%;
