@@ -5,6 +5,8 @@
 
 import { useRef, useEffect, useState } from 'react'
 import { useEditorDispatch } from '../../../contexts/EditorContext'
+import { usePageContext } from '../../../contexts/PageContext'
+import { usePagesContext } from '../../../contexts/PagesContext'
 import './PageTitle.scss'
 
 interface PageTitleProps {
@@ -13,6 +15,8 @@ interface PageTitleProps {
 
 export function PageTitle({ title }: PageTitleProps) {
   const dispatch = useEditorDispatch()
+  const { currentPage } = usePageContext()
+  const { updatePageLocally } = usePagesContext()
   const titleRef = useRef<HTMLHeadingElement>(null)
   const [isUpdating, setIsUpdating] = useState(false)
 
@@ -32,6 +36,11 @@ export function PageTitle({ title }: PageTitleProps) {
     setIsUpdating(true)
     const newTitle = e.currentTarget.textContent || ''
     dispatch({ type: 'UPDATE_TITLE', title: newTitle })
+
+    // Also update the page in PagesContext for sidebar sync
+    if (currentPage?.id) {
+      updatePageLocally(currentPage.id, { title: newTitle })
+    }
 
     // Reset updating flag after a short delay
     setTimeout(() => setIsUpdating(false), 10)

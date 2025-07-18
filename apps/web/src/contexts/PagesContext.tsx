@@ -31,6 +31,7 @@ interface PagesContextType {
   fetchPages: () => Promise<void>
   createPage: (title: string, parentId?: string | null, isFolder?: boolean) => Promise<Page | null>
   updatePage: (id: string, data: { title?: string; parentId?: string | null }) => Promise<boolean>
+  updatePageLocally: (id: string, data: { title?: string }) => void
   deletePage: (id: string) => Promise<boolean>
   reorderPages: (pageIds: string[]) => Promise<boolean>
   togglePageExpanded: (pageId: string) => void
@@ -199,6 +200,24 @@ export function PagesProvider({ children }: PagesProviderProps) {
     [fetchPages, showToast]
   )
 
+  // Update page properties locally without API call
+  const updatePageLocally = useCallback((id: string, data: { title?: string }) => {
+    setPages((prevPages) => {
+      const updatePageInTree = (pages: PageWithChildren[]): PageWithChildren[] => {
+        return pages.map((page) => {
+          if (page.id === id) {
+            return { ...page, ...data }
+          }
+          if (page.children?.length) {
+            return { ...page, children: updatePageInTree(page.children) }
+          }
+          return page
+        })
+      }
+      return updatePageInTree(prevPages)
+    })
+  }, [])
+
   // Delete a page
   const deletePage = useCallback(
     async (id: string): Promise<boolean> => {
@@ -350,6 +369,7 @@ export function PagesProvider({ children }: PagesProviderProps) {
     fetchPages,
     createPage,
     updatePage,
+    updatePageLocally,
     deletePage,
     reorderPages,
     togglePageExpanded,

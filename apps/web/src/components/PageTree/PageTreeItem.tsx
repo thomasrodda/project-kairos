@@ -25,7 +25,7 @@ interface PageTreeItemProps {
 }
 
 export function PageTreeItem({ page, level, isSelected, onSelect }: PageTreeItemProps) {
-  const { expandedPageIds, togglePageExpanded, updatePage, deletePage, createPage, selectedPageId } = usePagesContext()
+  const { expandedPageIds, togglePageExpanded, updatePage, updatePageLocally, deletePage, createPage, selectedPageId } = usePagesContext()
 
   const [isEditing, setIsEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(page.title)
@@ -86,11 +86,14 @@ export function PageTreeItem({ page, level, isSelected, onSelect }: PageTreeItem
     const trimmedTitle = editTitle.trim()
 
     if (trimmedTitle && trimmedTitle !== page.title) {
+      // Update locally first for immediate feedback
+      updatePageLocally(page.id, { title: trimmedTitle })
+      // Then update via API
       await updatePage(page.id, { title: trimmedTitle })
     }
 
     setIsEditing(false)
-  }, [page.id, page.title, editTitle, updatePage])
+  }, [page.id, page.title, editTitle, updatePage, updatePageLocally])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {

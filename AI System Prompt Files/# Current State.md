@@ -2,7 +2,7 @@
 
 This document provides a real-time snapshot of what's built, what's in progress, and known issues.
 
-**Last Updated**: January 18, 2025 (Save Status Indicator Update)
+**Last Updated**: January 18, 2025 (Real-time Page Name Sync)
 
 ## ✅ Completed Features
 
@@ -72,6 +72,10 @@ This document provides a real-time snapshot of what's built, what's in progress,
 - **Page CRUD operations** via UI (create, rename, delete) ✅ NEW
 - **Page routing** with URL-based navigation ✅ NEW
 - **Empty state handling** with call-to-action ✅ NEW
+- **Real-time page name synchronization** between editor and sidebar ✅ NEW
+  - Instant updates in both directions without refresh
+  - Local state updates for immediate feedback
+  - Auto-save handles API persistence
 - **Comprehensive test coverage** (30+ tests passing) ✅ NEW
 
 ### Database Migration (Phase 1) ✅ NEW
@@ -142,6 +146,7 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 1. **Offline handling** - No offline queue for failed saves
 2. **Page creation bugs** - Issues when creating pages in workspaces with default page
+3. ~~**Page name sync requires refresh**~~ - ✅ FIXED: Page names now sync in real-time between editor and sidebar (January 18, 2025)
 
 ## 📊 Test Coverage Status
 

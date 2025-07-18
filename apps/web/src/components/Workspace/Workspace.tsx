@@ -18,6 +18,7 @@ import { Sidebar } from '../Sidebar'
 import { Editor } from '../Editor'
 import { usePageContext } from '../../contexts/PageContext'
 import { usePagesContext } from '../../contexts/PagesContext'
+import { useEditor } from '../../contexts/EditorContext'
 import './Workspace.scss'
 
 // Error boundary for individual panels
@@ -142,7 +143,8 @@ export function Workspace() {
 const PageEditor = forwardRef<HTMLElement>((props, ref) => {
   const { pageId } = useParams<{ pageId: string }>()
   const { loadPage } = usePageContext()
-  const { setSelectedPageId } = usePagesContext()
+  const { setSelectedPageId, getPageById } = usePagesContext()
+  const { dispatch } = useEditor()
 
   useEffect(() => {
     if (pageId) {
@@ -150,6 +152,14 @@ const PageEditor = forwardRef<HTMLElement>((props, ref) => {
       setSelectedPageId(pageId)
     }
   }, [pageId, loadPage, setSelectedPageId])
+
+  // Watch for title changes from sidebar
+  const currentPage = getPageById(pageId || '')
+  useEffect(() => {
+    if (currentPage?.title) {
+      dispatch({ type: 'UPDATE_TITLE', title: currentPage.title })
+    }
+  }, [currentPage?.title, dispatch])
 
   return <Editor ref={ref} aria-label="Document editor" />
 })
