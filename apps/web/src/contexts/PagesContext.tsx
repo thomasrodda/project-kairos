@@ -344,6 +344,33 @@ export function PagesProvider({ children }: PagesProviderProps) {
           const response = await pageService.getPages(selectedWorkspace.id)
           const pageTree = buildPageTree(response.pages)
           setPages(pageTree)
+
+          // Auto-expand parent folders will be handled when selectedPageId is set
+
+          // If we already have a selectedPageId (set by PageEditor), expand its parents
+          if (selectedPageId) {
+            const expandParents = (pages: PageWithChildren[], targetId: string, path: string[] = []): string[] | null => {
+              for (const page of pages) {
+                if (page.id === targetId) {
+                  return path
+                }
+                if (page.children?.length) {
+                  const result = expandParents(page.children, targetId, [...path, page.id])
+                  if (result) return result
+                }
+              }
+              return null
+            }
+
+            const parentPath = expandParents(pageTree, selectedPageId)
+            if (parentPath && parentPath.length > 0) {
+              setExpandedPageIds((prev) => {
+                const newSet = new Set(prev)
+                parentPath.forEach((id) => newSet.add(id))
+                return newSet
+              })
+            }
+          }
         } catch (err) {
           console.error('Failed to fetch pages:', err)
           setError('Failed to load pages')
@@ -358,7 +385,7 @@ export function PagesProvider({ children }: PagesProviderProps) {
       setSelectedPageId(null)
       setExpandedPageIds(new Set())
     }
-  }, [selectedWorkspace?.id, buildPageTree])
+  }, [selectedWorkspace?.id, buildPageTree, selectedPageId])
 
   const value: PagesContextType = {
     pages,

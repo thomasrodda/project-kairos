@@ -7,19 +7,33 @@
   padding: var(--spacing-4) var(--spacing-8);
   cursor: pointer;
   user-select: none;
-  transition: background-color var(--transition-fast);
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast);
   border-radius: var(--radius-4);
+  margin-bottom: 2px;
+  border-left: 3px solid transparent;
+  padding-left: calc(var(--spacing-8) - 3px);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 
   &:hover {
-    background-color: var(--color-surface-hover);
+    background-color: var(--color-hover);
   }
 
   &--selected {
     background-color: var(--color-active);
+    border-left-color: var(--color-primary);
 
     .page-tree-item__title {
       color: var(--color-text-primary);
       font-weight: var(--font-weight-medium);
+    }
+
+    .page-tree-item__icon {
+      color: var(--color-primary);
     }
   }
 

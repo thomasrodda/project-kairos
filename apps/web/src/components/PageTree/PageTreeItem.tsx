@@ -148,7 +148,8 @@ export function PageTreeItem({ page, level, isSelected, onSelect }: PageTreeItem
     }
   }, [page.id, isExpanded, createPage, togglePageExpanded])
 
-  const indent = level * 20
+  const baseIndent = 8 - 3 // Account for 3px border
+  const indent = baseIndent + level * 20
 
   return (
     <>

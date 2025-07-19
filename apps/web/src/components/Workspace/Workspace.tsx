@@ -148,7 +148,9 @@ const PageEditor = forwardRef<HTMLElement>((props, ref) => {
 
   useEffect(() => {
     if (pageId) {
+      // Load the page content
       loadPage(pageId)
+      // Sync the sidebar selection with the current page
       setSelectedPageId(pageId)
     }
   }, [pageId, loadPage, setSelectedPageId])
