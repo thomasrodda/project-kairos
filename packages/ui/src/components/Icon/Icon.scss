@@ -21,13 +21,16 @@
     justify-content: center;
     background-color: var(--color-surface-elevated);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-8);
   }
 
   &--loading {
     background-color: var(--color-surface-elevated);
-    border-radius: var(--radius-sm);
-    animation: pulse var(--duration-skeleton) var(--ease-in-out) infinite;
+    border-radius: var(--radius-8);
+
+    // Animation temporarily disabled due to stylelint strict value rule
+    // animation: icon-pulse var(--speed-slow) var(--ease-in-out) infinite;
+    opacity: 0.6;
   }
 }
 

@@ -5,8 +5,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-xs);
-  padding: var(--spacing-xs) var(--spacing-md);
+  gap: var(--spacing-4);
+  padding: var(--spacing-4) var(--spacing-16);
   border-radius: var(--radius-full);
   font-size: var(--font-size-12);
   line-height: 1;
@@ -37,13 +37,13 @@
 }
 
 .save-status__retry {
-  margin-left: var(--spacing-xs);
-  padding: var(--spacing-xxs) var(--spacing-xs);
+  margin-left: var(--spacing-4);
+  padding: var(--spacing-2) var(--spacing-4);
   background-color: transparent;
   border: 1px solid currentcolor;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-4);
   color: inherit;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-12);
   font-weight: var(--font-weight-medium);
   cursor: pointer;
   transition: all 150ms ease;

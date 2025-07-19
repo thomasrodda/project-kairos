@@ -12,8 +12,8 @@
   // ========================================
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  gap: var(--spacing-16);
+  padding: var(--spacing-16);
   position: relative;
 
   // ========================================
@@ -21,14 +21,14 @@
   // ========================================
   width: 100%;
   min-height: var(--size-button-md);
-  max-width: var(--width-modal-md); // if applicable
+  max-width: var(--width-modal-medium); // if applicable
 
   // ========================================
   // Visual Styling
   // ========================================
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-12);
   box-shadow: var(--shadow-sm); // if elevated
 
   // ========================================
@@ -86,13 +86,13 @@
   }
 
   &--large {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-24);
     font-size: var(--font-size-16);
     min-height: var(--size-button-lg);
   }
 
   &--small {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-8);
     font-size: var(--font-size-12);
     min-height: var(--size-button-sm);
   }
@@ -109,7 +109,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: var(--spacing-md);
+    padding-bottom: var(--spacing-16);
     border-bottom: 1px solid var(--color-border);
   }
 
@@ -122,14 +122,14 @@
 
   &__content {
     flex: 1;
-    padding: var(--spacing-md) 0;
+    padding: var(--spacing-16) 0;
   }
 
   &__footer {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: var(--spacing-8);
     justify-content: flex-end;
-    padding-top: var(--spacing-md);
+    padding-top: var(--spacing-16);
     border-top: 1px solid var(--color-border);
   }
 
@@ -143,8 +143,8 @@
   // Responsive Design
   // ========================================
   @include breakpoint-down(sm) {
-    padding: var(--spacing-sm);
-    gap: var(--spacing-sm);
+    padding: var(--spacing-8);
+    gap: var(--spacing-8);
 
     &__footer {
       flex-direction: column;
@@ -174,7 +174,7 @@
 // ========================================
 .component-name-wrapper {
   // Container styles if component needs a wrapper
-  padding: var(--spacing-lg);
+  padding: var(--spacing-24);
 }
 
 // ========================================
@@ -183,7 +183,7 @@
 @keyframes component-name-enter {
   from {
     opacity: 0;
-    transform: translateY(var(--spacing-sm));
+    transform: translateY(var(--spacing-8));
   }
 
   to {

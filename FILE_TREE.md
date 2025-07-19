@@ -319,8 +319,7 @@ apps
 │   │   └── workspaces.ts
 │   ├── styles
 │   │   ├── base
-│   │   │   ├── reset.scss
-│   │   │   └── semantic-tokens.scss
+│   │   │   └── reset.scss
 │   │   ├── index.scss
 │   │   └── mixins.scss
 │   ├── test
