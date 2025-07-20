@@ -274,6 +274,6 @@ git --version   # Should be 2.25+
 
 _If your issue isn't listed here, check:_
 
-1. `AI System Prompt Files/# Current State.md` for known issues
+1. `AI System Prompt Files/01-Core/Current State.md` for known issues
 2. GitHub issues for similar problems
 3. Component-specific documentation in `AI System Prompt Files/`

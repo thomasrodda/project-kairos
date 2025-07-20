@@ -44,6 +44,35 @@ If the notification script fails, use: `echo -e "\a"`
 
 Please always think step by step and use sub agents where helpful.
 
+## 📝 MANDATORY: Documentation Updates Before Commits
+
+**CRITICAL**: When the user asks you to commit and push changes, you MUST FIRST:
+
+1. **Review all changes made** - List what files were modified/created
+2. **Update relevant documentation**:
+   - Update `Current State.md` if features were added/completed
+   - Update `Test Inventory.md` if tests were added/modified
+   - Update relevant guides if implementation patterns changed
+   - Update `CLAUDE.md` if new patterns or practices were established
+   - Update component-specific documentation if components were modified
+3. **Verify documentation accuracy**:
+   - Ensure file paths in docs match actual structure
+   - Update any code examples to reflect current implementation
+   - Check that all cross-references between docs are valid
+4. **Only then proceed with commit and push**
+
+Example workflow:
+
+```bash
+# User: "Please commit and push these changes"
+# You: "Let me first update the documentation to reflect these changes..."
+# [Update relevant docs]
+# [Then commit with descriptive message]
+# [Then push]
+```
+
+This ensures documentation stays synchronized with code changes and prevents drift between implementation and documentation.
+
 ## 🚀 Quick Start
 
 ### Current Focus
@@ -68,7 +97,7 @@ yarn lint         # Fix linting issues
 yarn typecheck    # Check TypeScript types
 ```
 
-📋 **Full command reference**: [Quick Commands.md](AI System Prompt Files/Quick Commands.md)
+📋 **Full command reference**: [Quick Commands.md](AI System Prompt Files/06-DevOps/Quick Commands.md)
 
 ## 📍 Project Overview
 
@@ -80,28 +109,28 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 
 ### Essential Documents (Check These First)
 
-- **[# 0.INDEX.md](AI System Prompt Files/# 0.INDEX.md)** - Helps you navigate Project Kairos documentation efficiently
-- **[# Current State.md](AI System Prompt Files/# Current State.md)** - What's built, in progress, known issues
+- **[INDEX.md](AI System Prompt Files/01-Core/INDEX.md)** - Helps you navigate Project Kairos documentation efficiently
+- **[Current State.md](AI System Prompt Files/01-Core/Current State.md)** - What's built, in progress, known issues
 - **[FILE_TREE.md](FILE_TREE.md)** - Complete project structure
-- **[Quick Commands.md](AI System Prompt Files/Quick Commands.md)** - All commands reference
-- **[Troubleshooting Guide.md](AI System Prompt Files/Troubleshooting Guide.md)** - Common fixes
+- **[Quick Commands.md](AI System Prompt Files/06-DevOps/Quick Commands.md)** - All commands reference
+- **[Troubleshooting Guide.md](AI System Prompt Files/06-DevOps/Troubleshooting Guide.md)** - Common fixes
 
 ### Core Project Documents
 
-- **[# 1. Vision & Scope.md](AI System Prompt Files/# 1. Vision & Scope.md)** - Product vision, terminology
-- **[# 2. User Stories.md](AI System Prompt Files/# 2. User Stories.md)** - Feature requirements
-- **[# 3. MVP.md](AI System Prompt Files/# 3. MVP.md)** - MVP scope and phases
-- **[# 5. Architecture.md](AI System Prompt Files/# 5. Architecture.md)** - System design
-- **[# Development Plan.md](AI System Prompt Files/# Development Plan.md)** - Feature roadmap
+- **[Vision & Scope.md](AI System Prompt Files/01-Core/Vision & Scope.md)** - Product vision, terminology
+- **[User Stories.md](AI System Prompt Files/01-Core/User Stories.md)** - Feature requirements
+- **[MVP.md](AI System Prompt Files/01-Core/MVP.md)** - MVP scope and phases
+- **[Architecture.md](AI System Prompt Files/02-Architecture/Architecture.md)** - System design
+- **[Development Plan.md](AI System Prompt Files/01-Core/Development Plan.md)** - Feature roadmap
 
 ### Implementation Guides
 
-- **[Component Structure Guide.md](AI System Prompt Files/Component Structure Guide.md)** - React patterns
-- **[Testing Guide.md](AI System Prompt Files/Testing Guide.md)** - Comprehensive testing strategy and patterns
-- **[Test Inventory.md](AI System Prompt Files/Test Inventory.md)** - Current test status and quality tracking
-- **[Text Formatting Plan.md](AI System Prompt Files/Text Formatting Plan.md)** - Rich text implementation
-- **[Backend Api Guide.md](AI System Prompt Files/Backend Api Guide.md)** - API design
-- **[Data Model Guide.md](AI System Prompt Files/Data Model Guide.md)** - Database schema
+- **[Component Structure Guide.md](AI System Prompt Files/03-Features/Component Structure Guide.md)** - React patterns
+- **[Testing Guide.md](AI System Prompt Files/04-Testing/Testing Guide.md)** - Comprehensive testing strategy and patterns
+- **[Test Inventory.md](AI System Prompt Files/04-Testing/Test Inventory.md)** - Current test status and quality tracking
+- **[Text Formatting Plan.md](AI System Prompt Files/03-Features/Text Formatting Plan.md)** - Rich text implementation
+- **[Backend Api Guide.md](AI System Prompt Files/02-Architecture/Backend Api Guide.md)** - API design
+- **[Data Model Guide.md](AI System Prompt Files/02-Architecture/Data Model Guide.md)** - Database schema
 
 ### Quick Decision Guide
 
@@ -110,7 +139,7 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 - **"Where is X located?"** → Check FILE_TREE.md
 - **"How do I run X?"** → Check Quick Commands.md
 - **"X is broken!"** → Check Troubleshooting Guide.md
-- **"What's the full doc list?"** → See [# 0. INDEX.md](AI System Prompt Files/# 0. INDEX.md)
+- **"What's the full doc list?"** → See [INDEX.md](AI System Prompt Files/01-Core/INDEX.md)
 
 ## Key File Locations
 
@@ -164,7 +193,7 @@ yarn db:migrate
 yarn dev
 ```
 
-📋 **Detailed setup**: [Environment Setup Guide.md](AI System Prompt Files/Environment Setup Guide.md)
+📋 **Detailed setup**: [Environment Setup Guide.md](AI System Prompt Files/06-DevOps/Environment Setup Guide.md)
 
 ## Architecture Overview
 
@@ -213,7 +242,7 @@ The editor uses a unified contentEditable approach with sophisticated state mana
 
 ## 🎯 Development Status
 
-For detailed status, see [# Current State.md](AI System Prompt Files/# Current State.md)
+For detailed status, see [Current State.md](AI System Prompt Files/01-Core/Current State.md)
 
 **Quick Summary**:
 
@@ -238,7 +267,7 @@ For detailed status, see [# Current State.md](AI System Prompt Files/# Current S
 
 ### Testing Guidelines
 
-See [Testing Guide.md](AI System Prompt Files/Testing Guide.md) for comprehensive testing strategy and patterns.
+See [Testing Guide.md](AI System Prompt Files/04-Testing/Testing Guide.md) for comprehensive testing strategy and patterns.
 
 **Quick reminders:**
 
@@ -256,7 +285,7 @@ See [Testing Guide.md](AI System Prompt Files/Testing Guide.md) for comprehensiv
 
 ## 🎨 Styling Guidelines
 
-**For all styling questions, refer to the [Styling Guide.md](AI System Prompt Files/Styling Guide.md)**
+**For all styling questions, refer to the [Styling Guide.md](AI System Prompt Files/05-Styling/Styling Guide.md)**
 
 Key points:
 
@@ -307,20 +336,20 @@ Key files for formatting:
 - **Tests failing on format**: Run `yarn format`
 - **TypeScript errors**: Run `yarn typecheck` then `yarn db:generate` if needed
 - **Can't find a file**: Check `FILE_TREE.md`
-- **Unsure what to work on**: Check `AI System Prompt Files/# Current State.md`
+- **Unsure what to work on**: Check `AI System Prompt Files/01-Core/Current State.md`
 
 ### Important Paths to Remember
 
 ```bash
 # Current project state
-cat "AI System Prompt Files/# Current State.md"
+cat "AI System Prompt Files/01-Core/Current State.md"
 
 # Documentation index
-cat "AI System Prompt Files/# 0. INDEX.md"
+cat "AI System Prompt Files/01-Core/INDEX.md"
 
 # File structure
 cat FILE_TREE.md
 
 # Test coverage status
-cat "AI System Prompt Files/Test Inventory.md"
+cat "AI System Prompt Files/04-Testing/Test Inventory.md"
 ```

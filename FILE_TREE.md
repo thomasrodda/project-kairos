@@ -28,43 +28,50 @@
 ├── extensions.json
 └── settings.json
 AI System Prompt Files
-├── # 0. INDEX.md
-├── # 1. Vision & Scope.md
-├── # 2. User Stories.md
-├── # 3. MVP.md
-├── # 5. Architecture.md
-├── # Current State.md
-├── # Development Plan.md
-├── # Project Management & Development Guide.md
+├── 01-Core
+│   ├── Current Issues.md
+│   ├── Current State.md
+│   ├── Development Plan.md
+│   ├── INDEX.md
+│   ├── MVP.md
+│   ├── Project Management & Development Guide.md
+│   ├── User Stories.md
+│   └── Vision & Scope.md
+├── 02-Architecture
+│   ├── Architecture.md
+│   ├── Backend Api Guide.md
+│   ├── Backend Implementation Plan.md
+│   ├── Data Model Guide.md
+│   ├── Database Connection Notes.md
+│   ├── Database Migration Strategy.md
+│   ├── Extensibility & Plugin Architecture Guide.md
+│   └── Prisma Supabase Connection Guide.md
+├── 03-Features
+│   ├── Component Structure Guide.md
+│   ├── Enhanced Custom Editor Plan.md
+│   ├── Markdown Export Import Guide.md
+│   ├── Slash Command Feature Development.md
+│   └── Text Formatting Plan.md
+├── 04-Testing
+│   ├── Test Inventory.md
+│   └── Testing Guide.md
+├── 05-Styling
+│   ├── Inline SVG System Guide.md
+│   ├── Scss Structure Guide.md
+│   ├── Styling Consistency Review.md
+│   └── Styling Guide.md
+├── 06-DevOps
+│   ├── CI CD Guide.md
+│   ├── Environment Setup Guide.md
+│   ├── Git & Github Guide.md
+│   ├── Production Deployment Guide.md
+│   ├── Quick Commands.md
+│   └── Troubleshooting Guide.md
+└── 07-Operations
 ├── Analytics Feature Flags Guide.md
-├── Backend Api Guide.md
-├── Backend Implementation Plan.md
-├── CI CD Guide.md
-├── Component Structure Guide.md
-├── Current Issues.md
-├── Data Model Guide.md
-├── Database Connection Notes.md
-├── Database Migration Strategy.md
-├── Enhanced Custom Editor Plan.md
-├── Environment Setup Guide.md
 ├── Error Handling Guide.md
-├── Extensibility & Plugin Architecture Guide.md
-├── Git & Github Guide.md
-├── Inline SVG System Guide.md
-├── Markdown Export Import Guide.md
 ├── Performance Optimization Guide.md
-├── Prisma Supabase Connection Guide.md
-├── Production Deployment Guide.md
-├── Quick Commands.md
-├── Scss Structure Guide.md
-├── Security Guide.md
-├── Slash Command Feature Development.md
-├── Styling Consistency Review.md
-├── Styling Guide.md
-├── Test Inventory.md
-├── Testing Guide.md
-├── Text Formatting Plan.md
-└── Troubleshooting Guide.md
+└── Security Guide.md
 apps
 ├── api
 │   ├── **tests**

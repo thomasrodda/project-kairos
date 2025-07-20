@@ -15,6 +15,17 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+
+    // Add a divider below the header
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background-color: var(--color-neutral-700);
+    }
   }
 
   &__save-status {

@@ -207,9 +207,9 @@ All commands should pass without errors.
 
 ## Next Steps
 
-1. Review [# Current State.md](./# Current State.md) to understand what's built
-2. Check [# Development Plan.md](./# Development Plan.md) for roadmap
-3. Read [Component Structure Guide.md](./Component Structure Guide.md) before adding features
+1. Review [Current State.md](../01-Core/Current State.md) to understand what's built
+2. Check [Development Plan.md](../01-Core/Development Plan.md) for roadmap
+3. Read [Component Structure Guide.md](../03-Features/Component Structure Guide.md) before adding features
 4. Run `yarn dev` and start coding!
 
 ## Getting Help

@@ -145,9 +145,9 @@ The slash command feature allows users to quickly change block types by typing "
 
 ## 🔗 Related Documents
 
-- [# 2. User Stories.md](./# 2. User Stories.md) - See "Changing block type via slash command"
+- [User Stories.md](../01-Core/User Stories.md) - See "Changing block type via slash command"
 - [Component Structure Guide.md](./Component Structure Guide.md) - Component patterns
-- [Testing Guide.md](./Testing Guide.md) - Testing best practices
+- [Testing Guide.md](../04-Testing/Testing Guide.md) - Testing best practices
 - [Test Inventory.md](./Test Inventory.md) - Full test coverage
 
 ## 📝 Notes
