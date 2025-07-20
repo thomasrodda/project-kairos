@@ -7,7 +7,7 @@ This checklist outlines the comprehensive plan to improve Project Kairos documen
 ```
 AI System Prompt Files/
 ├── 01-Core/
-│   ├── Vision & Scope.md (project overview)
+│   ├── Project Overview.md
 │   ├── Current State.md
 │   ├── INDEX.md
 │   └── ...
@@ -30,25 +30,27 @@ AI System Prompt Files/
 
 ### Documentation Workflow
 
-1. **Start with Vision & Scope.md** - Understand the overall product vision
+1. **Start with Project Overview.md** - Understand the overall product vision
 2. **Navigate to relevant feature folder** - Find the specific feature area
 3. **Read User Stories document** - Understand requirements and acceptance criteria
 4. **Check implementation guides** - Reference technical implementation details
 
 ## Phase 1: Foundation Documents (Critical Priority)
 
-### 1. Update/Consolidate Project Overview Document
+### 1. Update/Consolidate Project Overview Document ✓ COMPLETE
 
-- [ ] Review existing `Vision & Scope.md` in `AI System Prompt Files/01-Core/`
-- [ ] Check for other overview documents that should be consolidated
-- [ ] Enhance to include:
-  - [ ] Product vision and core value proposition
-  - [ ] Target users and detailed use cases
-  - [ ] Core feature categories and their relationships
-  - [ ] User workflow overview and journey maps
-  - [ ] High-level technical architecture summary
-  - [ ] MVP scope and future vision
-- [ ] Ensure it serves as the single source of truth for project vision
+- [✓] Review existing Project Overview document (formerly Vision & Scope.md)
+- [✓] Check for other overview documents that should be consolidated
+- [✓] Enhance to include:
+  - [✓] Product vision and core value proposition
+  - [✓] Target users and detailed use cases
+  - [✓] Core feature categories and their relationships
+  - [✓] User workflow overview and journey maps
+  - [✓] High-level technical architecture summary
+  - [✓] MVP scope and future vision (deferred to later)
+- [✓] Ensure it serves as the single source of truth for project vision
+- [✓] Consolidate MVP.md to reference Project Overview
+- [✓] Update all document references from Vision & Scope to Project Overview
 
 ### 2. Restructure User Stories into Feature Folders
 
@@ -83,13 +85,13 @@ AI System Prompt Files/
 ### 3. Update Navigation Documents
 
 - [ ] Update `CLAUDE.md`:
-  - [ ] Add instruction to check `Vision & Scope.md` for high-level understanding
+  - [ ] Add instruction to check `Project Overview.md` for high-level understanding
   - [ ] Add instruction to navigate to relevant feature folder and check User Stories before implementation
   - [ ] Update documentation references to new folder structure
-  - [ ] Add clear workflow: Vision & Scope → Feature Folder → User Stories → Implementation Guides
+  - [ ] Add clear workflow: Project Overview → Feature Folder → User Stories → Implementation Guides
 - [ ] Update `INDEX.md`:
   - [ ] Reorganize Features section to reflect new folder structure
-  - [ ] Add clear hierarchy: Vision & Scope → Feature User Stories → Implementation Guides
+  - [ ] Add clear hierarchy: Project Overview → Feature User Stories → Implementation Guides
   - [ ] Update quick decision guide with new folder paths
 
 ## Phase 2: Implementation Accuracy (High Priority)

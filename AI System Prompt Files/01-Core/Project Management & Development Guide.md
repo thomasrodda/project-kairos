@@ -6,21 +6,9 @@
 
 ## 🎯 Project Vision & Scope
 
-**App Concept**: A hybrid Notion/Obsidian‐style workspace tailored for creative writers—novelists, worldbuilders, D&D campaign planners—that combines block‐based editing with powerful AI‐driven tools.
+> **For complete project vision, features, and technical details, see [Project Overview.md](Project Overview.md)**
 
-**Core MVP Features**:
-
-- **Text Editor**: Block-based editing with drag‐and‐drop reordering, slash commands, formatting toolbar
-- **Pages & File Tree**: Nested workspace structure with internal linking and backlinks
-- **Accounts & Workspaces**: Google OAuth with multi-workspace support
-- **AI Features**: Grammar/style improvements and lore consistency checking
-
-**Technology Stack**:
-
-- **Frontend**: React + TypeScript, Custom SCSS, Vercel hosting
-- **Backend**: Vercel serverless functions, PostgreSQL + Prisma
-- **Authentication**: Firebase Authentication (Google OAuth)
-- **Testing**: Jest (unit), Cypress (e2e), GitHub Actions CI/CD
+This guide focuses on development workflow, roles, and processes.
 
 ---
 

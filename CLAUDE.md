@@ -119,7 +119,7 @@ Project Kairos is a creative writing and worldbuilding web application designed 
 
 ### Core Project Documents
 
-- **[Vision & Scope.md](AI System Prompt Files/01-Core/Vision & Scope.md)** - Product vision, terminology
+- **[Project Overview.md](AI System Prompt Files/01-Core/Project Overview.md)** - Product vision, terminology, target users
 - **[User Stories.md](AI System Prompt Files/01-Core/User Stories.md)** - Feature requirements
 - **[MVP.md](AI System Prompt Files/01-Core/MVP.md)** - MVP scope and phases
 - **[Architecture.md](AI System Prompt Files/02-Architecture/Architecture.md)** - System design

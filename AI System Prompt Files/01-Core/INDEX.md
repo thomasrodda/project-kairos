@@ -12,7 +12,7 @@
 
 ### Vision & Planning
 
-- **[Vision & Scope.md](./Vision & Scope.md)** - Product vision, target users, terminology
+- **[Project Overview.md](./Project Overview.md)** - Product vision, target users, terminology
   - _Use when_: Understanding product goals, checking feature scope
 - **[User Stories.md](./User Stories.md)** - Detailed feature requirements with acceptance criteria
   - _Use when_: Implementing specific features, checking requirements
@@ -98,7 +98,7 @@
 
 **"I need to..."**
 
-- **Understand what to build** → Vision & Scope, User Stories, MVP
+- **Understand what to build** → Project Overview, User Stories, MVP
 - **Know what's already built** → Current State, FILE_TREE
 - **Implement a feature** → User Stories, Component Structure Guide
 - **Write tests** → Testing Guide, Test Inventory
@@ -109,7 +109,7 @@
 ## 🔄 Document Dependencies
 
 ```
-Vision & Scope
+Project Overview
     ↓
 User Stories ←→ MVP
     ↓

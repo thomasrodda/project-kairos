@@ -1,42 +1,10 @@
-## MVP Scope Summary
+# MVP Development Details
 
-### Block-Based Editor
+> **Note**: For the complete project vision and feature descriptions, see [Project Overview.md](Project Overview.md)
 
-- Type, press enter to split blocks
-- Live markdown formatting (typing `# ` auto-converts to H1, `## ` to H2, `* ` to bullets)
-- Slash (`/`) command to change block type
-- Format with a floating toolbar (bold, italic, link)
-- Markdown paste detection and automatic block creation
-- Markdown export functionality for cross-app compatibility
-- Drag to reorder blocks
-- Undo/redo
-- Delete blocks
+This document contains specific MVP implementation details and development tracking.
 
-### Pages & File Tree
-
-- Create, rename, delete pages
-- Nest pages in folders
-- Drag to reorder pages
-- Sidebar for navigation
-
-### Internal Linking
-
-- Use `@` to link to pages
-- Show backlinks for each page
-
-### Account & Workspaces
-
-- Google login
-- Create and switch between workspaces
-
-### Cloud Sync
-
-- Changes autosave to the cloud in real time
-- **Optional local-first storage** (user preference)
-
----
-
-## Updated Development Phase Order
+## Development Phase Order
 
 ### Phase 1: UI Foundation First
 
