@@ -26,7 +26,8 @@
 └── pre-push
 .vscode
 ├── extensions.json
-└── settings.json
+├── settings.json
+└── tasks.json
 AI System Prompt Files
 ├── 01-Core
 │   ├── Current Issues.md
