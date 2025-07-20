@@ -33,6 +33,7 @@ AI System Prompt Files
 │   ├── Current Issues.md
 │   ├── Current State.md
 │   ├── Development Plan.md
+│   ├── Documentation Improvement Checklist.md
 │   ├── INDEX.md
 │   ├── MVP.md
 │   ├── Project Management & Development Guide.md

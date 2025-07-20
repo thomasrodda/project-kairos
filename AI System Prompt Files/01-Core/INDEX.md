@@ -32,6 +32,8 @@
   - _Use when_: Planning next features, understanding development priorities
 - **[Project Management & Development Guide.md](./Project Management & Development Guide.md)** - Team workflows and processes
   - _Use when_: Understanding development process, collaboration guidelines
+- **[Documentation Improvement Checklist.md](./Documentation Improvement Checklist.md)** - Plan for improving documentation accuracy and structure
+  - _Use when_: Updating documentation, ensuring docs match implementation
 
 ## 🆘 Quick References
 
