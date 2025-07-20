@@ -253,8 +253,7 @@ All user stories are organized by feature area in `AI System Prompt Files/03-Fea
 
 ### Core Features
 
-- **[Editor/User Stories - Editor.md](../03-Features/Editor/User Stories - Editor.md)** - Block management, drag/drop, copy/paste
-- **[TextFormatting/User Stories - Text Formatting.md](../03-Features/TextFormatting/User Stories - Text Formatting.md)** - Bold, italic, links, markdown
+- **[Editor/User Stories - Editor.md](../03-Features/Editor/User Stories - Editor.md)** - Block management, drag/drop, copy/paste, text formatting, internal linking
 - **[PageManagement/User Stories - Page Management.md](../03-Features/PageManagement/User Stories - Page Management.md)** - Create, delete, rename pages
 - **[Workspace/User Stories - Workspace.md](../03-Features/Workspace/User Stories - Workspace.md)** - Multiple workspaces, navigation
 - **[Authentication/User Stories - Authentication.md](../03-Features/Authentication/User Stories - Authentication.md)** - Login, user management

@@ -13,11 +13,9 @@ AI System Prompt Files/
 │   └── ...
 ├── 03-Features/
 │   ├── Editor/
-│   │   ├── User Stories - Editor.md
-│   │   └── [implementation guides]
-│   ├── TextFormatting/
-│   │   ├── User Stories - Text Formatting.md
-│   │   └── [implementation guides]
+│   │   ├── User Stories - Editor.md (includes text formatting)
+│   │   ├── Text Formatting Plan.md
+│   │   └── [other implementation guides]
 │   ├── PageManagement/
 │   │   └── User Stories - Page Management.md
 │   ├── Workspace/
@@ -57,8 +55,7 @@ AI System Prompt Files/
 #### Step 2a: Create folder structure and separate existing user stories ✓ COMPLETE
 
 - [✓] Create organized folder structure in `AI System Prompt Files/03-Features/`:
-  - [✓] `Editor/`
-  - [✓] `TextFormatting/`
+  - [✓] `Editor/` (includes text formatting)
   - [✓] `PageManagement/`
   - [✓] `Workspace/`
   - [✓] `Authentication/`
@@ -66,8 +63,7 @@ AI System Prompt Files/
   - [✓] `AI/` (future features)
   - [✓] `Collaboration/` (future features)
 - [✓] Extract existing user stories from `User Stories.md` and create separate files:
-  - [✓] `Editor/User Stories - Editor.md` (block management, drag/drop)
-  - [✓] `TextFormatting/User Stories - Text Formatting.md` (bold, italic, links, etc.)
+  - [✓] `Editor/User Stories - Editor.md` (block management, drag/drop, text formatting, internal linking)
   - [✓] `PageManagement/User Stories - Page Management.md` (create, delete, rename pages)
   - [✓] `Workspace/User Stories - Workspace.md` (workspace creation, file tree, navigation)
   - [✓] `Authentication/User Stories - Authentication.md` (sign up, login, user management)
@@ -126,6 +122,8 @@ AI System Prompt Files/
 ## Phase 2: Implementation Accuracy (High Priority)
 
 ### 4. Audit Current State
+
+Current State has become unweildy, unhelpful and innacurate.
 
 - [ ] Review `Current State.md` against actual codebase
 - [ ] Verify each listed feature actually works as described

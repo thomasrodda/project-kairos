@@ -61,12 +61,10 @@ AI System Prompt Files
 │   ├── Editor
 │   │   ├── Enhanced Custom Editor Plan.md
 │   │   ├── Slash Command Feature Development.md
+│   │   ├── Text Formatting Plan.md
 │   │   └── User Stories - Editor.md
 │   ├── PageManagement
 │   │   └── User Stories - Page Management.md
-│   ├── TextFormatting
-│   │   ├── Text Formatting Plan.md
-│   │   └── User Stories - Text Formatting.md
 │   ├── Workspace
 │   │   └── User Stories - Workspace.md
 │   └── Component Structure Guide.md

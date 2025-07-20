@@ -18,16 +18,21 @@ This document provides a real-time snapshot of what's built, what's in progress,
 - **Placeholder hints** for slash commands and AI features
 - **Comprehensive test coverage** (300+ tests passing)
 
-### Text Formatting
+### Text Formatting (In Progress)
 
-- **Rich text toolbar** appears on text selection
-- **Bold, italic, underline** formatting (Ctrl/Cmd+B/I/U)
-- **Link support** with URL editing (Ctrl/Cmd+K)
-- **Inline markdown** auto-conversion (e.g., **bold**, _italic_)
-- **Block-level markdown** (# for H1, ## for H2, - for bullets)
-- **Format preservation** during copy/paste operations
-- **Separate formatting layer** (plain text + TextFormat array)
+- **Rich text toolbar** appears on text selection ✅
+- **Bold, italic, underline** formatting (Ctrl/Cmd+B/I/U) ✅
+- **Link support** with URL editing (Ctrl/Cmd+K) ✅
+- **Inline markdown** auto-conversion (e.g., **bold**, _italic_) ✅
+- **Block-level markdown** (# for H1, ## for H2, - for bullets) ✅
+- **Format preservation** during copy/paste operations ✅
+- **Separate formatting layer** (plain text + TextFormat array) ✅
 - **Formatting persistence** to database ✅
+- **Known issues**:
+  - Clicking off formatting popup causes momentary appearance in top-left
+  - Slight delay in keyboard shortcut visual feedback
+  - Link functionality needs improvements (unlinking, click behavior)
+  - Link input dialog needs styling
 
 ### Backend Infrastructure
 

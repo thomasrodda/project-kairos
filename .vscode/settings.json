@@ -8,5 +8,38 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "IDX.aI.enableInlineCompletion": true,
-  "IDX.aI.enableCodebaseIndexing": true
+  "IDX.aI.enableCodebaseIndexing": true,
+  "folder-color.pathColors": [
+    {
+      "folderPath": "Project Kairos/AI System Prompt Files/01-Core/",
+      "color": "foldercolorizer.color_00cccc"
+    },
+    {
+      "folderPath": "Project Kairos/AI System Prompt Files/02-Architecture/",
+      "color": "foldercolorizer.color_00cc66"
+    },
+    {
+      "folderPath": "Project Kairos/AI System Prompt Files/03-Features/",
+      "color": "foldercolorizer.color_99cc33"
+    },
+    {
+      "folderPath": "Project Kairos/AI System Prompt Files/04-Testing/",
+      "color": "foldercolorizer.color_cccc66"
+    },
+    {
+      "folderPath": "Project Kairos/AI System Prompt Files/05-Styling/",
+      "color": "foldercolorizer.color_ff9966"
+    },
+    {
+      "folderPath": "Project Kairos/AI System Prompt Files/06-DevOps/",
+      "color": "foldercolorizer.color_cc3366"
+    },
+    {
+      "folderPath": "Project Kairos/AI System Prompt Files/07-Operations/",
+      "color": "foldercolorizer.color_ff99ff"
+    },
+    {
+      "folderPath": "Project Kairos/AI System Prompt Files/"
+    }
+  ]
 }

@@ -1,6 +1,6 @@
 # User Stories - Editor
 
-This document contains user stories for the block-based text editor, the core editing experience in Project Kairos.
+This document contains user stories for the block-based text editor, including text formatting and internal linking features, which comprise the core editing experience in Project Kairos.
 
 ## Block Based Text Editor
 
@@ -63,6 +63,7 @@ Acceptance Criteria:
 - [x] There will be a search box at the top of the floating menu that is automatically focused when the popup is triggered.
 - [x] Typing in the search box filters the formatting options in real time.
 - [x] Each time the search is altered, the highlighted option gets reset to the top result.
+- [ ] Empty state shows when no pages match the search
 - [x] Clicking off the popup or pressing escape closes it and no block type change takes place, cancelling the operation.
 - [ ] Cancelling the operation should reinsert the typed "/" or " /" where it was typed.
 
@@ -290,9 +291,121 @@ Priority: Medium
 
 ---
 
+### 8. **Basic formatting with toolbar**
+
+> User Story:
+>
+> As a user, I want to highlight text and apply formatting, so that I can style my writing (e.g., bold, italic, link).
+
+**Status**: In Progress
+
+**Dependencies**:
+
+- EditorContext for state management
+- Text selection utilities
+- Formatting renderer
+
+**Components**:
+
+- `apps/web/src/components/Editor/FormattingToolbar/` - Floating toolbar component
+- `apps/web/src/utils/textFormatting.ts` - Core formatting logic
+- `apps/web/src/utils/formattingRenderer.tsx` - Renders formatted text
+- `apps/web/src/contexts/EditorContext.tsx` - TextFormat types and actions
+
+**Acceptance Criteria:**
+
+- [x] Highlighting text shows a floating formatting popup above the highlighted text
+- [x] Popup includes options: Bold, Italic, Underline
+- [x] Clicking an option applies formatting to the selection
+- [x] Clicking off of the popup or pressing escape closes the popup
+- [x] Keyboard shortcuts work (Ctrl/Cmd+B/I/U)
+- [x] Link formatting supported (Ctrl/Cmd+K). A dialog box appears for the link.
+- [ ] Clicking the link while holding Ctrl/Cmd opens the link in a new tab.
+- [x] Formatting persists to database
+- [x] Cross-block formatting works when selecting across multiple blocks
+- [x] Inline markdown auto-converts (e.g., **bold**, _italic_)
+- [x] Formatting markdown symbols are removed once applied
+- [x] Selection is restored after formatting is applied
+- [x] Toolbar position stays stable (doesn't flicker/jump)
+- [x] Format buttons show active state when cursor is in formatted text
+
+**Notes:**
+
+- Clicking off the formatting popup causes it to momentarily appear in the top left of the editor
+- There is a slight delay when using key shortcuts for the bold/italic/underline icons to change colour
+- Linking works but needs work. Unlinking requires you to make the exact same selection. Clicking the link doesn
+- Selection restoration handles DOM changes from formatting
+- Link input box needs styling
+
+**Priority**: High
+
+**Complexity**: Medium
+
+---
+
+## Internal Linking
+
+### 9. **@-mention to link to another page**
+
+> User Story:
+>
+> As a user, I want to type "@" to search and link to other pages, so that I can quickly reference related content.
+
+**Status**: Not Started
+
+**Dependencies**:
+
+- Page search functionality (needs implementation)
+- PagesContext for page list (✅ already exists)
+- Floating menu component (can reuse SlashCommandMenu pattern)
+- Link formatting system (✅ already exists)
+
+**Components**:
+
+- `apps/web/src/components/Editor/MentionMenu/` - To be created
+- Integration with existing link formatting in `utils/textFormatting.ts`
+- Page search/filter utilities - To be created
+- Hook into `ContentEditableContainer` for "@" key detection
+
+**Acceptance Criteria:**
+
+- [ ] Typing "@" at the start of a block opens a floating menu.
+- [ ] Typing " @" inside a block that may already have content opens the floating menu.
+- [ ] Menu displays list of pages. Maybe recent pages?
+- [ ] Menu displays above the block where the "@" was typed.
+- [ ] You can select an option using mouse or arrow keys and enter.
+- [ ] The top option is automatically highlighted.
+- [ ] Pressing enter will apply the highlighted option.
+- [ ] There will be a search box at the top of the floating menu that is automatically focused when the popup is triggered.
+- [ ] Typing in the search box filters the page results in real time.
+- [ ] Each time the search is altered, the highlighted option gets reset to the top result.
+- [ ] Clicking off the popup or pressing escape closes it, cancelling the operation.
+- [ ] Cancelling the operation should reinsert the typed "@" or " @" where it was typed.
+- [ ] Selecting a result inserts a link to that page
+- [ ] The link is clickable and navigates to the target page
+- [ ] The link is the name of the page with a faint highlight color to indicate it's a link
+- [ ] When hovered over, the link also gains an underline
+- [ ] Menu position adjusts to avoid viewport edges
+- [ ] The "@" character is removed after selecting a page
+- [ ] Empty state shows when no pages match the search
+- [ ] Menu works within formatted text (e.g., inside bold/italic text) and any block type.
+- [ ] Page renames are reflected in existing mentions
+
+**Notes:**
+
+- Can follow the same pattern as SlashCommandMenu implementation. Would be a good idea to look into making some reuseable components and styles
+- May need to add page search API endpoint for performance with many pages
+- Should show page hierarchy in search results (e.g., "Parent > Child")
+
+**Priority**: High
+
+**Complexity**: Medium
+
+---
+
 ## Related Documentation
 
 - **[Enhanced Custom Editor Plan](./Enhanced Custom Editor Plan.md)** - Technical architecture and implementation strategy
-- **[Text Formatting Plan](../TextFormatting/Text Formatting Plan.md)** - Rich text formatting implementation details
+- **[Text Formatting Plan](./Text Formatting Plan.md)** - Rich text formatting implementation details
 - **[Component Structure Guide](../Component Structure Guide.md)** - General component patterns used in the editor
 - **[Current State](../../01-Core/Current State.md)** - Current implementation status of editor features

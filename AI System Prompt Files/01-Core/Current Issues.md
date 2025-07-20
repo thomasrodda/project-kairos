@@ -4,17 +4,7 @@ Last updated: 2025-01-12
 
 ## High Priority Issues
 
-### 1. Block Deletion Not Persisting
-
-**Problem**: Deleted blocks reappear on page refresh. Most other changes persist correctly (text edits, block reordering, formatting, etc.), but block deletions are not being saved.
-
-**Investigation Needed**:
-
-- Check if `deletedBlockIds` are being sent in the auto-save payload
-- Verify the backend is processing the `deletedBlockIds` array
-- Check if soft-deleted blocks are being filtered out when loading pages
-
-### 2. Page Creation Bugs in Empty Workspaces
+### 1. Page Creation Bugs in Empty Workspaces
 
 **Problem**: Bugs present when creating a page in workspaces that have the default page. The page creation process has issues with the UI and state management.
 
@@ -26,7 +16,7 @@ Last updated: 2025-01-12
 
 ## Medium Priority Issues
 
-### 3. Auto-Save Robustness
+### 2. Auto-Save Robustness
 
 **Improvements Needed**:
 
