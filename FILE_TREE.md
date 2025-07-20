@@ -49,11 +49,26 @@ AI System Prompt Files
 │   ├── Extensibility & Plugin Architecture Guide.md
 │   └── Prisma Supabase Connection Guide.md
 ├── 03-Features
-│   ├── Component Structure Guide.md
-│   ├── Enhanced Custom Editor Plan.md
-│   ├── Markdown Export Import Guide.md
-│   ├── Slash Command Feature Development.md
-│   └── Text Formatting Plan.md
+│   ├── AI
+│   │   └── User Stories - AI.md
+│   ├── Authentication
+│   │   └── User Stories - Authentication.md
+│   ├── Collaboration
+│   ├── DataManagement
+│   │   ├── Markdown Export Import Guide.md
+│   │   └── User Stories - Data Management.md
+│   ├── Editor
+│   │   ├── Enhanced Custom Editor Plan.md
+│   │   ├── Slash Command Feature Development.md
+│   │   └── User Stories - Editor.md
+│   ├── PageManagement
+│   │   └── User Stories - Page Management.md
+│   ├── TextFormatting
+│   │   ├── Text Formatting Plan.md
+│   │   └── User Stories - Text Formatting.md
+│   ├── Workspace
+│   │   └── User Stories - Workspace.md
+│   └── Component Structure Guide.md
 ├── 04-Testing
 │   ├── Test Inventory.md
 │   └── Testing Guide.md
