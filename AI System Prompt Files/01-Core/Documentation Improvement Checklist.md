@@ -74,22 +74,22 @@ AI System Prompt Files/
   - [✓] `DataManagement/User Stories - Data Management.md` (import/export, sync, backup)
 - [✓] Move existing feature implementation guides to appropriate folders
 
-#### Step 2b: Convert User Stories.md into a guide
+#### Step 2b: Convert User Stories.md into a guide ✓ COMPLETE
 
-- [ ] Transform original `User Stories.md` into `User Stories Guide.md` that includes:
-  - [ ] How to write effective user stories
-  - [ ] Standard user story format: "As a [user], I want to [action], so that [benefit]"
-  - [ ] Guidelines for writing acceptance criteria
-  - [ ] Template for user story documents
-  - [ ] How to track implementation status (Not Started/In Progress/Complete)
-  - [ ] How to document dependencies between features
-  - [ ] Component mapping section guidelines:
-    - [ ] For implemented features: List which components in `apps/web/src/components/` implement the feature
-    - [ ] For unimplemented features: Mark as "Components: Not yet implemented"
-    - [ ] Include example mapping format showing component paths
-    - [ ] Explain this helps AI assistants understand where to make changes
-  - [ ] Examples of well-written user stories (with and without component mappings)
-  - [ ] Index/directory of all user story documents by feature
+- [✓] Transform original `User Stories.md` into `User Stories Guide.md` that includes:
+  - [✓] How to write effective user stories
+  - [✓] Standard user story format: "As a [user], I want to [action], so that [benefit]"
+  - [✓] Guidelines for writing acceptance criteria
+  - [✓] Template for user story documents
+  - [✓] How to track implementation status (Not Started/In Progress/Complete)
+  - [✓] How to document dependencies between features
+  - [✓] Component mapping section guidelines:
+    - [✓] For implemented features: List which components in `apps/web/src/components/` implement the feature
+    - [✓] For unimplemented features: Mark as "Components: Not yet implemented"
+    - [✓] Include example mapping format showing component paths
+    - [✓] Explain this helps AI assistants understand where to make changes
+  - [✓] Examples of well-written user stories (with and without component mappings)
+  - [✓] Index/directory of all user story documents by feature
 
 #### Step 2c: Review and enhance existing user stories
 
