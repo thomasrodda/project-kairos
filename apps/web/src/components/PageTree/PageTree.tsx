@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { usePagesContext } from '../../contexts/PagesContext'
+import { usePages } from '../../contexts/PagesContext'
 import { useWorkspace } from '../../contexts/WorkspaceContext'
 import { PageTreeItem } from './PageTreeItem'
 import { Icon } from '@kairos/ui'
@@ -8,7 +8,7 @@ import './PageTree.scss'
 
 export function PageTree() {
   const navigate = useNavigate()
-  const { pages, loading, error, selectedPageId, createPage } = usePagesContext()
+  const pagesContext = usePages()
   const { currentWorkspace } = useWorkspace()
   const [isCreating, setIsCreating] = useState(false)
   const [newPageTitle, setNewPageTitle] = useState('')
@@ -24,10 +24,10 @@ export function PageTree() {
   )
 
   const handleCreatePage = useCallback(async () => {
-    if (!newPageTitle.trim() || isSubmitting) return
+    if (!newPageTitle.trim() || isSubmitting || !pagesContext) return
 
     setIsSubmitting(true)
-    const newPage = await createPage(newPageTitle.trim())
+    const newPage = await pagesContext.createPage(newPageTitle.trim())
     setIsSubmitting(false)
 
     if (newPage) {
@@ -41,14 +41,15 @@ export function PageTree() {
       }
     }
     // If createPage returned null (error), keep the input visible
-  }, [newPageTitle, createPage, handlePageSelect, isSubmitting])
+  }, [newPageTitle, pagesContext, handlePageSelect, isSubmitting])
 
   const handleCreateFolder = useCallback(async () => {
+    if (!pagesContext) return
     const folderName = prompt('Enter folder name:')
     if (!folderName?.trim()) return
 
-    await createPage(folderName.trim(), null, true)
-  }, [createPage])
+    await pagesContext.createPage(folderName.trim(), null, true)
+  }, [pagesContext])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -63,6 +64,17 @@ export function PageTree() {
     },
     [handleCreatePage]
   )
+
+  // If context is not available yet, show loading state
+  if (!pagesContext) {
+    return (
+      <div className="page-tree page-tree--loading">
+        <div className="page-tree__spinner">Loading...</div>
+      </div>
+    )
+  }
+
+  const { pages, loading, error, selectedPageId, createPage } = pagesContext
 
   if (loading) {
     return (

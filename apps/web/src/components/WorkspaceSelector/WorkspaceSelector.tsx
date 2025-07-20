@@ -41,8 +41,8 @@ export const WorkspaceSelector: React.FC<WorkspaceSelectorProps> = ({ isCollapse
     setIsOpen(!isOpen)
   }
 
-  const handleSelectWorkspace = (workspaceId: string) => {
-    selectWorkspace(workspaceId)
+  const handleSelectWorkspace = async (workspaceId: string) => {
+    await selectWorkspace(workspaceId)
     setIsOpen(false)
   }
 
@@ -65,7 +65,7 @@ export const WorkspaceSelector: React.FC<WorkspaceSelectorProps> = ({ isCollapse
 
     try {
       const newWorkspace = await createWorkspace(newWorkspaceName.trim())
-      selectWorkspace(newWorkspace.id)
+      await selectWorkspace(newWorkspace.id)
       setIsOpen(false)
       setIsCreating(false)
       setNewWorkspaceName('')

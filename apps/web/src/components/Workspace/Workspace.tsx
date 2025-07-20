@@ -13,11 +13,11 @@
 // State: Error boundary state for each panel
 
 import { Component, ReactNode, useEffect, useRef, forwardRef } from 'react'
-import { Routes, Route, Navigate, useParams, useNavigate } from 'react-router-dom'
+import { Routes, Route, useParams, useNavigate } from 'react-router-dom'
 import { Sidebar } from '../Sidebar'
 import { Editor } from '../Editor'
 import { usePageContext } from '../../contexts/PageContext'
-import { usePagesContext } from '../../contexts/PagesContext'
+import { usePages } from '../../contexts/PagesContext'
 import { useEditor } from '../../contexts/EditorContext'
 import './Workspace.scss'
 
@@ -143,20 +143,20 @@ export function Workspace() {
 const PageEditor = forwardRef<HTMLElement>((props, ref) => {
   const { pageId } = useParams<{ pageId: string }>()
   const { loadPage } = usePageContext()
-  const { setSelectedPageId, getPageById } = usePagesContext()
+  const pagesContext = usePages()
   const { dispatch } = useEditor()
 
   useEffect(() => {
-    if (pageId) {
+    if (pageId && pagesContext) {
       // Load the page content
       loadPage(pageId)
       // Sync the sidebar selection with the current page
-      setSelectedPageId(pageId)
+      pagesContext.setSelectedPageId(pageId)
     }
-  }, [pageId, loadPage, setSelectedPageId])
+  }, [pageId, loadPage, pagesContext])
 
   // Watch for title changes from sidebar
-  const currentPage = getPageById(pageId || '')
+  const currentPage = pagesContext?.getPageById(pageId || '')
   useEffect(() => {
     if (currentPage?.title) {
       dispatch({ type: 'UPDATE_TITLE', title: currentPage.title })
@@ -170,19 +170,19 @@ PageEditor.displayName = 'PageEditor'
 
 // Component shown when no page is selected
 function NoPageSelected() {
-  const { pages } = usePagesContext()
+  const pagesContext = usePages()
   const navigate = useNavigate()
   const { workspaceId } = useParams<{ workspaceId: string }>()
 
   useEffect(() => {
     // If there are pages, navigate to the first one
-    if (pages.length > 0 && workspaceId) {
-      const firstPage = pages.find((p) => !p.isFolder) || pages[0]
+    if (pagesContext && pagesContext.pages.length > 0 && workspaceId) {
+      const firstPage = pagesContext.pages.find((p) => !p.isFolder) || pagesContext.pages[0]
       if (firstPage && !firstPage.isFolder) {
         navigate(`/workspace/${workspaceId}/page/${firstPage.id}`)
       }
     }
-  }, [pages, workspaceId, navigate])
+  }, [pagesContext, workspaceId, navigate])
 
   return (
     <div className="workspace__no-page">

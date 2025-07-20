@@ -2,7 +2,7 @@
 
 This document provides a real-time snapshot of what's built, what's in progress, and known issues.
 
-**Last Updated**: January 18, 2025 (Real-time Page Name Sync)
+**Last Updated**: January 19, 2025 (Context Provider Fixes)
 
 ## ✅ Completed Features
 
@@ -173,10 +173,11 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 ### Immediate (This Week)
 
-1. Fix block deletion persistence issue
-2. Fix page creation bugs in workspaces
+1. ~~Fix block deletion persistence issue~~ ✅ (Fixed Jan 17)
+2. ~~Fix page creation bugs in workspaces~~ ✅ (Fixed with context provider fixes)
 3. Test and fix cross-block operations (selection, copy/paste)
 4. Add offline queue for failed saves
+5. Implement workspace-specific last page memory (enhancement)
 
 ### Short Term (Next 2 Weeks)
 
@@ -194,7 +195,21 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 ## 📝 Development Notes
 
-### Recent Changes (January 18, 2025)
+### Recent Changes (January 19, 2025)
+
+- ✅ Fixed "usePagesContext must be used within a PagesProvider" error
+  - Changed components to use safe `usePages()` hook instead of `usePagesContext()`
+  - Added null checks for components that might render before context is ready
+- ✅ Fixed page selection state on fresh load/refresh
+  - PagesContext now reads initial selectedPageId from URL
+  - Added URL sync effect to keep selection in sync with navigation
+  - Parent folders auto-expand to show selected page
+- ✅ Fixed workspace switching to navigate to first page
+  - `selectWorkspace` now fetches and navigates to first non-folder page
+  - Prevents "No page selected" intermediate state
+  - Clean state transition between workspaces
+
+### Previous Changes (January 18, 2025)
 
 - ✅ Moved save status indicator from sidebar to top center of editor
 - ✅ Simplified save indicator to show "All changes saved" or "Unsaved changes"

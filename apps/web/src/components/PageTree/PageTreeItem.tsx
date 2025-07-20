@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { Icon } from '@kairos/ui'
-import { usePagesContext } from '../../contexts/PagesContext'
+import { usePages } from '../../contexts/PagesContext'
 import './PageTreeItem.scss'
 
 interface PageWithChildren {
@@ -25,17 +25,13 @@ interface PageTreeItemProps {
 }
 
 export function PageTreeItem({ page, level, isSelected, onSelect }: PageTreeItemProps) {
-  const { expandedPageIds, togglePageExpanded, updatePage, updatePageLocally, deletePage, createPage, selectedPageId } = usePagesContext()
-
+  const pagesContext = usePages()
   const [isEditing, setIsEditing] = useState(false)
   const [editTitle, setEditTitle] = useState(page.title)
   const [showContextMenu, setShowContextMenu] = useState(false)
   const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 })
   const inputRef = useRef<HTMLInputElement>(null)
   const contextMenuRef = useRef<HTMLDivElement>(null)
-
-  const isExpanded = expandedPageIds.has(page.id)
-  const hasChildren = page.children && page.children.length > 0
 
   // Close context menu when clicking outside
   useEffect(() => {
@@ -55,13 +51,13 @@ export function PageTreeItem({ page, level, isSelected, onSelect }: PageTreeItem
     (e: React.MouseEvent) => {
       e.stopPropagation()
 
-      if (page.isFolder && hasChildren) {
-        togglePageExpanded(page.id)
+      if (pagesContext && page.isFolder && page.children && page.children.length > 0) {
+        pagesContext.togglePageExpanded(page.id)
       }
 
       onSelect(page.id, page.isFolder || false)
     },
-    [page.id, page.isFolder, hasChildren, togglePageExpanded, onSelect]
+    [page.id, page.isFolder, page.children, pagesContext, onSelect]
   )
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
@@ -85,15 +81,15 @@ export function PageTreeItem({ page, level, isSelected, onSelect }: PageTreeItem
   const handleSaveRename = useCallback(async () => {
     const trimmedTitle = editTitle.trim()
 
-    if (trimmedTitle && trimmedTitle !== page.title) {
+    if (trimmedTitle && trimmedTitle !== page.title && pagesContext) {
       // Update locally first for immediate feedback
-      updatePageLocally(page.id, { title: trimmedTitle })
+      pagesContext.updatePageLocally(page.id, { title: trimmedTitle })
       // Then update via API
-      await updatePage(page.id, { title: trimmedTitle })
+      await pagesContext.updatePage(page.id, { title: trimmedTitle })
     }
 
     setIsEditing(false)
-  }, [page.id, page.title, editTitle, updatePage, updatePageLocally])
+  }, [page.id, page.title, editTitle, pagesContext])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -115,41 +111,49 @@ export function PageTreeItem({ page, level, isSelected, onSelect }: PageTreeItem
       ? 'Are you sure you want to delete this folder? All pages inside will also be deleted.'
       : 'Are you sure you want to delete this page?'
 
-    if (confirm(confirmMessage)) {
-      await deletePage(page.id)
+    if (confirm(confirmMessage) && pagesContext) {
+      await pagesContext.deletePage(page.id)
     }
-  }, [page.id, page.isFolder, deletePage])
+  }, [page.id, page.isFolder, pagesContext])
 
   const handleCreateSubpage = useCallback(async () => {
     setShowContextMenu(false)
 
     const title = prompt('Enter page title:')
-    if (!title?.trim()) return
+    if (!title?.trim() || !pagesContext) return
 
-    await createPage(title.trim(), page.id, false)
+    await pagesContext.createPage(title.trim(), page.id, false)
 
     // Auto-expand parent to show new page
-    if (!isExpanded) {
-      togglePageExpanded(page.id)
+    if (pagesContext.expandedPageIds && !pagesContext.expandedPageIds.has(page.id)) {
+      pagesContext.togglePageExpanded(page.id)
     }
-  }, [page.id, isExpanded, createPage, togglePageExpanded])
+  }, [page.id, pagesContext])
 
   const handleCreateSubfolder = useCallback(async () => {
     setShowContextMenu(false)
 
     const title = prompt('Enter folder name:')
-    if (!title?.trim()) return
+    if (!title?.trim() || !pagesContext) return
 
-    await createPage(title.trim(), page.id, true)
+    await pagesContext.createPage(title.trim(), page.id, true)
 
     // Auto-expand parent to show new folder
-    if (!isExpanded) {
-      togglePageExpanded(page.id)
+    if (pagesContext.expandedPageIds && !pagesContext.expandedPageIds.has(page.id)) {
+      pagesContext.togglePageExpanded(page.id)
     }
-  }, [page.id, isExpanded, createPage, togglePageExpanded])
+  }, [page.id, pagesContext])
 
   const baseIndent = 8 - 3 // Account for 3px border
   const indent = baseIndent + level * 20
+
+  if (!pagesContext) {
+    return null
+  }
+
+  const { expandedPageIds, togglePageExpanded, updatePage, updatePageLocally, deletePage, createPage, selectedPageId } = pagesContext
+  const isExpanded = expandedPageIds.has(page.id)
+  const hasChildren = page.children && page.children.length > 0
 
   return (
     <>

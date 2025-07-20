@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuth } from './AuthContext'
-import { apiClient } from '../services/api'
+import { apiClient, pageService } from '../services/api'
 
 interface Workspace {
   id: string
@@ -20,7 +20,7 @@ interface WorkspaceContextValue {
   createWorkspace: (name: string) => Promise<Workspace>
   updateWorkspace: (id: string, name: string) => Promise<Workspace>
   deleteWorkspace: (id: string) => Promise<void>
-  selectWorkspace: (workspaceId: string) => void
+  selectWorkspace: (workspaceId: string) => Promise<void>
 }
 
 const WorkspaceContext = createContext<WorkspaceContextValue | undefined>(undefined)
@@ -177,10 +177,29 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
 
   // Select a workspace
   const selectWorkspace = useCallback(
-    (workspaceId: string) => {
+    async (workspaceId: string) => {
       const workspace = workspaces.find((w) => w.id === workspaceId)
       if (workspace) {
-        navigate(`/workspace/${workspaceId}`)
+        try {
+          // Try to get the first page in the new workspace
+          const response = await pageService.getPages(workspaceId)
+          const pages = response.pages
+
+          // Find the first non-folder page
+          const firstPage = pages.find((p: any) => !p.isFolder) || pages[0]
+
+          if (firstPage && !firstPage.isFolder) {
+            // Navigate directly to the first page
+            navigate(`/workspace/${workspaceId}/page/${firstPage.id}`)
+          } else {
+            // No pages, just navigate to workspace
+            navigate(`/workspace/${workspaceId}`)
+          }
+        } catch (err) {
+          console.error('Failed to fetch pages for workspace:', err)
+          // Fallback to just navigating to workspace
+          navigate(`/workspace/${workspaceId}`)
+        }
       }
     },
     [workspaces, navigate]

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react'
+import { useLocation } from 'react-router-dom'
 import { pageService } from '../services/api'
 import { useWorkspace } from './WorkspaceContext'
 import { useToast } from '../hooks/useToast'
@@ -64,10 +65,18 @@ interface PagesProviderProps {
 }
 
 export function PagesProvider({ children }: PagesProviderProps) {
+  const location = useLocation()
   const [pages, setPages] = useState<PageWithChildren[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [selectedPageId, setSelectedPageId] = useState<string | null>(null)
+
+  // Extract pageId from URL for initial selection
+  const getPageIdFromUrl = () => {
+    const match = location.pathname.match(/\/page\/([^/]+)/)
+    return match ? match[1] : null
+  }
+
+  const [selectedPageId, setSelectedPageId] = useState<string | null>(getPageIdFromUrl())
   const [expandedPageIds, setExpandedPageIds] = useState<Set<string>>(new Set())
 
   const { currentWorkspace: selectedWorkspace } = useWorkspace()
@@ -345,10 +354,15 @@ export function PagesProvider({ children }: PagesProviderProps) {
           const pageTree = buildPageTree(response.pages)
           setPages(pageTree)
 
-          // Auto-expand parent folders will be handled when selectedPageId is set
+          // Get pageId from URL if no selectedPageId is set
+          const pageIdToSelect = selectedPageId || getPageIdFromUrl()
 
-          // If we already have a selectedPageId (set by PageEditor), expand its parents
-          if (selectedPageId) {
+          // If we have a pageId to select (from state or URL), expand its parents
+          if (pageIdToSelect) {
+            // Set it as selected if it's from URL
+            if (!selectedPageId && pageIdToSelect) {
+              setSelectedPageId(pageIdToSelect)
+            }
             const expandParents = (pages: PageWithChildren[], targetId: string, path: string[] = []): string[] | null => {
               for (const page of pages) {
                 if (page.id === targetId) {
@@ -362,7 +376,7 @@ export function PagesProvider({ children }: PagesProviderProps) {
               return null
             }
 
-            const parentPath = expandParents(pageTree, selectedPageId)
+            const parentPath = expandParents(pageTree, pageIdToSelect)
             if (parentPath && parentPath.length > 0) {
               setExpandedPageIds((prev) => {
                 const newSet = new Set(prev)
@@ -385,7 +399,15 @@ export function PagesProvider({ children }: PagesProviderProps) {
       setSelectedPageId(null)
       setExpandedPageIds(new Set())
     }
-  }, [selectedWorkspace?.id, buildPageTree, selectedPageId])
+  }, [selectedWorkspace?.id, buildPageTree])
+
+  // Sync selectedPageId with URL changes
+  useEffect(() => {
+    const pageIdFromUrl = getPageIdFromUrl()
+    if (pageIdFromUrl && pageIdFromUrl !== selectedPageId) {
+      setSelectedPageId(pageIdFromUrl)
+    }
+  }, [location.pathname])
 
   const value: PagesContextType = {
     pages,
