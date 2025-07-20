@@ -54,33 +54,62 @@ AI System Prompt Files/
 
 ### 2. Restructure User Stories into Feature Folders
 
+#### Step 2a: Create folder structure and separate existing user stories
+
 - [ ] Create organized folder structure in `AI System Prompt Files/03-Features/`:
   - [ ] `Editor/`
-    - [ ] `User Stories - Editor.md` (block management, drag/drop)
-    - [ ] Implementation guides (move existing)
   - [ ] `TextFormatting/`
-    - [ ] `User Stories - Text Formatting.md` (bold, italic, links, etc.)
-    - [ ] Implementation guides (move existing)
   - [ ] `PageManagement/`
-    - [ ] `User Stories - Page Management.md` (create, delete, rename pages)
   - [ ] `Workspace/`
-    - [ ] `User Stories - Workspace.md` (workspace creation, file tree, navigation)
   - [ ] `Authentication/`
-    - [ ] `User Stories - Authentication.md` (sign up, login, user management)
   - [ ] `DataManagement/`
-    - [ ] `User Stories - Data Management.md` (import/export, sync, backup)
   - [ ] `AI/` (future features)
-    - [ ] `User Stories - AI Features.md` (consistency checking, writing assistance)
   - [ ] `Collaboration/` (future features)
-    - [ ] `User Stories - Collaboration.md` (sharing, commenting)
-- [ ] Each User Stories document should include:
-  - [ ] User story format: "As a [user], I want to [action], so that [benefit]"
-  - [ ] Acceptance criteria for each story
-  - [ ] Implementation status (Not Started/In Progress/Complete)
-  - [ ] Dependencies on other features
-  - [ ] Links to related implementation guides
-- [ ] Move existing feature guides to appropriate folders
-- [ ] Update original `User Stories.md` to serve as an index to the new structure
+- [ ] Extract existing user stories from `User Stories.md` and create separate files:
+  - [ ] `Editor/User Stories - Editor.md` (block management, drag/drop)
+  - [ ] `TextFormatting/User Stories - Text Formatting.md` (bold, italic, links, etc.)
+  - [ ] `PageManagement/User Stories - Page Management.md` (create, delete, rename pages)
+  - [ ] `Workspace/User Stories - Workspace.md` (workspace creation, file tree, navigation)
+  - [ ] `Authentication/User Stories - Authentication.md` (sign up, login, user management)
+  - [ ] `DataManagement/User Stories - Data Management.md` (import/export, sync, backup)
+- [ ] Move existing feature implementation guides to appropriate folders
+
+#### Step 2b: Convert User Stories.md into a guide
+
+- [ ] Transform original `User Stories.md` into `User Stories Guide.md` that includes:
+  - [ ] How to write effective user stories
+  - [ ] Standard user story format: "As a [user], I want to [action], so that [benefit]"
+  - [ ] Guidelines for writing acceptance criteria
+  - [ ] Template for user story documents
+  - [ ] How to track implementation status (Not Started/In Progress/Complete)
+  - [ ] How to document dependencies between features
+  - [ ] Component mapping section guidelines:
+    - [ ] For implemented features: List which components in `apps/web/src/components/` implement the feature
+    - [ ] For unimplemented features: Mark as "Components: Not yet implemented"
+    - [ ] Include example mapping format showing component paths
+    - [ ] Explain this helps AI assistants understand where to make changes
+  - [ ] Examples of well-written user stories (with and without component mappings)
+  - [ ] Index/directory of all user story documents by feature
+
+#### Step 2c: Review and enhance existing user stories
+
+- [ ] Review each extracted user story document for:
+  - [ ] Completeness of acceptance criteria
+  - [ ] Clarity of user value proposition
+  - [ ] Proper formatting according to the guide
+  - [ ] Current implementation status
+  - [ ] Missing edge cases or requirements
+- [ ] Update user stories based on current implementation knowledge
+- [ ] Ensure each user story has clear links to related implementation guides
+
+#### Step 2d: Add new user stories for missing features
+
+- [ ] Identify features that lack user stories by reviewing:
+  - [ ] Current State.md for implemented features without stories
+  - [ ] Codebase for undocumented functionality
+  - [ ] Project Overview.md for planned features
+- [ ] Write new user stories following the established guide
+- [ ] Ensure comprehensive coverage of all major features
 
 ### 3. Update Navigation Documents
 
