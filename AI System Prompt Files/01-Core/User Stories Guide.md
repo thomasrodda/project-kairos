@@ -50,13 +50,34 @@ Acceptance criteria define what must be true for the story to be considered comp
 3. **Define User Interactions**: Specify exact user actions and expected results
 4. **Keep it Simple**: Focus on behavior, not implementation
 
+### Notes Section Guidelines:
+
+The Notes section is for capturing important information discovered during implementation or review:
+
+- **Implementation discoveries**: Edge cases or behaviors found during development
+- **Clarifications**: Explanations of ambiguous acceptance criteria
+- **Known issues**: Current limitations or bugs
+- **Future considerations**: Ideas for improvements not in current scope
+- **Technical constraints**: Platform-specific behaviors or limitations
+
+Keep notes concise and actionable. Update them as implementation progresses.
+
 ### Example Format:
 
 ```
 Acceptance Criteria:
-- When [action], then [result]
-- [Feature] should [behavior]
-- If [condition], then [outcome]
+- [ ] When [action], then [result]
+- [ ] [Feature] should [behavior]
+- [ ] If [condition], then [outcome]
+```
+
+For completed features, mark the checkboxes:
+
+```
+Acceptance Criteria:
+- [x] When user presses Enter, a new block is created
+- [x] The new block receives focus immediately
+- [ ] Undo operation reverses the block creation
 ```
 
 ## User Story Document Template
@@ -76,9 +97,15 @@ Brief description of what this feature area covers.
 
 Acceptance Criteria:
 
-- [Specific testable criterion]
-- [Another criterion]
-- [Edge case handling]
+- [ ] [Specific testable criterion]
+- [ ] [Another criterion]
+- [ ] [Edge case handling]
+
+Notes:
+
+- [Implementation notes, edge cases discovered during development]
+- [Clarifications about expected behavior]
+- [Known issues or limitations]
 
 Priority: [High/Medium/Low]
 
@@ -110,8 +137,13 @@ Priority: [High/Medium/Low]
 ### Updating Status:
 
 1. Update status when beginning work on a story
-2. Include completion percentage if partially done (e.g., "In Progress - 70%")
-3. Only mark "Complete" when all acceptance criteria are satisfied
+2. Use checkboxes in acceptance criteria to track partial completion:
+   - `- [ ]` for unimplemented criteria
+   - `- [x]` for completed criteria
+3. Status should reflect overall completion:
+   - **Not Started**: No checkboxes marked
+   - **In Progress**: Some checkboxes marked
+   - **Complete**: All checkboxes marked
 4. Add implementation notes when marking complete
 
 ## Component Mapping
@@ -147,11 +179,16 @@ Component mapping helps developers and AI assistants quickly locate where featur
 
 Acceptance Criteria:
 
-- Pressing "Enter" splits the current block and creates a new one below
-- The new block is focused and ready for typing
-- The new block defaults to paragraph type, unless continuing a list
-- Cursor position is preserved when splitting mid-text
-- Empty blocks are created when pressing Enter at the end of a block
+- [x] Pressing "Enter" splits the current block and creates a new one below
+- [x] The new block is focused and ready for typing
+- [x] The new block defaults to paragraph type, unless continuing a list
+- [x] Cursor position is preserved when splitting mid-text
+- [x] Empty blocks are created when pressing Enter at the end of a block
+
+Notes:
+
+- When pressing Enter at the start of a block, the content moves down but maintains its block type
+- List continuation logic only applies when cursor is at the end of a list item
 
 Priority: High
 
@@ -179,13 +216,19 @@ Priority: High
 
 Acceptance Criteria:
 
-- Typing "/" at the start of a block opens a floating menu
-- Menu shows options like Heading 1, Heading 2, Bullet List, Paragraph
-- User can navigate options with arrow keys or mouse
-- Pressing Enter or clicking selects the highlighted option
-- Typing filters the options in real-time
-- Pressing Escape or clicking outside closes the menu
-- The slash character is removed after selecting an option
+- [x] Typing "/" at the start of a block opens a floating menu
+- [x] Menu shows options like Heading 1, Heading 2, Bullet List, Paragraph
+- [x] User can navigate options with arrow keys or mouse
+- [x] Pressing Enter or clicking selects the highlighted option
+- [x] Typing filters the options in real-time
+- [x] Pressing Escape or clicking outside closes the menu
+- [x] The slash character is removed after selecting an option
+
+Notes:
+
+- Menu position adjusts to avoid viewport edges
+- Search resets highlight to first result after each keystroke
+- Typing "/" mid-block also triggers the menu
 
 Priority: High
 

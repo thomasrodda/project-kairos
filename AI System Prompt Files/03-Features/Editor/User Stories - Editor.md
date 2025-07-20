@@ -1,6 +1,6 @@
 # User Stories - Editor
 
-_Extracted from AI System Prompt Files/01-Core/User Stories.md_
+This document contains user stories for the block-based text editor, the core editing experience in Project Kairos.
 
 ## Block Based Text Editor
 
@@ -12,13 +12,35 @@ _Extracted from AI System Prompt Files/01-Core/User Stories.md_
 
 Acceptance Criteria:
 
-- Pressing "Enter" splits the current block and creates a new one below.
-- The new block is focused and ready for typing.
-- The new block defaults to Body type, unless we are continuing something like a bullet point list.
+- [x] Pressing "Enter" splits the current block at the cursor location and creates a new one below.
+- [x] The new block is focused and ready for typing with the cursor at the start of the new block.
+- [ ] The new block defaults to Body type, unless we are continuing a list type block.
+- [x] Cursor position is preserved when splitting mid-text.
+- [x] Empty blocks are created when pressing Enter at the end of a block.
+- [ ] Pressing Enter at the start of a block creates an empty block above.
+- [ ] Empty blocks that have the cursor in them display placegholder text that you can't interact with
+- [x] The placeholder text disappears when the block has content in it.
+
+Notes:
+
+- Pressing enter at the start of a block moves the content of the block down into a new block and therefore changes it's block type. In this case, it should not change the block type. The block above should be body type, but the block below should maintain its type
+- Pressing enter on a list block does not create another list, it just creates a body type
+- The placeholder text displays at the right time but it can sometimes be interacted with.
+- I have experienced occasional bugs with typing that seemed to be related to either the placeholder text or trying to delete the last block. This resulted in typing text that I couldn't see until I created a new block, as well as the typing backwards bug.
 
 Priority: High
 
 **Complexity**: Low
+
+**Status**: In Progress
+
+**Dependencies**: None
+
+**Components**:
+
+- `apps/web/src/components/Editor/EditorContent.tsx` - Handles Enter key events
+- `apps/web/src/contexts/EditorContext.tsx` - ADD_BLOCK action
+- `apps/web/src/utils/blockUtils.ts` - createBlock() function
 
 ---
 
@@ -30,20 +52,39 @@ Priority: High
 
 Acceptance Criteria:
 
-- Typing "/" at the start of a block opens a floating menu.
-- Typing " /" inside a block that may already have content opens the floating menu.
-- Menu shows options like Heading 1, Heading 2, Bullet List, Paragraph.
-- Selecting an option changes the block format.
-- You can select an option using mouse or arrow keys and enter.
-- The top option is automatically highlighted.
-- Pressing enter will apply the highlighted option.
-- There will be a search box that is automatically focused when the popup is triggered.
-- Typing in the search box filters the formatting options in real time.
-- Clicking off the popup or pressing escape closes it.
+- [x] Typing "/" at the start of a block opens a floating menu.
+- [x] Typing " /" inside a block that may already have content opens the floating menu.
+- [x] Menu shows options like Heading 1, Heading 2, Bullet List, Paragraph. Displayed in a scrollable list.
+- [x] Menu displays above the block where the slash was typed.
+- [x] Selecting an option changes the block format.
+- [x] You can select an option using mouse or arrow keys and enter.
+- [x] The top option is automatically highlighted.
+- [x] Pressing enter will apply the highlighted option.
+- [x] There will be a search box at the top of the floating menu that is automatically focused when the popup is triggered.
+- [x] Typing in the search box filters the formatting options in real time.
+- [x] Each time the search is altered, the highlighted option gets reset to the top result.
+- [x] Clicking off the popup or pressing escape closes it and no block type change takes place, cancelling the operation.
+- [ ] Cancelling the operation should reinsert the typed "/" or " /" where it was typed.
+
+Notes:
+
+- Typing "/" directly after content in a block moves the cursor back to the start of the block. This should just type a "/" without triggering the menu. - Edit: I can no longer reproduce this. Let's look into it.
 
 Priority: High
 
 **Complexity**: Medium
+
+**Status**: In Progress
+
+**Dependencies**:
+
+- Block creation must be implemented first
+
+**Components**:
+
+- `apps/web/src/components/Editor/SlashCommandMenu/` - Menu component
+- `apps/web/src/components/Editor/EditorContent.tsx` - Triggers menu
+- `apps/web/src/hooks/useSlashCommands.ts` - Menu logic
 
 ---
 
@@ -57,27 +98,43 @@ Acceptance Criteria:
 
 **Typing markdown syntax:**
 
-- Typing "# " at the start of a block automatically converts it to Heading 1 format but preserves the "# " characters in the content.
-- Typing "## " at the start of a block automatically converts it to Heading 2 format but preserves the "## " characters in the content.
-- Typing "- " or "\* " at the start of a block automatically converts it to a Bullet List item but preserves the markdown characters.
-- The visual formatting changes immediately after typing the space character following the markdown syntax.
-- The block displays with proper heading/list styling while maintaining the underlying markdown syntax.
+- [x] Typing "# " or other markdown syntax at the start of a block automatically converts it to Heading 1 (or other relevant) and automatically removes the markdown from the block content.
+- [x] The visual formatting changes immediately after typing the space character following the markdown syntax.
+- [x] The block displays with proper heading/list styling while maintaining the underlying markdown syntax.
 
 **Pasting markdown content:**
 
-- When pasting text that contains markdown syntax (like "# Heading" or "- List item"), the app automatically creates properly formatted blocks.
-- Each markdown element becomes a separate block with the appropriate type and formatting.
-- The original markdown syntax is preserved in the content.
+- [ ] When pasting text that contains markdown syntax (like "# Heading" or "- List item"), the app automatically creates properly formatted blocks.
+- [ ] Each markdown element becomes a separate block with the appropriate type and formatting.
+- [ ] The markdown is removed and the blocks are styled accordingly.
 
 **Copying formatted content:**
 
-- When copying blocks from the app, the copied text includes the proper markdown syntax.
-- Pasting this copied content into other markdown-compatible applications (like GitHub, Notion, etc.) displays correctly with formatting.
-- Multiple blocks are copied as properly formatted markdown with appropriate line breaks.
+- [ ] When copying text, the copied text includes the proper markdown syntax that matches the blocks.
+- [ ] Pasting this copied content into other markdown-compatible applications (like GitHub, Notion, etc.) displays correctly with markdown formatting.
+- [ ] Multiple blocks are copied as properly formatted markdown with appropriate line breaks. There should be a line break between each block that gets copied into the markdown.
+
+Notes:
+
+- Pasting markdown into the app doesn't get formatted unless you readd the space after the markdown, or retype a "\*".
+- Each line of markdown does become a separate block, this does include empty lines. Need to make a decision on this.
+- Copying text across multiple blocks pastes without markdown and with 13 line breaks between lines where there should be none.
 
 Priority: High
 
 **Complexity**: Medium-High
+
+**Status**: In Progress
+
+**Dependencies**:
+
+- Block creation must be implemented first
+
+**Components**:
+
+- `apps/web/src/components/Editor/EditorContent.tsx` - Markdown detection
+- `apps/web/src/utils/markdownUtils.ts` - Markdown parsing logic
+- `apps/web/src/contexts/EditorContext.tsx` - Block type changes
 
 ---
 
@@ -89,17 +146,34 @@ Priority: High
 
 Acceptance Criteria:
 
-- Each block has a drag handle on the left that appears when the block is hovered over.
-- Clicking, holding and dragging the handle will begin to move the block.
-- You can click in empty space and drag over blocks to select multiple blocks for deletion.
-- Blocks can be clicked and dragged vertically.
-- A coloured line appears between blocks to indicate the location where the dragged block will be dropped.
-- This line only appears where the dragged block is hovered over.
-- Dropping moves the block to the new position.
+- [x] Each block has a drag handle on the left that appears when the block is hovered over.
+- [x] Clicking, holding and dragging the handle will begin to move the block.
+- [ ] You can click in empty space and drag over blocks to select multiple blocks.
+- [ ] You can then use the drag handle of the top selected block to drag and drop the selection.
+- [x] Blocks can be clicked and dragged vertically.
+- [x] Dropping moves the block(s) to the new position.
+
+Notes:
+
+- _No additional notes yet_
 
 Priority: Medium
 
 **Complexity**: Medium–High
+
+**Status**: In Progress
+
+**Dependencies**:
+
+- Block creation must be implemented first
+- Multi-block selection system
+
+**Components**:
+
+- `apps/web/src/components/Editor/DraggableBlock.tsx` - Drag wrapper
+- `apps/web/src/components/Editor/Block.tsx` - Block component with drag handle
+- `apps/web/src/contexts/EditorContext.tsx` - MOVE_BLOCK action
+- Uses @dnd-kit library for drag functionality
 
 ---
 
@@ -111,13 +185,32 @@ Priority: Medium
 
 Acceptance Criteria:
 
-- Cmd/Ctrl+Z undoes the last action.
-- Cmd/Ctrl+Shift+Z or Y redoes it.
-- Actions like typing, formatting, and moving blocks are tracked.
+- [ ] Cmd/Ctrl+Z undoes the last action.
+- [ ] Cmd/Ctrl+Shift+Z redoes it.
+- [ ] Actions like typing, formatting, and moving blocks are tracked.
+
+Notes:
+
+- _No additional notes yet_
 
 Priority: Medium
 
 **Complexity**: Medium
+
+**Status**: Not Started
+
+**Dependencies**:
+
+- Editor state management must be established
+- All block operations must be tracked
+
+**Components**: Not yet implemented
+
+**Proposed Implementation**:
+
+- Command pattern for action history
+- UndoManager service in `apps/web/src/services/`
+- Integration with EditorContext
 
 ---
 
@@ -129,18 +222,37 @@ Priority: Medium
 
 Acceptance Criteria:
 
-- Pressing backspace in an empty block deletes it and focuses the previous block.
-- Clicking on the drag handle highlights the block. Pressing delete removes the highlighted block.
-- You can click in empty space and drag over blocks to select multiple blocks for deletion.
-- There's no confirmation for deleting empty blocks.
+- [x] Pressing backspace in an empty block deletes it and focuses the previous block.
+- [x] Clicking on the drag handle highlights the block. Pressing delete removes the highlighted block.
+- [ ] You can click in empty space and drag over blocks to select multiple blocks for deletion.
+- [x] There's no confirmation for deleting empty blocks but you can undo it.
+- [x] Pressing backspace at the start of a block merges it with the previous block.
+- [ ] Deleting the last block in a page recreates the default starter block that a new page starts with.
+
+Notes:
+
+- Currently you cannot delete the last block in the page. Which is a solution, but I would rather it deletes and creates the default block.
 
 Priority: Medium
 
 **Complexity**: Low
 
+**Status**: In Progress
+
+**Dependencies**:
+
+- Block creation and selection system
+
+**Components**:
+
+- `apps/web/src/components/Editor/EditorContent.tsx` - Backspace handling
+- `apps/web/src/components/Editor/Block.tsx` - Selection UI
+- `apps/web/src/contexts/EditorContext.tsx` - DELETE_BLOCK action
+- `apps/web/src/hooks/useCrossBlockSelection.ts` - Multi-block selection
+
 ---
 
-### 7. Copy/Paste **support**
+### 7. **Copy/Paste support**
 
 > User Story:
 >
@@ -148,10 +260,39 @@ Priority: Medium
 
 Acceptance Criteria:
 
-- Cmd/Ctrl+C copies the selected block(s) or text
-- Cmd/Ctrl+V pastes the selected block(s) in the next space below the block with the cursor
-- Cmd/Ctrl+V pastes the selected text at the cursor location inside the block
+- [ ] Cmd/Ctrl+C copies the selected block(s) or text
+- [ ] Cmd/Ctrl+V pastes the selected block(s) in the next space below the block with the cursor
+- [x] Cmd/Ctrl+V pastes the selected text at the cursor location inside the block
+- [ ] Formatting is preserved when copying/pasting within Kairos
+- [x] Pasting from external sources converts content to Kairos blocks
+
+Notes:
+
+- You can copy and paste text but not blocks.
+- Pasting text from outside does create blocks per line, but markdown formatting does not carry over, as discussed above.
 
 Priority: Medium
 
 **Complexity**: Medium
+
+**Status**: In Progress
+
+**Dependencies**:
+
+- Block selection system
+- Text formatting system
+
+**Components**:
+
+- `apps/web/src/components/Editor/EditorContent.tsx` - Copy/paste handlers
+- `apps/web/src/utils/clipboardUtils.ts` - Clipboard formatting logic
+- Custom Kairos clipboard format for preserving formatting
+
+---
+
+## Related Documentation
+
+- **[Enhanced Custom Editor Plan](./Enhanced Custom Editor Plan.md)** - Technical architecture and implementation strategy
+- **[Text Formatting Plan](../TextFormatting/Text Formatting Plan.md)** - Rich text formatting implementation details
+- **[Component Structure Guide](../Component Structure Guide.md)** - General component patterns used in the editor
+- **[Current State](../../01-Core/Current State.md)** - Current implementation status of editor features

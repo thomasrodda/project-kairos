@@ -1,6 +1,6 @@
 # User Stories - Text Formatting
 
-_Extracted from AI System Prompt Files/01-Core/User Stories.md_
+User stories for text formatting features in the block-based editor, including rich text formatting toolbar and internal linking capabilities.
 
 ## Block Based Text Editor
 
@@ -10,14 +10,35 @@ _Extracted from AI System Prompt Files/01-Core/User Stories.md_
 >
 > As a user, I want to highlight text and apply formatting, so that I can style my writing (e.g., bold, italic, link).
 
-Acceptance Criteria:
+**Status**: ✅ Complete
 
-- Highlighting text shows a floating formatting popup above the highlighted text.
-- Popup includes options: Bold, Italic, Underline. More options to come in the future.
-- Clicking an option applies formatting to the selection.
-- Clicking off of the popup or pressing escape closes the popup.
+**Dependencies**:
 
-Priority: High
+- EditorContext for state management
+- Text selection utilities
+- Formatting renderer
+
+**Components**:
+
+- `FormattingToolbar/` - Floating toolbar component
+- `utils/textFormatting.ts` - Core formatting logic
+- `utils/formattingRenderer.tsx` - Renders formatted text
+
+**Acceptance Criteria:**
+
+- [x] Highlighting text shows a floating formatting popup above the highlighted text
+- [x] Popup includes options: Bold, Italic, Underline
+- [x] Clicking an option applies formatting to the selection
+- [x] Clicking off of the popup or pressing escape closes the popup
+- [x] Keyboard shortcuts work (Ctrl/Cmd+B/I/U)
+- [x] Link formatting supported (Ctrl/Cmd+K)
+- [x] Formatting persists to database
+
+**Notes:**
+
+- _No additional notes yet_
+
+**Priority**: High
 
 **Complexity**: Medium
 
@@ -31,15 +52,34 @@ Priority: High
 >
 > As a user, I want to type "@" to search and link to other pages, so that I can quickly reference related content.
 
-Acceptance Criteria:
+**Status**: 🔄 Not Started
 
-- Typing "@" opens a floating popup search menu of existing pages.
-- Selecting a result inserts a link to that page.
-- The results can be filtered by typing and searched through with the mouse or arrow keys in the same was as the block formatting for example
-- The link is clickable and navigates to the target page.
-- The link is the name of the page with a faint highlight colour to indicate it's a link
-- When hovered over, the link also gains a underline
+**Dependencies**:
 
-Priority: High
+- Page search functionality
+- PagesContext for page list
+- Floating menu component (similar to SlashCommandMenu)
+- Link formatting system
+
+**Components**:
+
+- `MentionMenu/` - To be created
+- Integration with existing link formatting
+- Page search/filter utilities
+
+**Acceptance Criteria:**
+
+- [ ] Typing "@" opens a floating popup search menu of existing pages
+- [ ] Selecting a result inserts a link to that page
+- [ ] The results can be filtered by typing and searched through with the mouse or arrow keys (similar to slash commands)
+- [ ] The link is clickable and navigates to the target page
+- [ ] The link is the name of the page with a faint highlight color to indicate it's a link
+- [ ] When hovered over, the link also gains an underline
+
+**Notes:**
+
+- _No additional notes yet_
+
+**Priority**: High
 
 **Complexity**: Medium
