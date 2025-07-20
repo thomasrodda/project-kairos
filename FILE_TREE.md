@@ -38,7 +38,7 @@ AI System Prompt Files
 │   ├── MVP.md
 │   ├── Project Management & Development Guide.md
 │   ├── Project Overview.md
-│   └── User Stories.md
+│   └── User Stories Guide.md
 ├── 02-Architecture
 │   ├── Architecture.md
 │   ├── Backend Api Guide.md
