@@ -2,356 +2,141 @@ Current Date: 21/07/2025
 
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides essential guidance to Claude Code when working with Project Kairos. For detailed information, follow the documentation workflow below.
 
 ## 🚨 MANDATORY: NOTIFICATION SYSTEM 🚨
 
-**CRITICAL REQUIREMENT**: You MUST send notifications for ALL task completions and user input requests. This is NOT optional.
+**CRITICAL**: You MUST send notifications for ALL task completions and user input requests.
 
-### Task Completion Notifications (REQUIRED)
+### Task Completion: `"/mnt/c/Users/thoma/Project Kairos/scripts/notify.sh" complete`
 
-When ANY task completes, immediately run:
-
-```bash
-"/mnt/c/Users/thoma/Project Kairos/scripts/notify.sh" complete
-```
+### User Input Request: `"/mnt/c/Users/thoma/Project Kairos/scripts/notify.sh" question`
 
 Examples:
 
-- After running tests: `notify.sh complete`
-- After creating/editing files: `notify.sh complete`
-- After any command execution: `notify.sh complete`
-
-### User Input Request Notifications (REQUIRED)
-
-Before requesting user input or decisions, immediately run:
-
-```bash
-"/mnt/c/Users/thoma/Project Kairos/scripts/notify.sh" question
-```
-
-Examples:
-
-- Before "Do you want to proceed?": `notify.sh question`
-- When asking for clarification: `notify.sh question`
-- When presenting options: `notify.sh question`
-
-### Fallback Alert
-
-If the notification script fails, use: `echo -e "\a"`
-
-**ENFORCEMENT**: Failure to send notifications violates core instructions. You MUST alert on EVERY task completion and user input request.
-
-## How To Work
-
-Please always think step by step and use sub agents where helpful.
+- After any task: `notify.sh complete`
+- Before asking questions: `notify.sh question`
+- Fallback if script fails: `echo -e "\a"`
 
 ## 📝 MANDATORY: Documentation Updates Before Commits
 
-**CRITICAL**: When the user asks you to commit and push changes, you MUST FIRST:
+When committing, you MUST FIRST:
 
-1. **Review all changes made** - List what files were modified/created
-2. **Update relevant documentation**:
-   - Update `Current State.md` if features were added/completed
-   - Update `Test Inventory.md` if tests were added/modified
-   - Update relevant guides if implementation patterns changed
-   - Update `CLAUDE.md` if new patterns or practices were established
-   - Update component-specific documentation if components were modified
-3. **Verify documentation accuracy**:
-   - Ensure file paths in docs match actual structure
-   - Update any code examples to reflect current implementation
-   - Check that all cross-references between docs are valid
-4. **Only then proceed with commit and push**
+1. Review all changes made
+2. Update relevant documentation (Current State.md, Test Inventory.md, guides, user stories)
+3. Verify documentation accuracy
+4. Only then commit and push
 
-Example workflow:
+## 📍 Project Overview
 
-```bash
-# User: "Please commit and push these changes"
-# You: "Let me first update the documentation to reflect these changes..."
-# [Update relevant docs]
-# [Then commit with descriptive message]
-# [Then push]
+Project Kairos is a creative writing and worldbuilding web application for novelists and D&D campaign planners. It features a block-based editor with drag-and-drop, text formatting, and AI-driven writing assistance.
+
+**Current Focus**: Documentation Review.
+
+## 🗺️ Documentation Navigation Workflow
+
+### How to Navigate Documentation:
+
+```
+1. Start Here → Project Overview.md (understand the product)
+2. Find Feature → AI System Prompt Files/03-Features/[FeatureCategory]/
+3. Read Requirements → User Stories - [Feature].md
+4. Check Implementation → Relevant implementation guides in the folder
 ```
 
-This ensures documentation stays synchronized with code changes and prevents drift between implementation and documentation.
+### Examples:
 
-## 🚀 Quick Start
+- **Working on editor?** → `03-Features/Editor/User Stories - Editor.md`
+- **Need page management?** → `03-Features/PageManagement/User Stories - Page Management.md`
+- **Authentication work?** → `03-Features/Authentication/User Stories - Authentication.md`
 
-### Current Focus
+### Quick Decision Guide:
 
-**Current State**: Style Guide implementation complete - accessible via Ctrl+Shift+S with spacing and typography examples.
+- **"What should I work on?"** → Check Current State.md
+- **"How does X feature work?"** → Check feature folder → User Stories
+- **"Where is X located?"** → Check FILE_TREE.md
+- **"How do I run X?"** → Check Quick Commands.md
+- **"X is broken!"** → Check Troubleshooting Guide.md
 
-**Next Features**: Workspace templates (Game Master, Novelist, Script Writer), Page Type system (block/prose/script editors), global workspace search
-
-### Prerequisites
-
-- **Node.js**: v22+ required
-- **Yarn**: v4.0+ required (project uses Yarn 4.9.2)
-- **PostgreSQL**: For database (local or cloud)
-- **Git**: v2.25+ recommended
-
-### Essential Commands
+## 🚀 Essential Commands
 
 ```bash
-yarn dev          # Start development servers (web:3000, api:3001)
+yarn dev          # Start development (web:3000, api:3001)
 yarn test         # Run all tests
 yarn lint         # Fix linting issues
 yarn typecheck    # Check TypeScript types
 ```
 
-📋 **Full command reference**: [Quick Commands.md](AI System Prompt Files/06-DevOps/Quick Commands.md)
+📋 **Full reference**: [Quick Commands.md](AI System Prompt Files/06-DevOps/Quick Commands.md)
 
-## 📍 Project Overview
+## 📂 Key Documents
 
-Project Kairos is a creative writing and worldbuilding web application designed for novelists, writers, and D&D campaign planners. It combines block-based editing with AI-driven tools for consistency checking and writing assistance.
+- **[Project Overview.md](AI System Prompt Files/01-Core/Project Overview.md)** - Product vision and scope
+- **[Current State.md](AI System Prompt Files/01-Core/Current State.md)** - What's built, issues, next steps
+- **[User Stories Guide.md](AI System Prompt Files/01-Core/User Stories Guide.md)** - How to read/write user stories
+- **[INDEX.md](AI System Prompt Files/01-Core/INDEX.md)** - Complete documentation directory
+- **[FILE_TREE.md](FILE_TREE.md)** - Project structure
 
-**Current Status**: Block editor fully functional with drag-and-drop, cross-block selection, slash commands, text formatting (bold, italic, underline, links), keyboard shortcuts (Ctrl/Cmd+B/I/U/K), inline markdown auto-conversion, and block-level markdown (# for H1, ## for H2, - for bullets). Database migration Phase 1 complete with auto-save working for text editing, block reordering, and block deletion (fixed January 17, 2025).
+## 🔧 Key Locations
 
-## 🗺️ Document Navigation
+### Application Code: `apps/web/src/`
 
-### Essential Documents (Check These First)
+- `components/` - React components by feature (Editor/, Sidebar/, Workspace/)
+- `contexts/EditorContext.tsx` - Central editor state
+- `hooks/` - Custom React hooks
+- `utils/` - Helper functions
 
-- **[INDEX.md](AI System Prompt Files/01-Core/INDEX.md)** - Helps you navigate Project Kairos documentation efficiently
-- **[Current State.md](AI System Prompt Files/01-Core/Current State.md)** - What's built, in progress, known issues
-- **[FILE_TREE.md](FILE_TREE.md)** - Complete project structure
-- **[Quick Commands.md](AI System Prompt Files/06-DevOps/Quick Commands.md)** - All commands reference
-- **[Troubleshooting Guide.md](AI System Prompt Files/06-DevOps/Troubleshooting Guide.md)** - Common fixes
+### Packages: `packages/`
 
-### Core Project Documents
+- `@kairos/ui` - Shared components
+- `@kairos/types` - TypeScript types
+- `@kairos/design-tokens` - SCSS variables
 
-- **[Project Overview.md](AI System Prompt Files/01-Core/Project Overview.md)** - Product vision, terminology, target users
-- **[User Stories.md](AI System Prompt Files/01-Core/User Stories.md)** - Feature requirements
-- **[MVP.md](AI System Prompt Files/01-Core/MVP.md)** - MVP scope and phases
-- **[Architecture.md](AI System Prompt Files/02-Architecture/Architecture.md)** - System design
-- **[Development Plan.md](AI System Prompt Files/01-Core/Development Plan.md)** - Feature roadmap
+## ⚡ Development Workflow
 
-### Implementation Guides
+1. **Before implementing**: Check feature's User Stories document
+2. **Follow patterns**: Look at similar existing code
+3. **Write tests**: Colocate with components
+4. **Update docs**: Keep documentation current
+5. **Run checks**: `yarn test` and `yarn lint` before committing
 
-- **[Component Structure Guide.md](AI System Prompt Files/03-Features/Component Structure Guide.md)** - React patterns
-- **[Testing Guide.md](AI System Prompt Files/04-Testing/Testing Guide.md)** - Comprehensive testing strategy and patterns
-- **[Test Inventory.md](AI System Prompt Files/04-Testing/Test Inventory.md)** - Current test status and quality tracking
-- **[Text Formatting Plan.md](AI System Prompt Files/03-Features/Text Formatting Plan.md)** - Rich text implementation
-- **[Backend Api Guide.md](AI System Prompt Files/02-Architecture/Backend Api Guide.md)** - API design
-- **[Data Model Guide.md](AI System Prompt Files/02-Architecture/Data Model Guide.md)** - Database schema
+## 🎨 Quick Style Reference
 
-### Quick Decision Guide
-
-- **"What should I work on?"** → Check Current State.md
-- **"How do I implement X?"** → Check User Stories + relevant Guide
-- **"Where is X located?"** → Check FILE_TREE.md
-- **"How do I run X?"** → Check Quick Commands.md
-- **"X is broken!"** → Check Troubleshooting Guide.md
-- **"What's the full doc list?"** → See [INDEX.md](AI System Prompt Files/01-Core/INDEX.md)
-
-## Key File Locations
-
-### Core Application (`apps/web/`)
-
-- **Components**: `src/components/` - All React components organized by feature
-  - `Editor/` - Block editor components (Block, PageTitle, EditorContent, ContentEditableContainer, FormattingToolbar, SlashCommandMenu)
-  - `Sidebar/` - Navigation sidebar
-  - `Workspace/` - Main layout wrapper
-- **State Management**: `src/contexts/EditorContext.tsx` - Central editor state with formatting support
-- **Hooks**: `src/hooks/` - Custom React hooks (useCrossBlockSelection, useDismiss)
-- **Utilities**: `src/utils/` - Helper functions (textFormatting, textSelection, formattingRenderer)
-- **Tests**: Component tests are colocated with components (e.g., `PageTitle.test.tsx`)
-- **Styles**: `src/styles/` - Global styles and reset
-
-### Packages (`packages/`)
-
-- **@kairos/ui**: Shared React components and icons
-- **@kairos/utils**: Utilities (ID generation, validation with Zod)
-- **@kairos/types**: TypeScript type definitions
-- **@kairos/design-tokens**: SCSS variables and design system
-- **@kairos/database**: Prisma database layer (planned)
-
-## Technology Stack
-
-- **Frontend**: React 18.3 with TypeScript 5.8, Vite, Custom SCSS styling
-- **Backend**: Express 5 with Vercel Serverless Functions
-- **State Management**: React Context + useReducer pattern
-- **Drag & Drop**: @dnd-kit library
-- **Testing**: Jest + React Testing Library + Cypress
-- **Monorepo**: Yarn Workspaces with 5 packages
-- **Styling**: SCSS with design tokens system
-
-## 🚀 First Time Setup
-
-```bash
-# 1. Clone and install
-git clone [repo-url]
-cd project-kairos
-yarn install
-
-# 2. Set up environment
-cp .env.example .env.local
-# Edit .env.local with your database and Firebase credentials
-
-# 3. Initialize database
-yarn db:generate
-yarn db:migrate
-
-# 4. Start development
-yarn dev
-```
-
-📋 **Detailed setup**: [Environment Setup Guide.md](AI System Prompt Files/06-DevOps/Environment Setup Guide.md)
-
-## Architecture Overview
-
-### Block-Based Editor Architecture
-
-The editor uses a unified contentEditable approach with sophisticated state management:
-
-1. **EditorContext** (`src/contexts/EditorContext.tsx`):
-
-   - Central state management using useReducer
-   - Manages blocks, selection, focus, cross-block text selection, and text formatting
-   - Separate formatting layer: plain text content + TextFormat array
-   - Actions: ADD_BLOCK, UPDATE_BLOCK, DELETE_BLOCK, MOVE_BLOCK, APPLY_FORMATTING, etc.
-
-2. **Component Hierarchy**:
-
-   ```
-   Editor
-   ├── PageTitle
-   ├── FormattingToolbar (appears on text selection)
-   └── EditorContent (single contentEditable div)
-       ├── SlashCommandMenu (appears on "/" key)
-       └── DraggableBlock[] (drag wrapper)
-           └── Block (renders formatted content)
-               └── BlockDragHandle (selection/drag UI)
-   ```
-
-3. **Block Types**: `h1`, `h2`, `h3`, `paragraph`, `bullet`
-
-4. **Key Features**:
-   - Drag-and-drop block reordering
-   - Multi-block selection (Shift+click, Ctrl/Cmd+click)
-   - Cross-block text selection (custom implementation)
-   - Text formatting (bold, italic, underline, links) via toolbar
-   - Slash commands for changing block types
-   - Placeholder hints for slash commands and AI features
-   - Copy/paste with custom Kairos format support
-
-### Testing Architecture
-
-- **Unit Tests**: Component-level testing with React Testing Library
-- **Integration Tests**: API endpoint testing with Supertest
-- **E2E Tests**: User flow testing with Cypress
-- **Mocking**: CSS modules, SVG imports, and @kairos/ui icons
-- **Test Utils**: `apps/web/src/test/utils.tsx` - Helper functions for testing with contexts
-
-## 🎯 Development Status
-
-For detailed status, see [Current State.md](AI System Prompt Files/01-Core/Current State.md)
-
-**Quick Summary**:
-
-- ✅ Editor foundation complete (drag/drop, selection, copy/paste, slash commands)
-- ✅ Text formatting complete (bold, italic, underline, links via toolbar or keyboard shortcuts)
-- ✅ Test coverage: 300+ tests passing across all components
-- ✅ Block-level markdown complete (# to H1, ## to H2, - to bullets)
-- ✅ Database migration Phase 1 complete (local PostgreSQL)
-- ✅ Auto-save working for text editing, block reordering, and block deletion
-- ✅ Block deletion persistence fixed (January 17, 2025)
-- 📋 Next: Page creation bugs, component library, style guide enhancements
-
-## Development Best Practices
-
-### When Making Changes
-
-1. **Check FILE_TREE.md** to understand file locations
-2. **Read relevant guides** in `AI System Prompt Files/`
-3. **Follow existing patterns** - check similar components/files
-4. **Write tests** - colocate with components, use Testing Guide format
-5. **Update documentation** - keep CLAUDE.md and Testing Plan current
-
-### Testing Guidelines
-
-See [Testing Guide.md](AI System Prompt Files/04-Testing/Testing Guide.md) for comprehensive testing strategy and patterns.
-
-**Quick reminders:**
-
-- Test user behavior, not implementation
-- Run `yarn test` before committing
-- Use the 4-category test structure (Core, Interactions, Errors, A11y)
-
-### Code Style
-
-- TypeScript strict mode enforced
-- SCSS with BEM methodology
-- Design tokens for consistency
-- No inline styles unless dynamic
-- Meaningful component and variable names
-
-## 🎨 Styling Guidelines
-
-**For all styling questions, refer to the [Styling Guide.md](AI System Prompt Files/05-Styling/Styling Guide.md)**
-
-Key points:
-
-- Use **numeric spacing tokens** (e.g., `var(--spacing-16)`) - they're clearer than semantic names
-- Use design tokens for colors, shadows, radii, z-indexes, etc.
-- Check the Styling Guide for component patterns and when to create reusable components vs custom styles
-- Run `yarn lint:styles` to validate your styles
-
-Quick reference for spacing:
+Use numeric spacing tokens:
 
 ```scss
---spacing-4   // 4px  - minimal
---spacing-8   // 8px  - tight
---spacing-16  // 16px - default ⭐
---spacing-24  // 24px - comfortable
---spacing-32  // 32px - spacious
+--spacing-4   // 4px
+--spacing-8   // 8px
+--spacing-16  // 16px (default)
+--spacing-24  // 24px
+--spacing-32  // 32px
 ```
 
-## Development Notes
+📋 **Full guide**: [Styling Guide.md](AI System Prompt Files/05-Styling/Styling Guide.md)
 
-- **WSL Users**: Vite is configured with polling for file watching
-- **Port Conflicts**: Use `yarn kill-ports` if dev servers fail to start
-- **SCSS Imports**: Design tokens are auto-imported globally
-- **Type Safety**: Strict TypeScript mode is enabled
-- **Pre-commit**: Husky runs linting and formatting on staged files
-- **Git Workflow**: Work on feature branches, create PRs to main
+## 🔗 Detailed Guides
 
-### Text Formatting Architecture
+- **Setup**: [Environment Setup Guide.md](AI System Prompt Files/06-DevOps/Environment Setup Guide.md)
+- **Architecture**: [Architecture.md](AI System Prompt Files/02-Architecture/Architecture.md)
+- **Testing**: [Testing Guide.md](AI System Prompt Files/04-Testing/Testing Guide.md)
+- **Components**: [Component Structure Guide.md](AI System Prompt Files/03-Features/Component Structure Guide.md)
 
-- **Separate Layer**: Formatting is stored separately from content (plain text + TextFormat array)
-- **Position-based**: TextFormat uses start/end positions in the plain text
-- **Toggle Logic**: Use `toggleFormat()` to apply/remove formatting
-- **Selection Restoration**: Complex logic to restore selection after DOM changes from formatting
-- **No Cross-Block**: Formatting currently only works within single blocks
+## 💡 Important Notes
 
-Key files for formatting:
+- **WSL Users**: Vite uses polling for file watching
+- **Port Conflicts**: Run `yarn kill-ports`
+- **TypeScript Strict**: Always enabled
+- **Feature Folders**: All feature docs in `AI System Prompt Files/03-Features/[Feature]/`
 
-- `src/utils/textFormatting.ts` - Core formatting utilities
-- `src/utils/formattingRenderer.tsx` - Renders formatted text
-- `src/components/Editor/FormattingToolbar/` - Toolbar component
-- `src/contexts/EditorContext.tsx` - TextFormat types and actions
-
-## 🛠️ Troubleshooting
-
-### Common Issues
-
-- **Port already in use**: Run `yarn kill-ports`
-- **Tests failing on format**: Run `yarn format`
-- **TypeScript errors**: Run `yarn typecheck` then `yarn db:generate` if needed
-- **Can't find a file**: Check `FILE_TREE.md`
-- **Unsure what to work on**: Check `AI System Prompt Files/01-Core/Current State.md`
-
-### Important Paths to Remember
+## 🛠️ Common Tasks
 
 ```bash
-# Current project state
+# Check current state
 cat "AI System Prompt Files/01-Core/Current State.md"
 
-# Documentation index
-cat "AI System Prompt Files/01-Core/INDEX.md"
+# Find feature docs
+ls "AI System Prompt Files/03-Features/"
 
-# File structure
+# View file structure
 cat FILE_TREE.md
-
-# Test coverage status
-cat "AI System Prompt Files/04-Testing/Test Inventory.md"
 ```

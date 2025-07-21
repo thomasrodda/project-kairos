@@ -14,7 +14,10 @@
 
 - **[Project Overview.md](./Project Overview.md)** - Product vision, target users, terminology
   - _Use when_: Understanding product goals, checking feature scope
-- **[User Stories.md](./User Stories.md)** - Detailed feature requirements with acceptance criteria
+- **[User Stories Guide.md](./User Stories Guide.md)** - How to write and navigate user stories
+  - _Use when_: Learning the user story format, finding feature requirements
+- **Feature User Stories** - Organized by feature in `../03-Features/[Feature]/`
+  - Examples: `Editor/User Stories - Editor.md`, `PageManagement/User Stories - Page Management.md`
   - _Use when_: Implementing specific features, checking requirements
 - **[MVP.md](./MVP.md)** - MVP scope summary and development phases
   - _Use when_: Checking what's in/out of MVP, understanding priorities
@@ -44,9 +47,33 @@
 - **[Environment Setup Guide.md](../06-DevOps/Environment Setup Guide.md)** - Complete setup instructions
   - _Use when_: First time setup, configuring environment, database setup
 
+## 📂 Feature Documentation (NEW STRUCTURE)
+
+### Documentation Workflow
+
+1. **Start with Project Overview** - Understand the product vision
+2. **Navigate to Feature Folder** - `../03-Features/[FeatureName]/`
+3. **Read User Stories** - `User Stories - [Feature].md` for requirements
+4. **Check Implementation Guides** - Feature-specific guides in the same folder
+
+### Feature Folders
+
+- **Editor/** - Block editor, text formatting, drag & drop
+  - [User Stories - Editor.md](../03-Features/Editor/User Stories - Editor.md)
+  - [Text Formatting Plan.md](../03-Features/Editor/Text Formatting Plan.md)
+  - [Enhanced Custom Editor Plan.md](../03-Features/Editor/Enhanced Custom Editor Plan.md)
+- **PageManagement/** - Page creation, deletion, organization
+  - [User Stories - Page Management.md](../03-Features/PageManagement/User Stories - Page Management.md)
+- **Workspace/** - Workspace management and navigation
+  - [User Stories - Workspace.md](../03-Features/Workspace/User Stories - Workspace.md)
+- **Authentication/** - User sign up, login, sessions
+  - [User Stories - Authentication.md](../03-Features/Authentication/User Stories - Authentication.md)
+- **DataManagement/** - Import/export, sync, backup
+  - [User Stories - Data Management.md](../03-Features/DataManagement/User Stories - Data Management.md)
+
 ## 🛠️ Implementation Guides
 
-### Frontend Development
+### General Development
 
 - **[Component Structure Guide.md](../03-Features/Component Structure Guide.md)** - React component patterns
   - _Use when_: Creating new components, understanding component architecture
@@ -54,11 +81,6 @@
   - _Use when_: Writing styles, understanding CSS architecture
 - **[Inline SVG System Guide.md](../05-Styling/Inline SVG System Guide.md)** - Icon system implementation
   - _Use when_: Working with icons, adding new SVG assets
-
-### Editor Implementation
-
-- **[Enhanced Custom Editor Plan.md](../03-Features/Enhanced Custom Editor Plan.md)** - Editor architecture details
-  - _Use when_: Understanding editor internals, implementing editor features
 
 ### Backend Development
 
@@ -98,9 +120,9 @@
 
 **"I need to..."**
 
-- **Understand what to build** → Project Overview, User Stories, MVP
+- **Understand what to build** → Project Overview, then Feature Folder → User Stories
 - **Know what's already built** → Current State, FILE_TREE
-- **Implement a feature** → User Stories, Component Structure Guide
+- **Implement a feature** → Navigate to `03-Features/[Feature]/` → Read User Stories → Check guides
 - **Write tests** → Testing Guide, Test Inventory
 - **Fix a bug** → Error Handling Guide, Current State (known issues)
 - **Deploy code** → CI CD Guide, Production Deployment Guide
@@ -111,9 +133,9 @@
 ```
 Project Overview
     ↓
-User Stories ←→ MVP
-    ↓
-Development Plan ←→ Current State
+User Stories Guide → Feature Folders → Feature User Stories
+    ↓                                        ↓
+MVP ←→ Development Plan ←→ Current State ← Implementation Guides
     ↓
 Architecture → Component/API/Data Guides
     ↓
