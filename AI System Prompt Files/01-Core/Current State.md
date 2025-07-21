@@ -128,9 +128,12 @@ This document provides a real-time snapshot of what's built, what's in progress,
 - **Additional style examples** - Add colors, buttons, forms to Style Guide
 - **Style documentation** - Update Styling Guide.md with component patterns
 
-### Next Sprint: Bug Fixes and Stability
+### Next Sprint: Workspace Enhancements & Editor Types
 
-- ✅ **Fix block deletion persistence** - COMPLETED (January 17, 2025)
+- **Workspace creation with templates** - Game Master, Novelist, Script Writer templates
+- **Page Type system** - Support for block-based, prose, and script editors per page
+- **Global workspace search** - Search across all pages in a workspace
+- **Workspace renaming UI** - Options menu in workspace dropdown
 - **Fix page creation bugs** in empty workspaces
 - **Improve auto-save reliability** for all operations
 
@@ -186,16 +189,18 @@ This document provides a real-time snapshot of what's built, what's in progress,
 
 ### Short Term (Next 2 Weeks)
 
-1. Implement page search functionality
-2. Add keyboard shortcuts panel
-3. Create onboarding flow for new users
-4. Migrate to Supabase for production deployment
+1. Implement workspace templates and creation wizard
+2. Add Page Type system (block-based, prose, script editors)
+3. Implement global workspace search
+4. Add keyboard shortcuts panel
+5. Create onboarding flow for new users
+6. Migrate to Supabase for production deployment
 
 ### Medium Term (Month 2)
 
 1. Real-time collaboration infrastructure
 2. AI writing assistant integration
-3. Export functionality (Markdown, HTML, PDF)
+3. Export functionality (Markdown for workspaces and pages)
 4. Mobile responsive design
 
 ## 📝 Development Notes

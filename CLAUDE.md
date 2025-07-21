@@ -81,7 +81,7 @@ This ensures documentation stays synchronized with code changes and prevents dri
 
 **Current State**: Style Guide implementation complete - accessible via Ctrl+Shift+S with spacing and typography examples.
 
-**Next Features**: Component library with buttons/cards/forms, additional style examples
+**Next Features**: Workspace templates (Game Master, Novelist, Script Writer), Page Type system (block/prose/script editors), global workspace search
 
 ### Prerequisites
 

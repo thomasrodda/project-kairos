@@ -403,9 +403,141 @@ Priority: Medium
 
 ---
 
+## Page Types (Editor Modes)
+
+### 1. **Page Type Selection**
+
+> User Story:
+>
+> As a user, I want to choose between different editor types for each page, so that I can use the best writing format for my content type.
+
+Acceptance Criteria:
+
+- [ ] Each page has an editor type setting that can be changed in page settings
+- [ ] Available editor types: Block-based (default), Prose, Script
+- [ ] Changing editor type converts existing content appropriately
+- [ ] Editor type is persisted with the page
+- [ ] Visual indicator shows current editor type
+- [ ] Warning shown when switching types if content might be affected
+
+Notes:
+
+- Block-based: Current implementation with blocks, drag-drop, slash commands
+- Prose: Traditional word processor style with paragraph indentation, continuous text flow
+- Script: Specialized formatting for screenplays and scripts
+- Editor type is per-page, not per-workspace
+- Conversion between types should preserve content where possible
+
+Priority: High
+
+**Complexity**: Very High
+
+**Status**: 📋 TODO
+
+**Dependencies**:
+
+- Page settings UI
+- Multiple editor implementations
+- Content conversion system
+
+**Components**:
+
+- PageSettings (to be created)
+- ProseEditor (to be created)
+- ScriptEditor (to be created)
+- EditorTypeSelector (to be created)
+
+---
+
+### 2. **Prose Editor Mode**
+
+> User Story:
+>
+> As a novelist, I want a traditional prose writing experience, so that I can write with familiar paragraph formatting and indentation.
+
+Acceptance Criteria:
+
+- [ ] Prose mode shows continuous text without visible block boundaries
+- [ ] Tab key creates paragraph indentation (first line indent)
+- [ ] Enter creates new paragraphs with proper spacing
+- [ ] Text flows continuously like a traditional word processor
+- [ ] Supports all text formatting (bold, italic, underline, links)
+- [ ] No slash commands or block types in prose mode
+- [ ] Word count and reading time displayed
+- [ ] Export maintains proper prose formatting
+
+Notes:
+
+- Should feel like Microsoft Word or Google Docs
+- Maintains compatibility with markdown export
+- May still use blocks internally but presents as continuous text
+- Consider page breaks and chapter markers
+
+Priority: Medium
+
+**Complexity**: High
+
+**Status**: 📋 TODO
+
+**Dependencies**:
+
+- Page Type system
+- Modified editor rendering
+
+**Components**:
+
+- ProseEditor (to be created)
+- ProseRenderer (to be created)
+- WordCount component (to be created)
+
+---
+
+### 3. **Script Editor Mode**
+
+> User Story:
+>
+> As a screenwriter, I want specialized script formatting, so that I can write properly formatted screenplays.
+
+Acceptance Criteria:
+
+- [ ] Script mode provides standard screenplay formatting elements
+- [ ] Character names automatically uppercase and centered
+- [ ] Dialogue properly indented
+- [ ] Action lines in standard format
+- [ ] Scene headings (INT./EXT.) recognized and formatted
+- [ ] Transitions (CUT TO:, FADE IN:) right-aligned
+- [ ] Tab key cycles through element types
+- [ ] Export to standard screenplay format
+
+Notes:
+
+- Follow industry-standard screenplay formatting
+- Consider integration with specialized script formats (Final Draft, etc.)
+- May need custom keyboard shortcuts for element switching
+
+Priority: Low
+
+**Complexity**: Very High
+
+**Status**: 📋 TODO (Future)
+
+**Dependencies**:
+
+- Page Type system
+- Specialized formatting engine
+
+**Components**:
+
+- ScriptEditor (to be created)
+- ScriptFormatter (to be created)
+- ScriptElements (to be created)
+
+---
+
 ## Related Documentation
 
 - **[Enhanced Custom Editor Plan](./Enhanced Custom Editor Plan.md)** - Technical architecture and implementation strategy
 - **[Text Formatting Plan](./Text Formatting Plan.md)** - Rich text formatting implementation details
+- **[Workspace User Stories](../Workspace/User Stories - Workspace.md)** - Workspace templates that set default page types
 - **[Component Structure Guide](../Component Structure Guide.md)** - General component patterns used in the editor
 - **[Current State](../../01-Core/Current State.md)** - Current implementation status of editor features

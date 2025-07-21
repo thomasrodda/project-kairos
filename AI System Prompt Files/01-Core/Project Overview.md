@@ -107,11 +107,15 @@ Below is a list of commonly used terminology used to describe certain app featur
 
 ## Core MVP Features
 
-1. **Block-Based Text Editor Architecture**
+1. **Flexible Editor System**
 
-   - **Floating Formatting Toolbar**: No fixed toolbar—when users highlight text, a contextual popup appears offering formatting (bold, italics, links, etc.).
-   - **Slash (`/`) Command Menu**: In an empty block, typing `/` opens a floating menu to insert or transform into different block types (H1, H2, Body, Bullets, etc.).
-   - **Extensible Design**: Engineered with a modular architecture (e.g., plugin system or block-definition schema) to support future features like embedded media, tables, and custom blocks.
+   - **Multiple Editor Types**: Each page can use Block-based (default), Prose, or Script editor modes.
+   - **Block-Based Mode**: Current implementation with drag-and-drop blocks, slash commands, and floating toolbar.
+   - **Prose Mode**: Traditional word processor experience for novelists with paragraph indentation and continuous text flow.
+   - **Script Mode**: Specialized screenplay formatting for writers (future feature).
+   - **Floating Formatting Toolbar**: Contextual popup for text formatting (bold, italics, links, etc.).
+   - **Slash (`/`) Command Menu**: In block mode, typing `/` opens a menu to transform blocks.
+   - **Extensible Design**: Modular architecture to support future features like embedded media, tables, and custom blocks.
 
 2. **Pages & File Tree**
 
@@ -124,8 +128,9 @@ Below is a list of commonly used terminology used to describe certain app featur
    - Automatic backlink generation for reverse lookup.
 
 4. **Workspace Management & Sync**
-   - Google OAuth for single sign‑on; multiple workspaces per user.
+   - Google OAuth for single sign‑on; multiple workspaces per user with templates (Game Master, Novelist, Script Writer).
    - Real‑time cloud persistence with optional local‑first editing and conflict resolution.
+   - Global search across all pages in a workspace.
 
 ---
 
