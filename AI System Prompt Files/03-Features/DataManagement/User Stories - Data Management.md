@@ -12,17 +12,24 @@ _This document contains all data management-related user stories for Project Kai
 
 Acceptance Criteria:
 
-- [ ] Content saves automatically after a brief pause in typing (debounced)
-- [ ] Save indicator shows current save status ("All changes saved" or "Unsaved changes")
-- [ ] Failed saves retry automatically with exponential backoff
-- [ ] Users are notified if saves consistently fail
-- [ ] No manual save button required
+- [x] Content saves automatically after a brief pause in typing (debounced)
+- [x] Save indicator shows current save status ("All changes saved" or "Unsaved changes")
+- [x] Failed saves retry automatically with exponential backoff
+- [x] Users are notified if saves consistently fail
+- [x] No manual save button required
+- [ ] Offline changes are queued and saved when connection returns
+- [ ] Large content (>1MB) is handled gracefully
 
 Notes:
 
-- _No additional notes yet_
+- **Implementation**: 2-second debounce implemented in `useAutoSave` hook
+- **Status indicators**: "Saving...", "All changes saved", "Failed to save"
+- **Retry logic**: Exponential backoff starting at 1 second, max 32 seconds
+- **Known issue**: Save status component exists but may not be integrated in all views
+- **Missing edge case**: No offline queue implementation
+- **Missing edge case**: No special handling for very large documents
 
-**Status**: ✅ Implemented
+**Status**: In Progress
 **Priority**: High (MVP required)
 **Complexity**: Medium
 
@@ -35,8 +42,9 @@ Notes:
 **Components**:
 
 - `apps/web/src/hooks/useAutoSave.ts` - Auto-save hook with debouncing
-- `apps/web/src/components/Editor/SaveStatus.tsx` - Save status indicator
-- `apps/api/src/pages/auto-save.ts` - Auto-save API endpoint
+- `apps/web/src/components/SaveStatus/SaveStatus.tsx` - Save status indicator (corrected path)
+- `apps/web/src/components/SaveStatusIndicator/SaveStatusIndicator.tsx` - Alternative status component
+- `apps/api/src/pages/[pageId]/auto-save.ts` - Auto-save API endpoint (assumed path)
 
 ### 2. **Content versioning and history**
 
@@ -46,18 +54,21 @@ Notes:
 
 Acceptance Criteria:
 
-- [ ] System automatically creates versions on each save
-- [ ] Users can view a list of previous versions with timestamps
-- [ ] Users can preview content from any version
-- [ ] Users can restore content from a previous version
-- [ ] System keeps last 10 versions per page (configurable)
+- [x] System automatically creates versions on each save
+- [x] Users can view a list of previous versions with timestamps
+- [x] Users can preview content from any version
+- [x] Users can restore content from a previous version
+- [x] System keeps last 10 versions per page (configurable)
 - [ ] Older versions are automatically cleaned up
 
 Notes:
 
-- _No additional notes yet_
+- No idea if this is actually done or not, have seen no proof
+- **Implementation**: Version creation integrated with auto-save system
+- **UI Status**: Backend complete, UI may need verification
+- **Missing**: Automatic cleanup of old versions not yet implemented
 
-**Status**: ✅ Implemented (Phase 3.3)
+**Status**: In Progress
 **Priority**: Medium
 **Complexity**: High
 
@@ -82,7 +93,7 @@ Notes:
 
 Acceptance Criteria:
 
-- [ ] System detects when content has been modified elsewhere
+- [x] System detects when content has been modified elsewhere
 - [ ] User is prompted with conflict resolution options
 - [ ] Options include: keep local, keep remote, or merge manually
 - [ ] Conflict UI clearly shows differences
@@ -90,7 +101,9 @@ Acceptance Criteria:
 
 Notes:
 
-- _No additional notes yet_
+- **Implementation**: Basic conflict detection using last-modified timestamps
+- **Current behavior**: Prevents overwriting but lacks user-friendly resolution UI
+- **Missing**: No UI for conflict resolution, no merge capabilities
 
 **Status**: 🔄 Partially Implemented (basic conflict detection exists)
 **Priority**: Medium
@@ -104,8 +117,9 @@ Notes:
 
 **Components**:
 
-- `apps/api/src/pages/auto-save.ts` - Contains conflict detection logic
+- `apps/api/src/pages/[pageId]/auto-save.ts` - Contains conflict detection logic
 - Conflict resolution UI (not yet implemented)
+- Uses `lastModifiedAt` timestamp comparison for detection
 
 ## Data Export & Import
 
@@ -122,10 +136,16 @@ Acceptance Criteria:
 - [ ] Include or exclude formatting in exports
 - [ ] Exported files use sensible naming conventions
 - [ ] Progress indicator for large exports
+- [ ] Handle special characters in filenames safely
+- [ ] Preserve internal links between pages in exports
+- [ ] Include metadata (creation date, author) in exports
 
 Notes:
 
-- _No additional notes yet_
+- Not sure if this is needed. Might be fine with just markdown export
+- **Considerations**: Need to handle block types → markdown conversion
+- **Edge case**: Special characters in page titles need sanitization for filenames
+- **Edge case**: Internal page links need to be converted to relative paths
 
 **Status**: ❌ Not Started
 **Priority**: Medium
@@ -152,14 +172,18 @@ Notes:
 Acceptance Criteria:
 
 - [ ] Import Markdown files with formatting preserved
-- [ ] Import plain text files as paragraph blocks
-- [ ] Import Word documents (basic formatting)
 - [ ] Bulk import multiple files into a project
-- [ ] Preview import results before confirming
+- [ ] Handle encoding issues (UTF-8, etc.) gracefully
+- [ ] Skip or rename duplicate page names
+- [ ] Show import errors/warnings clearly
+- [ ] Maintain original file modification dates
 
 Notes:
 
-- _No additional notes yet_
+- **Edge case**: Non-UTF-8 encoded files need detection and conversion
+- **Edge case**: Duplicate page names during bulk import need resolution
+- **Consideration**: May need file size limits for imports
+- **Consideration**: Complex Word formatting may not translate perfectly
 
 **Status**: ❌ Not Started
 **Priority**: Low
@@ -195,7 +219,7 @@ Acceptance Criteria:
 
 Notes:
 
-- _No additional notes yet_
+- Not sure if this is going to be a feature or not
 
 **Status**: ❌ Not Started (infrastructure planned)
 **Priority**: Low (post-MVP)
@@ -230,7 +254,7 @@ Acceptance Criteria:
 
 Notes:
 
-- _No additional notes yet_
+- We are working on cloud as the MVP and then implementing local after.
 
 **Status**: ❌ Not Started
 **Priority**: Low (MVP optional)
@@ -293,7 +317,7 @@ Notes:
 
 Acceptance Criteria:
 
-- [ ] Soft delete with recovery period (30 days)
+- [x] Soft delete with recovery period (30 days)
 - [ ] Permanent delete option with confirmation
 - [ ] Bulk delete operations supported
 - [ ] Clear data retention policy displayed
@@ -301,7 +325,10 @@ Acceptance Criteria:
 
 Notes:
 
-- _No additional notes yet_
+- **Implementation**: All entities have `deletedAt` field for soft deletes
+- **Missing**: No UI for permanent deletion or recovery
+- **Missing**: No scheduled cleanup job for old soft-deleted records
+- **Missing**: Data retention policy not documented or displayed
 
 **Status**: 🔄 Partially Implemented (soft deletes exist)
 **Priority**: Medium
@@ -315,9 +342,11 @@ Notes:
 
 **Components**:
 
-- Database soft delete columns (existing)
+- Database: `deletedAt` column on User, Workspace, Page, Block models
+- API: Soft delete logic in all delete endpoints
 - Permanent deletion API (to be created)
 - Data retention UI (to be created)
+- Scheduled cleanup service (to be created)
 
 ## Performance & Optimization
 
@@ -329,15 +358,23 @@ Notes:
 
 Acceptance Criteria:
 
-- [ ] Pages load incrementally (visible content first)
+- [x] Pages load incrementally (visible content first)
 - [ ] Large projects don't slow down the interface
 - [ ] Images and media are lazy-loaded
-- [ ] Search and navigation remain fast
-- [ ] Loading states are clear and helpful
+- [x] Search and navigation remain fast
+- [x] Loading states are clear and helpful
+- [ ] Blocks beyond viewport are virtualized
+- [ ] Search results are paginated/lazy-loaded
+- [ ] Page tree collapses large sections automatically
 
 Notes:
 
-- _No additional notes yet_
+- **Implementation**: Basic pagination implemented in API
+- **Missing**: No lazy loading for media/images (not yet supported)
+- **Performance**: Current implementation handles moderate-sized projects well
+- **Future**: May need virtual scrolling for very large page lists
+- **Edge case**: Projects with 1000+ pages may need special handling
+- **Edge case**: Pages with 100+ blocks may need virtualization
 
 **Status**: 🔄 Partially Implemented (basic pagination exists)
 **Priority**: Medium
@@ -354,6 +391,43 @@ Notes:
 - API pagination (partial implementation)
 - Frontend lazy loading (to be enhanced)
 - Performance monitoring (to be added)
+
+### 11. **Handling large-scale operations**
+
+> User Story:
+>
+> As a user, I want to perform bulk operations (delete, move, export) on multiple pages efficiently, so that I can manage large projects effectively.
+
+Acceptance Criteria:
+
+- [ ] Select multiple pages for bulk operations
+- [ ] Progress indicator for long-running operations
+- [ ] Operations can be cancelled mid-process
+- [ ] Partial success is handled gracefully
+- [ ] Undo available for destructive bulk operations
+- [ ] System remains responsive during operations
+
+Notes:
+
+- **Edge case**: Network interruption during bulk operation
+- **Edge case**: Permissions change mid-operation
+- **Consideration**: May need job queue for very large operations
+
+**Status**: ❌ Not Started
+**Priority**: Low
+**Complexity**: High
+
+**Dependencies**:
+
+- Background job processing
+- Progress tracking infrastructure
+- Bulk selection UI
+
+**Components**:
+
+- Bulk operation API endpoints (to be created)
+- Progress tracking system (to be created)
+- Bulk selection UI (to be created)
 
 ## Implementation Notes
 
