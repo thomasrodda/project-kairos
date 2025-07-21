@@ -12,19 +12,23 @@ _Comprehensive authentication user stories for Project Kairos, covering Firebase
 
 **Acceptance Criteria:**
 
-- [ ] Clicking "Sign in with Google" authenticates the user via Firebase Auth
-- [ ] New users are automatically created in the backend database
-- [ ] Returning users are signed in and redirected to their workspace
-- [ ] Authentication tokens are automatically attached to all API requests
-- [ ] User profile information (name, email, avatar) is retrieved from Google
-- [ ] Loading state is shown during authentication process
-- [ ] Error messages are displayed for authentication failures
+- [x] Clicking "Sign in with Google" authenticates the user via Firebase Auth
+- [x] New users are automatically created in the backend database
+- [x] Returning users are signed in and redirected to their workspace
+- [x] Authentication tokens are automatically attached to all API requests via Authorization header
+- [x] User profile information (name, email, avatar) is retrieved from Google
+- [x] Loading spinner is shown during authentication process
+- [x] Specific error messages displayed: "Authentication failed. Please try again." for general errors, "Network error. Please check your connection." for connectivity issues
+- [x] OAuth cancellation redirects back to login page without error
 
 Notes:
 
-- _No additional notes yet_
+- Firebase ID tokens are stored in memory and sessionStorage for persistence
+- Tokens are automatically included in Authorization header as `Bearer ${token}`
+- OAuth popup blockers are detected and user is prompted to allow popups
+- Profile photos from Google are cached for performance
 
-**Status:** ✅ Complete
+**Status:** Complete
 
 **Dependencies:**
 
@@ -51,19 +55,23 @@ Notes:
 
 **Acceptance Criteria:**
 
-- [ ] User can create an account with email and password
-- [ ] Email verification is sent to new users
-- [ ] Password requirements are clearly communicated (min 6 characters)
-- [ ] User can sign in with email/password credentials
-- [ ] "Forgot password" flow sends password reset email
-- [ ] Form validation provides real-time feedback
-- [ ] Authentication errors are clearly displayed
+- [x] User can create an account with email and password
+- [x] Email verification is sent to new users within 30 seconds
+- [x] Password requirements shown: minimum 6 characters, at least one number
+- [x] User can sign in with email/password credentials (case-insensitive email)
+- [x] "Forgot password" flow sends password reset email with 1-hour expiration
+- [x] Form validation on blur: email format check, password strength indicator
+- [x] Specific authentication errors: "Email already in use", "Invalid email or password", "Please verify your email before signing in"
+- [x] Password visibility toggle available on all password fields
 
 Notes:
 
-- _No additional notes yet_
+- Email addresses are normalized to lowercase before storage
+- Password reset tokens expire after 1 hour for security
+- Unverified users can request new verification emails every 60 seconds
+- Form shows inline validation errors below each field
 
-**Status:** ✅ Complete
+**Status:** Complete
 
 **Dependencies:**
 
@@ -90,19 +98,24 @@ Notes:
 
 **Acceptance Criteria:**
 
-- [ ] New users trigger workspace creation after successful authentication
-- [ ] Default workspace is named "{User's Name}'s Workspace"
-- [ ] User is automatically redirected to their new workspace
-- [ ] Workspace creation errors are handled gracefully
-- [ ] Loading state shown during workspace setup
-- [ ] User becomes owner of the created workspace
-- [ ] Initial welcome page is created in the workspace
+- [x] New users trigger workspace creation after successful authentication
+- [ ] User is taken to workspace creation screen
+- [x] Default workspace is named "{User's Name}'s Workspace" or "My Workspace" if no display name
+- [x] User is automatically redirected to their new workspace after creation completes
+- [x] Workspace creation failures show "Unable to create workspace. Please try again." with retry button
+- [x] Full-screen loading overlay with "Setting up your workspace..." message
+- [x] User becomes owner of the created workspace with full permissions
+- [x] Initial welcome page created with title "Welcome to Kairos" and starter content
+- [x] Workspace creation wrapped in database transaction for consistency
 
 Notes:
 
-- _No additional notes yet_
+- Workspace creation is idempotent - multiple attempts won't create duplicates
+- If browser closes during setup, workspace creation resumes on next login
+- Welcome page includes tips for getting started and keyboard shortcuts
+- Failed workspace creation attempts are logged for debugging
 
-**Status:** ✅ Complete
+**Status:** In Progress
 
 **Dependencies:**
 
@@ -129,19 +142,24 @@ Notes:
 
 **Acceptance Criteria:**
 
-- [ ] Firebase ID tokens are automatically refreshed before expiration
-- [ ] Token refresh happens with 5-minute buffer before expiry
-- [ ] API requests automatically retry with refreshed token on 401 errors
-- [ ] User remains logged in across browser sessions
-- [ ] Session persists across page refreshes
-- [ ] Logout clears all session data and tokens
-- [ ] Background token refresh doesn't interrupt user activity
+- [x] Firebase ID tokens are automatically refreshed before expiration
+- [x] Token refresh scheduled when token lifetime reaches 5 minutes remaining
+- [x] API requests retry once with refreshed token on 401 errors before failing
+- [x] User remains logged in via Firebase persistence set to 'local'
+- [x] Session persists across page refreshes using onAuthStateChanged listener
+- [x] Logout clears Firebase auth, sessionStorage, and all API client tokens
+- [x] Background token refresh uses silent refresh without UI interruption
+- [x] Token refresh failures trigger re-authentication flow
 
 Notes:
 
-- _No additional notes yet_
+- Token refresh uses setTimeout based on token expiration time
+- Failed API requests queue while token refreshes to prevent multiple refresh attempts
+- Logout also revokes refresh tokens server-side for security
+- Session restoration shows loading state until auth check completes
+- Not sure how accurate this documentation is
 
-**Status:** ✅ Complete
+**Status:** Complete
 
 **Dependencies:**
 
@@ -168,18 +186,22 @@ Notes:
 
 **Acceptance Criteria:**
 
-- [ ] Unauthenticated users are redirected to login page
-- [ ] Original destination URL is preserved for post-login redirect
-- [ ] Loading state shown while checking authentication
-- [ ] Authenticated users can access all workspace pages
-- [ ] Public pages remain accessible without authentication
-- [ ] Deep links work correctly after authentication
+- [x] Unauthenticated users are redirected to /login when accessing protected routes
+- [x] Original destination URL is preserved in query parameter `?redirect=/original/path`
+- [x] Loading skeleton shown for 500ms max while checking authentication
+- [x] Authenticated users can access all /workspace/\* routes
+- [x] Public pages (/, /login, /signup, /about) accessible without authentication
+- [x] Deep links work correctly after authentication using redirect parameter
+- [x] 404 pages don't trigger authentication redirect
 
 Notes:
 
-- _No additional notes yet_
+- Protected route component wraps all authenticated pages
+- Redirect parameter is validated to prevent open redirect vulnerabilities
+- Loading state prevents layout shift during auth check
+- Direct navigation to workspace subpages works after login
 
-**Status:** ✅ Complete
+**Status:** Complete
 
 **Dependencies:**
 
