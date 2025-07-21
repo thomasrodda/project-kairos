@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Update the current date in CLAUDE.md
 # This script updates the "Current Date:" line at the top of CLAUDE.md
@@ -16,8 +16,8 @@ fi
 
 # Check if the Current Date line exists
 if grep -q "^Current Date:" "$CLAUDE_MD_PATH"; then
-    # Update existing date line
-    sed -i "s/^Current Date:.*/Current Date: $CURRENT_DATE/" "$CLAUDE_MD_PATH"
+    # Update existing date line - escape the forward slashes in the date
+    sed -i "s|^Current Date:.*|Current Date: $CURRENT_DATE|" "$CLAUDE_MD_PATH"
     echo "Updated date to: $CURRENT_DATE"
 else
     # Add date line at the very top of the file

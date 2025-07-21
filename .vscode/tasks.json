@@ -4,14 +4,16 @@
     {
       "label": "Update CLAUDE.md Date",
       "type": "shell",
-      "command": "/mnt/c/Users/thoma/Project Kairos/scripts/update-date.sh",
+      "command": "bash",
+      "args": ["/mnt/c/Users/thoma/Project Kairos/scripts/update-date.sh"],
       "runOptions": {
         "runOn": "folderOpen"
       },
       "presentation": {
         "reveal": "silent",
         "close": true
-      }
+      },
+      "problemMatcher": []
     }
   ]
 }
