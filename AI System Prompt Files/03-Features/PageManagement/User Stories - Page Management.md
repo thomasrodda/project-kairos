@@ -15,19 +15,23 @@ _Extracted from AI System Prompt Files/01-Core/User Stories.md_
 Acceptance Criteria:
 
 - [x] There is a button in the sidebar to create a new page.
-- [x] The new page automatically opens in the editor, ready for typing
+- [ ] The new page automatically opens in the editor, ready for typing
 - [x] You can right click on a page in the sidebar to bring up a context menu that includes the delete option
 - [x] Pages can be deleted with a confirmation prompt.
 
 Notes:
 
-- _No additional notes yet_
+- The newly created page is not automatically selected and displayed in the editor
+- When clicking create page, a field appears in the sidebar below the other pages. I would prefer if instead a new page was auto created and displayed in the editor, with the default name of 'New Page'.
+- When a new page is created, the page title should display the placeholder name of 'New Page' styled with placeholder colour
+- When a new page is creaed, the page title should be auto focused, ready for the user to rename it.
+- The right click context menu options need their styling improved.
 
 Priority: High
 
 **Complexity**: Low
 
-**Status**: ✅ Complete
+**Status**: In Progress
 
 **Dependencies**:
 
@@ -53,22 +57,22 @@ Priority: High
 Acceptance Criteria:
 
 - [x] Right clicking on a page in the side bar bring up the popup context menu with the rename option
-- [x] Clicking rename will bring up a small floating popup with a field to rename the page
+- [x] Clicking rename in the sidebar context menu will make the displayed name in the sidebar into an editable field
 - [x] Pressing enter saves the new name
-- [x] Clicking off the popup or pressing escape cancels the action.
+- [x] Clicking off the field or pressing escape cancels the action.
 - [x] Each page will have its name displayed at the top of its content in the editor
 - [x] You can freely type in that name field in the editor to name or rename the page
-- [x] The name displayed at the top of the page in the editor is reflected in the sidebar
+- [x] The name displayed at the top of the page in the editor is reflected in the sidebar in real time
 
 Notes:
 
-- _No additional notes yet_
+- The styling for the sidebar rename field needs work
 
 Priority: Medium
 
 **Complexity**: Low
 
-**Status**: ✅ Complete
+**Status**: In Progress
 
 **Dependencies**:
 
@@ -93,13 +97,14 @@ Priority: Medium
 
 Acceptance Criteria:
 
-- [ ] Pages and folders in the file tree in the sidebar can be reordered by dragging.
+- [ ] Pages and folders in the file tree in the sidebar can be reordered by clicking and dragging.
 - [ ] Nesting pages inside folders is supported.
 - [ ] Visual indicators show valid drop targets.
 
 Notes:
 
-- _No additional notes yet_
+- The folder expand/collapse icon needs its rotation changed.
+- Consider not having folders and instead having pages that act as databases, like Notion.
 
 Priority: Medium
 
@@ -137,13 +142,17 @@ Acceptance Criteria:
 
 Notes:
 
-- _No additional notes yet_
+- Saving file changes of file content inside folders does not work
+- Currently creating folders is done with a folder button.
+- You can also create sub folders through the right click context menu.
+- Content of pages within folders is not being saved.
+- Consider not having folders and instead having pages that act as databases, like Notion.
 
 Priority: Medium
 
 **Complexity**: Low
 
-**Status**: 🚧 Partially Complete (backend supports folders, UI needs hover actions)
+**Status**: In Progress
 
 **Dependencies**:
 
@@ -169,6 +178,7 @@ Acceptance Criteria:
 
 - [x] A collapsible sidebar displays all pages and folder pages, amongst other things like the create page button.
 - [x] Clicking a page opens it in the editor.
+- [x] The page tree scrolls when not tall enough for the page list
 
 Notes:
 
@@ -178,7 +188,7 @@ Priority: High
 
 **Complexity**: Low
 
-**Status**: ✅ Complete
+**Status**: Complete
 
 **Dependencies**:
 
