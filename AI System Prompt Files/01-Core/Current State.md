@@ -1,323 +1,274 @@
 # Current State of Project Kairos
 
-This document provides a real-time snapshot of what's built, what's in progress, and known issues.
+This document provides a snapshot of features by area, their completion status, and links to detailed requirements.
 
-**Last Updated**: July 20, 2025 (Date Automation Scripts)
+**Last Updated**: January 22, 2025
 
-## ✅ Completed Features
+## 📊 Feature Status by Area
 
-### Editor Foundation
+### 1. Editor (~35% Complete)
 
-- **Block-based editor** with contentEditable implementation
-- **Drag-and-drop** block reordering via @dnd-kit
-- **Multi-block selection** (Shift+click, Ctrl/Cmd+click, drag selection)
-- **Cross-block text selection** with custom implementation
-- **Copy/paste** with Kairos format (preserves formatting on paste)
-- **Slash commands** menu for changing block types
-- **Keyboard shortcuts** for navigation and selection
-- **Placeholder hints** for slash commands and AI features
-- **Comprehensive test coverage** (300+ tests passing)
+📄 [User Stories - Editor](../03-Features/Editor/User Stories - Editor.md)
 
-### Text Formatting (In Progress)
+**Completed:**
 
-- **Rich text toolbar** appears on text selection ✅
-- **Bold, italic, underline** formatting (Ctrl/Cmd+B/I/U) ✅
-- **Link support** with URL editing (Ctrl/Cmd+K) ✅
-- **Inline markdown** auto-conversion (e.g., **bold**, _italic_) ✅
-- **Block-level markdown** (# for H1, ## for H2, - for bullets) ✅
-- **Format preservation** during copy/paste operations ✅
-- **Separate formatting layer** (plain text + TextFormat array) ✅
-- **Formatting persistence** to database ✅
-- **Known issues**:
-  - Clicking off formatting popup causes momentary appearance in top-left
-  - Slight delay in keyboard shortcut visual feedback
-  - Link functionality needs improvements (unlinking, click behavior)
-  - Link input dialog needs styling
+- ✅ Block-based editing with contentEditable
+- ✅ Drag-and-drop block reordering (single blocks only)
+- ✅ Slash commands for block types
+- ✅ Keyboard navigation (basic)
+- ✅ Rich text formatting (bold, italic, underline, links)
+- ✅ Markdown shortcuts (inline and block-level)
+- ✅ Auto-save with status indicator
 
-### Backend Infrastructure
+**Partially Working:**
 
-- **Authentication system** with Firebase Auth (Google OAuth + Email)
-- **Database setup** with PostgreSQL via Supabase
-- **Prisma ORM** integration with schema and migrations
-- **API endpoints** for workspaces, pages, and blocks
-- **Auto-save endpoint** with conflict detection
-- **Content versioning** system (Phase 3.3) ✅ NEW
-  - Automatic version creation on save
-  - Version history API endpoints
-  - Restore from previous versions
-  - Keeps last 10 versions per page
-- **Comprehensive test suite** for all backend features
+- ⚠️ Multi-block selection (Shift+click, Ctrl+click work but have bugs)
+- ⚠️ Copy/paste (text works, blocks don't, formatting sometimes lost)
+- ⚠️ Cross-block text selection (buggy)
 
-### Frontend-Backend Integration
+**Not Working:**
 
-- **Firebase authentication** in frontend
-- **API client** with automatic token injection
-- **Auth context** with user state management
-- **Backend sync** after Firebase login
-- **Workspace creation** flow for new users
-- **Health check** system with auto-retry
-- **Token refresh** logic with 5-minute buffer
-- **Auto-save integration** with debouncing and retry
-- **Save status indicator** at top of editor (shows "All changes saved" or "Unsaved changes")
-- **Workspace management** system with UI selector ✅ NEW
+- ❌ Click and drag selection across blocks
+- ❌ Multi-block drag and drop
+- ❌ Copy/paste of multiple blocks
 
-### Workspace Management (Phase 4.2)
+**Known Issues:**
 
-- **WorkspaceContext** for centralized state management ✅
-- **WorkspaceSelector** dropdown component in sidebar ✅
-- **Workspace creation** with inline form UI ✅
-- **Workspace switching** with URL updates ✅
-- **Comprehensive test coverage** (15 tests passing) ✅
+- 🐛 Multi-block selection is unreliable
+- 🐛 Formatting toolbar appears in wrong position when clicking away
+- 🐛 Link functionality incomplete (no unlink, can't click links)
+- 🐛 Placeholder text can be interacted with
+- 🐛 Typing bugs related to placeholder text
+- 🐛 Can't delete the last block
+- 🐛 Enter at start of block doesn't work correctly
+- 🐛 Markdown paste doesn't format unless you re-trigger it
 
-### Page Management (Phase 4.3)
+**Not Started:**
 
-- **PagesContext** for hierarchical page state management ✅ NEW
-- **PageTree component** in sidebar with expand/collapse ✅ NEW
-- **PageTreeItem** with context menus and inline editing ✅ NEW
-- **Page CRUD operations** via UI (create, rename, delete) ✅ NEW
-- **Page routing** with URL-based navigation ✅ NEW
-- **Empty state handling** with call-to-action ✅ NEW
-- **Real-time page name synchronization** between editor and sidebar ✅ NEW
-  - Instant updates in both directions without refresh
-  - Local state updates for immediate feedback
-  - Auto-save handles API persistence
-- **Comprehensive test coverage** (30+ tests passing) ✅ NEW
+- ❌ Undo/redo system
+- ❌ Tables and advanced block types
+- ❌ Code blocks with syntax highlighting
+- ❌ @-mentions for page linking
+- ❌ Page type system (prose/script modes)
 
-### Database Migration (Phase 1) ✅ NEW
+### 2. Page Management (~50% Complete)
 
-- **Local PostgreSQL** setup for development
-- **Real API endpoints** replacing mock endpoints
-- **Auto-save functionality** working for:
-  - Basic text editing within blocks
-  - Block reordering via drag-and-drop
-  - Text formatting (bold/italic/underline/links)
-  - ✅ Block deletions (FIXED January 17, 2025)
-- **Temporary solution** - Supabase will be used in production
-- **Known limitations**:
-  - Cross-block operations not fully tested
-  - No offline queueing for failed saves
+📄 [User Stories - Page Management](../03-Features/PageManagement/User Stories - Page Management.md)
 
-### Design System & Styling (Phase 2) ✅ NEW
+**Completed:**
 
-- **Complete tokenization** of all component styles
-- **Consistent spacing** using `var(--spacing-*)` tokens throughout
-- **Semantic dimensions** with `var(--size-*)` and `var(--width-*)` tokens
-- **Z-index management** using `var(--z-index-*)` tokens
-- **No more hard-coded values** (except documented Google brand colors)
-- **PerformanceTest refactor** - all inline styles moved to SCSS
-- **Design token compliance** across 12+ components
+- ✅ Create pages (basic functionality)
+- ✅ Delete pages with confirmation
+- ✅ Rename pages via context menu
+- ✅ Page tree display in sidebar
+- ✅ Real-time name synchronization
+- ✅ URL-based routing
 
-### Developer Style Guide ✅ NEW
+**Partially Working:**
 
-- **Interactive Style Guide** accessible via Ctrl+Shift+S
-- **Tabbed navigation** for different style categories
-- **Visual examples** with live previews:
-  - Spacing tokens with visual bars
-  - Typography showcase with Inter font details
-  - Semantic text styles (headings, body, UI)
-- **Copy-to-clipboard** functionality for file paths
-- **Row hover highlighting** for better clarity
-- **Responsive design** with mobile support
-- **No floating button** - keyboard shortcut only
+- ⚠️ Folder organization (can create folders but content saving has issues)
+- ⚠️ Context menus (work but need styling improvements)
 
-## 🚧 In Progress
+**Known Issues:**
 
-### Current Sprint: Style Guide & Component Library
+- 🐛 New pages don't auto-open in editor
+- 🐛 Page creation shows input field instead of creating "New Page"
+- 🐛 Content in folder pages doesn't save properly
+- 🐛 Context menu styling needs work
+- 🐛 Can't drag and drop pages to reorder
+- 🐛 No hover plus button to create nested pages
 
-- **Component library** - Create reusable button, card, and form components
-- **Additional style examples** - Add colors, buttons, forms to Style Guide
-- **Style documentation** - Update Styling Guide.md with component patterns
+**Not Started:**
 
-### Next Sprint: Workspace Enhancements & Editor Types
+- ❌ Page templates
+- ❌ Page type system (prose, script modes)
 
-- **Workspace creation with templates** - Game Master, Novelist, Script Writer templates
-- **Page Type system** - Support for block-based, prose, and script editors per page
-- **Global workspace search** - Search across all pages in a workspace
-- **Workspace renaming UI** - Options menu in workspace dropdown
-- **Fix page creation bugs** in empty workspaces
-- **Improve auto-save reliability** for all operations
+### 3. Workspace Management (~25% Complete)
 
-## 🐛 Known Issues
+📄 [User Stories - Workspace](../03-Features/Workspace/User Stories - Workspace.md)
 
-### Editor
+**Completed:**
 
-1. **Cross-block formatting** not yet supported (formatting only works within single blocks)
-2. ~~**Block deletion persistence**~~ - ✅ FIXED: Deleted blocks now properly persist (January 17, 2025)
-3. **Undo/redo** not implemented for formatting changes
+- ✅ Create workspaces (basic)
+- ✅ Switch between workspaces
+- ✅ Workspace selector dropdown
+- ✅ Auto-create workspace for new users
+- ✅ Cloud auto-save functionality
 
-### Backend
+**Known Issues:**
 
-1. **Direct database connection** - Migrations must be applied manually via Supabase SQL editor due to IPv4/pooling limitations
-2. **Block type naming** - Minor inconsistency between frontend (h1/h2/h3) and backend enum names
+- 🐛 Empty block placeholder text doesn't show "Start typing..."
+- 🐛 URL displays raw IDs (not user-friendly)
+- 🐛 No workspace-specific last page memory
 
-### Integration
+**Not Started:**
 
-1. **Offline handling** - No offline queue for failed saves
-2. **Page creation bugs** - Issues when creating pages in workspaces with default page
-3. ~~**Page name sync requires refresh**~~ - ✅ FIXED: Page names now sync in real-time between editor and sidebar (January 18, 2025)
+- ❌ Workspace templates (Game Master, Novelist, etc.)
+- ❌ Workspace rename UI
+- ❌ Workspace settings
+- ❌ Global workspace search
+- ❌ Remember last workspace
+- ❌ Export workspace
+- ❌ Workspace sharing/collaboration
 
-## 📊 Test Coverage Status
+### 4. Authentication (~70% Complete)
 
-### Frontend (apps/web)
+📄 [User Stories - Authentication](../03-Features/Authentication/User Stories - Authentication.md)
 
-- ✅ Editor components: 100% coverage
-- ✅ Text formatting: Full test suite
-- ✅ Drag and drop: Comprehensive tests
-- ✅ Keyboard shortcuts: All shortcuts tested
-- ✅ Copy/paste: Format preservation tests
-- ✅ Workspace management: 15 tests for WorkspaceSelector ✅ NEW
-- 🔄 Integration tests: Partial coverage
+**Completed:**
 
-### Backend (apps/api)
+- ✅ Google OAuth login
+- ✅ Email/password authentication
+- ✅ Token refresh handling
+- ✅ Backend user sync
+- ✅ Protected routes
+- ✅ Session persistence
 
-- ✅ Auth endpoints: Full coverage
-- ✅ Workspace CRUD: 14 tests passing
-- ✅ Page operations: Complete test suite
-- ✅ Block management: All operations tested
-- ✅ Auto-save: 16 tests including conflict detection
-- ✅ Content versioning: 15 tests for version management ✅ NEW
+**Known Issues:**
 
-## 🚀 Next Steps
+- 🐛 New users don't see workspace creation screen (auto-created instead)
 
-### Immediate (This Week)
+**Not Started:**
 
-1. ~~Fix block deletion persistence issue~~ ✅ (Fixed Jan 17)
-2. ~~Fix page creation bugs in workspaces~~ ✅ (Fixed with context provider fixes)
-3. Test and fix cross-block operations (selection, copy/paste)
-4. Add offline queue for failed saves
-5. Implement workspace-specific last page memory (enhancement)
+- ❌ User profile management UI
+- ❌ Multi-factor authentication
 
-### Short Term (Next 2 Weeks)
+### 5. Data Management (~20% Complete)
 
-1. Implement workspace templates and creation wizard
-2. Add Page Type system (block-based, prose, script editors)
-3. Implement global workspace search
-4. Add keyboard shortcuts panel
-5. Create onboarding flow for new users
-6. Migrate to Supabase for production deployment
+📄 [User Stories - Data Management](../03-Features/DataManagement/User Stories - Data Management.md)
 
-### Medium Term (Month 2)
+**Completed:**
 
-1. Real-time collaboration infrastructure
-2. AI writing assistant integration
-3. Export functionality (Markdown for workspaces and pages)
-4. Mobile responsive design
+- ✅ Auto-save with debouncing
+- ✅ Basic conflict detection
+- ✅ Soft deletes for all entities
+- ✅ PostgreSQL with Prisma ORM
 
-## 📝 Development Notes
+**Partially Working:**
 
-### Recent Changes (July 20, 2025)
+- ⚠️ Content versioning (backend complete, UI status unknown)
 
-- ✅ Added automatic date updating system for CLAUDE.md:
-  - Created `scripts/update-date.sh` to update "Current Date:" line at top of CLAUDE.md
-  - Created `scripts/auto-update-setup.sh` to configure automatic triggers
-  - Git pre-commit hook updates date on every commit
-  - VS Code task updates date when project folder opens
-  - Shell integration available for automatic updates on directory entry
-  - Date now displays in DD/MM/YYYY format at the top of CLAUDE.md
+**Known Issues:**
 
-### Previous Changes (January 20, 2025)
+- 🐛 No offline queue for failed saves
+- 🐛 Large content (>1MB) not handled specially
+- 🐛 No UI for conflict resolution
+- 🐛 No automatic cleanup of old versions
+- 🐛 No UI for permanent deletion or recovery
 
-- ✅ Reorganized documentation structure into categorized folders:
-  - `01-Core`: Vision, planning, current state documents
-  - `02-Architecture`: Technical design and database guides
-  - `03-Features`: Feature implementation guides
-  - `04-Testing`: Testing guides and inventory
-  - `05-Styling`: Styling guides and design system docs
-  - `06-DevOps`: Setup, deployment, and tooling guides
-  - `07-Operations`: Security, performance, and monitoring guides
-- ✅ Removed number/# prefixes from all documentation filenames
-- ✅ Updated all cross-references in documentation to use new paths
-- ✅ Added mandatory documentation update section to CLAUDE.md
-  - Ensures documentation is updated before any commit/push
-  - Prevents drift between code and documentation
+**Not Started:**
 
-### Previous Changes (January 19, 2025)
+- ❌ Export (Markdown, PDF, Word)
+- ❌ Import from external formats
+- ❌ Backup/restore workspace
+- ❌ Offline support with sync
+- ❌ Real-time collaboration
+- ❌ Bulk operations
 
-- ✅ Fixed "usePagesContext must be used within a PagesProvider" error
-  - Changed components to use safe `usePages()` hook instead of `usePagesContext()`
-  - Added null checks for components that might render before context is ready
-- ✅ Fixed page selection state on fresh load/refresh
-  - PagesContext now reads initial selectedPageId from URL
-  - Added URL sync effect to keep selection in sync with navigation
-  - Parent folders auto-expand to show selected page
-- ✅ Fixed workspace switching to navigate to first page
-  - `selectWorkspace` now fetches and navigates to first non-folder page
-  - Prevents "No page selected" intermediate state
-  - Clean state transition between workspaces
+### 6. AI Features (0% Complete)
 
-### Previous Changes (January 18, 2025)
+📄 [User Stories - AI](../03-Features/AI/User Stories - AI.md)
 
-- ✅ Moved save status indicator from sidebar to top center of editor
-- ✅ Simplified save indicator to show "All changes saved" or "Unsaved changes"
-- ✅ Removed animated icons - text only display
-- ✅ Fixed issue where save status would get stuck on "Saving..."
-- ✅ Converted useAutoSave hook from refs to state for proper re-renders
-- ✅ Made indicator subtle with semi-transparent background
+**Not Started:**
 
-### Previous Changes (January 17, 2025)
+- ❌ AI writing suggestions
+- ❌ AI-powered search
+- ❌ Content generation
+- ❌ Grammar/style checking
 
-- ✅ Fixed block deletion persistence issue
-- ✅ Implemented proper deletion tracking in useAutoSave hook
-- ✅ Added comparison against last saved state (not just previous render)
-- ✅ Fixed page change detection to prevent clearing deletions on re-renders
-- ✅ Tested multiple deletion scenarios (single, multiple, cross-save, cross-page)
-- ✅ Backend properly soft-deletes blocks and filters them on retrieval
+### 7. Collaboration (0% Complete)
 
-### Previous Changes (January 13, 2025)
+📄 [User Stories - Collaboration](../03-Features/Collaboration/User Stories - Collaboration.md)
 
-- ✅ Created interactive Style Guide accessible via Ctrl+Shift+S
-- ✅ Implemented spacing examples with visual representation
-- ✅ Added typography showcase with Inter font details
-- ✅ Built tabbed navigation for style categories
-- ✅ Added copy-to-clipboard for file paths
-- ✅ Removed floating developer tools button (keyboard shortcut only)
-- ✅ Fixed padding overlap issues in style examples
-- ✅ Implemented row hover highlighting for better UX
-- ✅ Created Styling Guide.md for developer reference
+**Not Started:**
 
-### Previous Changes (January 11, 2025)
+- ❌ Real-time collaborative editing
+- ❌ Comments and annotations
+- ❌ Share settings
+- ❌ Activity history
 
-- ✅ Completed Phase 1 Database Migration to local PostgreSQL
-- ✅ Replaced mock endpoints with real API endpoints
-- ✅ Auto-save now functional for basic text editing and block reordering
-- ✅ Verified data persistence across page reloads
-- ✅ Implemented workspace management system (Phase 4.2)
-- ✅ Created WorkspaceContext for state management
-- ✅ Added WorkspaceSelector dropdown UI in sidebar
-- ✅ Fixed PageContext to use workspace context
-- ✅ Updated routing to include workspace ID in URLs
-- ✅ Added comprehensive test coverage (15 tests)
-- ✅ Fixed Firebase mocking for Jest tests
-- ✅ Implemented page management UI (Phase 4.3)
-- ✅ Created PagesContext for hierarchical page state
-- ✅ Added PageTree and PageTreeItem components
-- ✅ Implemented page CRUD operations via context menus
-- ✅ Added page routing support
-- ✅ Created useToast hook for notifications
-- ✅ Fixed SCSS design token imports
+## 🚀 Current Sprint Focus
 
-### Previous Changes (January 10, 2025)
+**Documentation Cleanup & Critical Bug Fixes**
 
-- ✅ Implemented content versioning system (Phase 3.3)
-- ✅ Added version history endpoints
-- ✅ Created restore from version functionality
-- ✅ Added automatic cleanup for old versions
-- ✅ Updated API documentation
-- ✅ Applied migration to Supabase via SQL editor
+- ✅ Clean up Current State.md
+- 🔄 Fix multi-block selection bugs
+- 🔄 Fix click-and-drag selection
+- 🔄 Fix formatting toolbar positioning
+- 🔄 Fix folder page content saving
 
-### Environment Setup Required
+## 🐛 Active Issues
 
-- Node.js v22+
-- Yarn 4.0+
-- PostgreSQL (via Supabase)
-- Firebase project with Auth enabled
-- Environment variables configured in `.env.local`
+### High Priority
+
+1. **Formatting toolbar positioning** - Appears briefly in top-left when clicking away
+2. **Cross-block formatting** - Formatting doesn't work across block boundaries
+3. **Link dialog styling** - Needs proper design tokens
+
+### Medium Priority
+
+1. **Offline handling** - No queue for failed saves
+2. **Undo/redo** - Not implemented for formatting
+3. **Keyboard shortcut feedback** - Slight visual delay
+
+### Low Priority
+
+1. **Database migrations** - Manual application required via Supabase
+2. **Block type naming** - Minor frontend/backend inconsistency
+
+## 📊 Test Coverage
+
+**Overall**: ~85% coverage
+
+- **Editor**: 100% unit test coverage (300+ tests)
+- **Authentication**: 100% coverage
+- **Workspace/Pages**: 95% coverage
+- **Backend API**: 90% coverage
+- **Integration**: 60% coverage (needs improvement)
+
+See [Test Inventory](../04-Testing/Test Inventory.md) for detailed breakdown.
+
+## 📈 Overall Project Completion
+
+Based on user story analysis with bugs/issues considered:
+
+- **Editor**: ~35% (many features have bugs or are incomplete)
+- **Page Management**: ~50% (basic features work but missing key functionality)
+- **Workspace**: ~25% (minimal viable functionality)
+- **Authentication**: ~70% (most auth works well)
+- **Data Management**: ~20% (basic auto-save works, most features missing)
+- **AI Features**: 0% (not started)
+- **Collaboration**: 0% (not started)
+
+**Total**: ~35% complete (accounting for bugs and partial implementations)
+
+## 🔧 Technical Debt & Architecture Notes
 
 ### Key Architecture Decisions
 
-- **Monorepo structure** with Yarn workspaces
-- **Separate formatting layer** for rich text
-- **Soft deletes** for all database entities
-- **Optimistic UI** patterns for better UX
-- **Serverless functions** for API endpoints
-- **Content versioning** with JSON snapshots
+- **Separate formatting layer** - Plain text + TextFormat array (not standard contentEditable)
+- **Soft deletes** - All entities use deletedAt timestamp
+- **Optimistic UI** - Updates UI before API confirms
+- **Version snapshots** - Complete JSON copies, not diffs
+
+## 🔍 Focus Areas for Development
+
+### Immediate Priorities
+
+1. Fix multi-block selection and drag selection
+2. Complete copy/paste for blocks (not just text)
+3. Fix formatting toolbar positioning
+4. Add undo/redo system
+5. Fix folder page content saving
+
+### Next Phase
+
+1. Page templates and type system
+2. Workspace templates and search
+3. Export functionality (at least Markdown)
+4. @-mentions for internal linking
+5. Offline queue for failed saves
+
+---
+
+_For setup instructions, commands, and guides, see CLAUDE.md_
