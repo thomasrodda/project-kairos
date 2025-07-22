@@ -276,7 +276,7 @@ Migrate from:
 
 - `--transition-fast` → `--speed-fast`
 - `--border-radius-sm` → `--radius-4`
-- `--color-white` → `--color-neutral-100`
+- Keep `--color-white` as is (it's #fff, not neutral-100)
 
 ## Actual Implementation Patterns
 
