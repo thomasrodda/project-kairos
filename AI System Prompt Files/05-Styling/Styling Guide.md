@@ -210,7 +210,12 @@ Look in `apps/web/src/styles/components/` for existing patterns
 
 ## Style Guide Page
 
-Coming soon! A visual page showing all components and tokens with live examples. Will be accessible via a floating button in development mode.
+✅ **Now Available!** Access the visual Style Guide at `/style-guide` during development. The page includes:
+
+- Live examples of spacing, colors, and typography
+- Interactive component demonstrations
+- Copy-to-clipboard functionality for tokens
+- Responsive design examples
 
 ## Quick Tips
 
@@ -220,8 +225,89 @@ Coming soon! A visual page showing all components and tokens with live examples.
 4. **Test responsively** - Chrome DevTools device mode is your friend
 5. **Ask yourself** - "Will I use this style again?" If yes → component. If no → custom styles.
 
+## Real-World Examples
+
+### BEM Methodology in Action
+
+```scss
+// From Sidebar.scss - Perfect BEM implementation
+.sidebar {
+  &__header {
+  } // Element
+  &__toggle {
+  } // Element
+  &--collapsed {
+  } // Modifier
+  &__toggle-icon--flipped {
+  } // Element modifier
+}
+```
+
+### Design Token Usage
+
+```scss
+// Good - From Editor.scss
+paddding: var(--spacing-64);
+color: var(--color-text-primary);
+
+// Avoid - Hardcoded values
+transition: opacity 0.15s ease; // Use var(--animate-opacity)
+opacity: 0.6; // Define opacity tokens
+```
+
+## Common Issues Found
+
+### 1. **Missing Component Library Directory**
+
+- Guide mentions `apps/web/src/styles/components/` but it doesn't exist
+- Components use inline SCSS files instead (which is fine!)
+
+### 2. **Inconsistent Token Usage**
+
+Some files use hardcoded values instead of tokens:
+
+- Transitions: Use `var(--animate-colors)` not `transition: all 0.15s`
+- Opacity values: Consider defining `--opacity-60`, `--opacity-100`
+- Letter spacing: Define tokens like `--letter-spacing-tight`
+
+### 3. **Legacy Token Names**
+
+Migrate from:
+
+- `--transition-fast` → `--speed-fast`
+- `--border-radius-sm` → `--radius-4`
+- `--color-white` → `--color-neutral-100`
+
+## Actual Implementation Patterns
+
+### Mixins Available
+
+Project includes useful mixins in `apps/web/src/styles/mixins.scss`:
+
+```scss
+@include spinner; // Loading spinner
+@include input-base; // Form input styles
+@include button-primary; // Primary button styles
+@include error-message; // Error message styles
+```
+
+### Component Variants
+
+```scss
+// From SidebarButton.scss
+.sidebar-button {
+  &--standard {
+  } // Variant modifier
+  &--slim {
+  } // Variant modifier
+  &--collapsed {
+  } // State modifier
+}
+```
+
 ## Need More Details?
 
-- **Component patterns**: See `apps/web/src/styles/components/`
+- **Live examples**: Visit `/style-guide` in development
+- **Component patterns**: Check individual component SCSS files
 - **All tokens**: See `packages/design-tokens/src/`
 - **Technical docs**: See `AI System Prompt Files/Component Structure Guide.md`

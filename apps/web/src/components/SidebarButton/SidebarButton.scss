@@ -56,7 +56,7 @@
   &__icon {
     flex-shrink: 0;
     text-align: center;
-    transition: font-size var(--duration-normal) var(--ease-default);
+    transition: font-size var(--speed-normal) var(--ease-default);
   }
 
   &__text {

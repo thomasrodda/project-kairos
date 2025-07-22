@@ -44,9 +44,9 @@
   // Transitions & Animations
   // ========================================
   transition:
-    background var(--duration-fast) var(--easing-standard),
-    border-color var(--duration-fast) var(--easing-standard),
-    box-shadow var(--duration-normal) var(--easing-decelerate);
+    background var(--speed-fast) var(--ease-standard),
+    border-color var(--speed-fast) var(--ease-standard),
+    box-shadow var(--speed-normal) var(--ease-out);
 
   // ========================================
   // States

@@ -9,7 +9,7 @@
   border-radius: var(--radius-8);
   box-shadow: var(--shadow-md);
   z-index: var(--z-editor-toolbar);
-  transition: opacity 0.15s ease;
+  transition: var(--animate-opacity);
 
   // Disable transitions during formatting to prevent flicker
   &--formatting {
@@ -31,16 +31,16 @@
     border: none;
     border-radius: var(--radius-4);
     cursor: pointer;
-    transition: background-color 0.15s ease;
+    transition: var(--animate-colors);
     color: var(--color-text-primary);
     fill: var(--color-white);
 
     &:hover {
-      background-color: var(--color-hover);
+      background-color: var(--color-surface-elevated-1);
     }
 
     &:active {
-      background-color: var(--color-active);
+      background-color: var(--color-surface-elevated-2);
     }
 
     &--active {

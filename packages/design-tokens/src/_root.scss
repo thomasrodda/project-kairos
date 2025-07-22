@@ -5,7 +5,6 @@
 // This file consolidates all design tokens by forwarding category-specific
 // files. All tokens are organized into logical categories for better
 // maintainability while maintaining the same output structure.
-//
 // The @forward rule ensures all custom properties are included in the
 // cascade when this file is imported, without creating nested scopes.
 // =============================================================================
@@ -17,6 +16,7 @@
 @forward 'layout'; // Breakpoints, containers, z-index, dimensions
 @forward 'shadows'; // Shadow definitions
 @forward 'animations'; // Animation timings and easings
+@forward 'utilities'; // Opacity, letter spacing, transforms, focus states
 
 // Semantic assignments (reference base tokens)
 @forward 'semantic-colors'; // Background, text, border, and state colors

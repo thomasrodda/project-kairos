@@ -8,8 +8,8 @@
   cursor: pointer;
   user-select: none;
   transition:
-    background-color var(--transition-fast),
-    border-color var(--transition-fast);
+    background-color var(--speed-fast),
+    border-color var(--speed-fast);
   border-radius: var(--radius-4);
   margin-bottom: 2px;
   border-left: 3px solid transparent;
@@ -57,7 +57,7 @@
     color: var(--color-text-secondary);
     cursor: pointer;
     flex-shrink: 0;
-    transition: transform var(--transition-fast);
+    transition: transform var(--speed-fast);
 
     &:hover {
       color: var(--color-text-primary);
@@ -67,7 +67,7 @@
       width: var(--size-icon-xs);
       height: var(--size-icon-xs);
       transform: rotate(-90deg);
-      transition: transform var(--transition-fast);
+      transition: transform var(--speed-fast);
     }
 
     &--expanded svg {
@@ -102,7 +102,7 @@
     padding: var(--spacing-2) var(--spacing-4);
     background: var(--color-surface);
     border: 1px solid var(--color-primary);
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-4);
     color: var(--color-text-primary);
     font-size: var(--font-size-14);
     font-family: var(--font-family-base);
@@ -117,7 +117,7 @@
   &__context-menu {
     background: var(--color-surface-elevated-1);
     border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-md);
+    border-radius: var(--radius-8);
     box-shadow: var(--shadow-lg);
     padding: var(--spacing-4);
     z-index: var(--z-index-popover);
@@ -130,13 +130,13 @@
     padding: var(--spacing-4) var(--spacing-8);
     background: transparent;
     border: none;
-    border-radius: var(--border-radius-sm);
+    border-radius: var(--radius-4);
     color: var(--color-text-primary);
     font-size: var(--font-size-14);
     font-family: var(--font-family-base);
     text-align: left;
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: background-color var(--speed-fast);
 
     &:hover {
       background-color: var(--color-surface-hover);
