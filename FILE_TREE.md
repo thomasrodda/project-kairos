@@ -66,7 +66,8 @@ AI System Prompt Files
 │   │   └── User Stories - Page Management.md
 │   ├── Workspace
 │   │   └── User Stories - Workspace.md
-│   └── Component Structure Guide.md
+│   ├── Component Structure Guide.md
+│   └── Component-UserStory-Mapping.md
 ├── 04-Testing
 │   ├── Test Inventory.md
 │   └── Testing Guide.md
