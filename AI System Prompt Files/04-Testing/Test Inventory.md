@@ -4,9 +4,12 @@
 
 ### Overall Metrics
 
-- **Total Tests**: 300+ passing
+- **Total Tests**: 570+ tests across 57 test files
 - **Average Quality Score**: 12.4/20 (improving - ContentEditableContainer now at 16/20)
-- **Test Execution Time**: ~15 seconds for full suite
+- **Test Execution Time**: ~15 seconds for full suite (but coverage is slow)
+- **Test Coverage**:
+  - Web Utils: 77.5% statements, 74.83% branches
+  - API: 29.71% statements, 25.83% branches
 - **Framework**: Jest + React Testing Library + Cypress
 - **Major Issues Found**: Widespread use of fireEvent, testing implementation details, missing accessibility tests
 
@@ -49,8 +52,8 @@
 | ------------------------------ | ----- | ------- | ------------- | ------------------------------------------------ |
 | textSelection.test.ts          | 15    | 15/20   | ✅ Good       | Good structure but missing error handling & perf |
 | markdownDetection.test.ts      | 12    | 14/20   | ⚠️ Needs Work | Good happy paths but missing edge cases          |
-| textFormatting.test.ts         | -     | -       | 🔄 Pending    | Review pending                                   |
-| blockMarkdownDetection.test.ts | -     | -       | 🔄 Pending    | Review pending                                   |
+| textFormatting.test.ts         | 47    | 18/20   | ✅ Excellent  | Comprehensive tests for all formatting functions |
+| blockMarkdownDetection.test.ts | 18    | 17/20   | ✅ Good       | Well-structured tests, covers main cases         |
 
 ### Context/State Management
 
@@ -62,11 +65,11 @@
 
 ### Custom Hooks
 
-| Hook                             | Tests | Quality | Status     | Notes                                                       |
-| -------------------------------- | ----- | ------- | ---------- | ----------------------------------------------------------- |
-| useAutoSave.integration.test.tsx | 2     | 17/20   | ✅ Good    | Tests block deletion tracking, validates fix (Jan 17, 2025) |
-| useCrossBlockSelection           | -     | -       | 🔄 Planned | Needs testing                                               |
-| useDismiss                       | -     | -       | 🔄 Planned | Needs testing                                               |
+| Hook                             | Tests | Quality | Status  | Notes                                                       |
+| -------------------------------- | ----- | ------- | ------- | ----------------------------------------------------------- |
+| useAutoSave.integration.test.tsx | 2     | 17/20   | ✅ Good | Tests block deletion tracking, validates fix (Jan 17, 2025) |
+| useCrossBlockSelection.test.tsx  | 18    | 16/20   | ✅ Good | Comprehensive selection tests with DOM simulation           |
+| useDismiss.test.ts               | 13    | 15/20   | ✅ Good | Tests various dismiss scenarios                             |
 
 ### Backend/API
 
@@ -200,21 +203,67 @@
 3. **Browser Compatibility** - Cross-browser testing
 4. **Internationalization** - Multi-language support
 
+## 📊 Test Coverage Analysis (January 2025)
+
+### Coverage Breakdown by Area
+
+#### Web Application (`apps/web`)
+
+- **Utils**: 77.5% coverage (4 test files) - Excellent coverage
+- **Components**: Not measured in detail, but 36 test files exist
+- **Hooks**: 3 test files covering main custom hooks
+- **Contexts**: 2 test files (EditorContext, ThemeContext)
+
+#### API (`apps/api`)
+
+- **Overall**: 29.71% coverage (7 test files)
+- **Well-tested**: auth.ts (68%), version endpoints (89-100%)
+- **Gaps**: blocks.ts, pages.ts, workspaces.ts (0% coverage)
+
+#### Packages
+
+- **@kairos/ui**: 2 test files (Icon, performance)
+- **@kairos/utils**: 2 test files (environment, index)
+- **@kairos/types**: No tests
+- **@kairos/design-tokens**: No tests
+
+### Missing Test Categories
+
+1. **E2E Tests**: No Cypress tests found
+2. **Integration Tests**: Limited (only Editor.integration.test.tsx)
+3. **Performance Tests**: Only 1 dedicated performance test
+4. **Accessibility Tests**: Sporadic, not systematic
+5. **Security Tests**: API tests lack security scenarios
+
+### Test Distribution
+
+- **Editor Components**: 17 test files (most tested area)
+- **Authentication**: 3 test files
+- **Page Management**: 5 test files
+- **Utilities**: 4 test files
+- **API Endpoints**: 7 test files
+
 ## 🐛 Known Test Issues
 
 ### Current Issues
 
-1. **Flaky Tests**
+1. **Test Coverage Setup** (FIXED January 2025)
+
+   - **Issue**: `import.meta.env` caused syntax errors during coverage instrumentation
+   - **Solution**: Created separate config module and mocks to avoid module-level access
+   - **Status**: Coverage now runs but is slow
+
+2. **Flaky Tests**
 
    - `Editor.test.tsx` - Intermittent timing issues on slow CI (investigating)
    - Solution: Add explicit waits for animations
 
-2. **Mock Limitations**
+3. **Mock Limitations**
 
    - Firebase auth mock incomplete
    - Solution: Implement MSW for better API mocking
 
-3. **Coverage Gaps**
+4. **Coverage Gaps**
    - No E2E tests for complete user flows
    - Limited error boundary testing
    - Missing performance benchmarks
@@ -354,7 +403,14 @@ Target State:
 3. Check for timing issues with `waitFor`
 4. Verify mocks match reality
 
+## 📚 Related Documentation
+
+- [Testing Guide](./Testing%20Guide.md) - How to write and run tests
+- [Vitest Migration Plan](./Vitest%20Migration%20Plan.md) - Plan to fix coverage issues
+- [Test Coverage Gap Analysis](./Test%20Coverage%20Gap%20Analysis.md) - User story coverage gaps
+
 ---
 
-_Last Updated: Current Sprint_
+_Last Updated: January 23, 2025_
 _Next Review: End of Sprint_
+_Coverage Analysis: Complete with 57 test files inventoried_

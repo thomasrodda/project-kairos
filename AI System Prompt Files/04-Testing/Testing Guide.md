@@ -61,9 +61,23 @@ We follow Kent C. Dodds' Testing Trophy model: **"Write tests. Not too many. Mos
 - **Cypress** - End-to-end testing
 - **Supertest** - API endpoint testing
 
+⚠️ **Known Issue**: Jest coverage times out with `import.meta.env`. Use:
+
+```bash
+yarn test:coverage:web  # Utils & hooks only
+yarn test:coverage:api  # API coverage
+```
+
+### Planned Migration
+
+**Vitest** - We have a [migration plan](./Vitest%20Migration%20Plan.md) to switch from Jest to Vitest, which will:
+
+- Fix the coverage timeout issue
+- Run tests 2-3x faster
+- Better integrate with our Vite build setup
+
 ### Modern Alternatives (Consider for future)
 
-- **Vitest** - Faster alternative to Jest for Vite projects, with better TypeScript/ESM support
 - **Playwright** - More powerful E2E testing with better performance and debugging
 - **MSW (Mock Service Worker)** - Network-level API mocking for more realistic tests
 

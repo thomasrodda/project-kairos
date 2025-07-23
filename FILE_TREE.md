@@ -53,7 +53,6 @@ AI System Prompt Files
 │   │   └── User Stories - AI.md
 │   ├── Authentication
 │   │   └── User Stories - Authentication.md
-│   ├── Collaboration
 │   ├── DataManagement
 │   │   ├── Markdown Export Import Guide.md
 │   │   └── User Stories - Data Management.md
@@ -69,8 +68,10 @@ AI System Prompt Files
 │   ├── Component Structure Guide.md
 │   └── Component-UserStory-Mapping.md
 ├── 04-Testing
+│   ├── Test Coverage Gap Analysis.md
 │   ├── Test Inventory.md
-│   └── Testing Guide.md
+│   ├── Testing Guide.md
+│   └── Vitest Migration Plan.md
 ├── 05-Styling
 │   ├── Inline SVG System Guide.md
 │   ├── Scss Structure Guide.md
@@ -90,7 +91,6 @@ AI System Prompt Files
 └── Security Guide.md
 apps
 ├── api
-│   ├── **tests**
 │   ├── lib
 │   │   ├── validations
 │   │   │   ├── block.ts
@@ -334,9 +334,12 @@ apps
 │   │   ├── **mocks**
 │   │   │   └── api.ts
 │   │   └── api
+│   │   ├── **mocks**
+│   │   │   └── config.ts
 │   │   ├── auth.ts
 │   │   ├── blocks.ts
 │   │   ├── client.ts
+│   │   ├── config.ts
 │   │   ├── index.ts
 │   │   ├── pages.ts
 │   │   └── workspaces.ts

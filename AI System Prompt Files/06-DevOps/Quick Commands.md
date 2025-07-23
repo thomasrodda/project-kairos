@@ -21,7 +21,9 @@ yarn workspace @kairos/web build  # Frontend only
 # Run tests
 yarn test                   # All tests
 yarn test:watch            # Watch mode
-yarn test:coverage         # With coverage report
+yarn test:coverage:web     # Web coverage (utils & hooks only)
+yarn test:coverage:api     # API coverage
+yarn test:coverage:report  # Both web and API coverage
 
 # Test specific files
 yarn test apps/web/src/components/Editor/Editor.test.tsx

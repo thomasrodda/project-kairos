@@ -9,6 +9,8 @@ module.exports = {
       {
         tsconfig: {
           jsx: 'react-jsx',
+          module: 'commonjs',
+          esModuleInterop: true,
         },
       },
     ],
@@ -24,7 +26,10 @@ module.exports = {
     '\\.svg$': 'jest-transform-stub',
 
     // Mock firebase lib to avoid import.meta issues
-    '^../lib/firebase$': '<rootDir>/src/lib/__mocks__/firebase.ts',
+    '^.*/lib/firebase$': '<rootDir>/src/lib/__mocks__/firebase.ts',
+
+    // Mock API config to avoid import.meta issues
+    '^.*/services/api/config$': '<rootDir>/src/services/api/__mocks__/config.ts',
 
     // Path aliases
     '^@/(.*)$': '<rootDir>/src/$1',
@@ -34,5 +39,6 @@ module.exports = {
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/main.tsx', '!src/vite-env.d.ts'],
+  collectCoverageFrom: ['src/utils/**/*.{ts,tsx}', 'src/hooks/**/*.{ts,tsx}', '!src/**/*.d.ts', '!src/**/*.test.{ts,tsx}'],
+  // coverageProvider: 'v8',
 }

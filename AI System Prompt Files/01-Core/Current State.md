@@ -218,13 +218,21 @@ This document provides a snapshot of features by area, their completion status, 
 
 ## 📊 Test Coverage
 
-**Overall**: ~85% coverage
+**Actual Coverage** (January 2025):
 
-- **Editor**: 100% unit test coverage (300+ tests)
-- **Authentication**: 100% coverage
-- **Workspace/Pages**: 95% coverage
-- **Backend API**: 90% coverage
-- **Integration**: 60% coverage (needs improvement)
+- **Web Utils**: 77.5% coverage
+- **API**: 29.71% coverage
+- **Components**: Not measured due to Jest/Vite issues
+- **Total Tests**: 570+ tests across 57 files
+
+**Known Issue**: Jest coverage times out with `import.meta.env`. Use:
+
+```bash
+yarn test:coverage:web  # Utils & hooks only
+yarn test:coverage:api  # API coverage
+```
+
+**Planned Fix**: [Vitest Migration](../04-Testing/Vitest%20Migration%20Plan.md) will resolve coverage issues and improve test performance.
 
 See [Test Inventory](../04-Testing/Test Inventory.md) for detailed breakdown.
 

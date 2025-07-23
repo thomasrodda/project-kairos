@@ -1,6 +1,5 @@
 import { auth } from '../../lib/firebase'
-
-const API_BASE_URL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:3001/api'
+import { getApiBaseUrl } from './config'
 
 interface ApiRequestOptions extends RequestInit {
   skipAuth?: boolean
@@ -86,8 +85,8 @@ export class BaseApiClient {
     }
 
     // Make the request
-    const url = `${API_BASE_URL}${endpoint}`
-    console.log('Making request to:', url, 'Base URL:', API_BASE_URL, 'Endpoint:', endpoint)
+    const url = `${getApiBaseUrl()}${endpoint}`
+    console.log('Making request to:', url, 'Base URL:', getApiBaseUrl(), 'Endpoint:', endpoint)
     const response = await fetch(url, {
       ...fetchOptions,
       headers,
@@ -141,7 +140,7 @@ export class BaseApiClient {
   async healthCheck() {
     try {
       // Remove /api from base URL if present since health endpoint is at /api/health
-      const baseUrl = API_BASE_URL.replace(/\/api$/, '')
+      const baseUrl = getApiBaseUrl().replace(/\/api$/, '')
       const response = await fetch(`${baseUrl}/api/health`, {
         method: 'GET',
         headers: {
@@ -155,6 +154,3 @@ export class BaseApiClient {
     }
   }
 }
-
-// Export base URL for services that might need it
-export { API_BASE_URL }
