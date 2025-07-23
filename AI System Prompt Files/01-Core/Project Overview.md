@@ -107,7 +107,7 @@ Below is a list of commonly used terminology used to describe certain app featur
 
 ## Core MVP Features
 
-1. **Flexible Editor System**
+1. **Flexible Editor System** → [User Stories - Editor](../03-Features/Editor/User Stories - Editor.md)
 
    - **Multiple Editor Types**: Each page can use Block-based (default), Prose, or Script editor modes.
    - **Block-Based Mode**: Current implementation with drag-and-drop blocks, slash commands, and floating toolbar.
@@ -117,17 +117,17 @@ Below is a list of commonly used terminology used to describe certain app featur
    - **Slash (`/`) Command Menu**: In block mode, typing `/` opens a menu to transform blocks.
    - **Extensible Design**: Modular architecture to support future features like embedded media, tables, and custom blocks.
 
-2. **Pages & File Tree**
+2. **Pages & File Tree** → [User Stories - Page Management](../03-Features/PageManagement/User Stories - Page Management.md)
 
    - Nested workspace structure with folders and pages.
    - Create, rename, delete, and reorder pages via drag‑and‑drop.
 
-3. **Internal Linking & Backlinks**
+3. **Internal Linking & Backlinks** → [User Stories - Editor](../03-Features/Editor/User Stories - Editor.md#internal-linking)
 
    - `@`‑mention pages and blocks for quick navigation.
    - Automatic backlink generation for reverse lookup.
 
-4. **Workspace Management & Sync**
+4. **Workspace Management & Sync** → [User Stories - Workspace](../03-Features/Workspace/User Stories - Workspace.md) | [User Stories - Authentication](../03-Features/Authentication/User Stories - Authentication.md)
    - Google OAuth for single sign‑on; multiple workspaces per user with templates (Game Master, Novelist, Script Writer).
    - Real‑time cloud persistence with optional local‑first editing and conflict resolution.
    - Global search across all pages in a workspace.
@@ -156,7 +156,7 @@ _For detailed technical implementation, see [Architecture.md](../02-Architecture
 
 ## Feature Integration & Relationships
 
-### AI Integration Approach
+### AI Integration Approach → [User Stories - AI](../03-Features/AI/User Stories - AI.md)
 
 AI features will be accessible through:
 
@@ -212,7 +212,7 @@ These are important standards our product must meet:
 
 ## Related Documentation
 
-- **[User Stories.md](User Stories.md)**: Detailed feature requirements and acceptance criteria
+- **[User Stories Guide.md](User Stories Guide.md)**: How to write and organize user stories
 - **[Development Plan.md](Development Plan.md)**: Phased implementation roadmap
 - **[Architecture.md](../02-Architecture/Architecture.md)**: Technical implementation details
 - **[Current State.md](Current State.md)**: Real-time project status and progress

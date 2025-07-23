@@ -331,3 +331,12 @@ Notes:
 - Backend validates tokens on every request
 - User permissions checked at API level
 - Sensitive operations require fresh authentication
+
+---
+
+## Related Documentation
+
+- **[User Stories Guide](../../01-Core/User Stories Guide.md)** - How to write and organize user stories
+- **[Feature Dependencies](../Feature Dependencies.md)** - How Authentication relates to other features
+- **[Component-UserStory-Mapping](../Component-UserStory-Mapping.md)** - Component usage across features
+- **[Current State](../../01-Core/Current State.md)** - Current implementation status of authentication features

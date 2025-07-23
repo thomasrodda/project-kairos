@@ -185,15 +185,15 @@ Import SCSS at the top of the `.tsx` file.
 - **Follow standardized file header comments** for consistency
 - **Comment complex logic and business rules**, not obvious code
 
-### Block-Based Editor Architecture (Current Implementation)
+### Block-Based Editor Architecture (Current Implementation) → [User Stories - Editor](Editor/User Stories - Editor.md)
 
 ⚠️ **Important:** The documented plugin architecture is NOT yet implemented. Current architecture:
 
 **What exists:**
 
 - Block types are a simple TypeScript union: `'h1' | 'h2' | 'h3' | 'paragraph' | 'bullet'`
-- Single `Block.tsx` component handles all block types via CSS classes
-- Slash menu options are hardcoded in `SlashCommandMenu.tsx`
+- Single `Block.tsx` component handles all block types via CSS classes → `apps/web/src/components/Editor/Block/Block.tsx`
+- Slash menu options are hardcoded in `SlashCommandMenu.tsx` → `apps/web/src/components/Editor/SlashCommandMenu/SlashCommandMenu.tsx`
 - No plugin system or registry pattern
 
 **Actual implementation:**
@@ -238,8 +238,8 @@ Components extensively use React Context for state management:
 
 ```typescript
 // From Editor.tsx using multiple contexts:
-import { usePageContext } from '../../contexts/PageContext'
-import { useEditorState } from '../../contexts/EditorContext'
+import { usePageContext } from '../../contexts/PageContext' // → apps/web/src/contexts/PageContext.tsx
+import { useEditorState } from '../../contexts/EditorContext' // → apps/web/src/contexts/EditorContext.tsx
 
 export const Editor = forwardRef<HTMLElement>((props, ref) => {
   const { saveStatus, lastSaved, forceSave } = usePageContext()
@@ -250,10 +250,10 @@ export const Editor = forwardRef<HTMLElement>((props, ref) => {
 
 Key contexts:
 
-- `EditorContext` - Central editor state
-- `PageContext` - Page management
-- `AuthContext` - Authentication
-- `WorkspaceContext` - Workspace data
+- `EditorContext` - Central editor state → `apps/web/src/contexts/EditorContext.tsx`
+- `PageContext` - Page management → `apps/web/src/contexts/PageContext.tsx`
+- `AuthContext` - Authentication → `apps/web/src/contexts/AuthContext.tsx`
+- `WorkspaceContext` - Workspace data → `apps/web/src/contexts/WorkspaceContext.tsx`
 
 ### ForwardRef Pattern
 
@@ -313,7 +313,7 @@ For detailed component-to-user-story mapping, see: [Component-UserStory-Mapping.
 
 **Most Critical Components:**
 
-1. `EditorContext.tsx` - Central to 5 editor user stories
-2. `PagesContext` - Used by 6 user stories across features
-3. `AuthContext.tsx` - Central to 6 authentication user stories
-4. `PageTreeItem` - Central to 5 page management user stories
+1. `EditorContext.tsx` - Central to 5 editor user stories → [User Stories - Editor](Editor/User Stories - Editor.md)
+2. `PagesContext` - Used by 6 user stories across features → [User Stories - Page Management](PageManagement/User Stories - Page Management.md)
+3. `AuthContext.tsx` - Central to 6 authentication user stories → [User Stories - Authentication](Authentication/User Stories - Authentication.md)
+4. `PageTreeItem` - Central to 5 page management user stories → [User Stories - Page Management](PageManagement/User Stories - Page Management.md)

@@ -536,6 +536,7 @@ Priority: Low
 
 ## Related Documentation
 
+- **[User Stories Guide](../../01-Core/User Stories Guide.md)** - How to write and organize user stories
 - **[Enhanced Custom Editor Plan](./Enhanced Custom Editor Plan.md)** - Technical architecture and implementation strategy
 - **[Text Formatting Plan](./Text Formatting Plan.md)** - Rich text formatting implementation details
 - **[Workspace User Stories](../Workspace/User Stories - Workspace.md)** - Workspace templates that set default page types

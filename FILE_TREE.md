@@ -66,7 +66,8 @@ AI System Prompt Files
 │   ├── Workspace
 │   │   └── User Stories - Workspace.md
 │   ├── Component Structure Guide.md
-│   └── Component-UserStory-Mapping.md
+│   ├── Component-UserStory-Mapping.md
+│   └── Feature Dependencies.md
 ├── 04-Testing
 │   ├── Test Coverage Gap Analysis.md
 │   ├── Test Inventory.md

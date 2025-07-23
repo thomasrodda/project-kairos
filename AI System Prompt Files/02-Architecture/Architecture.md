@@ -6,9 +6,9 @@
 
 **Styling**: Custom SCSS (not using Tailwind or shadcn/ui)
 
-**Structure**: Organized by features, with dedicated components/, styles/, hooks/, and utils/ folders under apps/web/src
+**Structure**: Organized by features, with dedicated components/, styles/, hooks/, and utils/ folders under apps/web/src → [Component Structure Guide](../03-Features/Component Structure Guide.md)
 
-**Editor Architecture**: **Custom block-based editor built from scratch**
+**Editor Architecture**: **Custom block-based editor built from scratch** → [User Stories - Editor](../03-Features/Editor/User Stories - Editor.md)
 
 - Provides full control over block behavior, slash commands, and AI integration
 - Each block is an independent React component with its own state and behavior
@@ -41,7 +41,7 @@
 
 **Primary**: Cloud-first with real-time sync
 
-**Database**: PostgreSQL with Prisma ORM
+**Database**: PostgreSQL with Prisma ORM → [Data Model Guide](Data Model Guide.md)
 
 **Optional**: Local-first storage as user preference for offline capability
 
@@ -114,7 +114,7 @@ project-root/
 
 **Pre-commit hooks**: Husky + lint-staged for code quality enforcement
 
-**Testing**: Jest for unit tests, Cypress for end-to-end testing
+**Testing**: Jest for unit tests, Cypress for end-to-end testing → [Testing Guide](../04-Testing/Testing Guide.md)
 
 ## 8. Custom Editor Architecture Details
 
@@ -147,7 +147,7 @@ project-root/
 
 **React + TypeScript**: Large ecosystem, strong typing, excellent development experience
 
-**SCSS over Tailwind**: More powerful styling system, better component encapsulation
+**SCSS over Tailwind**: More powerful styling system, better component encapsulation → [Styling Guide](../05-Styling/Styling Guide.md)
 
 **Serverless on Vercel**: Simple deployment, fast iteration, automatic scaling
 

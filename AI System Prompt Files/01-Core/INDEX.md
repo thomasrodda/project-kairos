@@ -71,6 +71,13 @@
 - **DataManagement/** - Import/export, sync, backup
   - [User Stories - Data Management.md](../03-Features/DataManagement/User Stories - Data Management.md)
 
+### Cross-Feature References
+
+- **[Feature Dependencies.md](../03-Features/Feature Dependencies.md)** - Dependencies between features
+  - _Use when_: Understanding feature relationships, planning implementation order
+- **[Component-UserStory-Mapping.md](../03-Features/Component-UserStory-Mapping.md)** - Component usage across features
+  - _Use when_: Finding which components implement which features
+
 ## 🛠️ Implementation Guides
 
 ### General Development
@@ -134,12 +141,12 @@
 Project Overview
     ↓
 User Stories Guide → Feature Folders → Feature User Stories
-    ↓                                        ↓
+    ↓                     ↓                    ↓
 MVP ←→ Development Plan ←→ Current State ← Implementation Guides
-    ↓
-Architecture → Component/API/Data Guides
-    ↓
-Testing/Error/Security Guides
+    ↓                                           ↓
+Architecture → Component/API/Data Guides    Feature Dependencies
+    ↓                                           ↓
+Testing/Error/Security Guides            Component-UserStory-Mapping
 ```
 
 ## 📝 Documentation Standards & Templates

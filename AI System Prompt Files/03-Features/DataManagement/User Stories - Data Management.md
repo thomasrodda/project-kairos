@@ -451,3 +451,13 @@ Notes:
 - Real-time collaboration infrastructure not implemented
 - Import/export functionality not available
 - No data compression for versions
+
+---
+
+## Related Documentation
+
+- **[User Stories Guide](../../01-Core/User Stories Guide.md)** - How to write and organize user stories
+- **[Feature Dependencies](../Feature Dependencies.md)** - How Data Management relates to other features
+- **[Component-UserStory-Mapping](../Component-UserStory-Mapping.md)** - Component usage across features
+- **[Current State](../../01-Core/Current State.md)** - Current implementation status of data features
+- **[Data Model Guide](../../02-Architecture/Data Model Guide.md)** - Database schema and data flow

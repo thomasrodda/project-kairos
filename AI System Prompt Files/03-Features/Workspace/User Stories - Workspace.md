@@ -555,3 +555,12 @@ Priority: Low
 - The workspace system is largely complete for basic functionality
 - Major upcoming work involves templates and search functionality
 - Export functionality is important for user trust but not MVP critical
+
+---
+
+## Related Documentation
+
+- **[User Stories Guide](../../01-Core/User Stories Guide.md)** - How to write and organize user stories
+- **[Feature Dependencies](../Feature Dependencies.md)** - How Workspace Management relates to other features
+- **[Component-UserStory-Mapping](../Component-UserStory-Mapping.md)** - Component usage across features
+- **[Current State](../../01-Core/Current State.md)** - Current implementation status of workspace features

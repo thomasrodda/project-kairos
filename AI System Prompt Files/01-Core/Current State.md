@@ -142,7 +142,7 @@ This document provides a snapshot of features by area, their completion status, 
 - ✅ Auto-save with debouncing
 - ✅ Basic conflict detection
 - ✅ Soft deletes for all entities
-- ✅ PostgreSQL with Prisma ORM
+- ✅ PostgreSQL with Prisma ORM → [Data Model Guide](../02-Architecture/Data Model Guide.md)
 
 **Partially Working:**
 
@@ -232,9 +232,9 @@ yarn test:coverage:web  # Utils & hooks only
 yarn test:coverage:api  # API coverage
 ```
 
-**Planned Fix**: [Vitest Migration](../04-Testing/Vitest%20Migration%20Plan.md) will resolve coverage issues and improve test performance.
+**Planned Fix**: [Vitest Migration](../04-Testing/Vitest Migration Plan.md) will resolve coverage issues and improve test performance.
 
-See [Test Inventory](../04-Testing/Test Inventory.md) for detailed breakdown.
+See [Test Inventory](../04-Testing/Test Inventory.md) for detailed breakdown and [Testing Guide](../04-Testing/Testing Guide.md) for testing best practices.
 
 ## 📈 Overall Project Completion
 
