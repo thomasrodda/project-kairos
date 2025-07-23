@@ -17,6 +17,7 @@ export const createMockEditorState = (overrides?: Partial<EditorState>): EditorS
   ],
   focusedBlockId: null,
   selectedBlockIds: [],
+  selectionAnchorId: null,
   crossBlockSelection: null,
   isDragging: false,
   isDirty: false,

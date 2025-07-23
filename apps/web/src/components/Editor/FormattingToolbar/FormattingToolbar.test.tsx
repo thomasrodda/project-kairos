@@ -15,6 +15,7 @@ describe('FormattingToolbar', () => {
     ],
     focusedBlockId: null,
     selectedBlockIds: [],
+    selectionAnchorId: null,
     isDragging: false,
     crossBlockSelection: null,
     isDirty: false,

@@ -55,6 +55,7 @@ export interface EditorState {
   blocks: EditorBlock[] // All blocks in the page
   focusedBlockId: string | null // Currently focused block
   selectedBlockIds: string[] // Currently selected blocks (via drag handle)
+  selectionAnchorId: string | null // Anchor point for shift+click range selection
   crossBlockSelection: CrossBlockSelection | null // Cross-block text selection
   isDragging: boolean // Whether we're currently dragging a block
   selectedRange?: {
@@ -140,6 +141,7 @@ const initialState: EditorState = {
   blocks: createInitialBlocks(),
   focusedBlockId: null,
   selectedBlockIds: [],
+  selectionAnchorId: null,
   crossBlockSelection: null,
   isDragging: false,
   selectedRange: undefined,
@@ -161,6 +163,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
         blocks: action.blocks.length > 0 ? action.blocks : createInitialBlocks(),
         focusedBlockId: null,
         selectedBlockIds: [],
+        selectionAnchorId: null,
         crossBlockSelection: null,
         selectedRange: undefined,
         isDirty: false,
@@ -359,6 +362,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return {
         ...state,
         selectedBlockIds: action.blockIds,
+        selectionAnchorId: action.blockIds.length > 0 ? action.blockIds[0] : null, // Set anchor to first selected block
         focusedBlockId: null, // Clear focus when selecting
         crossBlockSelection: null, // Clear text selection when selecting blocks
       }
@@ -366,10 +370,13 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'TOGGLE_BLOCK_SELECTION': {
       const { blockId } = action
       const isSelected = state.selectedBlockIds.includes(blockId)
+      const newSelectedIds = isSelected ? state.selectedBlockIds.filter((id) => id !== blockId) : [...state.selectedBlockIds, blockId]
 
       return {
         ...state,
-        selectedBlockIds: isSelected ? state.selectedBlockIds.filter((id) => id !== blockId) : [...state.selectedBlockIds, blockId],
+        selectedBlockIds: newSelectedIds,
+        // Set anchor when adding first block, clear when removing all blocks
+        selectionAnchorId: newSelectedIds.length === 1 ? newSelectedIds[0] : newSelectedIds.length === 0 ? null : state.selectionAnchorId,
         focusedBlockId: null, // Clear focus when selecting
         crossBlockSelection: null, // Clear text selection
       }
@@ -377,17 +384,22 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
 
     case 'SELECT_BLOCK_RANGE': {
       const { startBlockId, endBlockId } = action
-      const startIndex = state.blocks.findIndex((b) => b.id === startBlockId)
+
+      // Use the anchor if available, otherwise fall back to startBlockId
+      const anchorId = state.selectionAnchorId || startBlockId
+      const anchorIndex = state.blocks.findIndex((b) => b.id === anchorId)
       const endIndex = state.blocks.findIndex((b) => b.id === endBlockId)
 
-      if (startIndex === -1 || endIndex === -1) return state
+      if (anchorIndex === -1 || endIndex === -1) return state
 
-      const [minIndex, maxIndex] = [Math.min(startIndex, endIndex), Math.max(startIndex, endIndex)]
+      const [minIndex, maxIndex] = [Math.min(anchorIndex, endIndex), Math.max(anchorIndex, endIndex)]
       const selectedIds = state.blocks.slice(minIndex, maxIndex + 1).map((b) => b.id)
 
       return {
         ...state,
         selectedBlockIds: selectedIds,
+        // Maintain the anchor for future shift+clicks
+        selectionAnchorId: state.selectionAnchorId || anchorId,
         focusedBlockId: null, // Clear focus when selecting range
         crossBlockSelection: null, // Clear text selection
       }
@@ -397,6 +409,7 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
       return {
         ...state,
         selectedBlockIds: [],
+        selectionAnchorId: null, // Clear anchor when clearing selection
         crossBlockSelection: null, // Also clear text selection
       }
 

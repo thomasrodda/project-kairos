@@ -51,6 +51,7 @@ describe('EditorContext Reducer', () => {
     ],
     focusedBlockId: null,
     selectedBlockIds: [],
+    selectionAnchorId: null,
     crossBlockSelection: null,
     isDragging: false,
     selectedRange: undefined,

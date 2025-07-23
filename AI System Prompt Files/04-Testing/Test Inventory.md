@@ -179,6 +179,7 @@
 - ✅ Improved test descriptions to reflect user perspective
 - ✅ Documented Shift+click bug in comments - issue is in EditorContext, not Block component
 - ✅ Created bug documentation at `/docs/bugs/shift-click-selection-asymmetry.md`
+- ✅ Fixed Shift+click selection bug by adding anchor-based selection to EditorContext
 
 ## 📋 Testing Priorities
 

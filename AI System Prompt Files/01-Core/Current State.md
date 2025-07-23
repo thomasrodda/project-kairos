@@ -2,7 +2,7 @@
 
 This document provides a snapshot of features by area, their completion status, and links to detailed requirements.
 
-**Last Updated**: January 22, 2025
+**Last Updated**: January 23, 2025
 
 ## 📊 Feature Status by Area
 
@@ -22,7 +22,7 @@ This document provides a snapshot of features by area, their completion status, 
 
 **Partially Working:**
 
-- ⚠️ Multi-block selection (Shift+click, Ctrl+click work but have bugs)
+- ✅ Multi-block selection (Shift+click, Ctrl+click work correctly)
 - ⚠️ Copy/paste (text works, blocks don't, formatting sometimes lost)
 - ⚠️ Cross-block text selection (buggy)
 
@@ -34,7 +34,6 @@ This document provides a snapshot of features by area, their completion status, 
 
 **Known Issues:**
 
-- 🐛 Multi-block selection is unreliable
 - 🐛 Formatting toolbar appears in wrong position when clicking away
 - 🐛 Link functionality incomplete (no unlink, can't click links)
 - 🐛 Placeholder text can be interacted with
@@ -192,7 +191,7 @@ This document provides a snapshot of features by area, their completion status, 
 **Documentation Cleanup & Critical Bug Fixes**
 
 - ✅ Clean up Current State.md
-- 🔄 Fix multi-block selection bugs
+- ✅ Fix multi-block selection bugs
 - 🔄 Fix click-and-drag selection
 - 🔄 Fix formatting toolbar positioning
 - 🔄 Fix folder page content saving
