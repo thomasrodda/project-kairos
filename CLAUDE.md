@@ -4,6 +4,13 @@ Current Date: 23/07/2025
 
 This file provides essential guidance to Claude Code when working with Project Kairos. For detailed information, follow the documentation workflow below.
 
+## 📅 CRITICAL: USE CORRECT DATE IN DOCUMENTATION
+
+- ❌ DO NOT use "January 2025" or other training data dates
+- ✅ ALWAYS use the "Current Date" shown at the top of this file (line 1)
+- ✅ CHECK line 1 of this file before any documentation updates
+- 📝 The date is automatically updated by a script
+
 ## 🚨 MANDATORY: NOTIFICATION SYSTEM 🚨
 
 **CRITICAL**: You MUST send notifications for ALL task completions and user input requests.
