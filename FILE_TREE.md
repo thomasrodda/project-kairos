@@ -84,11 +84,17 @@ AI System Prompt Files
 │   ├── Production Deployment Guide.md
 │   ├── Quick Commands.md
 │   └── Troubleshooting Guide.md
-└── 07-Operations
-├── Analytics Feature Flags Guide.md
-├── Error Handling Guide.md
-├── Performance Optimization Guide.md
-└── Security Guide.md
+├── 07-Operations
+│   ├── Analytics Feature Flags Guide.md
+│   ├── Error Handling Guide.md
+│   ├── Performance Optimization Guide.md
+│   └── Security Guide.md
+└── templates
+├── API_ENDPOINT_TEMPLATE.md
+├── COMPONENT_TEMPLATE.md
+├── DOCUMENTATION_STANDARDS.md
+├── FEATURE_TEMPLATE.md
+└── README.md
 apps
 ├── api
 │   ├── lib

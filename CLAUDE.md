@@ -27,6 +27,15 @@ When committing, you MUST FIRST:
 3. Verify documentation accuracy
 4. Only then commit and push
 
+### Documentation Templates
+
+When creating new documentation, use these templates for consistency:
+
+- **Feature Documentation**: `AI System Prompt Files/templates/FEATURE_TEMPLATE.md`
+- **Component Documentation**: `AI System Prompt Files/templates/COMPONENT_TEMPLATE.md`
+- **API Documentation**: `AI System Prompt Files/templates/API_ENDPOINT_TEMPLATE.md`
+- **Standards Guide**: `AI System Prompt Files/templates/DOCUMENTATION_STANDARDS.md`
+
 ## 📍 Project Overview
 
 Project Kairos is a creative writing and worldbuilding web application for novelists and D&D campaign planners. It features a block-based editor with drag-and-drop, text formatting, and AI-driven writing assistance.

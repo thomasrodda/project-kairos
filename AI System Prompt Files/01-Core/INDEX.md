@@ -142,7 +142,18 @@ Architecture → Component/API/Data Guides
 Testing/Error/Security Guides
 ```
 
-## 📝 Documentation Standards
+## 📝 Documentation Standards & Templates
+
+### Templates Directory
+
+- **[Templates README](../templates/README.md)** - How to use documentation templates
+  - _Use when_: Creating new documentation, ensuring consistency
+- **[Feature Template](../templates/FEATURE_TEMPLATE.md)** - Template for user stories
+- **[Component Template](../templates/COMPONENT_TEMPLATE.md)** - Template for component docs
+- **[API Endpoint Template](../templates/API_ENDPOINT_TEMPLATE.md)** - Template for API docs
+- **[Documentation Standards](../templates/DOCUMENTATION_STANDARDS.md)** - Consistency guidelines
+
+### General Standards
 
 - **Numbered docs (#)**: Core planning documents, read in order
 - **Guide docs**: Implementation references, use as needed
