@@ -8,6 +8,10 @@
 
 The backend is built using **serverless functions** deployed on **Vercel**. Each function is modular, fast, and isolated. Functions live under `apps/api/` and follow a one-file-per-route structure.
 
+> **Current State**: As of January 11, 2025, the application migrated from mock endpoints to real PostgreSQL database. Data is now persisted in a local PostgreSQL database for development, with plans to migrate to Supabase for production. See [Database Migration Strategy](./Database Migration Strategy.md) for details.
+>
+> **Note**: The project never used localStorage for data persistence. It transitioned from in-memory mock endpoints directly to PostgreSQL. Local storage and offline capabilities remain planned future features (see [User Stories - Data Management](../03-Features/DataManagement/User Stories - Data Management.md)).
+
 ---
 
 ## Folder Structure
@@ -70,6 +74,14 @@ GET /api/health
 
 Returns server status. No authentication required.
 
+### Hello (Example)
+
+```
+GET /api/hello
+```
+
+Example endpoint that returns a simple message. No authentication required.
+
 ### Authentication
 
 ```
@@ -84,6 +96,12 @@ GET /api/auth/me
 ```
 
 Returns current user profile with workspaces.
+
+```
+POST /api/auth/logout
+```
+
+Optional logout endpoint. Since authentication is stateless (Firebase JWT), logout is mainly handled client-side.
 
 ### Workspaces
 
@@ -382,7 +400,7 @@ All API responses follow a consistent format:
 
 ## Database
 
-We use **PostgreSQL** via **Supabase** with **Prisma ORM**.
+We use **PostgreSQL** with **Prisma ORM**. Currently running locally for development, with plans to migrate to Supabase for production.
 
 ### Key Models
 
@@ -417,6 +435,100 @@ export TOKEN="your-firebase-token"
 
 # Test endpoints
 curl -H "Authorization: Bearer $TOKEN" http://localhost:3001/api/workspaces
+```
+
+---
+
+## Frontend API Usage Examples
+
+### Base API Client Pattern
+
+The frontend uses a centralized `BaseApiClient` that handles authentication and error handling:
+
+```typescript
+// apps/web/src/services/api/client.ts
+class BaseApiClient {
+  async request<T>(path: string, options?: RequestInit): Promise<T> {
+    // Automatically includes Firebase auth token
+    // Handles token refresh on 401 errors
+    // Provides consistent error handling
+  }
+}
+```
+
+### Service Layer Pattern
+
+Each API domain has its own service class:
+
+```typescript
+// apps/web/src/services/api/workspaces.ts
+class WorkspaceService extends BaseApiClient {
+  async getWorkspaces() {
+    return this.request<WorkspacesResponse>('/workspaces')
+  }
+
+  async createWorkspace(data: { name: string }) {
+    return this.request<CreateWorkspaceResponse>('/workspaces', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+}
+
+export const workspaceService = new WorkspaceService()
+```
+
+### Context Usage Pattern
+
+API calls are wrapped in React contexts for state management:
+
+```typescript
+// apps/web/src/contexts/WorkspaceContext.tsx
+const loadWorkspaces = useCallback(async () => {
+  setIsLoading(true)
+  try {
+    const response = await workspaceService.getWorkspaces()
+    setWorkspaces(response.workspaces)
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setIsLoading(false)
+  }
+}, [])
+```
+
+### Auto-save Example
+
+```typescript
+// apps/web/src/services/api/pages.ts
+async savePageContent(pageId: string, data: SaveContentData) {
+  return this.request<SaveContentResponse>(`/pages/${pageId}/content`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+```
+
+### Error Handling with User Feedback
+
+```typescript
+// apps/web/src/contexts/PagesContext.tsx
+const createPage = async (title: string) => {
+  try {
+    const newPage = await pageService.createPage(workspaceId, { title })
+    showToast({
+      message: 'Page created successfully',
+      type: 'success',
+    })
+    return newPage
+  } catch (err) {
+    showToast({
+      message: err.response?.data?.error?.message || 'Failed to create page',
+      type: 'error',
+    })
+    return null
+  }
+}
 ```
 
 ---

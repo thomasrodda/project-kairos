@@ -41,7 +41,7 @@ AI System Prompt Files
 │   └── User Stories Guide.md
 ├── 02-Architecture
 │   ├── Architecture.md
-│   ├── Backend Api Guide.md
+│   ├── Backend API Guide.md
 │   ├── Backend Implementation Plan.md
 │   ├── Data Model Guide.md
 │   ├── Database Connection Notes.md

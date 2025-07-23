@@ -24,24 +24,25 @@ This document contains specific MVP implementation details and development track
 
 While some of the below are currently marked as complete, this does not indicate that no more work is needed on them. it merely shows that they have got to a rough working state.
 
-| Phase | Feature Area       | Deliverable                                     | Status         |
-| ----- | ------------------ | ----------------------------------------------- | -------------- |
-| 1     | **UI Foundation**  | App layout with sidebar and editor area         | ✅ Complete    |
-| 1     | **Basic Editor**   | Text blocks with Enter/Backspace functionality  | ✅ Complete    |
-| 1     | **Block Types**    | Paragraph, H1, H2, H3, Bullet                   | ✅ Complete    |
-| 2     | **Slash Commands** | `/` menu for block type conversion              | ✅ Complete    |
-| 2     | **Block Mgmt**     | Drag/drop, multi-select, copy/paste             | ✅ Complete    |
-| 2     | **Formatting**     | Floating toolbar (bold, italic, link)           | ✅ Complete    |
-| 2     | **Live Markdown**  | Auto-formatting (`# ` → H1, `## ` → H2, etc.)   | ✅ Complete    |
-| 2     | **Markdown I/O**   | Paste detection and export functionality        | 📋 Planned     |
-| 3     | **Authentication** | Google OAuth login                              | ✅ Complete    |
-| 3     | **Database**       | Cloud storage and API endpoints                 | ✅ Complete    |
-| 4     | **Pages**          | Create, rename, delete, nest pages              | ✅ Complete    |
-| 4     | **Navigation**     | File tree sidebar with drag-and-drop            | ✅ Complete    |
-| 5     | **Linking**        | `@`-mention linking and backlinks panel         | 📋 Planned     |
-| 6     | **Workspaces**     | Multi-workspace support and switching           | ✅ Complete    |
-| 6     | **Cloud Sync**     | Real-time autosave with optional local storage  | ⏳ In Progress |
-| 7     | **Polish**         | Undo/redo, copy/paste, performance optimization | 📋 Planned     |
+| Phase | Feature Area       | Deliverable                                     | Status      |
+| ----- | ------------------ | ----------------------------------------------- | ----------- |
+| 1     | **UI Foundation**  | App layout with sidebar and editor area         | ✅ Complete |
+| 1     | **Basic Editor**   | Text blocks with Enter/Backspace functionality  | ✅ Complete |
+| 1     | **Block Types**    | Paragraph, H1, H2, H3, Bullet                   | ✅ Complete |
+| 2     | **Slash Commands** | `/` menu for block type conversion              | ✅ Complete |
+| 2     | **Block Mgmt**     | Drag/drop, multi-select, copy/paste             | ✅ Complete |
+| 2     | **Formatting**     | Floating toolbar (bold, italic, link)           | ✅ Complete |
+| 2     | **Live Markdown**  | Auto-formatting (`# ` → H1, `## ` → H2, etc.)   | ✅ Complete |
+| 2     | **Markdown I/O**   | Paste detection and export functionality        | 📋 Planned  |
+| 3     | **Authentication** | Google OAuth login                              | ✅ Complete |
+| 3     | **Database**       | Cloud storage and API endpoints                 | ✅ Complete |
+| 4     | **Pages**          | Create, rename, delete, nest pages              | ✅ Complete |
+| 4     | **Navigation**     | File tree sidebar with drag-and-drop            | ✅ Complete |
+| 5     | **Linking**        | `@`-mention linking and backlinks panel         | 📋 Planned  |
+| 6     | **Workspaces**     | Multi-workspace support and switching           | ✅ Complete |
+| 6     | **Auto-save**      | Real-time autosave to local PostgreSQL database | ✅ Complete |
+| 7     | **Cloud Sync**     | Migration to Supabase cloud database            | 📋 Planned  |
+| 8     | **Polish**         | Undo/redo, copy/paste, performance optimization | 📋 Planned  |
 
 ## Key MVP Success Criteria
 

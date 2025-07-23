@@ -93,7 +93,7 @@ This document provides a snapshot of features by area, their completion status, 
 - ✅ Switch between workspaces
 - ✅ Workspace selector dropdown
 - ✅ Auto-create workspace for new users
-- ✅ Cloud auto-save functionality
+- ✅ Auto-save functionality (to local PostgreSQL database)
 
 **Known Issues:**
 
