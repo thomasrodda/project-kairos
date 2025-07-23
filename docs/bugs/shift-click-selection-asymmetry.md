@@ -49,7 +49,7 @@ Medium - This is a UX inconsistency that affects daily usage but has a workaroun
 
 ## Resolution
 
-**Fixed on**: January 23, 2025
+**Fixed on**: July 23, 2025
 
 ### Solution Implemented
 
