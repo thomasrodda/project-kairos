@@ -3,7 +3,7 @@
 // Uses a single contentEditable container to enable cross-block text selection.
 // Manages drag and drop reordering using @dnd-kit for smooth, accessible interactions.
 
-import { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -14,6 +14,7 @@ import {
   useSensors,
   DragStartEvent,
   DragEndEvent,
+  DragOverEvent,
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useEditorState, useEditorDispatch, EditorBlock } from '../../../contexts/EditorContext'
@@ -35,6 +36,8 @@ export function EditorContent() {
   const contentEditableRef = useRef<HTMLDivElement>(null)
   const formattingToolbarRef = useRef<HTMLDivElement>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [overId, setOverId] = useState<string | null>(null)
+  const [overIndex, setOverIndex] = useState<number | null>(null)
 
   // Screen reader announcements for accessibility
   const [announcement, setAnnouncement] = useState<string>('')
@@ -294,6 +297,30 @@ export function EditorContent() {
     excludeRefs: [formattingToolbarRef], // Don't dismiss when clicking on formatting toolbar
   })
 
+  // Handle drag over
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event
+    
+    if (!over) {
+      setOverId(null)
+      setOverIndex(null)
+      return
+    }
+    
+    const activeIndex = blocks.findIndex((b) => b.id === active.id)
+    const overBlockIndex = blocks.findIndex((b) => b.id === over.id)
+    
+    if (activeIndex !== -1 && overBlockIndex !== -1) {
+      // Determine if we're dragging up or down
+      const dragDirection = activeIndex < overBlockIndex ? 'down' : 'up'
+      
+      // For downward drags, show indicator after the target block
+      // For upward drags, show indicator before the target block
+      setOverId(over.id as string)
+      setOverIndex(dragDirection === 'down' ? overBlockIndex + 1 : overBlockIndex)
+    }
+  }
+
   // Handle drag start
   const handleDragStart = (event: DragStartEvent) => {
     const draggedBlockId = event.active.id as string
@@ -401,6 +428,8 @@ export function EditorContent() {
     }
 
     setActiveId(null)
+    setOverId(null)
+    setOverIndex(null)
     dispatch({ type: 'SET_DRAGGING', isDragging: false })
   }
 
@@ -408,7 +437,7 @@ export function EditorContent() {
   const isDraggingMultiple = activeId && selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId)
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
       <div
         className={`editor-content ${activeId ? 'editor-content--sorting' : ''} ${isDraggingMultiple ? 'editor-content--dragging-multiple' : ''}`}
         ref={editorRef}
@@ -442,15 +471,24 @@ export function EditorContent() {
           <ContentEditableContainer onBlockClick={handleBlockClick} containerRef={contentEditableRef}>
             <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
               {blocks.map((block, index) => (
-                <div key={block.id} aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
-                  <DraggableBlock
-                    block={block}
-                    isFocused={focusedBlockId === block.id}
-                    isSelected={selectedBlockIds.includes(block.id)}
-                    activeId={activeId}
-                    selectedBlockIds={selectedBlockIds}
-                  />
-                </div>
+                <React.Fragment key={block.id}>
+                  {activeId && overIndex === index && (
+                    <div className="drop-indicator" />
+                  )}
+                  <div aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
+                    <DraggableBlock
+                      block={block}
+                      isFocused={focusedBlockId === block.id}
+                      isSelected={selectedBlockIds.includes(block.id)}
+                      activeId={activeId}
+                      selectedBlockIds={selectedBlockIds}
+                      overId={overId}
+                    />
+                  </div>
+                  {activeId && overIndex === index + 1 && index === blocks.length - 1 && (
+                    <div className="drop-indicator" />
+                  )}
+                </React.Fragment>
               ))}
             </SortableContext>
           </ContentEditableContainer>
@@ -462,7 +500,7 @@ export function EditorContent() {
       {/* Drag overlay that shows the dragged blocks */}
       <DragOverlay dropAnimation={null}>
         {activeId ? (
-          <div style={{ opacity: 1 }}>
+          <div style={{ opacity: 0.7 }}>
             {selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId) ? (
               // Multi-block drag: show all selected blocks
               <div className="dragging-multiple-blocks">

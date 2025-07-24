@@ -13,7 +13,7 @@ This document provides a snapshot of features by area, their completion status, 
 **Completed:**
 
 - ✅ Block-based editing with contentEditable
-- ✅ Drag-and-drop block reordering (single and multi-block drag implemented July 24, 2025)
+- ✅ Drag-and-drop block reordering (single and multi-block drag implemented July 24, 2025, UI improvements added: purple drop indicator line, reduced opacity for dragged blocks)
 - ✅ Slash commands for block types
 - ✅ Keyboard navigation (basic)
 - ✅ Rich text formatting (bold, italic, underline, links)
@@ -40,6 +40,7 @@ This document provides a snapshot of features by area, their completion status, 
 - 🐛 Enter at start of block doesn't work correctly
 - 🐛 Markdown paste doesn't format unless you re-trigger it
 - 🐛 Multi-block drag: blocks jump to top when dropping below selected block position (WIP)
+- 🐛 Drop gap size only matches single block height, not all selected blocks
 
 **Not Started:**
 

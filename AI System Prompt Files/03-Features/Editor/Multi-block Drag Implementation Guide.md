@@ -5,7 +5,7 @@
 This guide documents the implementation of multi-block drag functionality in the Kairos editor, allowing users to select and drag multiple blocks together.
 
 **Last Updated**: July 24, 2025  
-**Status**: Work in Progress (WIP)
+**Status**: Work in Progress (WIP) - UI improvements added, drop position bug remains
 
 ## Implementation Details
 
@@ -57,10 +57,10 @@ This guide documents the implementation of multi-block drag functionality in the
 ### Current Implementation (July 24, 2025)
 
 ```tsx
-// EditorContent.tsx - DragOverlay implementation
+// EditorContent.tsx - DragOverlay implementation with reduced opacity
 <DragOverlay dropAnimation={null}>
   {activeId ? (
-    <div style={{ opacity: 1 }}>
+    <div style={{ opacity: 0.7 }}>  // Reduced opacity for dragged blocks
       {selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId) ? (
         // Multi-block drag: show all selected blocks
         <div className="dragging-multiple-blocks">
@@ -79,6 +79,23 @@ This guide documents the implementation of multi-block drag functionality in the
 </DragOverlay>
 ```
 
+### UI Improvements (July 24, 2025)
+
+1. **Drop Indicator Line**:
+   - Purple horizontal line (3px height) shows drop position
+   - Appears between blocks during drag operations
+   - Uses `--color-primary-500` for consistency
+   - Smooth slide-in animation
+
+2. **Dragged Block Opacity**:
+   - Reduced opacity to 0.7 (70%) for better visual feedback
+   - Applied to DragOverlay for both single and multi-block drag
+
+3. **Animation Improvements**:
+   - Custom cubic-bezier easing for smoother transitions
+   - Disabled default dnd-kit animations for better control
+   - Consistent 200ms transition timing
+
 ## Known Issues
 
 ### 1. Drop Position Bug (WIP)
@@ -87,11 +104,17 @@ This guide documents the implementation of multi-block drag functionality in the
 - **Status**: Under investigation
 - **Impact**: Makes multi-block drag unreliable for certain movements
 
-### 2. UI/UX Refinements Needed
+### 2. Drop Gap Size Issue
 
-- Smooth transition animations
-- Better visual feedback during drag
-- Drop indicators for precise placement
+- **Issue**: Drop gap only matches the height of the single block being dragged, not all selected blocks
+- **Status**: Identified, needs fix
+- **Impact**: Visual feedback doesn't accurately represent space needed for multi-block drop
+
+### 3. UI/UX Refinements Completed (July 24, 2025)
+
+- ✅ Smooth transition animations (cubic-bezier easing)
+- ✅ Better visual feedback during drag (70% opacity)
+- ✅ Drop indicators for precise placement (purple line)
 
 ## Design Decisions
 

@@ -15,12 +15,14 @@ interface DraggableBlockProps {
   isSelected: boolean
   activeId: string | null
   selectedBlockIds: string[]
+  overId: string | null
 }
 
-export function DraggableBlock({ block, isFocused, isSelected, activeId, selectedBlockIds }: DraggableBlockProps) {
+export function DraggableBlock({ block, isFocused, isSelected, activeId, selectedBlockIds, overId }: DraggableBlockProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: block.id,
     disabled: false, // Allow dragging even when editing
+    animateLayoutChanges: () => false, // Disable default animations to use our own
   })
 
   // Check if this block should appear as dragging
@@ -36,7 +38,7 @@ export function DraggableBlock({ block, isFocused, isSelected, activeId, selecte
   // Hide dragging blocks (they're shown in the overlay)
   const style = {
     transform: CSS.Transform.toString(transform),
-    transition,
+    transition: isDragging ? undefined : 'transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Custom smooth transition
     opacity: shouldShowAsDragging ? 0 : 1,
   }
 
