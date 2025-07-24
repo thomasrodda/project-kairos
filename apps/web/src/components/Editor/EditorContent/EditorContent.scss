@@ -75,30 +75,27 @@
   }
 }
 
+// Multi-block dragging state
+.editor-content--dragging-multiple {
+  // Compress gaps between selected blocks during drag
+  .draggable-block--multi-drag {
+    // Remove margin between consecutive selected blocks
+    & + .draggable-block--multi-drag {
+      margin-top: calc(var(--spacing-4) * -1);
+    }
+  }
+}
+
 // Multi-block drag overlay styles
 .dragging-multiple-blocks {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
-  padding: var(--spacing-8);
-  background: var(--color-surface);
-  border-radius: var(--radius-8);
-  box-shadow: var(--shadow-heavy);
 
-  // Limit height for many blocks
-  max-height: 300px;
-  overflow: hidden;
-  position: relative;
-
-  // Fade out at bottom if content is clipped
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: linear-gradient(transparent, var(--color-surface));
-    pointer-events: none;
+  .block {
+    background: var(--color-surface);
+    border-radius: var(--radius-8);
+    box-shadow: var(--shadow-heavy);
+    opacity: 0.9;
   }
 }

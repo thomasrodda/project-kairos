@@ -404,13 +404,13 @@ export function EditorContent() {
     dispatch({ type: 'SET_DRAGGING', isDragging: false })
   }
 
-  // Find the active block for the drag overlay
-  const activeBlock = activeId ? blocks.find((b) => b.id === activeId) : null
+  // Check if we're dragging multiple blocks
+  const isDraggingMultiple = activeId && selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId)
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div
-        className={`editor-content ${activeId ? 'editor-content--sorting' : ''}`}
+        className={`editor-content ${activeId ? 'editor-content--sorting' : ''} ${isDraggingMultiple ? 'editor-content--dragging-multiple' : ''}`}
         ref={editorRef}
         onClick={handleEmptySpaceClick}
         role="document"
@@ -443,7 +443,13 @@ export function EditorContent() {
             <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
               {blocks.map((block, index) => (
                 <div key={block.id} aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
-                  <DraggableBlock block={block} isFocused={focusedBlockId === block.id} />
+                  <DraggableBlock
+                    block={block}
+                    isFocused={focusedBlockId === block.id}
+                    isSelected={selectedBlockIds.includes(block.id)}
+                    activeId={activeId}
+                    selectedBlockIds={selectedBlockIds}
+                  />
                 </div>
               ))}
             </SortableContext>
@@ -453,12 +459,12 @@ export function EditorContent() {
         </div>
       </div>
 
-      {/* Drag overlay for smooth dragging animation */}
-      <DragOverlay>
+      {/* Drag overlay that shows the dragged blocks */}
+      <DragOverlay dropAnimation={null}>
         {activeId ? (
-          <div style={{ opacity: 0.8 }} role="img" aria-label="Dragging block">
-            {/* Show all selected blocks if dragging multiple */}
+          <div style={{ opacity: 1 }}>
             {selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId) ? (
+              // Multi-block drag: show all selected blocks
               <div className="dragging-multiple-blocks">
                 {blocks
                   .filter((block) => selectedBlockIds.includes(block.id))
@@ -467,8 +473,8 @@ export function EditorContent() {
                   ))}
               </div>
             ) : (
-              // Show single block when dragging one
-              activeBlock && <Block block={activeBlock} isFocused={false} />
+              // Single block drag
+              blocks.find((b) => b.id === activeId) && <Block block={blocks.find((b) => b.id === activeId)!} isFocused={false} />
             )}
           </div>
         ) : null}
