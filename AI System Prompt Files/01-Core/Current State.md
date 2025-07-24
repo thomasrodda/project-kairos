@@ -34,7 +34,6 @@ This document provides a snapshot of features by area, their completion status, 
 
 **Known Issues:**
 
-- 🐛 Formatting toolbar appears in wrong position when clicking away
 - 🐛 Link functionality incomplete (no unlink, can't click links)
 - 🐛 Placeholder text can be interacted with
 - 🐛 Typing bugs related to placeholder text
@@ -192,17 +191,17 @@ This document provides a snapshot of features by area, their completion status, 
 
 - ✅ Clean up Current State.md
 - ✅ Fix multi-block selection bugs
-- 🔄 Fix click-and-drag selection
-- 🔄 Fix formatting toolbar positioning
+- ✅ Fix click-and-drag selection
+- ✅ Fix formatting toolbar positioning
 - 🔄 Fix folder page content saving
 
 ## 🐛 Active Issues
 
 ### High Priority
 
-1. **Formatting toolbar positioning** - Appears briefly in top-left when clicking away
-2. **Cross-block formatting** - Formatting doesn't work across block boundaries
-3. **Link dialog styling** - Needs proper design tokens
+1. **Cross-block formatting** - Formatting doesn't work across block boundaries
+2. **Link dialog styling** - Needs proper design tokens
+3. **Folder page content saving** - Content in folder pages doesn't save properly
 
 ### Medium Priority
 

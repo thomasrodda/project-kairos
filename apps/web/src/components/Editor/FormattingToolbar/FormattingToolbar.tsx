@@ -42,8 +42,20 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
     }
 
     // Track mouse state
-    const handleMouseDown = () => {
+    const handleMouseDown = (e: MouseEvent) => {
       setIsMouseDown(true)
+
+      // If clicking outside the toolbar, hide it immediately
+      if (toolbarRef.current && !toolbarRef.current.contains(e.target as Node)) {
+        // Clear any pending hide timeout
+        if (hideTimeoutRef.current) {
+          clearTimeout(hideTimeoutRef.current)
+          hideTimeoutRef.current = null
+        }
+        // Hide immediately
+        setIsVisible(false)
+        setHasValidSelection(false)
+      }
     }
 
     const handleMouseUp = () => {
@@ -70,7 +82,7 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
       document.removeEventListener('mouseup', handleMouseUp)
       document.removeEventListener('selectionchange', handleSelectionChange)
     }
-  }, [isMouseDown])
+  }, [isMouseDown, toolbarRef])
 
   // Listen for formatting events from keyboard shortcuts
   useEffect(() => {
@@ -164,7 +176,7 @@ export const FormattingToolbar: React.FC<FormattingToolbarProps> = ({ containerR
 
     // Use a small delay to ensure the toolbar is rendered before calculating position
     const timeoutId = setTimeout(() => {
-      if (!containerRef.current || !toolbarRef.current) {
+      if (!containerRef.current || !toolbarRef.current || !isVisible) {
         return
       }
 
