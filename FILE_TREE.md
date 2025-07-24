@@ -58,6 +58,7 @@ AI System Prompt Files
 │   │   └── User Stories - Data Management.md
 │   ├── Editor
 │   │   ├── Enhanced Custom Editor Plan.md
+│   │   ├── Multi-block Drag Implementation Guide.md
 │   │   ├── Slash Command Feature Development.md
 │   │   ├── Text Formatting Plan.md
 │   │   └── User Stories - Editor.md

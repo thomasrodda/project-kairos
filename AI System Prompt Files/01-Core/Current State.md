@@ -39,6 +39,7 @@ This document provides a snapshot of features by area, their completion status, 
 - 🐛 Can't delete the last block
 - 🐛 Enter at start of block doesn't work correctly
 - 🐛 Markdown paste doesn't format unless you re-trigger it
+- 🐛 Multi-block drag: blocks jump to top when dropping below selected block position (WIP)
 
 **Not Started:**
 

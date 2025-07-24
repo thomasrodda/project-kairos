@@ -91,11 +91,4 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-4);
-
-  .block {
-    background: var(--color-surface);
-    border-radius: var(--radius-8);
-    box-shadow: var(--shadow-heavy);
-    opacity: 0.9;
-  }
 }
