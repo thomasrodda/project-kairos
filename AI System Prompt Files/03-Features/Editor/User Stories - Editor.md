@@ -150,9 +150,10 @@ Acceptance Criteria:
 - [x] Each block has a drag handle on the left that appears when the block is hovered over.
 - [x] Clicking, holding and dragging the handle will begin to move the block.
 - [x] You can click in empty space and drag over blocks to select multiple blocks.
-- [ ] You can then use the drag handle of the top selected block to drag and drop the selection.
+- [x] You can then use the drag handle of any selected block to drag and drop the selection.
 - [x] Blocks can be clicked and dragged vertically.
 - [x] Dropping moves the block(s) to the new position.
+- [x] When multiple blocks are selected, dragging any selected block's grab handle moves all selected blocks together.
 
 Notes:
 
@@ -160,13 +161,14 @@ Notes:
 - Selection box only appears after dragging 5+ pixels to avoid interfering with normal clicks
 - Cursor remains as default arrow during selection
 - Fixed text selection within blocks (July 24, 2025) - Drag selection now only activates when starting drag outside contentEditable areas
-- Multi-block drag and drop of the selection is not yet implemented
+- Multi-block drag and drop implemented (July 24, 2025) - Selected blocks maintain their relative order when dragged together
+- Fixed drag selection within editor content (July 24, 2025) - Resolved click event race condition that was clearing selections
 
 Priority: Medium
 
 **Complexity**: Medium–High
 
-**Status**: In Progress
+**Status**: Completed
 
 **Dependencies**:
 

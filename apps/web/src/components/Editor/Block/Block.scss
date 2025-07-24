@@ -20,9 +20,8 @@
       box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-primary-500) 10%, transparent);
     }
 
+    // Don't force grab handle visibility - let hover control it
     .block-drag-handle {
-      opacity: 1;
-
       .icon {
         color: var(--color-primary-500);
       }

@@ -57,13 +57,10 @@
     opacity: 1;
   }
 
-  // When parent block is selected, make handle more visible
+  // When parent block is selected, only change icon color (not opacity)
   .block--selected & {
-    opacity: 1;
-
     .icon {
       color: var(--color-primary-500);
-      opacity: 1;
     }
   }
 

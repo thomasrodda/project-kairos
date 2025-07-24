@@ -13,7 +13,7 @@ This document provides a snapshot of features by area, their completion status, 
 **Completed:**
 
 - ✅ Block-based editing with contentEditable
-- ✅ Drag-and-drop block reordering (single blocks only)
+- ✅ Drag-and-drop block reordering (single and multi-block drag implemented July 24, 2025)
 - ✅ Slash commands for block types
 - ✅ Keyboard navigation (basic)
 - ✅ Rich text formatting (bold, italic, underline, links)
@@ -22,14 +22,13 @@ This document provides a snapshot of features by area, their completion status, 
 
 **Partially Working:**
 
-- ✅ Multi-block selection (Shift+click, Ctrl+click work correctly)
-- ✅ Click and drag selection across blocks (visual selection box implemented July 2025, fixed text selection within blocks July 24, 2025)
+- ✅ Multi-block selection (Shift+click, Ctrl+click work correctly, multi-block drag implemented July 24, 2025)
+- ✅ Click and drag selection across blocks (visual selection box implemented July 2025, fixed text selection within blocks July 24, 2025, fixed drag selection within editor content July 24, 2025)
 - ⚠️ Copy/paste (text works, blocks don't, formatting sometimes lost)
 - ⚠️ Cross-block text selection (buggy)
 
 **Not Working:**
 
-- ❌ Multi-block drag and drop
 - ❌ Copy/paste of multiple blocks
 
 **Known Issues:**
@@ -261,11 +260,11 @@ Based on user story analysis with bugs/issues considered:
 
 ### Immediate Priorities
 
-1. Fix multi-block selection and drag selection
-2. Complete copy/paste for blocks (not just text)
-3. Fix formatting toolbar positioning
-4. Add undo/redo system
-5. Fix folder page content saving
+1. Complete copy/paste for blocks (not just text)
+2. Add undo/redo system
+3. Fix folder page content saving
+4. Fix link functionality (unlink, clickable links)
+5. Fix placeholder text interaction bugs
 
 ### Next Phase
 

@@ -16,7 +16,7 @@ import {
   DragEndEvent,
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { useEditorState, useEditorDispatch } from '../../../contexts/EditorContext'
+import { useEditorState, useEditorDispatch, EditorBlock } from '../../../contexts/EditorContext'
 import { useDismiss, useCrossBlockSelection } from '../../../hooks'
 import { PageTitle } from '../PageTitle'
 import { usePageContext } from '../../../contexts/PageContext'
@@ -181,6 +181,12 @@ export function EditorContent() {
   const handleEmptySpaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement
 
+    // Check if a drag selection just completed by looking for the flag on the editor container
+    const editorContainer = target.closest('.editor')
+    if (editorContainer && editorContainer.getAttribute('data-drag-selection-just-completed') === 'true') {
+      return
+    }
+
     // Check if the click was on specific elements
     const isOnBlock = target.closest('.block') !== null
     const isOnPageTitle = target.closest('.page-title') !== null
@@ -301,9 +307,22 @@ export function EditorContent() {
       clearSelection()
     }
 
+    // If the dragged block is part of a multi-selection, ensure it stays selected
+    if (selectedBlockIds.length > 1 && selectedBlockIds.includes(draggedBlockId)) {
+      // Keep the multi-selection
+    } else if (!selectedBlockIds.includes(draggedBlockId)) {
+      // If dragging an unselected block, select only that block
+      dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: [draggedBlockId] })
+    }
+
     // Announce drag start for screen readers
     const blockIndex = blocks.findIndex((b) => b.id === draggedBlockId)
-    setAnnouncement(`Started dragging block ${blockIndex + 1} of ${blocks.length}`)
+    const dragCount = selectedBlockIds.includes(draggedBlockId) ? selectedBlockIds.length : 1
+    if (dragCount > 1) {
+      setAnnouncement(`Started dragging ${dragCount} selected blocks`)
+    } else {
+      setAnnouncement(`Started dragging block ${blockIndex + 1} of ${blocks.length}`)
+    }
     setTimeout(() => setAnnouncement(''), 2000)
   }
 
@@ -312,16 +331,68 @@ export function EditorContent() {
     const { active, over } = event
 
     if (active.id !== over?.id && over?.id) {
-      const oldIndex = blocks.findIndex((block) => block.id === active.id)
-      const newIndex = blocks.findIndex((block) => block.id === over.id)
+      const draggedBlockId = active.id as string
+      const overBlockId = over.id as string
 
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newBlocks = arrayMove(blocks, oldIndex, newIndex)
-        dispatch({ type: 'REORDER_BLOCKS', blocks: newBlocks })
+      // Check if we're dragging multiple blocks
+      const isDraggingMultiple = selectedBlockIds.length > 1 && selectedBlockIds.includes(draggedBlockId)
 
-        // Announce successful reorder for screen readers
-        setAnnouncement(`Block moved from position ${oldIndex + 1} to position ${newIndex + 1}`)
-        setTimeout(() => setAnnouncement(''), 2000)
+      if (isDraggingMultiple) {
+        // Multi-block drag logic
+        const overIndex = blocks.findIndex((block) => block.id === overBlockId)
+
+        if (overIndex !== -1) {
+          // Get all selected blocks in their current order
+          const selectedBlocks: EditorBlock[] = []
+          const unselectedBlocks: EditorBlock[] = []
+
+          blocks.forEach((block) => {
+            if (selectedBlockIds.includes(block.id)) {
+              selectedBlocks.push(block)
+            } else {
+              unselectedBlocks.push(block)
+            }
+          })
+
+          // Find where to insert the selected blocks
+          let insertIndex = 0
+          for (let i = 0; i < blocks.length; i++) {
+            if (blocks[i].id === overBlockId) {
+              // Check if we're dropping above or below the target
+              const draggedIndex = blocks.findIndex((b) => b.id === draggedBlockId)
+              if (draggedIndex < i) {
+                // Dragging down - insert after the target
+                insertIndex = unselectedBlocks.findIndex((b) => b.id === overBlockId) + 1
+              } else {
+                // Dragging up - insert before the target
+                insertIndex = unselectedBlocks.findIndex((b) => b.id === overBlockId)
+              }
+              break
+            }
+          }
+
+          // Reconstruct the blocks array with selected blocks at the new position
+          const newBlocks = [...unselectedBlocks.slice(0, insertIndex), ...selectedBlocks, ...unselectedBlocks.slice(insertIndex)]
+
+          dispatch({ type: 'REORDER_BLOCKS', blocks: newBlocks })
+
+          // Announce successful reorder for screen readers
+          setAnnouncement(`Moved ${selectedBlocks.length} blocks to new position`)
+          setTimeout(() => setAnnouncement(''), 2000)
+        }
+      } else {
+        // Single block drag logic (existing code)
+        const oldIndex = blocks.findIndex((block) => block.id === active.id)
+        const newIndex = blocks.findIndex((block) => block.id === over.id)
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newBlocks = arrayMove(blocks, oldIndex, newIndex)
+          dispatch({ type: 'REORDER_BLOCKS', blocks: newBlocks })
+
+          // Announce successful reorder for screen readers
+          setAnnouncement(`Block moved from position ${oldIndex + 1} to position ${newIndex + 1}`)
+          setTimeout(() => setAnnouncement(''), 2000)
+        }
       }
     } else if (activeId) {
       // Announce if drag was cancelled
@@ -384,9 +455,21 @@ export function EditorContent() {
 
       {/* Drag overlay for smooth dragging animation */}
       <DragOverlay>
-        {activeBlock ? (
+        {activeId ? (
           <div style={{ opacity: 0.8 }} role="img" aria-label="Dragging block">
-            <Block block={activeBlock} isFocused={false} />
+            {/* Show all selected blocks if dragging multiple */}
+            {selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId) ? (
+              <div className="dragging-multiple-blocks">
+                {blocks
+                  .filter((block) => selectedBlockIds.includes(block.id))
+                  .map((block) => (
+                    <Block key={block.id} block={block} isFocused={false} />
+                  ))}
+              </div>
+            ) : (
+              // Show single block when dragging one
+              activeBlock && <Block block={activeBlock} isFocused={false} />
+            )}
           </div>
         ) : null}
       </DragOverlay>

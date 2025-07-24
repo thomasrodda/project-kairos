@@ -152,6 +152,12 @@ export function shouldTreatAsTextSelection(range: Range): boolean {
     return false
   }
 
+  // Check if drag selection is active by looking for the editor--selecting class
+  const isDragSelecting = document.querySelector('.editor--selecting') !== null
+  if (isDragSelecting) {
+    return false
+  }
+
   // Check if the selection started from a drag handle
   const startElement =
     range.startContainer.nodeType === Node.ELEMENT_NODE ? (range.startContainer as HTMLElement) : range.startContainer.parentElement

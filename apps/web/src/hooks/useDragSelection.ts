@@ -4,7 +4,7 @@
 // Does not interfere with text selection within contentEditable elements.
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { useEditorState, useEditorDispatch } from '../contexts/EditorContext'
+import { useEditorDispatch } from '../contexts/EditorContext'
 
 interface SelectionBox {
   startX: number
@@ -19,7 +19,6 @@ interface UseDragSelectionOptions {
 }
 
 export function useDragSelection({ containerRef, enabled = true }: UseDragSelectionOptions) {
-  const { blocks } = useEditorState()
   const dispatch = useEditorDispatch()
 
   const [isSelecting, setIsSelecting] = useState(false)
@@ -101,11 +100,21 @@ export function useDragSelection({ containerRef, enabled = true }: UseDragSelect
       const isOnFormattingToolbar = target.closest('.formatting-toolbar') !== null
       const isOutsideEditor = !containerRef.current.contains(target)
 
-      // Check if the click started on a contentEditable element or its children
-      // This allows text selection to work normally within blocks
-      const isOnContentEditable = target.closest('[contenteditable="true"]') !== null
+      if (isOnDragHandle || isOnFormattingToolbar || isOutsideEditor) return
 
-      if (isOnDragHandle || isOnFormattingToolbar || isOutsideEditor || isOnContentEditable) return
+      // CRITICAL: Check if clicking on a block or its content
+      // This is the key to differentiating between text selection and block selection
+      const isOnBlock = target.closest('.block') !== null
+      const isOnBlockContent = target.closest('.block__content') !== null
+      const isOnPageTitle = target.closest('.page-title') !== null
+
+      // If clicking on a block, its content, or page title, don't start drag selection
+      // This allows text selection to work normally
+      if (isOnBlock || isOnBlockContent || isOnPageTitle) return
+
+      // Also check for other interactive elements
+      const isInteractiveElement = target.closest('a, button, input, textarea, select') !== null
+      if (isInteractiveElement) return
 
       // Get container-relative coordinates
       const containerRect = containerRef.current.getBoundingClientRect()
@@ -137,13 +146,17 @@ export function useDragSelection({ containerRef, enabled = true }: UseDragSelect
           hasMovedEnoughRef.current = true
           setIsSelecting(true)
 
-          // Clear any existing text selection
+          // Clear any existing text selection and prevent text selection
           window.getSelection()?.removeAllRanges()
+          e.preventDefault()
         }
       }
 
       // Update selection box if selecting
       if (isSelecting && startPointRef.current) {
+        // Prevent text selection while dragging
+        e.preventDefault()
+
         const newBox = {
           startX: startPointRef.current.x,
           startY: startPointRef.current.y,
@@ -155,21 +168,52 @@ export function useDragSelection({ containerRef, enabled = true }: UseDragSelect
         updateSelectedBlocks(newBox)
       }
     },
-    [isSelecting, containerRef, updateSelectedBlocks]
+    [isSelecting, containerRef, updateSelectedBlocks, MIN_DRAG_DISTANCE]
   )
 
   // Handle mouse up - finish selection or cancel potential drag
-  const handleMouseUp = useCallback(() => {
-    isPotentialDragRef.current = false
-    hasMovedEnoughRef.current = false
+  const handleMouseUp = useCallback(
+    (e: MouseEvent) => {
+      isPotentialDragRef.current = false
+      hasMovedEnoughRef.current = false
 
-    if (isSelecting) {
-      setIsSelecting(false)
-      setSelectionBox(null)
-    }
+      if (isSelecting && startPointRef.current && containerRef.current) {
+        // Do a final update with the current mouse position
+        const containerRect = containerRef.current.getBoundingClientRect()
+        const finalX = e.clientX - containerRect.left
+        const finalY = e.clientY - containerRect.top
 
-    startPointRef.current = null
-  }, [isSelecting])
+        const finalBox = {
+          startX: startPointRef.current.x,
+          startY: startPointRef.current.y,
+          endX: finalX,
+          endY: finalY,
+        }
+
+        // Update selection one last time with final coordinates
+        updateSelectedBlocks(finalBox)
+
+        // Set a flag on the container to indicate a drag selection just completed
+        // This will be checked by the click handler to prevent clearing the selection
+        containerRef.current.dataset.dragSelectionJustCompleted = 'true'
+
+        // Clear the flag after a short delay (enough time for the click event to fire)
+        setTimeout(() => {
+          if (containerRef.current) {
+            delete containerRef.current.dataset.dragSelectionJustCompleted
+          }
+        }, 100)
+      }
+
+      if (isSelecting) {
+        setIsSelecting(false)
+        setSelectionBox(null)
+      }
+
+      startPointRef.current = null
+    },
+    [isSelecting, containerRef, updateSelectedBlocks]
+  )
 
   // Set up event listeners
   useEffect(() => {
