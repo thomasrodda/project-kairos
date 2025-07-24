@@ -149,14 +149,17 @@ Acceptance Criteria:
 
 - [x] Each block has a drag handle on the left that appears when the block is hovered over.
 - [x] Clicking, holding and dragging the handle will begin to move the block.
-- [ ] You can click in empty space and drag over blocks to select multiple blocks.
+- [x] You can click in empty space and drag over blocks to select multiple blocks.
 - [ ] You can then use the drag handle of the top selected block to drag and drop the selection.
 - [x] Blocks can be clicked and dragged vertically.
 - [x] Dropping moves the block(s) to the new position.
 
 Notes:
 
-- _No additional notes yet_
+- Drag selection implemented (July 2025) - Click and drag in empty space to create a purple selection box
+- Selection box only appears after dragging 5+ pixels to avoid interfering with normal clicks
+- Cursor remains as default arrow during selection
+- Multi-block drag and drop of the selection is not yet implemented
 
 Priority: Medium
 
@@ -174,6 +177,8 @@ Priority: Medium
 - `apps/web/src/components/Editor/DraggableBlock.tsx` - Drag wrapper
 - `apps/web/src/components/Editor/Block.tsx` - Block component with drag handle
 - `apps/web/src/contexts/EditorContext.tsx` - MOVE_BLOCK action
+- `apps/web/src/hooks/useDragSelection.ts` - Drag selection logic (July 2025)
+- `apps/web/src/components/Editor/SelectionBox/` - Visual selection box (July 2025)
 - Uses @dnd-kit library for drag functionality
 
 ---
@@ -225,7 +230,7 @@ Acceptance Criteria:
 
 - [x] Pressing backspace in an empty block deletes it and focuses the previous block.
 - [x] Clicking on the drag handle highlights the block. Pressing delete removes the highlighted block.
-- [ ] You can click in empty space and drag over blocks to select multiple blocks for deletion.
+- [x] You can click in empty space and drag over blocks to select multiple blocks for deletion.
 - [x] There's no confirmation for deleting empty blocks but you can undo it.
 - [x] Pressing backspace at the start of a block merges it with the previous block.
 - [ ] Deleting the last block in a page recreates the default starter block that a new page starts with.

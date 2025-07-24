@@ -258,6 +258,10 @@ apps
 │   │   │   │   ├── PageTitle.test.tsx
 │   │   │   │   ├── PageTitle.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── SelectionBox
+│   │   │   │   ├── SelectionBox.scss
+│   │   │   │   ├── SelectionBox.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── SlashCommandMenu
 │   │   │   │   ├── SlashCommandMenu.scss
 │   │   │   │   ├── SlashCommandMenu.test.tsx
@@ -324,6 +328,7 @@ apps
 │   │   ├── useCrossBlockSelection.ts
 │   │   ├── useDismiss.test.ts
 │   │   ├── useDismiss.ts
+│   │   ├── useDragSelection.ts
 │   │   └── useToast.tsx
 │   ├── integration
 │   │   ├── Editor.integration.test.tsx

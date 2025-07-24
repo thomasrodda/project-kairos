@@ -58,7 +58,7 @@ export function EditorContent() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 8px movement required to start drag
+        distance: 20, // 20px movement required to start drag (increased from 8px to avoid conflicts with text selection)
       },
     }),
     useSensor(KeyboardSensor, {
@@ -294,8 +294,10 @@ export function EditorContent() {
     setActiveId(draggedBlockId)
     dispatch({ type: 'SET_DRAGGING', isDragging: true })
 
-    // Clear any text selection when starting drag
-    if (crossBlockSelection) {
+    // Only clear text selection if we're actually dragging a block
+    // This prevents interfering with click-and-drag text selection
+    const isDraggingBlock = blocks.some((b) => b.id === draggedBlockId)
+    if (crossBlockSelection && isDraggingBlock) {
       clearSelection()
     }
 

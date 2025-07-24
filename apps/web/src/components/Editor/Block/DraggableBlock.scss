@@ -49,5 +49,6 @@
 // Cursor changes during drag
 body.is-dragging {
   cursor: grabbing !important;
-  user-select: none;
+
+  // Removed user-select: none to allow text selection during drag
 }

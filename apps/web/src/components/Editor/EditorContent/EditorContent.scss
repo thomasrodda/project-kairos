@@ -5,6 +5,7 @@
   max-width: var(--editor-max-width); // Uses 45rem from layout tokens
   margin: 0 auto;
   padding: var(--spacing-32) 0;
+  position: relative; // For absolute positioning of selection box
 
   // Take full height to register clicks in empty space
   min-height: 100%;

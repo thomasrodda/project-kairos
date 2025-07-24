@@ -7,6 +7,15 @@
   padding: var(--spacing-64);
   position: relative;
 
+  // Keep default cursor during drag selection
+  &--selecting {
+    cursor: default !important;
+
+    * {
+      cursor: default !important;
+    }
+  }
+
   &__save-indicator {
     position: fixed;
     top: var(--spacing-16);

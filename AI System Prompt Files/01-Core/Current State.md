@@ -2,7 +2,7 @@
 
 This document provides a snapshot of features by area, their completion status, and links to detailed requirements.
 
-**Last Updated**: July 23, 2025
+**Last Updated**: July 24, 2025
 
 ## 📊 Feature Status by Area
 
@@ -23,12 +23,12 @@ This document provides a snapshot of features by area, their completion status, 
 **Partially Working:**
 
 - ✅ Multi-block selection (Shift+click, Ctrl+click work correctly)
+- ✅ Click and drag selection across blocks (visual selection box implemented July 2025)
 - ⚠️ Copy/paste (text works, blocks don't, formatting sometimes lost)
 - ⚠️ Cross-block text selection (buggy)
 
 **Not Working:**
 
-- ❌ Click and drag selection across blocks
 - ❌ Multi-block drag and drop
 - ❌ Copy/paste of multiple blocks
 
