@@ -1,6 +1,7 @@
 // apps/web/src/hooks/useDragSelection.ts
 // Hook for implementing drag-to-select functionality with a visual selection box.
 // Tracks mouse drag events and calculates which blocks are within the selection area.
+// Does not interfere with text selection within contentEditable elements.
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useEditorState, useEditorDispatch } from '../contexts/EditorContext'
@@ -100,7 +101,11 @@ export function useDragSelection({ containerRef, enabled = true }: UseDragSelect
       const isOnFormattingToolbar = target.closest('.formatting-toolbar') !== null
       const isOutsideEditor = !containerRef.current.contains(target)
 
-      if (isOnDragHandle || isOnFormattingToolbar || isOutsideEditor) return
+      // Check if the click started on a contentEditable element or its children
+      // This allows text selection to work normally within blocks
+      const isOnContentEditable = target.closest('[contenteditable="true"]') !== null
+
+      if (isOnDragHandle || isOnFormattingToolbar || isOutsideEditor || isOnContentEditable) return
 
       // Get container-relative coordinates
       const containerRect = containerRef.current.getBoundingClientRect()

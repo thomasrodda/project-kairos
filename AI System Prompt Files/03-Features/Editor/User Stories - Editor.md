@@ -159,6 +159,7 @@ Notes:
 - Drag selection implemented (July 2025) - Click and drag in empty space to create a purple selection box
 - Selection box only appears after dragging 5+ pixels to avoid interfering with normal clicks
 - Cursor remains as default arrow during selection
+- Fixed text selection within blocks (July 24, 2025) - Drag selection now only activates when starting drag outside contentEditable areas
 - Multi-block drag and drop of the selection is not yet implemented
 
 Priority: Medium
