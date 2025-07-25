@@ -25,6 +25,7 @@ import { DraggableBlock } from '../Block/DraggableBlock'
 import { Block } from '../Block'
 import { ContentEditableContainer } from '../ContentEditableContainer'
 import { FormattingToolbar } from '../FormattingToolbar'
+import { generateId } from '@kairos/utils'
 import './EditorContent.scss'
 
 export function EditorContent() {
@@ -79,6 +80,189 @@ export function EditorContent() {
         return
       }
 
+      // Handle copy/cut shortcuts for block selection
+      if (selectedBlockIds.length > 0 && !focusedBlockId && !crossBlockSelection) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+          // Copy will be handled by the copy event listener
+          return
+        }
+
+        if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
+          // Cut: copy then delete
+          e.preventDefault()
+
+          // Trigger copy event
+          document.execCommand('copy')
+
+          // Delete the blocks
+          if (selectedBlockIds.length === 1) {
+            dispatch({ type: 'DELETE_BLOCK', blockId: selectedBlockIds[0] })
+            setAnnouncement('Block cut to clipboard')
+          } else {
+            dispatch({ type: 'DELETE_BLOCKS', blockIds: selectedBlockIds })
+            setAnnouncement(`${selectedBlockIds.length} blocks cut to clipboard`)
+          }
+
+          setTimeout(() => setAnnouncement(''), 1000)
+          return
+        }
+      }
+
+      // Handle paste when no block is focused (paste after selected block or at end)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !focusedBlockId) {
+        e.preventDefault()
+
+        // Read clipboard data
+        navigator.clipboard
+          .read()
+          .then(async (items) => {
+            for (const item of items) {
+              // Try to get Kairos blocks format first
+              if (item.types.includes('application/x-kairos-blocks')) {
+                const blob = await item.getType('application/x-kairos-blocks')
+                const text = await blob.text()
+                try {
+                  const blocksData = JSON.parse(text)
+
+                  // Determine where to insert: after last selected block or at end
+                  let afterBlockId: string | undefined
+                  if (selectedBlockIds.length > 0) {
+                    // Find the last selected block in document order
+                    const selectedIndices = selectedBlockIds
+                      .map((id) => blocks.findIndex((b) => b.id === id))
+                      .filter((i) => i !== -1)
+                      .sort((a, b) => b - a) // Sort descending to get last
+
+                    if (selectedIndices.length > 0) {
+                      afterBlockId = blocks[selectedIndices[0]].id
+                    }
+                  } else if (blocks.length > 0) {
+                    // No selection, insert at end
+                    afterBlockId = blocks[blocks.length - 1].id
+                  }
+
+                  // Add the blocks
+                  const newBlocks: EditorBlock[] = blocksData.map((blockData: any) => ({
+                    id: generateId(),
+                    type: blockData.type,
+                    content: blockData.content,
+                    formatting: blockData.formatting || [],
+                  }))
+
+                  // Insert blocks
+                  newBlocks.forEach((block, index) => {
+                    const insertAfter = index === 0 ? afterBlockId : newBlocks[index - 1].id
+                    dispatch({ type: 'ADD_BLOCK', block, afterBlockId: insertAfter })
+                  })
+
+                  // Select the pasted blocks
+                  dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: newBlocks.map((b) => b.id) })
+
+                  // Announce paste
+                  const announcement = newBlocks.length === 1 ? 'Block pasted from clipboard' : `${newBlocks.length} blocks pasted from clipboard`
+                  setAnnouncement(announcement)
+                  setTimeout(() => setAnnouncement(''), 1000)
+
+                  return
+                } catch (err) {
+                  console.error('Failed to parse Kairos blocks data:', err)
+                }
+              }
+
+              // Fall back to plain text
+              if (item.types.includes('text/plain')) {
+                const blob = await item.getType('text/plain')
+                const text = await blob.text()
+
+                // Split text into blocks by newlines
+                const lines = text.split('\n').filter((line) => line.trim() !== '')
+
+                if (lines.length === 0) return
+
+                // Determine where to insert
+                let afterBlockId: string | undefined
+                if (selectedBlockIds.length > 0) {
+                  const selectedIndices = selectedBlockIds
+                    .map((id) => blocks.findIndex((b) => b.id === id))
+                    .filter((i) => i !== -1)
+                    .sort((a, b) => b - a)
+
+                  if (selectedIndices.length > 0) {
+                    afterBlockId = blocks[selectedIndices[0]].id
+                  }
+                } else if (blocks.length > 0) {
+                  afterBlockId = blocks[blocks.length - 1].id
+                }
+
+                // Create new blocks
+                const newBlocks: EditorBlock[] = lines.map((line) => ({
+                  id: generateId(),
+                  type: 'paragraph' as const,
+                  content: line,
+                }))
+
+                // Insert blocks
+                newBlocks.forEach((block, index) => {
+                  const insertAfter = index === 0 ? afterBlockId : newBlocks[index - 1].id
+                  dispatch({ type: 'ADD_BLOCK', block, afterBlockId: insertAfter })
+                })
+
+                // Select the pasted blocks
+                dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: newBlocks.map((b) => b.id) })
+
+                // Announce paste
+                const announcement = newBlocks.length === 1 ? 'Text pasted as block' : `Text pasted as ${newBlocks.length} blocks`
+                setAnnouncement(announcement)
+                setTimeout(() => setAnnouncement(''), 1000)
+              }
+            }
+          })
+          .catch((err) => {
+            console.error('Failed to read clipboard:', err)
+            // Fall back to older clipboard API if available
+            if (navigator.clipboard.readText) {
+              navigator.clipboard.readText().then((text) => {
+                // Same logic as plain text handling above
+                const lines = text.split('\n').filter((line) => line.trim() !== '')
+                if (lines.length === 0) return
+
+                let afterBlockId: string | undefined
+                if (selectedBlockIds.length > 0) {
+                  const selectedIndices = selectedBlockIds
+                    .map((id) => blocks.findIndex((b) => b.id === id))
+                    .filter((i) => i !== -1)
+                    .sort((a, b) => b - a)
+
+                  if (selectedIndices.length > 0) {
+                    afterBlockId = blocks[selectedIndices[0]].id
+                  }
+                } else if (blocks.length > 0) {
+                  afterBlockId = blocks[blocks.length - 1].id
+                }
+
+                const newBlocks: EditorBlock[] = lines.map((line) => ({
+                  id: generateId(),
+                  type: 'paragraph' as const,
+                  content: line,
+                }))
+
+                newBlocks.forEach((block, index) => {
+                  const insertAfter = index === 0 ? afterBlockId : newBlocks[index - 1].id
+                  dispatch({ type: 'ADD_BLOCK', block, afterBlockId: insertAfter })
+                })
+
+                dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: newBlocks.map((b) => b.id) })
+
+                const announcement = newBlocks.length === 1 ? 'Text pasted as block' : `Text pasted as ${newBlocks.length} blocks`
+                setAnnouncement(announcement)
+                setTimeout(() => setAnnouncement(''), 1000)
+              })
+            }
+          })
+
+        return
+      }
+
       // Handle text selection shortcuts first
       if (crossBlockSelection) {
         // Escape clears text selection
@@ -119,11 +303,61 @@ export function EditorContent() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [selectedBlockIds, focusedBlockId, crossBlockSelection, dispatch, clearSelection, forceSave])
+  }, [selectedBlockIds, focusedBlockId, crossBlockSelection, dispatch, clearSelection, forceSave, blocks])
 
-  // Handle copy event for cross-block selection
+  // Handle copy event for both cross-block text selection and block selection
   useEffect(() => {
     const handleCopy = (e: ClipboardEvent) => {
+      // Handle block selection copy (when blocks are selected via drag handles)
+      if (selectedBlockIds.length > 0 && !crossBlockSelection) {
+        e.preventDefault()
+
+        // Get selected blocks
+        const selectedBlocks = blocks.filter((block) => selectedBlockIds.includes(block.id))
+
+        // Create plain text representation
+        const plainText = selectedBlocks.map((block) => block.content).join('\n')
+
+        // Create markdown representation
+        const markdown = selectedBlocks
+          .map((block) => {
+            switch (block.type) {
+              case 'h1':
+                return `# ${block.content}`
+              case 'h2':
+                return `## ${block.content}`
+              case 'h3':
+                return `### ${block.content}`
+              case 'bullet':
+                return `- ${block.content}`
+              default:
+                return block.content
+            }
+          })
+          .join('\n')
+
+        // Create custom format that preserves block structure and formatting
+        const blockData = selectedBlocks.map((block) => ({
+          type: block.type,
+          content: block.content,
+          formatting: block.formatting || [],
+        }))
+
+        // Set clipboard data
+        if (e.clipboardData) {
+          e.clipboardData.setData('text/plain', plainText)
+          e.clipboardData.setData('text/markdown', markdown)
+          e.clipboardData.setData('application/x-kairos-blocks', JSON.stringify(blockData))
+        }
+
+        // Announce copy for screen readers
+        const announcement = selectedBlockIds.length === 1 ? 'Block copied to clipboard' : `${selectedBlockIds.length} blocks copied to clipboard`
+        setAnnouncement(announcement)
+        setTimeout(() => setAnnouncement(''), 1000)
+        return
+      }
+
+      // Handle cross-block text selection copy
       if (!crossBlockSelection) return
 
       // Get the selected content
@@ -178,7 +412,7 @@ export function EditorContent() {
 
     document.addEventListener('copy', handleCopy)
     return () => document.removeEventListener('copy', handleCopy)
-  }, [crossBlockSelection, getSelectedText, getSelectedMarkdown, blocks])
+  }, [crossBlockSelection, getSelectedText, getSelectedMarkdown, blocks, selectedBlockIds])
 
   // Handle clicks in empty space
   const handleEmptySpaceClick = (e: React.MouseEvent<HTMLDivElement>) => {

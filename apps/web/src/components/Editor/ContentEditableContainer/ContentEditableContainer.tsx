@@ -827,10 +827,10 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
       // Check for custom Kairos block format first
       const kairosBlocksData = e.clipboardData.getData('application/x-kairos-blocks')
-      let blocksToInsert: { type: string; content: string }[] = []
+      let blocksToInsert: { type: string; content: string; formatting?: any[] }[] = []
 
       if (kairosBlocksData) {
-        // Use custom format that preserves empty blocks
+        // Use custom format that preserves empty blocks and formatting
         try {
           blocksToInsert = JSON.parse(kairosBlocksData)
         } catch (err) {
@@ -922,6 +922,23 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         const firstNewContent = beforeCursor + blocksToInsert[0].content
         dispatch({ type: 'UPDATE_BLOCK', blockId, content: firstNewContent })
 
+        // If the first pasted block has formatting, we need to adjust it for the merged content
+        if (blocksToInsert[0].formatting && blocksToInsert[0].formatting.length > 0) {
+          const adjustedFormatting = blocksToInsert[0].formatting.map((format: any) => ({
+            ...format,
+            start: format.start + beforeCursor.length,
+            end: format.end + beforeCursor.length,
+          }))
+
+          // Get existing formatting for the block
+          const existingBlock = editorState.blocks.find((b) => b.id === blockId)
+          const existingFormatting = existingBlock?.formatting || []
+
+          // Merge formatting
+          const mergedFormatting = [...existingFormatting, ...adjustedFormatting]
+          dispatch({ type: 'UPDATE_BLOCK_FORMATTING', blockId, formatting: mergedFormatting })
+        }
+
         // Create middle blocks
         const newBlocks: EditorBlock[] = []
 
@@ -930,6 +947,7 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
             id: generateId(),
             type: blocksToInsert[i].type as EditorBlock['type'],
             content: blocksToInsert[i].content,
+            formatting: blocksToInsert[i].formatting,
           }
           newBlocks.push(newBlock)
         }
@@ -939,6 +957,7 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
           id: generateId(),
           type: blocksToInsert[blocksToInsert.length - 1].type as EditorBlock['type'],
           content: blocksToInsert[blocksToInsert.length - 1].content + afterCursor,
+          formatting: blocksToInsert[blocksToInsert.length - 1].formatting,
         }
         newBlocks.push(lastBlock)
 

@@ -24,12 +24,8 @@ This document provides a snapshot of features by area, their completion status, 
 
 - ✅ Multi-block selection (Shift+click, Ctrl+click work correctly, multi-block drag implemented July 24, 2025)
 - ✅ Click and drag selection across blocks (visual selection box implemented July 2025, fixed text selection within blocks July 24, 2025, fixed drag selection within editor content July 24, 2025)
-- ⚠️ Copy/paste (text works, blocks don't, formatting sometimes lost)
+- ⚠️ Copy/paste (basic block copy/paste implemented July 25, 2025, but has issues: blocks paste as paragraphs losing type/formatting, paste inside blocks should create new blocks)
 - ⚠️ Cross-block text selection (buggy)
-
-**Not Working:**
-
-- ❌ Copy/paste of multiple blocks
 
 **Known Issues:**
 
@@ -40,6 +36,9 @@ This document provides a snapshot of features by area, their completion status, 
 - 🐛 Enter at start of block doesn't work correctly
 - 🐛 Markdown paste doesn't format unless you re-trigger it
 - 🐛 Drop gap size only matches single block height, not all selected blocks
+- 🐛 Block copy/paste loses block type (everything becomes paragraph)
+- 🐛 Block copy/paste loses text formatting (bold, italic, etc.)
+- 🐛 Pasting blocks inside a focused block should create new blocks below, not insert text
 
 **Not Started:**
 
@@ -199,9 +198,10 @@ This document provides a snapshot of features by area, their completion status, 
 
 ### High Priority
 
-1. **Cross-block formatting** - Formatting doesn't work across block boundaries
-2. **Link dialog styling** - Needs proper design tokens
-3. **Folder page content saving** - Content in folder pages doesn't save properly
+1. **Block copy/paste preservation** - Copied blocks lose their type and formatting when pasted
+2. **Cross-block formatting** - Formatting doesn't work across block boundaries
+3. **Link dialog styling** - Needs proper design tokens
+4. **Folder page content saving** - Content in folder pages doesn't save properly
 
 ### Medium Priority
 
@@ -261,11 +261,12 @@ Based on user story analysis with bugs/issues considered:
 
 ### Immediate Priorities
 
-1. Complete copy/paste for blocks (not just text)
-2. Add undo/redo system
-3. Fix folder page content saving
-4. Fix link functionality (unlink, clickable links)
-5. Fix placeholder text interaction bugs
+1. Fix block copy/paste to preserve block types and formatting
+2. Fix paste behavior to create new blocks when pasting blocks (not insert into current)
+3. Add undo/redo system
+4. Fix folder page content saving
+5. Fix link functionality (unlink, clickable links)
+6. Fix placeholder text interaction bugs
 
 ### Next Phase
 
