@@ -30,9 +30,20 @@ Examples:
 When committing, you MUST FIRST:
 
 1. Review all changes made
-2. Update relevant documentation (Current State.md, Test Inventory.md, guides, user stories)
+2. Update relevant documentation:
+   - **Current State.md** - Update feature status, known issues, and priorities
+   - **User Stories - [Feature].md** - Update acceptance criteria checkboxes and implementation notes
+   - **Test Inventory.md** - Update if new tests were added
+   - Other relevant guides and documentation
 3. Verify documentation accuracy
 4. Only then commit and push
+
+### When Implementing Features:
+
+- Find the relevant User Story in `AI System Prompt Files/03-Features/[Feature]/User Stories - [Feature].md`
+- Update acceptance criteria checkboxes to reflect what's completed
+- Add implementation notes with dates and any known issues
+- Update component references with specific line numbers when helpful
 
 ### Documentation Templates
 

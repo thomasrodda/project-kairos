@@ -269,16 +269,22 @@ Priority: Medium
 
 Acceptance Criteria:
 
-- [ ] Cmd/Ctrl+C copies the selected block(s) or text
+- [x] Cmd/Ctrl+C copies the selected block(s) or text
 - [ ] Cmd/Ctrl+V pastes the selected block(s) in the next space below the block with the cursor
 - [x] Cmd/Ctrl+V pastes the selected text at the cursor location inside the block
 - [ ] Formatting is preserved when copying/pasting within Kairos
 - [x] Pasting from external sources converts content to Kairos blocks
+- [x] Cmd/Ctrl+X cuts the selected block(s)
 
 Notes:
 
-- You can copy and paste text but not blocks.
-- Pasting text from outside does create blocks per line, but markdown formatting does not carry over, as discussed above.
+- Basic block copy/paste implemented July 25, 2025
+- Current implementation issues:
+  - Blocks lose their type when pasted (all become paragraphs)
+  - Text formatting (bold, italic, etc.) is not preserved when copying blocks
+  - Pasting blocks while focused in a block should create new blocks below, not insert text
+- Exports to three clipboard formats: plain text, markdown, and custom Kairos format
+- Screen reader announcements work for all copy/paste operations
 
 Priority: Medium
 
@@ -293,9 +299,9 @@ Priority: Medium
 
 **Components**:
 
-- `apps/web/src/components/Editor/EditorContent.tsx` - Copy/paste handlers
-- `apps/web/src/utils/clipboardUtils.ts` - Clipboard formatting logic
-- Custom Kairos clipboard format for preserving formatting
+- `apps/web/src/components/Editor/EditorContent.tsx` - Copy/paste handlers (lines 312-393)
+- `apps/web/src/components/Editor/ContentEditableContainer.tsx` - Paste handling (lines 824-956)
+- Custom Kairos clipboard format (`application/x-kairos-blocks`) for preserving formatting
 
 ---
 
