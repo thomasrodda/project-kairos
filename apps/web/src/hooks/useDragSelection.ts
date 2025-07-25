@@ -47,13 +47,15 @@ export function useDragSelection({ containerRef, enabled = true }: UseDragSelect
       const blockRect = blockElement.getBoundingClientRect()
       const containerRect = containerRef.current?.getBoundingClientRect()
 
-      if (!containerRect) return false
+      if (!containerRect || !containerRef.current) return false
 
       // Convert selection box coordinates to absolute positions
+      // Note: The selection box coordinates already include scroll offset
+      const scrollTop = containerRef.current.scrollTop
       const selectionLeft = Math.min(box.startX, box.endX) + containerRect.left
-      const selectionTop = Math.min(box.startY, box.endY) + containerRect.top
+      const selectionTop = Math.min(box.startY, box.endY) + containerRect.top - scrollTop
       const selectionRight = Math.max(box.startX, box.endX) + containerRect.left
-      const selectionBottom = Math.max(box.startY, box.endY) + containerRect.top
+      const selectionBottom = Math.max(box.startY, box.endY) + containerRect.top - scrollTop
 
       // Check intersection
       return !(
@@ -116,10 +118,10 @@ export function useDragSelection({ containerRef, enabled = true }: UseDragSelect
       const isInteractiveElement = target.closest('a, button, input, textarea, select') !== null
       if (isInteractiveElement) return
 
-      // Get container-relative coordinates
+      // Get container-relative coordinates including scroll offset
       const containerRect = containerRef.current.getBoundingClientRect()
       const startX = e.clientX - containerRect.left
-      const startY = e.clientY - containerRect.top
+      const startY = e.clientY - containerRect.top + containerRef.current.scrollTop
 
       // Store potential start point but don't start selection yet
       startPointRef.current = { x: startX, y: startY }
@@ -136,7 +138,7 @@ export function useDragSelection({ containerRef, enabled = true }: UseDragSelect
 
       const containerRect = containerRef.current.getBoundingClientRect()
       const currentX = e.clientX - containerRect.left
-      const currentY = e.clientY - containerRect.top
+      const currentY = e.clientY - containerRect.top + containerRef.current.scrollTop
 
       // Check if we should start selection
       if (isPotentialDragRef.current && startPointRef.current && !hasMovedEnoughRef.current) {
@@ -181,7 +183,7 @@ export function useDragSelection({ containerRef, enabled = true }: UseDragSelect
         // Do a final update with the current mouse position
         const containerRect = containerRef.current.getBoundingClientRect()
         const finalX = e.clientX - containerRect.left
-        const finalY = e.clientY - containerRect.top
+        const finalY = e.clientY - containerRect.top + containerRef.current.scrollTop
 
         const finalBox = {
           startX: startPointRef.current.x,
