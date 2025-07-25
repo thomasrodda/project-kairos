@@ -19,7 +19,7 @@ interface DraggableBlockProps {
 }
 
 export function DraggableBlock({ block, isFocused, isSelected, activeId, selectedBlockIds, overId }: DraggableBlockProps) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({
     id: block.id,
     disabled: false, // Allow dragging even when editing
     animateLayoutChanges: () => false, // Disable default animations to use our own

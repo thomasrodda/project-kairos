@@ -300,20 +300,59 @@ export function EditorContent() {
   // Handle drag over
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event
-    
+
     if (!over) {
       setOverId(null)
       setOverIndex(null)
       return
     }
-    
+
+    const activeId = active.id as string
+    const overId = over.id as string
+
+    // Check if we're dragging multiple blocks
+    const isDraggingMultiple = selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId)
+
+    if (isDraggingMultiple) {
+      // Don't allow dropping on any selected block
+      if (selectedBlockIds.includes(overId)) {
+        setOverId(null)
+        setOverIndex(null)
+        return
+      }
+
+      // Check if we would be dropping within the selected range
+      const selectedIndices = selectedBlockIds
+        .map((id) => blocks.findIndex((b) => b.id === id))
+        .filter((i) => i !== -1)
+        .sort((a, b) => a - b)
+      const minSelectedIndex = Math.min(...selectedIndices)
+      const maxSelectedIndex = Math.max(...selectedIndices)
+      const overIndex = blocks.findIndex((b) => b.id === overId)
+      const draggedIndex = blocks.findIndex((b) => b.id === activeId)
+
+      // Determine target position based on drag direction
+      let targetIndex = overIndex
+      if (draggedIndex < overIndex) {
+        // Dragging down
+        targetIndex = overIndex + 1
+      }
+
+      // Don't show indicator if it would be within the selected range
+      if (targetIndex > minSelectedIndex && targetIndex <= maxSelectedIndex + 1) {
+        setOverId(null)
+        setOverIndex(null)
+        return
+      }
+    }
+
     const activeIndex = blocks.findIndex((b) => b.id === active.id)
     const overBlockIndex = blocks.findIndex((b) => b.id === over.id)
-    
+
     if (activeIndex !== -1 && overBlockIndex !== -1) {
       // Determine if we're dragging up or down
       const dragDirection = activeIndex < overBlockIndex ? 'down' : 'up'
-      
+
       // For downward drags, show indicator after the target block
       // For upward drags, show indicator before the target block
       setOverId(over.id as string)
@@ -366,9 +405,54 @@ export function EditorContent() {
 
       if (isDraggingMultiple) {
         // Multi-block drag logic
+
+        // Check if the drop target is one of the selected blocks being dragged
+        if (selectedBlockIds.includes(overBlockId)) {
+          // Cannot drop on a block that's part of the selection
+          setAnnouncement('Cannot drop selected blocks onto themselves')
+          setTimeout(() => setAnnouncement(''), 2000)
+          // Reset states properly
+          setActiveId(null)
+          setOverId(null)
+          setOverIndex(null)
+          dispatch({ type: 'SET_DRAGGING', isDragging: false })
+          return
+        }
+
         const overIndex = blocks.findIndex((block) => block.id === overBlockId)
 
         if (overIndex !== -1) {
+          // Get indices of all selected blocks
+          const selectedIndices = selectedBlockIds
+            .map((id) => blocks.findIndex((b) => b.id === id))
+            .filter((i) => i !== -1)
+            .sort((a, b) => a - b)
+
+          // Check if we're trying to drop within the selected range
+          const minSelectedIndex = Math.min(...selectedIndices)
+          const maxSelectedIndex = Math.max(...selectedIndices)
+          const draggedIndex = blocks.findIndex((b) => b.id === draggedBlockId)
+
+          // Determine target position based on drag direction
+          let targetIndex = overIndex
+          if (draggedIndex < overIndex) {
+            // Dragging down
+            targetIndex = overIndex + 1
+          }
+
+          // Check if the target position is within the selected blocks range
+          if (targetIndex > minSelectedIndex && targetIndex <= maxSelectedIndex + 1) {
+            // This would result in dropping within the selection, which is invalid
+            setAnnouncement('Cannot drop selected blocks within their current range')
+            setTimeout(() => setAnnouncement(''), 2000)
+            // Reset states properly
+            setActiveId(null)
+            setOverId(null)
+            setOverIndex(null)
+            dispatch({ type: 'SET_DRAGGING', isDragging: false })
+            return
+          }
+
           // Get all selected blocks in their current order
           const selectedBlocks: EditorBlock[] = []
           const unselectedBlocks: EditorBlock[] = []
@@ -386,7 +470,6 @@ export function EditorContent() {
           for (let i = 0; i < blocks.length; i++) {
             if (blocks[i].id === overBlockId) {
               // Check if we're dropping above or below the target
-              const draggedIndex = blocks.findIndex((b) => b.id === draggedBlockId)
               if (draggedIndex < i) {
                 // Dragging down - insert after the target
                 insertIndex = unselectedBlocks.findIndex((b) => b.id === overBlockId) + 1
@@ -437,7 +520,13 @@ export function EditorContent() {
   const isDraggingMultiple = activeId && selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId)
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragOver={handleDragOver} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
       <div
         className={`editor-content ${activeId ? 'editor-content--sorting' : ''} ${isDraggingMultiple ? 'editor-content--dragging-multiple' : ''}`}
         ref={editorRef}
@@ -471,24 +560,16 @@ export function EditorContent() {
           <ContentEditableContainer onBlockClick={handleBlockClick} containerRef={contentEditableRef}>
             <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
               {blocks.map((block, index) => (
-                <React.Fragment key={block.id}>
-                  {activeId && overIndex === index && (
-                    <div className="drop-indicator" />
-                  )}
-                  <div aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
-                    <DraggableBlock
-                      block={block}
-                      isFocused={focusedBlockId === block.id}
-                      isSelected={selectedBlockIds.includes(block.id)}
-                      activeId={activeId}
-                      selectedBlockIds={selectedBlockIds}
-                      overId={overId}
-                    />
-                  </div>
-                  {activeId && overIndex === index + 1 && index === blocks.length - 1 && (
-                    <div className="drop-indicator" />
-                  )}
-                </React.Fragment>
+                <div key={block.id} aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
+                  <DraggableBlock
+                    block={block}
+                    isFocused={focusedBlockId === block.id}
+                    isSelected={selectedBlockIds.includes(block.id)}
+                    activeId={activeId}
+                    selectedBlockIds={selectedBlockIds}
+                    overId={overId}
+                  />
+                </div>
               ))}
             </SortableContext>
           </ContentEditableContainer>

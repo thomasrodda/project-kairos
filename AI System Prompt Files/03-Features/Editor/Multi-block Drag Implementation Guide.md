@@ -4,8 +4,8 @@
 
 This guide documents the implementation of multi-block drag functionality in the Kairos editor, allowing users to select and drag multiple blocks together.
 
-**Last Updated**: July 24, 2025  
-**Status**: Work in Progress (WIP) - UI improvements added, drop position bug remains
+**Last Updated**: July 25, 2025  
+**Status**: Completed - UI improvements added, drop position bugs fixed
 
 ## Implementation Details
 
@@ -60,7 +60,9 @@ This guide documents the implementation of multi-block drag functionality in the
 // EditorContent.tsx - DragOverlay implementation with reduced opacity
 <DragOverlay dropAnimation={null}>
   {activeId ? (
-    <div style={{ opacity: 0.7 }}>  // Reduced opacity for dragged blocks
+    <div style={{ opacity: 0.7 }}>
+      {' '}
+      // Reduced opacity for dragged blocks
       {selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId) ? (
         // Multi-block drag: show all selected blocks
         <div className="dragging-multiple-blocks">
@@ -82,12 +84,14 @@ This guide documents the implementation of multi-block drag functionality in the
 ### UI Improvements (July 24, 2025)
 
 1. **Drop Indicator Line**:
+
    - Purple horizontal line (3px height) shows drop position
    - Appears between blocks during drag operations
    - Uses `--color-primary-500` for consistency
    - Smooth slide-in animation
 
 2. **Dragged Block Opacity**:
+
    - Reduced opacity to 0.7 (70%) for better visual feedback
    - Applied to DragOverlay for both single and multi-block drag
 
@@ -96,25 +100,36 @@ This guide documents the implementation of multi-block drag functionality in the
    - Disabled default dnd-kit animations for better control
    - Consistent 200ms transition timing
 
-## Known Issues
+## Fixed Issues (July 25, 2025)
 
-### 1. Drop Position Bug (WIP)
+### 1. Drop Position Bug (Fixed)
 
-- **Issue**: When dropping selected blocks below the position of one of the selected blocks, they jump to the top of the page
-- **Status**: Under investigation
-- **Impact**: Makes multi-block drag unreliable for certain movements
+- **Issue**: When dropping selected blocks below the position of one of the selected blocks, they would jump to the top of the page
+- **Solution**: Added validation to prevent dropping selected blocks onto themselves or within their current range
+- **Implementation**:
+  - Added checks in `handleDragOver` to hide drop indicators for invalid positions
+  - Added validation in `handleDragEnd` to reject invalid drop operations
+  - Properly reset drag states when operations are cancelled
 
-### 2. Drop Gap Size Issue
+### 2. Remaining Known Issues
 
-- **Issue**: Drop gap only matches the height of the single block being dragged, not all selected blocks
-- **Status**: Identified, needs fix
+- **Drop Gap Size**: Drop gap only matches the height of the single block being dragged, not all selected blocks
+- **Status**: Identified, needs fix in future iteration
 - **Impact**: Visual feedback doesn't accurately represent space needed for multi-block drop
 
-### 3. UI/UX Refinements Completed (July 24, 2025)
+## UI/UX Refinements Completed
+
+### July 24, 2025
 
 - ✅ Smooth transition animations (cubic-bezier easing)
 - ✅ Better visual feedback during drag (70% opacity)
 - ✅ Drop indicators for precise placement (purple line)
+
+### July 25, 2025
+
+- ✅ Invalid drop target prevention
+- ✅ Proper state management for cancelled drags
+- ✅ User feedback for rejected drop operations
 
 ## Design Decisions
 
