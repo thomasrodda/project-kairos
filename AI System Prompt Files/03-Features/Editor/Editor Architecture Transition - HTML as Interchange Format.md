@@ -7,370 +7,221 @@
 
 ## ⚠️ Critical Notice
 
-This is not just a clipboard change. This represents a fundamental shift in how the editor handles data interchange, potentially affecting:
+This document describes a fundamental shift in the editor's data philosophy. It is NOT just about clipboard functionality - it's about how the editor conceptualizes data exchange with the outside world.
 
-- Block serialization/deserialization
-- Import/export functionality
-- Copy/paste operations
-- Future mobile app compatibility
-- Data persistence format
-- External integrations
+## The Paradigm Shift
 
-## Executive Summary
+### From: Application-Centric Model
 
-This document outlines a fundamental architectural transition to adopt HTML as the primary interchange format for the Kairos editor, replacing the current custom JSON-based approach. While initially motivated by clipboard limitations, this change has far-reaching implications for the entire editor architecture.
+```
+┌─────────────────────┐
+│   Kairos Editor     │
+│                     │
+│  "Our JSON format   │
+│   is the truth"     │
+│                     │
+│  Everyone else must │
+│  adapt to us        │
+└─────────────────────┘
+```
 
-## Current Architecture
+### To: Web-Native Model
 
-### Internal Data Model
+```
+┌─────────────────────┐
+│   Kairos Editor     │
+│                     │
+│  "HTML is the       │
+│   lingua franca"    │
+│                     │
+│  We speak the web's │
+│  native language    │
+└─────────────────────┘
+```
+
+## The Core Problem
+
+Every modern editor faces the same challenge: How do you maintain rich internal state while seamlessly exchanging data with the outside world?
+
+### Current Reality: The Translation Tax
+
+Every time data crosses the editor boundary, we pay a "translation tax":
+
+```
+Internal World          Boundary               External World
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                          ↓
+JSON Blocks    →    [TRANSLATE]    →    Markdown/HTML/Plain
+                          ↓
+EditorBlock[]  →    [TRANSLATE]    →    User's Clipboard
+                          ↓
+Our Format     →    [TRANSLATE]    →    Other Apps
+                          ↓
+Custom Types   →    [TRANSLATE]    →    Mobile Platforms
+```
+
+**Every arrow is complexity. Every translation is a potential bug.**
+
+## The Architectural Vision
+
+### HTML as Universal Interchange
+
+Instead of forcing the world to understand our JSON, we adopt HTML as the canonical interchange format:
+
+```
+┌─────────────────┐         ┌─────────────────┐         ┌─────────────────┐
+│  Internal State │         │   Interchange   │         │ External World  │
+│                 │         │                 │         │                 │
+│  JSON (private) │ <-----> │  HTML (public)  │ <-----> │ Everything Else │
+│  Optimized for  │         │  Universal      │         │ Notion, Google  │
+│  React/Editor   │         │  Standard       │         │ Docs, Mobile... │
+└─────────────────┘         └─────────────────┘         └─────────────────┘
+```
+
+### What This Means
+
+1. **Import Anything**: If it's HTML, we can import it
+2. **Export Anywhere**: Our content works everywhere
+3. **Copy/Paste Naturally**: No special handling needed
+4. **Mobile Ready**: Native HTML support on all platforms
+5. **Future Features**: Templates, sharing, collaboration - all HTML-based
+
+## Implementation Philosophy
+
+### Phase 1: Establish the Bridge (Current Focus)
+
+- Create robust HTML ↔ JSON converters
+- Replace custom clipboard format with HTML
+- Maintain full fidelity in conversions
+- Keep JSON as internal format
+
+### Phase 2: Expand the Bridge (Future)
+
+- Import/export features use HTML
+- Templates stored as HTML
+- Sharing mechanisms use HTML
+- API responses include HTML representation
+
+### Phase 3: Consider Full Migration (Distant Future)
+
+- Evaluate storing HTML in database
+- Consider HTML as internal format
+- Align with libraries like ProseMirror/Slate
+
+## Technical Implementation
+
+### Core Converters
 
 ```typescript
-// Current: Blocks stored as JSON objects
-{
-  id: string,
-  type: 'h1' | 'h2' | 'paragraph' | 'bullet',
-  content: string,
-  formatting: [{ type: 'bold', start: 0, end: 5 }]
+// The heart of the architecture transition
+interface EditorInterchange {
+  // Serialize our internal state to HTML
+  toHTML(blocks: EditorBlock[]): string
+
+  // Parse HTML into our internal state
+  fromHTML(html: string): EditorBlock[]
+
+  // Graceful degradation to markdown
+  toMarkdown(blocks: EditorBlock[]): string
+
+  // Smart detection of content type
+  detectFormat(content: string): 'html' | 'markdown' | 'plain'
 }
 ```
 
-### Current Data Flow
-
-1. **Internal State**: JSON objects in React state
-2. **Rendering**: React components render from JSON
-3. **Editing**: ContentEditable → DOM changes → Sync to JSON state
-4. **Persistence**: JSON saved to database
-5. **Interchange**: Custom format for copy/paste
-
-### Current Problems
-
-1. **Clipboard Limitations**:
-
-   - Unfocused paste loses block types and formatting
-   - Browser security restrictions with custom MIME types
-   - Poor mobile compatibility
-
-2. **Architectural Constraints**:
-   - Two separate systems: JSON for state, DOM for editing
-   - Complex synchronization between DOM and state
-   - Custom format limits interoperability
-   - Future mobile apps would need custom clipboard handling
-
-## Proposed Architecture
-
-### Philosophical Shift
-
-**HTML becomes the canonical interchange format** - the "lingua franca" for moving data in and out of the editor. The internal JSON representation remains, but HTML serves as the bridge to the outside world.
-
-### New Data Flow
-
-1. **Internal State**: Keep JSON objects (no change initially)
-2. **Rendering**: Keep React components (no change)
-3. **Editing**: Keep ContentEditable (no change)
-4. **Interchange**: HTML as primary format
-5. **Import/Export**: HTML-based
-6. **Copy/Paste**: HTML + Markdown in plain text
-
-### Benefits
-
-- **Universal compatibility**: Works everywhere (web, desktop, mobile)
-- **Graceful degradation**: Rich content → HTML → Markdown → Plain text
-- **Future-proof**: Natural path to mobile apps
-- **Industry standard**: How Notion, Google Docs, and others work
-
-### HTML Format Structure
+### HTML Structure
 
 ```html
-<!-- Heading 1 -->
-<h1 data-kairos-block-id="block123">Page Title</h1>
-
-<!-- Heading 2 -->
-<h2 data-kairos-block-id="block456">Section Header</h2>
-
-<!-- Paragraph with formatting -->
-<p data-kairos-block-id="block789">This is <strong>bold</strong> and <em>italic</em> text with a <a href="https://example.com">link</a>.</p>
-
-<!-- Bullet list -->
-<ul>
-  <li data-kairos-block-id="block012">First item</li>
-  <li data-kairos-block-id="block345">Second item</li>
-</ul>
-
-<!-- Inline formatting data -->
-<p
-  data-kairos-block-id="block678"
-  data-kairos-formatting='[{"type":"bold","start":5,"end":10},{"type":"link","start":15,"end":20,"url":"https://example.com"}]'
->
-  Some formatted text here
-</p>
+<!-- Our blocks become semantic HTML -->
+<article data-kairos-page>
+  <h1>Document Title</h1>
+  <p>This is <strong>rich</strong> text with <a href="#">links</a>.</p>
+  <ul>
+    <li>Bullet points</li>
+    <li>Naturally represented</li>
+  </ul>
+</article>
 ```
 
-### Plain Text Format
+### Data Preservation
 
-```markdown
-# Page Title
-
-## Section Header
-
-This is **bold** and _italic_ text with a [link](https://example.com).
-
-- First item
-- Second item
-
-Some formatted text here
+```html
+<!-- Kairos-specific data preserved in attributes -->
+<p data-kairos-id="block123" data-kairos-created="2025-07-27T10:00:00Z" data-kairos-version="1">Content with metadata</p>
 ```
 
-## Architectural Implications
+## Impact Analysis
 
-### What This Changes
+### Immediate Benefits
 
-1. **Import/Export**: Future import/export features would use HTML
-2. **Templates**: Page templates could be stored as HTML
-3. **Sharing**: Shared content would be HTML-based
-4. **Mobile**: Native mobile apps can handle HTML natively
-5. **Integrations**: Third-party tools expect HTML
+1. **Clipboard**: Works in all scenarios (focused/unfocused)
+2. **Interoperability**: Paste from any source preserves structure
+3. **Mobile Path**: Clear strategy for mobile apps
 
-### What Stays The Same (For Now)
+### Long-term Benefits
 
-1. **Internal State**: Still JSON-based EditorBlock[]
-2. **Database**: Still stores JSON (can migrate later)
-3. **React Components**: No changes needed
-4. **Editor Logic**: Core editing remains unchanged
+1. **Standards-based**: Leverage web standards instead of fighting them
+2. **Ecosystem**: Integrate with any HTML-aware tool
+3. **Future-proof**: HTML will outlive any proprietary format
 
-### Future Considerations
+### Risks and Mitigations
 
-This transition opens the door to:
+| Risk                    | Impact | Mitigation                                             |
+| ----------------------- | ------ | ------------------------------------------------------ |
+| HTML parsing complexity | High   | Use battle-tested libraries (DOMParser, sanitize-html) |
+| Performance overhead    | Medium | Cache conversions, optimize hot paths                  |
+| Feature parity          | Medium | Careful mapping, progressive enhancement               |
+| Security (XSS)          | High   | Strict sanitization, whitelist approach                |
 
-- Storing HTML in database instead of JSON
-- Using HTML as internal format (like ProseMirror)
-- Rich text editing libraries that work with HTML
-- Better WYSIWYG experience
+## Success Metrics
 
-## Implementation Steps
+1. **Functional**: All current features work through HTML interchange
+2. **Performance**: < 50ms for typical conversions
+3. **Compatibility**: Works with Notion, Google Docs, MS Word
+4. **Security**: Zero XSS vulnerabilities
+5. **Developer Experience**: Clear, maintainable conversion code
 
-### Phase 1: Copy Implementation
+## Migration Strategy
 
-1. **Modify copy handler** in `EditorContent.tsx`
+### Phase 1: Clipboard (Immediate)
 
-   - Remove custom Kairos format
-   - Add HTML generation
-   - Ensure plain text includes markdown syntax
+- Replace custom clipboard format
+- Implement HTML generators/parsers
+- Maintain backward compatibility
 
-2. **Create HTML generator** utility
+### Phase 2: Import/Export (Next Quarter)
 
-   ```typescript
-   // utils/clipboardHtml.ts
-   export function blocksToHtml(blocks: EditorBlock[]): string
-   export function formatToHtml(text: string, formatting: TextFormat[]): string
-   ```
+- Document import uses HTML parser
+- Export includes HTML option
+- Templates use HTML format
 
-3. **Update existing markdown generation**
-   - Ensure all block types properly convert
-   - Add inline markdown for formatting (bold, italic)
+### Phase 3: Storage (Future Consideration)
 
-### Phase 2: Paste Implementation
+- Evaluate HTML storage benefits
+- Migration tools for existing content
+- Performance analysis
 
-1. **Modify paste handlers** in both:
+## The Bigger Picture
 
-   - `ContentEditableContainer.tsx` (focused paste)
-   - `EditorContent.tsx` (unfocused paste)
+This transition positions Kairos as a truly web-native editor:
 
-2. **Create HTML parser** utility
+- **Not just in the browser**: Part of the web ecosystem
+- **Not just using web tech**: Embracing web standards
+- **Not just another editor**: A participant in the broader web
 
-   ```typescript
-   // utils/clipboardHtml.ts
-   export function htmlToBlocks(html: string): EditorBlock[]
-   export function parseHtmlFormatting(element: HTMLElement): TextFormat[]
-   ```
-
-3. **Update markdown detection**
-   - Keep existing `blockMarkdownDetection.ts`
-   - Use as fallback when no HTML available
-
-### Phase 3: Testing & Edge Cases
-
-1. **Test matrix**:
-
-   - Copy from Kairos → Paste in Kairos (focused)
-   - Copy from Kairos → Paste in Kairos (unfocused)
-   - Copy from Kairos → Paste in external editor
-   - Copy from external → Paste in Kairos
-   - Multi-block operations
-   - Complex formatting combinations
-
-2. **Edge cases to handle**:
-   - Malformed HTML
-   - XSS prevention
-   - Nested formatting
-   - Unknown HTML elements
-   - Character encoding
-
-### Phase 4: Cleanup
-
-1. Remove old custom format code
-2. Update tests
-3. Update documentation
-
-## File Changes Required
-
-### Files to Modify
-
-1. `/apps/web/src/components/Editor/EditorContent/EditorContent.tsx`
-
-   - Update copy event handler
-   - Update unfocused paste handler
-
-2. `/apps/web/src/components/Editor/ContentEditableContainer/ContentEditableContainer.tsx`
-
-   - Update focused paste handler
-
-3. `/apps/web/src/utils/clipboardHtml.ts` (NEW FILE)
-
-   - HTML generation functions
-   - HTML parsing functions
-   - Security/sanitization
-
-4. `/apps/web/src/utils/formattingRenderer.tsx`
-   - May need updates for HTML generation
-
-### Files to Keep (with modifications)
-
-1. `/apps/web/src/utils/blockMarkdownDetection.ts` - Keep as fallback
-2. `/apps/web/src/utils/textFormatting.ts` - Still needed for internal use
-
-## Security Considerations
-
-### HTML Sanitization
-
-- **Required**: Sanitize all pasted HTML to prevent XSS
-- **Library Option**: Consider DOMPurify or similar
-- **Allowed Tags**: `<p>`, `<h1-h6>`, `<ul>`, `<li>`, `<strong>`, `<em>`, `<u>`, `<a>`, `<code>`
-- **Allowed Attributes**: `href` (for links), `data-kairos-*` (for metadata)
-
-### URL Validation
-
-- Continue using existing URL sanitization
-- Block `javascript:` and `data:` URLs
-
-## Migration Path
-
-### For Existing Users
-
-- No migration needed - this only affects copy/paste
-- Old clipboard data won't persist anyway
-
-### Rollback Plan
-
-1. Keep old code in git history
-2. Document commit hash before changes
-3. Can revert by restoring three files
-
-## Risks and Mitigation
-
-### Technical Risks
-
-1. **HTML Parsing Complexity**
-
-   - Risk: HTML parsing is complex and error-prone
-   - Mitigation: Use battle-tested libraries, extensive testing
-
-2. **Performance Impact**
-
-   - Risk: HTML generation/parsing slower than JSON
-   - Mitigation: Profile and optimize, cache where possible
-
-3. **Data Loss**
-
-   - Risk: HTML can't represent all JSON features
-   - Mitigation: Use data attributes, careful mapping
-
-4. **Security**
-   - Risk: XSS vulnerabilities from pasted HTML
-   - Mitigation: Strict sanitization, whitelist approach
-
-### Architectural Risks
-
-1. **Scope Creep**
-
-   - Risk: Temptation to rewrite entire editor
-   - Mitigation: Strict phases, clear boundaries
-
-2. **Two-System Problem**
-
-   - Risk: HTML and JSON drift apart
-   - Mitigation: Single source of truth, clear conversion rules
-
-3. **Migration Difficulty**
-   - Risk: Hard to migrate existing content
-   - Mitigation: This is interchange only, not storage
-
-## Success Criteria
-
-1. ✅ All paste scenarios work (focused and unfocused)
-2. ✅ Block types preserved in all cases
-3. ✅ Text formatting preserved when possible
-4. ✅ Works with external editors (Notion, Google Docs, VS Code)
-5. ✅ No security vulnerabilities
-6. ✅ Performance acceptable (< 100ms for typical paste)
-
-## Testing Checklist
-
-### Basic Operations
-
-- [ ] Copy single block → paste focused
-- [ ] Copy single block → paste unfocused
-- [ ] Copy multiple blocks → paste focused
-- [ ] Copy multiple blocks → paste unfocused
-- [ ] Cut operations work correctly
-
-### Formatting Preservation
-
-- [ ] Bold text preserved
-- [ ] Italic text preserved
-- [ ] Links preserved and clickable
-- [ ] Mixed formatting preserved
-- [ ] Block types (H1, H2, bullet) preserved
-
-### External Integration
-
-- [ ] Copy from Kairos → paste in Notion
-- [ ] Copy from Notion → paste in Kairos
-- [ ] Copy from Kairos → paste in Google Docs
-- [ ] Copy from Kairos → paste in VS Code (markdown)
-- [ ] Copy from web page → paste in Kairos
-
-### Edge Cases
-
-- [ ] Empty blocks
-- [ ] Very long blocks (1000+ characters)
-- [ ] Special characters and unicode
-- [ ] Malformed HTML doesn't crash
-- [ ] XSS attempts are blocked
-
-## Notes for Future Implementation
-
-1. **Start with Phase 1** - Get copy working first
-2. **Test extensively** before moving to Phase 2
-3. **Keep console.logs during testing** - Remove before final commit
-4. **Browser compatibility**: Test in Chrome, Firefox, Safari, Edge
-5. **This is a TEST** - Be prepared to revert if issues arise
-
-## Related Documentation
-
-- [User Stories - Copy Paste.md](./User Stories - Copy Paste.md) - Original requirements
-- [User Stories - Editor.md](./User Stories - Editor.md) - Editor context
-- [Current State.md](../../01-Core/Current State.md) - Update after implementation
+When a user copies from Kairos and pastes into their blog, email, or notes app, it should "just work" - because we're all speaking the same language: HTML.
 
 ## Decision Log
 
 **July 27, 2025**:
 
-- Initially created as "Clipboard Transition Plan" to solve unfocused paste issue
-- Renamed to "Editor Architecture Transition" after recognizing the fundamental implications
-- Decision: Adopt HTML as the interchange format while keeping JSON as internal state
-- Rationale:
-  - Solves immediate clipboard problems
-  - Prepares for mobile apps
-  - Industry standard approach
-  - Allows gradual migration
-- Risk acknowledged: This is a significant architectural change disguised as a simple fix
+- Recognized that clipboard issues reveal deeper architectural concerns
+- Decided to adopt HTML as interchange format (not internal format)
+- Acknowledged this is a fundamental shift in data philosophy
+- Committed to phased approach to manage risk
+
+## For Future Implementers
+
+You're not just implementing copy/paste. You're building the bridge between Kairos and the rest of the web. Every HTML parser you write, every converter you optimize, is making Kairos more connected to the broader ecosystem.
+
+Remember: The goal isn't to replace our internal architecture. It's to make our editor a first-class citizen of the web.
