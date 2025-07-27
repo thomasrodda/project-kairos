@@ -1,4 +1,4 @@
-Current Date: 24/07/2025
+Current Date: 27/07/2025
 
 # CLAUDE.md
 
@@ -10,6 +10,13 @@ This file provides essential guidance to Claude Code when working with Project K
 - ✅ ALWAYS use the "Current Date" shown at the top of this file (line 1)
 - ✅ CHECK line 1 of this file before any documentation updates
 - 📝 The date is automatically updated by a script
+
+## 🚨 CRITICAL: ALWAYS READ USER STORIES FIRST 🚨
+
+**BEFORE answering questions about features, progress, or "what are we working on":**
+
+1. ✅ ALWAYS read the relevant `User Stories - [Feature].md` file
+2. ✅ Check the Current State.md and recent git commits
 
 ## 🚨 MANDATORY: NOTIFICATION SYSTEM 🚨
 
@@ -62,6 +69,29 @@ Project Kairos is a creative writing and worldbuilding web application for novel
 
 ## 🗺️ Documentation Navigation Workflow
 
+### 🛑 STOP: ALWAYS CHECK USER STORIES FIRST 🛑
+
+**BEFORE answering ANY of these questions, you MUST read User Stories:**
+
+- "What are we working on?" → Read Current State.md THEN the relevant User Stories
+- "What's the status of [feature]?" → Read User Stories - [Feature].md
+- "How's [feature] going?" → Read User Stories - [Feature].md
+- "What should I work on?" → Read Current State.md THEN the relevant User Stories
+- ANY question about features, progress, or implementation → Check User Stories FIRST
+
+**Why? User Stories contain:**
+
+- ✅ Detailed acceptance criteria with checkboxes showing what's done
+- ✅ Known issues and bugs in the Notes sections
+- ✅ Exact component locations and line numbers
+- ✅ Implementation status that's more detailed than Current State.md
+
+**Example: "How's the copy/paste work going?"**
+
+- ❌ DON'T: Look at git commits or guess based on branch name
+- ❌ DON'T: Only read Current State.md
+- ✅ DO: Read `Editor/User Stories - Editor.md` and find the "Copy/Paste support" section
+
 ### How to Navigate Documentation:
 
 ```
@@ -79,11 +109,12 @@ Project Kairos is a creative writing and worldbuilding web application for novel
 
 ### Quick Decision Guide:
 
-- **"What should I work on?"** → Check Current State.md
+- **"What are we working on?"** → Check Current State.md AND User Stories - [Feature].md
+- **"What should I work on?"** → Check Current State.md THEN relevant User Stories
 - **"How does X feature work?"** → Check feature folder → User Stories
 - **"Where is X located?"** → Check FILE_TREE.md
 - **"How do I run X?"** → Check Quick Commands.md
-- **"X is broken!"** → Check Troubleshooting Guide.md
+- **"X is broken!"** → Check User Stories first (Notes section), then Troubleshooting Guide.md
 
 ## 🚀 Essential Commands
 

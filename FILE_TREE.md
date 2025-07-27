@@ -61,6 +61,7 @@ AI System Prompt Files
 │   │   ├── Multi-block Drag Implementation Guide.md
 │   │   ├── Slash Command Feature Development.md
 │   │   ├── Text Formatting Plan.md
+│   │   ├── User Stories - Copy Paste.md
 │   │   └── User Stories - Editor.md
 │   ├── PageManagement
 │   │   └── User Stories - Page Management.md

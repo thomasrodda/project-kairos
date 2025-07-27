@@ -24,7 +24,7 @@ This document provides a snapshot of features by area, their completion status, 
 
 - ✅ Multi-block selection (Shift+click, Ctrl+click work correctly, multi-block drag implemented July 24, 2025)
 - ✅ Click and drag selection across blocks (visual selection box implemented July 2025, fixed text selection within blocks July 24, 2025, fixed drag selection within editor content July 24, 2025)
-- ⚠️ Copy/paste (basic block copy/paste implemented July 25, 2025, but has issues: blocks paste as paragraphs losing type/formatting, paste inside blocks should create new blocks)
+- ⚠️ Copy/paste (mostly functional as of July 27, 2025, but has remaining issues - see Known Issues)
 - ⚠️ Cross-block text selection (buggy)
 
 **Known Issues:**
@@ -36,9 +36,10 @@ This document provides a snapshot of features by area, their completion status, 
 - 🐛 Enter at start of block doesn't work correctly
 - 🐛 Markdown paste doesn't format unless you re-trigger it
 - 🐛 Drop gap size only matches single block height, not all selected blocks
-- 🐛 Block copy/paste loses block type (everything becomes paragraph)
-- 🐛 Block copy/paste loses text formatting (bold, italic, etc.)
-- 🐛 Pasting blocks inside a focused block should create new blocks below, not insert text
+- 🐛 Copy/paste: Pasting without cursor focus loses block types and formatting
+- 🐛 Copy/paste: Multi-block paste - first block loses type when pasted inside another block
+- 🐛 Copy/paste: Cut operation doesn't preserve formatting for first block in multi-block selection
+- 🐛 Copy/paste: Plain text editors (Notepad) don't preserve formatting (expected but worth noting)
 
 **Not Started:**
 
@@ -198,10 +199,11 @@ This document provides a snapshot of features by area, their completion status, 
 
 ### High Priority
 
-1. **Block copy/paste preservation** - Copied blocks lose their type and formatting when pasted
-2. **Cross-block formatting** - Formatting doesn't work across block boundaries
-3. **Link dialog styling** - Needs proper design tokens
-4. **Folder page content saving** - Content in folder pages doesn't save properly
+1. **Copy/paste focus issues** - Pasting without cursor focus loses block types and formatting
+2. **Multi-block copy/paste** - First block loses type when pasted inside another block
+3. **Cross-block formatting** - Formatting doesn't work across block boundaries
+4. **Link dialog styling** - Needs proper design tokens
+5. **Folder page content saving** - Content in folder pages doesn't save properly
 
 ### Medium Priority
 
@@ -261,12 +263,12 @@ Based on user story analysis with bugs/issues considered:
 
 ### Immediate Priorities
 
-1. Fix block copy/paste to preserve block types and formatting
-2. Fix paste behavior to create new blocks when pasting blocks (not insert into current)
-3. Add undo/redo system
-4. Fix folder page content saving
-5. Fix link functionality (unlink, clickable links)
-6. Fix placeholder text interaction bugs
+1. Add undo/redo system
+2. Fix folder page content saving
+3. Fix link functionality (unlink, clickable links)
+4. Fix placeholder text interaction bugs
+5. Fix enter at start of block behavior
+6. Fix cross-block text selection bugs
 
 ### Next Phase
 

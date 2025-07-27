@@ -9,7 +9,7 @@ import type { EditorBlock, BlockType, FormatType } from '../../../contexts/Edito
 import { generateId } from '@kairos/utils'
 import { SlashCommandMenu } from '../SlashCommandMenu'
 import { shouldConvertMarkdown, convertMarkdownToFormatting, extractLinkUrl } from '../../../utils/markdownDetection'
-import { shouldConvertBlockMarkdown, removeMarkdownPrefix } from '../../../utils/blockMarkdownDetection'
+import { shouldConvertBlockMarkdown, removeMarkdownPrefix, detectBlockMarkdown } from '../../../utils/blockMarkdownDetection'
 import { toggleFormat } from '../../../utils/textFormatting'
 import './ContentEditableContainer.scss'
 
@@ -861,8 +861,22 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
           lines.push('')
         }
 
-        // Convert to block format
-        blocksToInsert = lines.map((line) => ({ type: 'paragraph', content: line }))
+        // Convert to block format, detecting markdown patterns
+        blocksToInsert = lines.map((line) => {
+          // Check if the line starts with markdown that indicates a block type
+          const markdownPattern = detectBlockMarkdown(line)
+
+          if (markdownPattern) {
+            // Remove the markdown prefix and set the appropriate block type
+            return {
+              type: markdownPattern.blockType,
+              content: removeMarkdownPrefix(line, markdownPattern),
+            }
+          }
+
+          // Default to paragraph for lines without markdown
+          return { type: 'paragraph', content: line }
+        })
       }
 
       const selection = window.getSelection()
@@ -901,15 +915,89 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
       if (blocksToInsert.length === 1) {
         // Single block paste
-        const newContent = currentContent.slice(0, offset) + blocksToInsert[0].content + currentContent.slice(offset)
+        const pastedBlock = blocksToInsert[0]
+        const validTypes: BlockType[] = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
 
-        // Save cursor position after paste
-        savedSelection.current = { blockId, offset: offset + blocksToInsert[0].content.length }
+        // Check if this is Kairos block data (has type info) or just plain text
+        const isBlockData = kairosBlocksData !== ''
 
-        // Mark as internal update
-        isInternalUpdate.current = true
+        // If pasting a block with a different type and the current block is empty, change the block type
+        if (currentContent === '' && pastedBlock.type && validTypes.includes(pastedBlock.type as BlockType)) {
+          // Save cursor position after paste
+          savedSelection.current = { blockId, offset: pastedBlock.content.length }
 
-        dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+          // Mark as internal update
+          isInternalUpdate.current = true
+
+          // Update both content and type
+          dispatch({ type: 'UPDATE_BLOCK', blockId, content: pastedBlock.content })
+          dispatch({ type: 'CHANGE_BLOCK_TYPE', blockId, blockType: pastedBlock.type as BlockType })
+
+          // If there's formatting, apply it
+          if (pastedBlock.formatting && pastedBlock.formatting.length > 0) {
+            dispatch({ type: 'UPDATE_BLOCK_FORMATTING', blockId, formatting: pastedBlock.formatting })
+          }
+        } else if (isBlockData && currentContent !== '') {
+          // We're pasting block data into a non-empty block - create new blocks instead
+          const beforeCursor = currentContent.slice(0, offset)
+          const afterCursor = currentContent.slice(offset)
+
+          // Mark as internal update
+          isInternalUpdate.current = true
+
+          // Keep the current block content up to the cursor
+          dispatch({ type: 'UPDATE_BLOCK', blockId, content: beforeCursor })
+
+          // Create new block with pasted content
+          const newBlockType = validTypes.includes(pastedBlock.type as BlockType) ? (pastedBlock.type as BlockType) : 'paragraph'
+          const newBlock: EditorBlock = {
+            id: generateId(),
+            type: newBlockType,
+            content: pastedBlock.content,
+            formatting: pastedBlock.formatting,
+          }
+
+          // If there's content after cursor, create another block for it
+          if (afterCursor) {
+            const afterBlock: EditorBlock = {
+              id: generateId(),
+              type: block.type, // Keep the original block type
+              content: afterCursor,
+              formatting:
+                block.formatting
+                  ?.filter((f) => f.start >= offset)
+                  .map((f) => ({
+                    ...f,
+                    start: f.start - offset,
+                    end: f.end - offset,
+                  })) || [],
+            }
+
+            // Add new block and then the after block
+            dispatch({ type: 'ADD_BLOCK', block: newBlock, afterBlockId: blockId })
+            dispatch({ type: 'ADD_BLOCK', block: afterBlock, afterBlockId: newBlock.id })
+
+            // Position cursor at end of pasted block
+            savedSelection.current = { blockId: newBlock.id, offset: pastedBlock.content.length }
+          } else {
+            // Just add the new block
+            dispatch({ type: 'ADD_BLOCK', block: newBlock, afterBlockId: blockId })
+
+            // Position cursor at end of new block
+            savedSelection.current = { blockId: newBlock.id, offset: pastedBlock.content.length }
+          }
+        } else {
+          // Normal paste - just insert content inline
+          const newContent = currentContent.slice(0, offset) + pastedBlock.content + currentContent.slice(offset)
+
+          // Save cursor position after paste
+          savedSelection.current = { blockId, offset: offset + pastedBlock.content.length }
+
+          // Mark as internal update
+          isInternalUpdate.current = true
+
+          dispatch({ type: 'UPDATE_BLOCK', blockId, content: newContent })
+        }
       } else {
         // Multi-block paste
         const beforeCursor = currentContent.slice(0, offset)
@@ -943,9 +1031,12 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         const newBlocks: EditorBlock[] = []
 
         for (let i = 1; i < blocksToInsert.length - 1; i++) {
+          const blockType = blocksToInsert[i].type as BlockType
+          // Validate the block type, fallback to paragraph if invalid
+          const validTypes: BlockType[] = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
           const newBlock: EditorBlock = {
             id: generateId(),
-            type: blocksToInsert[i].type as EditorBlock['type'],
+            type: validTypes.includes(blockType) ? blockType : 'paragraph',
             content: blocksToInsert[i].content,
             formatting: blocksToInsert[i].formatting,
           }
@@ -953,11 +1044,37 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         }
 
         // Create last block with remaining content
+        const lastBlockType = blocksToInsert[blocksToInsert.length - 1].type as BlockType
+        const validTypes: BlockType[] = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
+        const lastPastedBlock = blocksToInsert[blocksToInsert.length - 1]
+
+        // Prepare formatting for the last block
+        let lastBlockFormatting = lastPastedBlock.formatting || []
+
+        // If we're appending afterCursor content and the current block has formatting that extends beyond the paste point,
+        // we need to preserve that formatting
+        if (afterCursor) {
+          const existingBlock = editorState.blocks.find((b) => b.id === blockId)
+          if (existingBlock?.formatting) {
+            // Get formatting that starts after the paste point
+            const afterCursorFormatting = existingBlock.formatting
+              .filter((f) => f.start >= offset)
+              .map((f) => ({
+                ...f,
+                start: f.start - offset + lastPastedBlock.content.length,
+                end: f.end - offset + lastPastedBlock.content.length,
+              }))
+
+            // Merge with the pasted block's formatting
+            lastBlockFormatting = [...lastBlockFormatting, ...afterCursorFormatting]
+          }
+        }
+
         const lastBlock: EditorBlock = {
           id: generateId(),
-          type: blocksToInsert[blocksToInsert.length - 1].type as EditorBlock['type'],
-          content: blocksToInsert[blocksToInsert.length - 1].content + afterCursor,
-          formatting: blocksToInsert[blocksToInsert.length - 1].formatting,
+          type: validTypes.includes(lastBlockType) ? lastBlockType : 'paragraph',
+          content: lastPastedBlock.content + afterCursor,
+          formatting: lastBlockFormatting,
         }
         newBlocks.push(lastBlock)
 
