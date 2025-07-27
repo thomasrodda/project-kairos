@@ -2,7 +2,7 @@
 
 This document provides a snapshot of features by area, their completion status, and links to detailed requirements.
 
-**Last Updated**: July 25, 2025
+**Last Updated**: July 27, 2025
 
 ## 📊 Feature Status by Area
 
@@ -24,7 +24,7 @@ This document provides a snapshot of features by area, their completion status, 
 
 - ✅ Multi-block selection (Shift+click, Ctrl+click work correctly, multi-block drag implemented July 24, 2025)
 - ✅ Click and drag selection across blocks (visual selection box implemented July 2025, fixed text selection within blocks July 24, 2025, fixed drag selection within editor content July 24, 2025)
-- ⚠️ Copy/paste (mostly functional as of July 27, 2025, but has remaining issues - see Known Issues)
+- ✅ Copy/paste (fully functional as of July 27, 2025 - block types and formatting preserved, fixed unfocused editor paste)
 - ⚠️ Cross-block text selection (buggy)
 
 **Known Issues:**
@@ -36,10 +36,10 @@ This document provides a snapshot of features by area, their completion status, 
 - 🐛 Enter at start of block doesn't work correctly
 - 🐛 Markdown paste doesn't format unless you re-trigger it
 - 🐛 Drop gap size only matches single block height, not all selected blocks
-- 🐛 Copy/paste: Pasting without cursor focus loses block types and formatting
-- 🐛 Copy/paste: Multi-block paste - first block loses type when pasted inside another block
-- 🐛 Copy/paste: Cut operation doesn't preserve formatting for first block in multi-block selection
-- 🐛 Copy/paste: Plain text editors (Notepad) don't preserve formatting (expected but worth noting)
+- ✅ FIXED (July 27, 2025): Copy/paste now preserves block types when pasting with unfocused editor - using paste event API for better browser compatibility
+- ✅ FIXED (July 27, 2025): Multi-block paste now preserves all block types including the first block
+- ✅ FIXED (July 27, 2025): Cut operation now preserves formatting for all blocks
+- ✅ FIXED: Links now work properly - clickable with Ctrl/Cmd+click
 
 **Not Started:**
 

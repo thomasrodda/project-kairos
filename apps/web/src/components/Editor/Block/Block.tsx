@@ -49,7 +49,13 @@ export function Block({ block, isFocused, dragHandleProps, onBlockClick }: Block
   }
 
   // Handle click on block
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Check if the click is on a link
+    const target = e.target as HTMLElement
+    if (target.tagName === 'A' || target.closest('a')) {
+      // Allow link clicks to propagate normally
+      return
+    }
     onBlockClick?.(block.id)
   }
 

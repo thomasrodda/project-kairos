@@ -1006,34 +1006,26 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         // Mark as internal update for all operations
         isInternalUpdate.current = true
 
-        // Update first block with first pasted content
-        const firstNewContent = beforeCursor + blocksToInsert[0].content
-        dispatch({ type: 'UPDATE_BLOCK', blockId, content: firstNewContent })
+        // Update current block to only contain content before cursor
+        dispatch({ type: 'UPDATE_BLOCK', blockId, content: beforeCursor })
 
-        // If the first pasted block has formatting, we need to adjust it for the merged content
-        if (blocksToInsert[0].formatting && blocksToInsert[0].formatting.length > 0) {
-          const adjustedFormatting = blocksToInsert[0].formatting.map((format: any) => ({
-            ...format,
-            start: format.start + beforeCursor.length,
-            end: format.end + beforeCursor.length,
-          }))
+        // Create all pasted blocks with their proper types
+        const newBlocks: EditorBlock[] = []
+        const validTypes: BlockType[] = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
 
-          // Get existing formatting for the block
-          const existingBlock = editorState.blocks.find((b) => b.id === blockId)
-          const existingFormatting = existingBlock?.formatting || []
-
-          // Merge formatting
-          const mergedFormatting = [...existingFormatting, ...adjustedFormatting]
-          dispatch({ type: 'UPDATE_BLOCK_FORMATTING', blockId, formatting: mergedFormatting })
+        // Create first pasted block with its proper type
+        const firstBlockType = blocksToInsert[0].type as BlockType
+        const firstBlock: EditorBlock = {
+          id: generateId(),
+          type: validTypes.includes(firstBlockType) ? firstBlockType : 'paragraph',
+          content: blocksToInsert[0].content,
+          formatting: blocksToInsert[0].formatting,
         }
+        newBlocks.push(firstBlock)
 
         // Create middle blocks
-        const newBlocks: EditorBlock[] = []
-
         for (let i = 1; i < blocksToInsert.length - 1; i++) {
           const blockType = blocksToInsert[i].type as BlockType
-          // Validate the block type, fallback to paragraph if invalid
-          const validTypes: BlockType[] = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
           const newBlock: EditorBlock = {
             id: generateId(),
             type: validTypes.includes(blockType) ? blockType : 'paragraph',
@@ -1045,7 +1037,6 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
 
         // Create last block with remaining content
         const lastBlockType = blocksToInsert[blocksToInsert.length - 1].type as BlockType
-        const validTypes: BlockType[] = ['h1', 'h2', 'h3', 'paragraph', 'bullet']
         const lastPastedBlock = blocksToInsert[blocksToInsert.length - 1]
 
         // Prepare formatting for the last block
@@ -1166,6 +1157,21 @@ export function ContentEditableContainer({ children, onBlockClick, containerRef:
         onPaste={handlePaste}
         onClick={(e) => {
           const target = e.target as HTMLElement
+
+          // Check if the click is on a link
+          if (target.tagName === 'A' || target.closest('a')) {
+            // For links, we need to handle them specially in contenteditable
+            const link = (target.tagName === 'A' ? target : target.closest('a')) as HTMLAnchorElement
+            if (link && link.href) {
+              // Only open link if Ctrl/Cmd is held (standard contenteditable behavior)
+              if (e.ctrlKey || e.metaKey) {
+                e.preventDefault()
+                window.open(link.href, link.target || '_blank')
+              }
+            }
+            return
+          }
+
           const blockEl = findBlockElement(target)
           if (blockEl) {
             const blockId = blockEl.parentElement?.getAttribute('data-block-id')

@@ -57,6 +57,7 @@ AI System Prompt Files
 │   │   ├── Markdown Export Import Guide.md
 │   │   └── User Stories - Data Management.md
 │   ├── Editor
+│   │   ├── Editor Architecture Transition - HTML as Interchange Format.md
 │   │   ├── Enhanced Custom Editor Plan.md
 │   │   ├── Multi-block Drag Implementation Guide.md
 │   │   ├── Slash Command Feature Development.md

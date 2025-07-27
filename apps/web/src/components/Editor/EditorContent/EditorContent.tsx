@@ -26,6 +26,7 @@ import { Block } from '../Block'
 import { ContentEditableContainer } from '../ContentEditableContainer'
 import { FormattingToolbar } from '../FormattingToolbar'
 import { generateId } from '@kairos/utils'
+import { detectBlockMarkdown, removeMarkdownPrefix } from '../../../utils/blockMarkdownDetection'
 import './EditorContent.scss'
 
 export function EditorContent() {
@@ -112,152 +113,78 @@ export function EditorContent() {
       if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !focusedBlockId) {
         e.preventDefault()
 
-        // Read clipboard data
+        // Use readText which has better browser support
         navigator.clipboard
-          .read()
-          .then(async (items) => {
-            for (const item of items) {
-              // Try to get Kairos blocks format first
-              if (item.types.includes('application/x-kairos-blocks')) {
-                const blob = await item.getType('application/x-kairos-blocks')
-                const text = await blob.text()
-                try {
-                  const blocksData = JSON.parse(text)
+          .readText()
+          .then((text) => {
+            if (!text) return
 
-                  // Determine where to insert: after last selected block or at end
-                  let afterBlockId: string | undefined
-                  if (selectedBlockIds.length > 0) {
-                    // Find the last selected block in document order
-                    const selectedIndices = selectedBlockIds
-                      .map((id) => blocks.findIndex((b) => b.id === id))
-                      .filter((i) => i !== -1)
-                      .sort((a, b) => b - a) // Sort descending to get last
+            // Split text into blocks by newlines
+            const lines = text.split('\n').filter((line) => line.trim() !== '')
 
-                    if (selectedIndices.length > 0) {
-                      afterBlockId = blocks[selectedIndices[0]].id
-                    }
-                  } else if (blocks.length > 0) {
-                    // No selection, insert at end
-                    afterBlockId = blocks[blocks.length - 1].id
-                  }
+            if (lines.length === 0) return
 
-                  // Add the blocks
-                  const newBlocks: EditorBlock[] = blocksData.map((blockData: any) => ({
-                    id: generateId(),
-                    type: blockData.type,
-                    content: blockData.content,
-                    formatting: blockData.formatting || [],
-                  }))
+            // Determine where to insert
+            let afterBlockId: string | undefined
+            if (selectedBlockIds.length > 0) {
+              const selectedIndices = selectedBlockIds
+                .map((id) => blocks.findIndex((b) => b.id === id))
+                .filter((i) => i !== -1)
+                .sort((a, b) => b - a)
 
-                  // Insert blocks
-                  newBlocks.forEach((block, index) => {
-                    const insertAfter = index === 0 ? afterBlockId : newBlocks[index - 1].id
-                    dispatch({ type: 'ADD_BLOCK', block, afterBlockId: insertAfter })
-                  })
-
-                  // Select the pasted blocks
-                  dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: newBlocks.map((b) => b.id) })
-
-                  // Announce paste
-                  const announcement = newBlocks.length === 1 ? 'Block pasted from clipboard' : `${newBlocks.length} blocks pasted from clipboard`
-                  setAnnouncement(announcement)
-                  setTimeout(() => setAnnouncement(''), 1000)
-
-                  return
-                } catch (err) {
-                  console.error('Failed to parse Kairos blocks data:', err)
-                }
+              if (selectedIndices.length > 0) {
+                afterBlockId = blocks[selectedIndices[0]].id
               }
-
-              // Fall back to plain text
-              if (item.types.includes('text/plain')) {
-                const blob = await item.getType('text/plain')
-                const text = await blob.text()
-
-                // Split text into blocks by newlines
-                const lines = text.split('\n').filter((line) => line.trim() !== '')
-
-                if (lines.length === 0) return
-
-                // Determine where to insert
-                let afterBlockId: string | undefined
-                if (selectedBlockIds.length > 0) {
-                  const selectedIndices = selectedBlockIds
-                    .map((id) => blocks.findIndex((b) => b.id === id))
-                    .filter((i) => i !== -1)
-                    .sort((a, b) => b - a)
-
-                  if (selectedIndices.length > 0) {
-                    afterBlockId = blocks[selectedIndices[0]].id
-                  }
-                } else if (blocks.length > 0) {
-                  afterBlockId = blocks[blocks.length - 1].id
-                }
-
-                // Create new blocks
-                const newBlocks: EditorBlock[] = lines.map((line) => ({
-                  id: generateId(),
-                  type: 'paragraph' as const,
-                  content: line,
-                }))
-
-                // Insert blocks
-                newBlocks.forEach((block, index) => {
-                  const insertAfter = index === 0 ? afterBlockId : newBlocks[index - 1].id
-                  dispatch({ type: 'ADD_BLOCK', block, afterBlockId: insertAfter })
-                })
-
-                // Select the pasted blocks
-                dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: newBlocks.map((b) => b.id) })
-
-                // Announce paste
-                const announcement = newBlocks.length === 1 ? 'Text pasted as block' : `Text pasted as ${newBlocks.length} blocks`
-                setAnnouncement(announcement)
-                setTimeout(() => setAnnouncement(''), 1000)
-              }
+            } else if (blocks.length > 0) {
+              afterBlockId = blocks[blocks.length - 1].id
             }
+
+            // Create new blocks with markdown detection
+            const newBlocks: EditorBlock[] = lines.map((line) => {
+              // Check if the line starts with markdown that indicates a block type
+              const markdownPattern = detectBlockMarkdown(line)
+
+              if (markdownPattern) {
+                // Remove the markdown prefix and set the appropriate block type
+                return {
+                  id: generateId(),
+                  type: markdownPattern.blockType,
+                  content: removeMarkdownPrefix(line, markdownPattern),
+                }
+              }
+
+              // Default to paragraph for lines without markdown
+              return {
+                id: generateId(),
+                type: 'paragraph' as const,
+                content: line,
+              }
+            })
+
+            // Insert blocks
+            newBlocks.forEach((block, index) => {
+              const insertAfter = index === 0 ? afterBlockId : newBlocks[index - 1].id
+              dispatch({ type: 'ADD_BLOCK', block, afterBlockId: insertAfter })
+            })
+
+            // Select the pasted blocks
+            dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: newBlocks.map((b) => b.id) })
+
+            // Focus the first pasted block to ensure editor is focused
+            if (newBlocks.length > 0) {
+              dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: newBlocks[0].id })
+            }
+
+            // Announce paste
+            const announcement = newBlocks.length === 1 ? 'Text pasted as block' : `Text pasted as ${newBlocks.length} blocks`
+            setAnnouncement(announcement)
+            setTimeout(() => setAnnouncement(''), 1000)
           })
           .catch((err) => {
             console.error('Failed to read clipboard:', err)
-            // Fall back to older clipboard API if available
-            if (navigator.clipboard.readText) {
-              navigator.clipboard.readText().then((text) => {
-                // Same logic as plain text handling above
-                const lines = text.split('\n').filter((line) => line.trim() !== '')
-                if (lines.length === 0) return
-
-                let afterBlockId: string | undefined
-                if (selectedBlockIds.length > 0) {
-                  const selectedIndices = selectedBlockIds
-                    .map((id) => blocks.findIndex((b) => b.id === id))
-                    .filter((i) => i !== -1)
-                    .sort((a, b) => b - a)
-
-                  if (selectedIndices.length > 0) {
-                    afterBlockId = blocks[selectedIndices[0]].id
-                  }
-                } else if (blocks.length > 0) {
-                  afterBlockId = blocks[blocks.length - 1].id
-                }
-
-                const newBlocks: EditorBlock[] = lines.map((line) => ({
-                  id: generateId(),
-                  type: 'paragraph' as const,
-                  content: line,
-                }))
-
-                newBlocks.forEach((block, index) => {
-                  const insertAfter = index === 0 ? afterBlockId : newBlocks[index - 1].id
-                  dispatch({ type: 'ADD_BLOCK', block, afterBlockId: insertAfter })
-                })
-
-                dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: newBlocks.map((b) => b.id) })
-
-                const announcement = newBlocks.length === 1 ? 'Text pasted as block' : `Text pasted as ${newBlocks.length} blocks`
-                setAnnouncement(announcement)
-                setTimeout(() => setAnnouncement(''), 1000)
-              })
-            }
+            // Show a user-friendly message
+            setAnnouncement('Unable to paste - clipboard access denied')
+            setTimeout(() => setAnnouncement(''), 2000)
           })
 
         return

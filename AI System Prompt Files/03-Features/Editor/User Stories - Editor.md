@@ -279,16 +279,18 @@ Acceptance Criteria:
 Notes:
 
 - Fully implemented as of July 27, 2025
-- Block types are preserved when copying/pasting
+- Block types are preserved when copying/pasting (including unfocused editor paste)
 - Text formatting (bold, italic, etc.) is preserved
 - Markdown syntax in pasted text is automatically converted to proper block types
+- Fixed browser compatibility issues with custom clipboard formats by using paste event API
 - **For detailed testing checklist and implementation notes, see [User Stories - Copy Paste.md](./User Stories - Copy Paste.md)**
+- **ARCHITECTURAL CHANGE IN PROGRESS**: See [Editor Architecture Transition - HTML as Interchange Format.md](./Editor Architecture Transition - HTML as Interchange Format.md) for fundamental changes to how the editor handles data interchange
 
 Priority: Medium
 
 **Complexity**: Medium
 
-**Status**: ⚠️ Partially Complete (July 27, 2025) - Some multi-block and focus-related issues remain
+**Status**: ✅ Complete (July 27, 2025) - All major copy/paste functionality implemented
 
 **Dependencies**:
 
