@@ -73,6 +73,7 @@ AI System Prompt Files
 │   ├── Component-UserStory-Mapping.md
 │   └── Feature Dependencies.md
 ├── 04-Testing
+│   ├── Editor Test Inventory.md
 │   ├── Test Coverage Gap Analysis.md
 │   ├── Test Inventory.md
 │   ├── Testing Guide.md
@@ -425,12 +426,14 @@ packages
 │   └── package.json
 ├── editor-interchange
 │   ├── src
+│   │   ├── converters.ts
 │   │   ├── format-detector.ts
 │   │   ├── html-converter.test.ts
 │   │   ├── html-converter.ts
 │   │   ├── index.ts
 │   │   ├── markdown-converter.ts
 │   │   └── types.ts
+│   ├── jest.setup.js
 │   ├── package.json
 │   └── tsconfig.json
 ├── types

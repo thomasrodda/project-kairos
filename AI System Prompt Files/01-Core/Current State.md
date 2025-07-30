@@ -2,7 +2,7 @@
 
 This document provides a snapshot of features by area, their completion status, and links to detailed requirements.
 
-**Last Updated**: July 27, 2025
+**Last Updated**: July 30, 2025
 
 ## 📊 Feature Status by Area
 
@@ -26,6 +26,13 @@ This document provides a snapshot of features by area, their completion status, 
 - ✅ Click and drag selection across blocks (visual selection box implemented July 2025, fixed text selection within blocks July 24, 2025, fixed drag selection within editor content July 24, 2025)
 - ✅ Copy/paste (fully functional as of July 27, 2025 - block types and formatting preserved, fixed unfocused editor paste)
 - ⚠️ Cross-block text selection (buggy)
+
+**Architecture Improvements (July 30, 2025):**
+
+- ✅ Created `@kairos/editor-interchange` package for HTML/JSON conversion
+- ✅ Implemented HTML as interchange format (Phase 0 of transition plan)
+- ✅ Comprehensive test suite with 90% coverage
+- ✅ Created Editor Test Inventory document mapping User Stories to test cases
 
 **Known Issues:**
 
