@@ -3,7 +3,7 @@
 // Uses a single contentEditable container to enable cross-block text selection.
 // Manages drag and drop reordering using @dnd-kit for smooth, accessible interactions.
 
-import { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -14,9 +14,10 @@ import {
   useSensors,
   DragStartEvent,
   DragEndEvent,
+  DragOverEvent,
 } from '@dnd-kit/core'
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { useEditorState, useEditorDispatch } from '../../../contexts/EditorContext'
+import { useEditorState, useEditorDispatch, EditorBlock } from '../../../contexts/EditorContext'
 import { useDismiss, useCrossBlockSelection } from '../../../hooks'
 import { PageTitle } from '../PageTitle'
 import { usePageContext } from '../../../contexts/PageContext'
@@ -24,6 +25,8 @@ import { DraggableBlock } from '../Block/DraggableBlock'
 import { Block } from '../Block'
 import { ContentEditableContainer } from '../ContentEditableContainer'
 import { FormattingToolbar } from '../FormattingToolbar'
+import { generateId } from '@kairos/utils'
+import { detectBlockMarkdown, removeMarkdownPrefix } from '../../../utils/blockMarkdownDetection'
 import './EditorContent.scss'
 
 export function EditorContent() {
@@ -35,6 +38,8 @@ export function EditorContent() {
   const contentEditableRef = useRef<HTMLDivElement>(null)
   const formattingToolbarRef = useRef<HTMLDivElement>(null)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const [overId, setOverId] = useState<string | null>(null)
+  const [overIndex, setOverIndex] = useState<number | null>(null)
 
   // Screen reader announcements for accessibility
   const [announcement, setAnnouncement] = useState<string>('')
@@ -58,7 +63,7 @@ export function EditorContent() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 8px movement required to start drag
+        distance: 20, // 20px movement required to start drag (increased from 8px to avoid conflicts with text selection)
       },
     }),
     useSensor(KeyboardSensor, {
@@ -73,6 +78,115 @@ export function EditorContent() {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
         forceSave()
+        return
+      }
+
+      // Handle copy/cut shortcuts for block selection
+      if (selectedBlockIds.length > 0 && !focusedBlockId && !crossBlockSelection) {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+          // Copy will be handled by the copy event listener
+          return
+        }
+
+        if ((e.ctrlKey || e.metaKey) && e.key === 'x') {
+          // Cut: copy then delete
+          e.preventDefault()
+
+          // Trigger copy event
+          document.execCommand('copy')
+
+          // Delete the blocks
+          if (selectedBlockIds.length === 1) {
+            dispatch({ type: 'DELETE_BLOCK', blockId: selectedBlockIds[0] })
+            setAnnouncement('Block cut to clipboard')
+          } else {
+            dispatch({ type: 'DELETE_BLOCKS', blockIds: selectedBlockIds })
+            setAnnouncement(`${selectedBlockIds.length} blocks cut to clipboard`)
+          }
+
+          setTimeout(() => setAnnouncement(''), 1000)
+          return
+        }
+      }
+
+      // Handle paste when no block is focused (paste after selected block or at end)
+      if ((e.ctrlKey || e.metaKey) && e.key === 'v' && !focusedBlockId) {
+        e.preventDefault()
+
+        // Use readText which has better browser support
+        navigator.clipboard
+          .readText()
+          .then((text) => {
+            if (!text) return
+
+            // Split text into blocks by newlines
+            const lines = text.split('\n').filter((line) => line.trim() !== '')
+
+            if (lines.length === 0) return
+
+            // Determine where to insert
+            let afterBlockId: string | undefined
+            if (selectedBlockIds.length > 0) {
+              const selectedIndices = selectedBlockIds
+                .map((id) => blocks.findIndex((b) => b.id === id))
+                .filter((i) => i !== -1)
+                .sort((a, b) => b - a)
+
+              if (selectedIndices.length > 0) {
+                afterBlockId = blocks[selectedIndices[0]].id
+              }
+            } else if (blocks.length > 0) {
+              afterBlockId = blocks[blocks.length - 1].id
+            }
+
+            // Create new blocks with markdown detection
+            const newBlocks: EditorBlock[] = lines.map((line) => {
+              // Check if the line starts with markdown that indicates a block type
+              const markdownPattern = detectBlockMarkdown(line)
+
+              if (markdownPattern) {
+                // Remove the markdown prefix and set the appropriate block type
+                return {
+                  id: generateId(),
+                  type: markdownPattern.blockType,
+                  content: removeMarkdownPrefix(line, markdownPattern),
+                }
+              }
+
+              // Default to paragraph for lines without markdown
+              return {
+                id: generateId(),
+                type: 'paragraph' as const,
+                content: line,
+              }
+            })
+
+            // Insert blocks
+            newBlocks.forEach((block, index) => {
+              const insertAfter = index === 0 ? afterBlockId : newBlocks[index - 1].id
+              dispatch({ type: 'ADD_BLOCK', block, afterBlockId: insertAfter })
+            })
+
+            // Select the pasted blocks
+            dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: newBlocks.map((b) => b.id) })
+
+            // Focus the first pasted block to ensure editor is focused
+            if (newBlocks.length > 0) {
+              dispatch({ type: 'SET_FOCUSED_BLOCK', blockId: newBlocks[0].id })
+            }
+
+            // Announce paste
+            const announcement = newBlocks.length === 1 ? 'Text pasted as block' : `Text pasted as ${newBlocks.length} blocks`
+            setAnnouncement(announcement)
+            setTimeout(() => setAnnouncement(''), 1000)
+          })
+          .catch((err) => {
+            console.error('Failed to read clipboard:', err)
+            // Show a user-friendly message
+            setAnnouncement('Unable to paste - clipboard access denied')
+            setTimeout(() => setAnnouncement(''), 2000)
+          })
+
         return
       }
 
@@ -116,11 +230,61 @@ export function EditorContent() {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [selectedBlockIds, focusedBlockId, crossBlockSelection, dispatch, clearSelection, forceSave])
+  }, [selectedBlockIds, focusedBlockId, crossBlockSelection, dispatch, clearSelection, forceSave, blocks])
 
-  // Handle copy event for cross-block selection
+  // Handle copy event for both cross-block text selection and block selection
   useEffect(() => {
     const handleCopy = (e: ClipboardEvent) => {
+      // Handle block selection copy (when blocks are selected via drag handles)
+      if (selectedBlockIds.length > 0 && !crossBlockSelection) {
+        e.preventDefault()
+
+        // Get selected blocks
+        const selectedBlocks = blocks.filter((block) => selectedBlockIds.includes(block.id))
+
+        // Create plain text representation
+        const plainText = selectedBlocks.map((block) => block.content).join('\n')
+
+        // Create markdown representation
+        const markdown = selectedBlocks
+          .map((block) => {
+            switch (block.type) {
+              case 'h1':
+                return `# ${block.content}`
+              case 'h2':
+                return `## ${block.content}`
+              case 'h3':
+                return `### ${block.content}`
+              case 'bullet':
+                return `- ${block.content}`
+              default:
+                return block.content
+            }
+          })
+          .join('\n')
+
+        // Create custom format that preserves block structure and formatting
+        const blockData = selectedBlocks.map((block) => ({
+          type: block.type,
+          content: block.content,
+          formatting: block.formatting || [],
+        }))
+
+        // Set clipboard data
+        if (e.clipboardData) {
+          e.clipboardData.setData('text/plain', plainText)
+          e.clipboardData.setData('text/markdown', markdown)
+          e.clipboardData.setData('application/x-kairos-blocks', JSON.stringify(blockData))
+        }
+
+        // Announce copy for screen readers
+        const announcement = selectedBlockIds.length === 1 ? 'Block copied to clipboard' : `${selectedBlockIds.length} blocks copied to clipboard`
+        setAnnouncement(announcement)
+        setTimeout(() => setAnnouncement(''), 1000)
+        return
+      }
+
+      // Handle cross-block text selection copy
       if (!crossBlockSelection) return
 
       // Get the selected content
@@ -175,11 +339,17 @@ export function EditorContent() {
 
     document.addEventListener('copy', handleCopy)
     return () => document.removeEventListener('copy', handleCopy)
-  }, [crossBlockSelection, getSelectedText, getSelectedMarkdown, blocks])
+  }, [crossBlockSelection, getSelectedText, getSelectedMarkdown, blocks, selectedBlockIds])
 
   // Handle clicks in empty space
   const handleEmptySpaceClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const target = e.target as HTMLElement
+
+    // Check if a drag selection just completed by looking for the flag on the editor container
+    const editorContainer = target.closest('.editor')
+    if (editorContainer && editorContainer.getAttribute('data-drag-selection-just-completed') === 'true') {
+      return
+    }
 
     // Check if the click was on specific elements
     const isOnBlock = target.closest('.block') !== null
@@ -288,20 +458,98 @@ export function EditorContent() {
     excludeRefs: [formattingToolbarRef], // Don't dismiss when clicking on formatting toolbar
   })
 
+  // Handle drag over
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event
+
+    if (!over) {
+      setOverId(null)
+      setOverIndex(null)
+      return
+    }
+
+    const activeId = active.id as string
+    const overId = over.id as string
+
+    // Check if we're dragging multiple blocks
+    const isDraggingMultiple = selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId)
+
+    if (isDraggingMultiple) {
+      // Don't allow dropping on any selected block
+      if (selectedBlockIds.includes(overId)) {
+        setOverId(null)
+        setOverIndex(null)
+        return
+      }
+
+      // Check if we would be dropping within the selected range
+      const selectedIndices = selectedBlockIds
+        .map((id) => blocks.findIndex((b) => b.id === id))
+        .filter((i) => i !== -1)
+        .sort((a, b) => a - b)
+      const minSelectedIndex = Math.min(...selectedIndices)
+      const maxSelectedIndex = Math.max(...selectedIndices)
+      const overIndex = blocks.findIndex((b) => b.id === overId)
+      const draggedIndex = blocks.findIndex((b) => b.id === activeId)
+
+      // Determine target position based on drag direction
+      let targetIndex = overIndex
+      if (draggedIndex < overIndex) {
+        // Dragging down
+        targetIndex = overIndex + 1
+      }
+
+      // Don't show indicator if it would be within the selected range
+      if (targetIndex > minSelectedIndex && targetIndex <= maxSelectedIndex + 1) {
+        setOverId(null)
+        setOverIndex(null)
+        return
+      }
+    }
+
+    const activeIndex = blocks.findIndex((b) => b.id === active.id)
+    const overBlockIndex = blocks.findIndex((b) => b.id === over.id)
+
+    if (activeIndex !== -1 && overBlockIndex !== -1) {
+      // Determine if we're dragging up or down
+      const dragDirection = activeIndex < overBlockIndex ? 'down' : 'up'
+
+      // For downward drags, show indicator after the target block
+      // For upward drags, show indicator before the target block
+      setOverId(over.id as string)
+      setOverIndex(dragDirection === 'down' ? overBlockIndex + 1 : overBlockIndex)
+    }
+  }
+
   // Handle drag start
   const handleDragStart = (event: DragStartEvent) => {
     const draggedBlockId = event.active.id as string
     setActiveId(draggedBlockId)
     dispatch({ type: 'SET_DRAGGING', isDragging: true })
 
-    // Clear any text selection when starting drag
-    if (crossBlockSelection) {
+    // Only clear text selection if we're actually dragging a block
+    // This prevents interfering with click-and-drag text selection
+    const isDraggingBlock = blocks.some((b) => b.id === draggedBlockId)
+    if (crossBlockSelection && isDraggingBlock) {
       clearSelection()
+    }
+
+    // If the dragged block is part of a multi-selection, ensure it stays selected
+    if (selectedBlockIds.length > 1 && selectedBlockIds.includes(draggedBlockId)) {
+      // Keep the multi-selection
+    } else if (!selectedBlockIds.includes(draggedBlockId)) {
+      // If dragging an unselected block, select only that block
+      dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: [draggedBlockId] })
     }
 
     // Announce drag start for screen readers
     const blockIndex = blocks.findIndex((b) => b.id === draggedBlockId)
-    setAnnouncement(`Started dragging block ${blockIndex + 1} of ${blocks.length}`)
+    const dragCount = selectedBlockIds.includes(draggedBlockId) ? selectedBlockIds.length : 1
+    if (dragCount > 1) {
+      setAnnouncement(`Started dragging ${dragCount} selected blocks`)
+    } else {
+      setAnnouncement(`Started dragging block ${blockIndex + 1} of ${blocks.length}`)
+    }
     setTimeout(() => setAnnouncement(''), 2000)
   }
 
@@ -310,16 +558,112 @@ export function EditorContent() {
     const { active, over } = event
 
     if (active.id !== over?.id && over?.id) {
-      const oldIndex = blocks.findIndex((block) => block.id === active.id)
-      const newIndex = blocks.findIndex((block) => block.id === over.id)
+      const draggedBlockId = active.id as string
+      const overBlockId = over.id as string
 
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newBlocks = arrayMove(blocks, oldIndex, newIndex)
-        dispatch({ type: 'REORDER_BLOCKS', blocks: newBlocks })
+      // Check if we're dragging multiple blocks
+      const isDraggingMultiple = selectedBlockIds.length > 1 && selectedBlockIds.includes(draggedBlockId)
 
-        // Announce successful reorder for screen readers
-        setAnnouncement(`Block moved from position ${oldIndex + 1} to position ${newIndex + 1}`)
-        setTimeout(() => setAnnouncement(''), 2000)
+      if (isDraggingMultiple) {
+        // Multi-block drag logic
+
+        // Check if the drop target is one of the selected blocks being dragged
+        if (selectedBlockIds.includes(overBlockId)) {
+          // Cannot drop on a block that's part of the selection
+          setAnnouncement('Cannot drop selected blocks onto themselves')
+          setTimeout(() => setAnnouncement(''), 2000)
+          // Reset states properly
+          setActiveId(null)
+          setOverId(null)
+          setOverIndex(null)
+          dispatch({ type: 'SET_DRAGGING', isDragging: false })
+          return
+        }
+
+        const overIndex = blocks.findIndex((block) => block.id === overBlockId)
+
+        if (overIndex !== -1) {
+          // Get indices of all selected blocks
+          const selectedIndices = selectedBlockIds
+            .map((id) => blocks.findIndex((b) => b.id === id))
+            .filter((i) => i !== -1)
+            .sort((a, b) => a - b)
+
+          // Check if we're trying to drop within the selected range
+          const minSelectedIndex = Math.min(...selectedIndices)
+          const maxSelectedIndex = Math.max(...selectedIndices)
+          const draggedIndex = blocks.findIndex((b) => b.id === draggedBlockId)
+
+          // Determine target position based on drag direction
+          let targetIndex = overIndex
+          if (draggedIndex < overIndex) {
+            // Dragging down
+            targetIndex = overIndex + 1
+          }
+
+          // Check if the target position is within the selected blocks range
+          if (targetIndex > minSelectedIndex && targetIndex <= maxSelectedIndex + 1) {
+            // This would result in dropping within the selection, which is invalid
+            setAnnouncement('Cannot drop selected blocks within their current range')
+            setTimeout(() => setAnnouncement(''), 2000)
+            // Reset states properly
+            setActiveId(null)
+            setOverId(null)
+            setOverIndex(null)
+            dispatch({ type: 'SET_DRAGGING', isDragging: false })
+            return
+          }
+
+          // Get all selected blocks in their current order
+          const selectedBlocks: EditorBlock[] = []
+          const unselectedBlocks: EditorBlock[] = []
+
+          blocks.forEach((block) => {
+            if (selectedBlockIds.includes(block.id)) {
+              selectedBlocks.push(block)
+            } else {
+              unselectedBlocks.push(block)
+            }
+          })
+
+          // Find where to insert the selected blocks
+          let insertIndex = 0
+          for (let i = 0; i < blocks.length; i++) {
+            if (blocks[i].id === overBlockId) {
+              // Check if we're dropping above or below the target
+              if (draggedIndex < i) {
+                // Dragging down - insert after the target
+                insertIndex = unselectedBlocks.findIndex((b) => b.id === overBlockId) + 1
+              } else {
+                // Dragging up - insert before the target
+                insertIndex = unselectedBlocks.findIndex((b) => b.id === overBlockId)
+              }
+              break
+            }
+          }
+
+          // Reconstruct the blocks array with selected blocks at the new position
+          const newBlocks = [...unselectedBlocks.slice(0, insertIndex), ...selectedBlocks, ...unselectedBlocks.slice(insertIndex)]
+
+          dispatch({ type: 'REORDER_BLOCKS', blocks: newBlocks })
+
+          // Announce successful reorder for screen readers
+          setAnnouncement(`Moved ${selectedBlocks.length} blocks to new position`)
+          setTimeout(() => setAnnouncement(''), 2000)
+        }
+      } else {
+        // Single block drag logic (existing code)
+        const oldIndex = blocks.findIndex((block) => block.id === active.id)
+        const newIndex = blocks.findIndex((block) => block.id === over.id)
+
+        if (oldIndex !== -1 && newIndex !== -1) {
+          const newBlocks = arrayMove(blocks, oldIndex, newIndex)
+          dispatch({ type: 'REORDER_BLOCKS', blocks: newBlocks })
+
+          // Announce successful reorder for screen readers
+          setAnnouncement(`Block moved from position ${oldIndex + 1} to position ${newIndex + 1}`)
+          setTimeout(() => setAnnouncement(''), 2000)
+        }
       }
     } else if (activeId) {
       // Announce if drag was cancelled
@@ -328,16 +672,24 @@ export function EditorContent() {
     }
 
     setActiveId(null)
+    setOverId(null)
+    setOverIndex(null)
     dispatch({ type: 'SET_DRAGGING', isDragging: false })
   }
 
-  // Find the active block for the drag overlay
-  const activeBlock = activeId ? blocks.find((b) => b.id === activeId) : null
+  // Check if we're dragging multiple blocks
+  const isDraggingMultiple = activeId && selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId)
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+    >
       <div
-        className={`editor-content ${activeId ? 'editor-content--sorting' : ''}`}
+        className={`editor-content ${activeId ? 'editor-content--sorting' : ''} ${isDraggingMultiple ? 'editor-content--dragging-multiple' : ''}`}
         ref={editorRef}
         onClick={handleEmptySpaceClick}
         role="document"
@@ -370,7 +722,14 @@ export function EditorContent() {
             <SortableContext items={blocks.map((b) => b.id)} strategy={verticalListSortingStrategy}>
               {blocks.map((block, index) => (
                 <div key={block.id} aria-label={`Block ${index + 1} of ${blocks.length}, ${block.type}`}>
-                  <DraggableBlock block={block} isFocused={focusedBlockId === block.id} />
+                  <DraggableBlock
+                    block={block}
+                    isFocused={focusedBlockId === block.id}
+                    isSelected={selectedBlockIds.includes(block.id)}
+                    activeId={activeId}
+                    selectedBlockIds={selectedBlockIds}
+                    overId={overId}
+                  />
                 </div>
               ))}
             </SortableContext>
@@ -380,11 +739,23 @@ export function EditorContent() {
         </div>
       </div>
 
-      {/* Drag overlay for smooth dragging animation */}
-      <DragOverlay>
-        {activeBlock ? (
-          <div style={{ opacity: 0.8 }} role="img" aria-label="Dragging block">
-            <Block block={activeBlock} isFocused={false} />
+      {/* Drag overlay that shows the dragged blocks */}
+      <DragOverlay dropAnimation={null}>
+        {activeId ? (
+          <div style={{ opacity: 0.7 }}>
+            {selectedBlockIds.length > 1 && selectedBlockIds.includes(activeId) ? (
+              // Multi-block drag: show all selected blocks
+              <div className="dragging-multiple-blocks">
+                {blocks
+                  .filter((block) => selectedBlockIds.includes(block.id))
+                  .map((block) => (
+                    <Block key={block.id} block={block} isFocused={false} />
+                  ))}
+              </div>
+            ) : (
+              // Single block drag
+              blocks.find((b) => b.id === activeId) && <Block block={blocks.find((b) => b.id === activeId)!} isFocused={false} />
+            )}
           </div>
         ) : null}
       </DragOverlay>

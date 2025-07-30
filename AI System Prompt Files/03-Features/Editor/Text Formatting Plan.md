@@ -34,6 +34,7 @@
 - ✅ Fixed selection preservation after formatting
 - ✅ Prevented toolbar from closing during formatting operations
 - ✅ Fixed toolbar position flickering/jumping issues
+- ✅ Fixed toolbar positioning when clicking away (immediate hide on outside click)
 - ✅ Added link creation/removal with URL prompt
 - ✅ Improved selection restoration logic to handle DOM changes
 

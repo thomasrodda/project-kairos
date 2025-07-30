@@ -1,4 +1,4 @@
-# Bug: Asymmetric Shift+Click Selection Behavior
+# Bug: Asymmetric Shift+Click Selection Behavior [RESOLVED]
 
 ## Issue Description
 
@@ -46,3 +46,37 @@ The bug is NOT in the Block component. The Block component correctly dispatches 
 ## Priority
 
 Medium - This is a UX inconsistency that affects daily usage but has a workaround (Ctrl+click for precise selection)
+
+## Resolution
+
+**Fixed on**: July 23, 2025
+
+### Solution Implemented
+
+Added a `selectionAnchorId` field to the EditorState to track the anchor point for shift+click range selections. This ensures that:
+
+1. The first selected block becomes the anchor point
+2. Subsequent shift+clicks always create a range from the anchor to the target
+3. The behavior is now symmetric and matches standard applications
+
+### Changes Made
+
+1. **EditorContext.tsx**:
+   - Added `selectionAnchorId: string | null` to EditorState interface
+   - Updated `SET_SELECTED_BLOCKS` to set anchor to first selected block
+   - Modified `SELECT_BLOCK_RANGE` to use anchor instead of startBlockId
+   - Updated `TOGGLE_BLOCK_SELECTION` to maintain anchor appropriately
+   - Updated `CLEAR_SELECTION` to clear the anchor
+   - Added anchor to initial state and SET_PAGE action
+
+### Test Coverage
+
+Comprehensive tests were added to verify:
+
+- Anchor-based selection in both directions
+- Anchor persistence across multiple shift+clicks
+- Proper anchor management with Ctrl+click
+- Anchor reset on new single selection
+- Anchor clearing when selection is cleared
+
+All existing tests continue to pass, confirming no regressions were introduced.

@@ -1,0 +1,13 @@
+// apps/web/src/components/Editor/SelectionBox/SelectionBox.scss
+
+.selection-box {
+  position: absolute;
+  background-color: rgb(139 92 246 / 10%); // Light purple with transparency
+  border: 1px solid rgb(139 92 246 / 50%); // Semi-transparent purple border
+  border-radius: var(--radius-4);
+  pointer-events: none;
+  z-index: var(--z-index-dropdown); // Higher z-index to ensure visibility
+
+  // Smooth animation when resizing
+  transition: none; // No transition during drag for better performance
+}

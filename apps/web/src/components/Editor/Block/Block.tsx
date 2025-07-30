@@ -37,13 +37,25 @@ export function Block({ block, isFocused, dragHandleProps, onBlockClick }: Block
       // Toggle individual block selection (Ctrl/Cmd+click)
       dispatch({ type: 'TOGGLE_BLOCK_SELECTION', blockId })
     } else {
+      // If clicking on an already selected block (part of multi-selection), don't change selection
+      // This allows dragging multiple selected blocks
+      if (editorState.selectedBlockIds.length > 1 && editorState.selectedBlockIds.includes(blockId)) {
+        // Do nothing - keep the current multi-selection
+        return
+      }
       // Single selection (clear others and select this one)
       dispatch({ type: 'SET_SELECTED_BLOCKS', blockIds: [blockId] })
     }
   }
 
   // Handle click on block
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
+    // Check if the click is on a link
+    const target = e.target as HTMLElement
+    if (target.tagName === 'A' || target.closest('a')) {
+      // Allow link clicks to propagate normally
+      return
+    }
     onBlockClick?.(block.id)
   }
 

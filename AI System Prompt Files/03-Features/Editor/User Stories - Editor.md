@@ -149,20 +149,26 @@ Acceptance Criteria:
 
 - [x] Each block has a drag handle on the left that appears when the block is hovered over.
 - [x] Clicking, holding and dragging the handle will begin to move the block.
-- [ ] You can click in empty space and drag over blocks to select multiple blocks.
-- [ ] You can then use the drag handle of the top selected block to drag and drop the selection.
+- [x] You can click in empty space and drag over blocks to select multiple blocks.
+- [x] You can then use the drag handle of any selected block to drag and drop the selection.
 - [x] Blocks can be clicked and dragged vertically.
 - [x] Dropping moves the block(s) to the new position.
+- [x] When multiple blocks are selected, dragging any selected block's grab handle moves all selected blocks together.
 
 Notes:
 
-- _No additional notes yet_
+- Drag selection implemented (July 2025) - Click and drag in empty space to create a purple selection box
+- Selection box only appears after dragging 5+ pixels to avoid interfering with normal clicks
+- Cursor remains as default arrow during selection
+- Fixed text selection within blocks (July 24, 2025) - Drag selection now only activates when starting drag outside contentEditable areas
+- Multi-block drag and drop implemented (July 24, 2025) - Selected blocks maintain their relative order when dragged together
+- Fixed drag selection within editor content (July 24, 2025) - Resolved click event race condition that was clearing selections
 
 Priority: Medium
 
 **Complexity**: Medium–High
 
-**Status**: In Progress
+**Status**: Completed
 
 **Dependencies**:
 
@@ -174,6 +180,8 @@ Priority: Medium
 - `apps/web/src/components/Editor/DraggableBlock.tsx` - Drag wrapper
 - `apps/web/src/components/Editor/Block.tsx` - Block component with drag handle
 - `apps/web/src/contexts/EditorContext.tsx` - MOVE_BLOCK action
+- `apps/web/src/hooks/useDragSelection.ts` - Drag selection logic (July 2025)
+- `apps/web/src/components/Editor/SelectionBox/` - Visual selection box (July 2025)
 - Uses @dnd-kit library for drag functionality
 
 ---
@@ -225,7 +233,7 @@ Acceptance Criteria:
 
 - [x] Pressing backspace in an empty block deletes it and focuses the previous block.
 - [x] Clicking on the drag handle highlights the block. Pressing delete removes the highlighted block.
-- [ ] You can click in empty space and drag over blocks to select multiple blocks for deletion.
+- [x] You can click in empty space and drag over blocks to select multiple blocks for deletion.
 - [x] There's no confirmation for deleting empty blocks but you can undo it.
 - [x] Pressing backspace at the start of a block merges it with the previous block.
 - [ ] Deleting the last block in a page recreates the default starter block that a new page starts with.
@@ -261,22 +269,28 @@ Priority: Medium
 
 Acceptance Criteria:
 
-- [ ] Cmd/Ctrl+C copies the selected block(s) or text
-- [ ] Cmd/Ctrl+V pastes the selected block(s) in the next space below the block with the cursor
+- [x] Cmd/Ctrl+C copies the selected block(s) or text
+- [x] Cmd/Ctrl+V pastes the selected block(s) in the next space below the block with the cursor
 - [x] Cmd/Ctrl+V pastes the selected text at the cursor location inside the block
-- [ ] Formatting is preserved when copying/pasting within Kairos
+- [x] Formatting is preserved when copying/pasting within Kairos
 - [x] Pasting from external sources converts content to Kairos blocks
+- [x] Cmd/Ctrl+X cuts the selected block(s)
 
 Notes:
 
-- You can copy and paste text but not blocks.
-- Pasting text from outside does create blocks per line, but markdown formatting does not carry over, as discussed above.
+- Fully implemented as of July 27, 2025
+- Block types are preserved when copying/pasting (including unfocused editor paste)
+- Text formatting (bold, italic, etc.) is preserved
+- Markdown syntax in pasted text is automatically converted to proper block types
+- Fixed browser compatibility issues with custom clipboard formats by using paste event API
+- **For detailed testing checklist and implementation notes, see [User Stories - Copy Paste.md](./User Stories - Copy Paste.md)**
+- **ARCHITECTURAL CHANGE IN PROGRESS**: See [Editor Architecture Transition - HTML as Interchange Format.md](./Editor Architecture Transition - HTML as Interchange Format.md) for fundamental changes to how the editor handles data interchange
 
 Priority: Medium
 
 **Complexity**: Medium
 
-**Status**: In Progress
+**Status**: ✅ Complete (July 27, 2025) - All major copy/paste functionality implemented
 
 **Dependencies**:
 
@@ -286,8 +300,8 @@ Priority: Medium
 **Components**:
 
 - `apps/web/src/components/Editor/EditorContent.tsx` - Copy/paste handlers
-- `apps/web/src/utils/clipboardUtils.ts` - Clipboard formatting logic
-- Custom Kairos clipboard format for preserving formatting
+- `apps/web/src/components/Editor/ContentEditableContainer.tsx` - Paste handling
+- Custom Kairos clipboard format (`application/x-kairos-blocks`)
 
 ---
 

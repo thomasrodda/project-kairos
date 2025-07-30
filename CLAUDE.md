@@ -1,8 +1,22 @@
-Current Date: 23/07/2025
+Current Date: 30/07/2025
 
 # CLAUDE.md
 
 This file provides essential guidance to Claude Code when working with Project Kairos. For detailed information, follow the documentation workflow below.
+
+## 📅 CRITICAL: USE CORRECT DATE IN DOCUMENTATION
+
+- ❌ DO NOT use "January 2025" or other training data dates
+- ✅ ALWAYS use the "Current Date" shown at the top of this file (line 1)
+- ✅ CHECK line 1 of this file before any documentation updates
+- 📝 The date is automatically updated by a script
+
+## 🚨 CRITICAL: ALWAYS READ USER STORIES FIRST 🚨
+
+**BEFORE answering questions about features, progress, or "what are we working on":**
+
+1. ✅ ALWAYS read the relevant `User Stories - [Feature].md` file
+2. ✅ Check the Current State.md and recent git commits
 
 ## 🚨 MANDATORY: NOTIFICATION SYSTEM 🚨
 
@@ -23,9 +37,20 @@ Examples:
 When committing, you MUST FIRST:
 
 1. Review all changes made
-2. Update relevant documentation (Current State.md, Test Inventory.md, guides, user stories)
+2. Update relevant documentation:
+   - **Current State.md** - Update feature status, known issues, and priorities
+   - **User Stories - [Feature].md** - Update acceptance criteria checkboxes and implementation notes
+   - **Test Inventory.md** - Update if new tests were added
+   - Other relevant guides and documentation
 3. Verify documentation accuracy
 4. Only then commit and push
+
+### When Implementing Features:
+
+- Find the relevant User Story in `AI System Prompt Files/03-Features/[Feature]/User Stories - [Feature].md`
+- Update acceptance criteria checkboxes to reflect what's completed
+- Add implementation notes with dates and any known issues
+- Update component references with specific line numbers when helpful
 
 ### Documentation Templates
 
@@ -44,6 +69,29 @@ Project Kairos is a creative writing and worldbuilding web application for novel
 
 ## 🗺️ Documentation Navigation Workflow
 
+### 🛑 STOP: ALWAYS CHECK USER STORIES FIRST 🛑
+
+**BEFORE answering ANY of these questions, you MUST read User Stories:**
+
+- "What are we working on?" → Read Current State.md THEN the relevant User Stories
+- "What's the status of [feature]?" → Read User Stories - [Feature].md
+- "How's [feature] going?" → Read User Stories - [Feature].md
+- "What should I work on?" → Read Current State.md THEN the relevant User Stories
+- ANY question about features, progress, or implementation → Check User Stories FIRST
+
+**Why? User Stories contain:**
+
+- ✅ Detailed acceptance criteria with checkboxes showing what's done
+- ✅ Known issues and bugs in the Notes sections
+- ✅ Exact component locations and line numbers
+- ✅ Implementation status that's more detailed than Current State.md
+
+**Example: "How's the copy/paste work going?"**
+
+- ❌ DON'T: Look at git commits or guess based on branch name
+- ❌ DON'T: Only read Current State.md
+- ✅ DO: Read `Editor/User Stories - Editor.md` and find the "Copy/Paste support" section
+
 ### How to Navigate Documentation:
 
 ```
@@ -61,11 +109,12 @@ Project Kairos is a creative writing and worldbuilding web application for novel
 
 ### Quick Decision Guide:
 
-- **"What should I work on?"** → Check Current State.md
+- **"What are we working on?"** → Check Current State.md AND User Stories - [Feature].md
+- **"What should I work on?"** → Check Current State.md THEN relevant User Stories
 - **"How does X feature work?"** → Check feature folder → User Stories
 - **"Where is X located?"** → Check FILE_TREE.md
 - **"How do I run X?"** → Check Quick Commands.md
-- **"X is broken!"** → Check Troubleshooting Guide.md
+- **"X is broken!"** → Check User Stories first (Notes section), then Troubleshooting Guide.md
 
 ## 🚀 Essential Commands
 

@@ -2,7 +2,7 @@
 
 This document provides a snapshot of features by area, their completion status, and links to detailed requirements.
 
-**Last Updated**: January 22, 2025
+**Last Updated**: July 27, 2025
 
 ## 📊 Feature Status by Area
 
@@ -13,7 +13,7 @@ This document provides a snapshot of features by area, their completion status, 
 **Completed:**
 
 - ✅ Block-based editing with contentEditable
-- ✅ Drag-and-drop block reordering (single blocks only)
+- ✅ Drag-and-drop block reordering (single and multi-block drag implemented July 24, 2025, UI improvements added: purple drop indicator line, reduced opacity for dragged blocks; fixed invalid drop target issues July 25, 2025)
 - ✅ Slash commands for block types
 - ✅ Keyboard navigation (basic)
 - ✅ Rich text formatting (bold, italic, underline, links)
@@ -22,26 +22,24 @@ This document provides a snapshot of features by area, their completion status, 
 
 **Partially Working:**
 
-- ⚠️ Multi-block selection (Shift+click, Ctrl+click work but have bugs)
-- ⚠️ Copy/paste (text works, blocks don't, formatting sometimes lost)
+- ✅ Multi-block selection (Shift+click, Ctrl+click work correctly, multi-block drag implemented July 24, 2025)
+- ✅ Click and drag selection across blocks (visual selection box implemented July 2025, fixed text selection within blocks July 24, 2025, fixed drag selection within editor content July 24, 2025)
+- ✅ Copy/paste (fully functional as of July 27, 2025 - block types and formatting preserved, fixed unfocused editor paste)
 - ⚠️ Cross-block text selection (buggy)
-
-**Not Working:**
-
-- ❌ Click and drag selection across blocks
-- ❌ Multi-block drag and drop
-- ❌ Copy/paste of multiple blocks
 
 **Known Issues:**
 
-- 🐛 Multi-block selection is unreliable
-- 🐛 Formatting toolbar appears in wrong position when clicking away
 - 🐛 Link functionality incomplete (no unlink, can't click links)
 - 🐛 Placeholder text can be interacted with
 - 🐛 Typing bugs related to placeholder text
 - 🐛 Can't delete the last block
 - 🐛 Enter at start of block doesn't work correctly
 - 🐛 Markdown paste doesn't format unless you re-trigger it
+- 🐛 Drop gap size only matches single block height, not all selected blocks
+- ✅ FIXED (July 27, 2025): Copy/paste now preserves block types when pasting with unfocused editor - using paste event API for better browser compatibility
+- ✅ FIXED (July 27, 2025): Multi-block paste now preserves all block types including the first block
+- ✅ FIXED (July 27, 2025): Cut operation now preserves formatting for all blocks
+- ✅ FIXED: Links now work properly - clickable with Ctrl/Cmd+click
 
 **Not Started:**
 
@@ -192,18 +190,20 @@ This document provides a snapshot of features by area, their completion status, 
 **Documentation Cleanup & Critical Bug Fixes**
 
 - ✅ Clean up Current State.md
-- 🔄 Fix multi-block selection bugs
-- 🔄 Fix click-and-drag selection
-- 🔄 Fix formatting toolbar positioning
+- ✅ Fix multi-block selection bugs
+- ✅ Fix click-and-drag selection
+- ✅ Fix formatting toolbar positioning
 - 🔄 Fix folder page content saving
 
 ## 🐛 Active Issues
 
 ### High Priority
 
-1. **Formatting toolbar positioning** - Appears briefly in top-left when clicking away
-2. **Cross-block formatting** - Formatting doesn't work across block boundaries
-3. **Link dialog styling** - Needs proper design tokens
+1. **Copy/paste focus issues** - Pasting without cursor focus loses block types and formatting
+2. **Multi-block copy/paste** - First block loses type when pasted inside another block
+3. **Cross-block formatting** - Formatting doesn't work across block boundaries
+4. **Link dialog styling** - Needs proper design tokens
+5. **Folder page content saving** - Content in folder pages doesn't save properly
 
 ### Medium Priority
 
@@ -263,11 +263,12 @@ Based on user story analysis with bugs/issues considered:
 
 ### Immediate Priorities
 
-1. Fix multi-block selection and drag selection
-2. Complete copy/paste for blocks (not just text)
-3. Fix formatting toolbar positioning
-4. Add undo/redo system
-5. Fix folder page content saving
+1. Add undo/redo system
+2. Fix folder page content saving
+3. Fix link functionality (unlink, clickable links)
+4. Fix placeholder text interaction bugs
+5. Fix enter at start of block behavior
+6. Fix cross-block text selection bugs
 
 ### Next Phase
 

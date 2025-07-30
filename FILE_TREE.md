@@ -41,7 +41,7 @@ AI System Prompt Files
 │   └── User Stories Guide.md
 ├── 02-Architecture
 │   ├── Architecture.md
-│   ├── Backend API Guide.md
+│   ├── Backend Api Guide.md
 │   ├── Backend Implementation Plan.md
 │   ├── Data Model Guide.md
 │   ├── Database Connection Notes.md
@@ -57,9 +57,12 @@ AI System Prompt Files
 │   │   ├── Markdown Export Import Guide.md
 │   │   └── User Stories - Data Management.md
 │   ├── Editor
+│   │   ├── Editor Architecture Transition - HTML as Interchange Format.md
 │   │   ├── Enhanced Custom Editor Plan.md
+│   │   ├── Multi-block Drag Implementation Guide.md
 │   │   ├── Slash Command Feature Development.md
 │   │   ├── Text Formatting Plan.md
+│   │   ├── User Stories - Copy Paste.md
 │   │   └── User Stories - Editor.md
 │   ├── PageManagement
 │   │   └── User Stories - Page Management.md
@@ -258,11 +261,16 @@ apps
 │   │   │   │   ├── PageTitle.test.tsx
 │   │   │   │   ├── PageTitle.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── SelectionBox
+│   │   │   │   ├── SelectionBox.scss
+│   │   │   │   ├── SelectionBox.tsx
+│   │   │   │   └── index.ts
 │   │   │   ├── SlashCommandMenu
 │   │   │   │   ├── SlashCommandMenu.scss
 │   │   │   │   ├── SlashCommandMenu.test.tsx
 │   │   │   │   ├── SlashCommandMenu.tsx
 │   │   │   │   └── index.ts
+│   │   │   ├── utils
 │   │   │   ├── DebugFormatting.tsx
 │   │   │   ├── Editor.integration.test.tsx
 │   │   │   ├── Editor.performance.simple.test.tsx
@@ -324,6 +332,7 @@ apps
 │   │   ├── useCrossBlockSelection.ts
 │   │   ├── useDismiss.test.ts
 │   │   ├── useDismiss.ts
+│   │   ├── useDragSelection.ts
 │   │   └── useToast.tsx
 │   ├── integration
 │   │   ├── Editor.integration.test.tsx

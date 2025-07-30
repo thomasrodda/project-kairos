@@ -5,6 +5,7 @@
   max-width: var(--editor-max-width); // Uses 45rem from layout tokens
   margin: 0 auto;
   padding: var(--spacing-32) 0;
+  position: relative; // For absolute positioning of selection box
 
   // Take full height to register clicks in empty space
   min-height: 100%;
@@ -46,6 +47,12 @@
 
     // Position relative for toolbar positioning
     position: relative;
+
+    // Ensure the contentEditable container doesn't interfere with drag selection
+    .content-editable-container {
+      // Allow pointer events to pass through when not editing
+      pointer-events: auto;
+    }
   }
 }
 
@@ -66,4 +73,22 @@
   .block__content {
     user-select: text;
   }
+}
+
+// Multi-block dragging state
+.editor-content--dragging-multiple {
+  // Compress gaps between selected blocks during drag
+  .draggable-block--multi-drag {
+    // Remove margin between consecutive selected blocks
+    & + .draggable-block--multi-drag {
+      margin-top: calc(var(--spacing-4) * -1);
+    }
+  }
+}
+
+// Multi-block drag overlay styles
+.dragging-multiple-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-4);
 }
