@@ -61,6 +61,7 @@ AI System Prompt Files
 │   │   ├── Enhanced Custom Editor Plan.md
 │   │   ├── Multi-block Drag Implementation Guide.md
 │   │   ├── Slash Command Feature Development.md
+│   │   ├── Test Inventory - Editor HTML Transition.md
 │   │   ├── Text Formatting Plan.md
 │   │   ├── User Stories - Copy Paste.md
 │   │   └── User Stories - Editor.md
@@ -369,6 +370,11 @@ apps
 │   │   │   └── dnd-kit.tsx
 │   │   ├── setup.ts
 │   │   └── utils.tsx
+│   ├── tests
+│   │   └── golden-files
+│   │   ├── README.md
+│   │   ├── editor-golden.test.tsx
+│   │   └── golden-test-utils.ts
 │   ├── utils
 │   │   ├── blockMarkdownDetection.test.ts
 │   │   ├── blockMarkdownDetection.ts
@@ -417,6 +423,16 @@ packages
 │   │   └── root-declarations.scss
 │   ├── README.md
 │   └── package.json
+├── editor-interchange
+│   ├── src
+│   │   ├── format-detector.ts
+│   │   ├── html-converter.test.ts
+│   │   ├── html-converter.ts
+│   │   ├── index.ts
+│   │   ├── markdown-converter.ts
+│   │   └── types.ts
+│   ├── package.json
+│   └── tsconfig.json
 ├── types
 │   ├── src
 │   │   └── index.ts
