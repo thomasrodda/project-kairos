@@ -183,23 +183,179 @@ interface EditorInterchange {
 
 ## Migration Strategy
 
-### Phase 1: Clipboard (Immediate)
+### Branch Strategy
 
-- Replace custom clipboard format
-- Implement HTML generators/parsers
-- Maintain backward compatibility
+**Working in `editor-transition` branch means:**
 
-### Phase 2: Import/Export (Next Quarter)
+- ✅ Zero risk to main development
+- ✅ Can experiment freely
+- ✅ Easy rollback if approach doesn't work
+- ✅ Can skip extensive prototyping phase
+
+### Phase 0: Foundation & Testing (Start Here)
+
+**Goal**: Build test suite and HTML converters
+
+#### 1. **Create Comprehensive Test Suite**
+
+**Test Discovery Process**:
+
+a) **Extract from User Stories**
+
+- Systematically review every User Story document
+- Convert each acceptance criteria into a test case
+- Include all "Notes" sections as edge case tests
+- Example: "User Stories - Editor.md" → 50+ specific test cases
+
+b) **Catalog Current Behavior**
+
+- Create "golden file" tests that capture exact current output
+- Record DOM structure for each operation
+- Capture event sequences and state changes
+- Document browser-specific behaviors
+
+c) **Test Inventory Structure**:
+
+```markdown
+## Editor Test Inventory
+
+### Block Operations (from User Stories - Editor.md)
+
+- [ ] Enter at end of block → new block below
+- [ ] Enter in middle → splits block correctly
+- [ ] Enter at start → empty block above
+- [ ] Delete last block → handled gracefully
+- [ ] Backspace at block start → merges blocks
+
+### Text Formatting (from User Stories - Editor.md)
+
+- [ ] Bold selection (Ctrl+B)
+- [ ] Italic selection (Ctrl+I)
+- [ ] Format across block boundaries
+- [ ] Preserve formatting on block split
+
+### Known Issues to Test (from Notes sections)
+
+- [ ] "Typing backwards" bug
+- [ ] Invisible text until new block
+- [ ] Placeholder interaction issues
+- [ ] Slash command after content
+```
+
+d) **Review Process**
+
+- Present complete test inventory for review
+- Verify understanding of each feature
+- Add any missing scenarios
+- Prioritize critical vs nice-to-have tests
+
+#### 2. **Build HTML Converters in Isolation**
+
+**Safe Development Approach**:
+
+a) **Separate Module**
+
+- Create `packages/editor-interchange/` package
+- Zero dependencies on existing editor code
+- Can be developed and tested independently
+
+b) **Comprehensive Testing**
+
+```typescript
+// Test every conversion scenario
+describe('HTML Converters', () => {
+  test('paragraph block → <p> tag', () => {})
+  test('heading block → <h1-h6> tags', () => {})
+  test('formatted text → <strong>, <em>', () => {})
+  test('nested lists → <ul>/<ol> structure', () => {})
+  // ... test for EVERY block type and format
+})
+```
+
+c) **Round-trip Validation**
+
+- JSON → HTML → JSON must be identical
+- Test with complex nested structures
+- Verify metadata preservation
+- Handle edge cases gracefully
+
+#### 3. **Direct Implementation in Branch**
+
+**Since we're using a separate branch, we can skip prototypes and directly:**
+
+a) **Test as We Go**
+
+- Make changes directly in the branch
+- Test each feature immediately
+- Revert specific commits if something doesn't work
+
+b) **Incremental Progress**
+
+- Start with HTML converters
+- Test with existing features
+- Only proceed if things work well
+
+c) **Success Criteria**
+
+- All existing features still work
+- Code becomes simpler
+- Edge cases are reduced
+- Performance remains good
+
+### Phase 1: Clipboard Enhancement (Low Risk)
+
+**Goal**: Fix clipboard while maintaining all current functionality
+
+1. **Dual-Mode Clipboard**
+
+   - ADD HTML format to clipboard (don't remove JSON yet)
+   - Test extensively with external apps
+   - Keep JSON format as fallback
+
+2. **Progressive Rollout**
+
+   - Enable HTML clipboard behind feature flag
+   - Test with small group first
+   - Monitor for issues before full rollout
+
+3. **Edge Case Handling**
+   - Handle paste from Word, Google Docs, websites
+   - Preserve as much formatting as possible
+   - Graceful degradation for unknown content
+
+### Phase 2: Internal Simplifications (Medium Risk)
+
+**Goal**: Reduce complexity by leveraging HTML internally
+
+1. **Simplify Selection Management**
+
+   - Use browser's native selection for text
+   - Keep custom selection only for blocks
+   - Remove complex offset calculations
+
+2. **Reduce Event Interception**
+
+   - Let browser handle more native editing
+   - Only intercept where necessary
+   - Simplify cursor management
+
+3. **Fix Current Edge Cases**
+   - Enter at start of block
+   - Delete last block
+   - Placeholder interactions
+
+### Phase 3: Import/Export (Low Risk, High Value)
 
 - Document import uses HTML parser
 - Export includes HTML option
-- Templates use HTML format
+- Templates stored as HTML
+- API responses include HTML representation
 
-### Phase 3: Storage (Future Consideration)
+### Phase 4: Consider Full Migration (Future)
 
-- Evaluate HTML storage benefits
-- Migration tools for existing content
-- Performance analysis
+- Evaluate storing HTML in database
+- Consider HTML as internal format
+- Align with libraries like ProseMirror/Slate
 
 ## The Bigger Picture
 
@@ -211,6 +367,58 @@ This transition positions Kairos as a truly web-native editor:
 
 When a user copies from Kairos and pastes into their blog, email, or notes app, it should "just work" - because we're all speaking the same language: HTML.
 
+## Functionality Preservation Guarantee
+
+### What We Keep (100% Preserved)
+
+✅ **Block Operations**
+
+- Drag-and-drop reordering
+- Block selection with handles
+- Block type transformations
+- Slash commands
+
+✅ **Text Editing**
+
+- All formatting (bold, italic, underline, etc.)
+- Cross-block text selection
+- Keyboard shortcuts
+- Undo/redo
+
+✅ **UI/UX Features**
+
+- Hover states
+- Visual feedback
+- Smooth animations
+- Responsive design
+
+✅ **Data Integrity**
+
+- All block metadata
+- Creation timestamps
+- Version tracking
+- User preferences
+
+### What Gets Better
+
+🚀 **Copy/Paste**
+
+- Works when editor not focused
+- Preserves formatting from external sources
+- No more custom clipboard handlers
+
+🚀 **Performance**
+
+- Less JavaScript execution per keystroke
+- Native browser optimizations
+- Reduced state updates
+
+🚀 **Maintainability**
+
+- Fewer edge cases
+- Simpler codebase
+- Standard patterns
+
 ## Decision Log
 
 **July 27, 2025**:
@@ -219,6 +427,13 @@ When a user copies from Kairos and pastes into their blog, email, or notes app, 
 - Decided to adopt HTML as interchange format (not internal format)
 - Acknowledged this is a fundamental shift in data philosophy
 - Committed to phased approach to manage risk
+
+**July 30, 2025**:
+
+- Added Phase 0 for risk reduction and testing
+- Emphasized functionality preservation
+- Created explicit guarantees about feature retention
+- Prioritized building confidence before major changes
 
 ## For Future Implementers
 
